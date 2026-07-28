@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.6 - Candidate MVP dengan field invoice wajib |
+| Versi | 0.7 - Candidate MVP dengan aturan kelayakan partai |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
@@ -41,7 +41,7 @@ serta diproses admin.
 | MVP-002 | Approval dan status pelanggan | BR-003 - BR-004; FR-AUTH-006 - FR-AUTH-009 | Admin dapat menyetujui, menolak, menangguhkan, dan mengaktifkan pelanggan dengan status yang benar. |
 | MVP-003 | Hak akses guest, pending, aktif, dan admin | FR-AUTH-002; FR-CAT-007; FR-PRC-007; FR-ORD-003 | Guest/pending dapat melihat katalog tanpa harga; hanya pelanggan aktif dapat checkout dan melihat riwayat sendiri. |
 | MVP-004 | Katalog dan pelengkap produk | BR-005; FR-CAT-001 - FR-CAT-007 | Seluruh data yang tersedia di POS disinkronkan sebagai sumber utama; website dapat melengkapi gambar, deskripsi, atau field lain yang belum tersedia di POS. |
-| MVP-005 | Harga eceran, partai, dan grosir | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-007 | Setiap produk memiliki tiga jenis harga dari POS; harga eceran disiapkan tetapi tidak ditampilkan pada storefront, harga grosir mengikuti minimum per produk, dan aturan harga partai mengikuti OPN-013. |
+| MVP-005 | Harga eceran, partai, dan grosir | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-007 | Setiap produk memiliki tiga jenis harga dari POS; harga eceran disiapkan tetapi tidak ditampilkan pada storefront. Harga partai eligible jika sedikitnya satu produk/SKU dalam struk berjumlah minimal lima unit dan kuantitas antar-SKU tidak dijumlahkan. Harga grosir mengikuti minimum per produk; cakupan penerapan harga partai dan prioritas terhadap grosir mengikuti OPN-013. |
 | MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh digunakan sampai alur website berjalan, lalu akses POS dikoordinasikan dengan Kak Rio. |
 | MVP-007 | Stok efektif dan rekonsiliasi | BR-011 - BR-014; FR-POS-007 - FR-POS-012, FR-POS-017 - FR-POS-020 | Stok berkurang setelah sales order POS berhasil, bertambah setelah retur, dan dapat direkonsiliasi tanpa perubahan ganda. |
 | MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat subtotal, PPh 22, ongkir, serta total yang dihitung server-side; PPh 22 tampil sebagai komponen terpisah. |

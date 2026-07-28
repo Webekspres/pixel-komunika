@@ -7,7 +7,7 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.8 - Invoice Required Fields |
+| Versi | 0.9 - Partai Eligibility Rule |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
@@ -50,6 +50,7 @@ Status requirement:
 | CR-007 | Selasa, 28 Juli 2026 | Keputusan working baseline System Analyst Webekspres | Konfigurasi klasifikasi, ambang, dan tarif PPh 22 dikelola melalui website. Nilai PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice, dan laporan. | Q-008 dan Q-009 diselesaikan; BR-007, BR-008, BR-015, BR-026, RULE-006, serta requirement turunannya diperjelas. Dasar pengenaan tetap terbuka pada OPN-006. | Resolved for working baseline |
 | CR-008 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai akses POS | Kak Rio ditetapkan sebagai PIC POS. Akses POS dibuka setelah alur website berbasis data contoh sudah berjalan. | Q-014 diselesaikan; OPN-005 dan OPN-019 diperjelas. Kontak dan trigger akses telah tersedia, sedangkan kontrak teknis API serta contract test tetap terbuka. | Resolved access owner and trigger |
 | CR-009 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai isi invoice | Invoice wajib menampilkan nama, alamat, nomor kontak, dan NPWP toko; jumlah barang, nama barang, SKU, harga satuan, dan total harga item; total pembelian keseluruhan; serta nilai rupiah PPh 22 jika berlaku. | Isi minimum invoice ditetapkan pada BR-016 dan requirement turunannya. OPN-022 tetap parsial untuk sumber data identitas toko, PDF, channel, dan kepemilikan dokumen invoice. | Required fields resolved; delivery format partial |
+| CR-010 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai syarat harga partai | Dalam satu pembelian, sedikitnya satu produk/SKU harus berjumlah minimal lima unit agar transaksi memenuhi syarat harga partai. Kuantitas produk/SKU berbeda tidak dijumlahkan. | Kriteria kelayakan harga partai pada BR-006, RULE-018, OPN-013, dan Q-015 diperjelas. Cakupan item yang mendapat harga partai serta prioritas terhadap harga grosir tetap terbuka. | Eligibility resolved; application partial |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -230,7 +231,7 @@ flowchart LR
 | BR-003 | Admin harus menyetujui pelanggan sebelum akses pembelian diberikan. | Baseline |
 | BR-004 | Admin harus dapat mengaktifkan dan menonaktifkan akun pelanggan. | Baseline |
 | BR-005 | Sistem harus menyinkronkan seluruh field produk yang tersedia di POS. Website hanya melengkapi field yang tidak disediakan POS dan tidak boleh mengganti nilai POS yang tersedia ([lihat OPN-003](#opn-003)). | Baseline |
-| BR-006 | Setiap produk harus memiliki harga eceran, partai, dan grosir dari POS. Harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini; aturan penerapan harga partai dan grosir mengikuti [OPN-013](#opn-013). | Baseline; aturan partai partially open |
+| BR-006 | Setiap produk harus memiliki harga eceran, partai, dan grosir dari POS. Harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. Transaksi memenuhi syarat harga partai jika sedikitnya satu produk/SKU berjumlah minimal lima unit; kuantitas antar-SKU tidak dijumlahkan. Cakupan penerapan harga partai dan prioritas terhadap harga grosir mengikuti [OPN-013](#opn-013). | Baseline; kelayakan partai resolved, penerapan partially open |
 | BR-007 | Admin harus dapat memilih klasifikasi produk dan mengatur ambang nilai belanja untuk masing-masing klasifikasi terpilih melalui website ([lihat OPN-018](#opn-018)). | Baseline |
 | BR-008 | Admin harus dapat mengatur tarif PPh 22 melalui website, termasuk `0%`; sistem menambahkan PPh 22 ketika nilai belanja pada klasifikasi terpilih melampaui ambangnya. Dasar pengenaan dan rincian formula mengikuti [OPN-006](#opn-006). | Baseline; formula partially open |
 | BR-009 | Website harus menarik kategori, produk, detail produk, daftar harga, dan seluruh stok dari POS sekali sehari; stok per produk dapat dipanggil berkala untuk rekonsiliasi. Data contoh hanya digunakan sebelum koneksi tersedia ([OPN-005](#opn-005), [OPN-019](#opn-019)). | Baseline; kontrak API partially open |
@@ -277,7 +278,7 @@ flowchart LR
 | RULE-015 | Perubahan data produk atau identitas toko setelah order tidak mengubah invoice lama; invoice menggunakan snapshot identitas toko, item, harga, total, dan PPh 22 transaksi. |
 | RULE-016 | Data contoh harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment non-production. |
 | RULE-017 | Data contoh bukan bukti bahwa koneksi POS production telah lulus; go-live mensyaratkan koneksi POS production berhasil diuji. |
-| RULE-018 | Harga grosir memiliki minimum kuantitas yang dapat berbeda per produk. Aturan kelayakan dan penerapan harga partai dalam satu struk mengikuti [OPN-013](#opn-013). |
+| RULE-018 | Transaksi memenuhi syarat harga partai jika sedikitnya satu baris produk/SKU memiliki kuantitas minimal lima unit; kuantitas dari SKU berbeda tidak dapat digabung untuk memenuhi syarat. Harga grosir memiliki minimum kuantitas yang dapat berbeda per produk. Cakupan penerapan harga partai dan prioritas terhadap harga grosir mengikuti [OPN-013](#opn-013). |
 | RULE-019 | Ambang PPh 22 berbasis nilai belanja pada klasifikasi terpilih, bukan batas kuantitas maksimum dan bukan alasan untuk menolak checkout. Persentase `0%` menonaktifkan pungutan untuk aturan tersebut. |
 | RULE-020 | Pesanan tanpa pembayaran yang masih aktif pada hari pembuatannya otomatis menjadi `CANCELLED` pada hari kalender berikutnya. |
 | RULE-021 | Keberhasilan `CreateSalesOrder` menjadi event pengurangan stok POS dan penerbitan invoice; website harus menyimpan POS sales order ID, invoice ID/number, serta status sinkronisasinya. |
@@ -513,15 +514,15 @@ Setiap produk wajib memiliki tiga jenis harga dari POS:
 
 1. **Eceran** untuk penjualan langsung ke konsumen; disiapkan dan disinkronkan,
    tetapi tidak ditampilkan pada storefront fase saat ini.
-2. **Partai** dengan indikasi minimum lima unit dalam satu struk.
+2. **Partai** jika sedikitnya satu produk/SKU dalam satu struk berjumlah minimal
+   lima unit. Kuantitas SKU berbeda tidak dijumlahkan; item lain boleh dibeli
+   masing-masing satu unit.
 3. **Grosir** dengan minimum kuantitas dan harga yang dapat berbeda per produk;
    contoh klien adalah minimum 200 unit dengan harga Rp10.800.
 
-Yang masih terbuka untuk harga partai adalah apakah lima unit harus berasal dari
-satu produk atau boleh gabungan, serta apakah harga partai kemudian berlaku
-untuk semua item dalam struk termasuk item berkuantitas satu atau hanya item
-yang memenuhi syarat. Perlu dikonfirmasi pula prioritas harga jika suatu item
-memenuhi syarat partai dan grosir.
+Yang masih terbuka adalah apakah harga partai berlaku untuk seluruh item dalam
+struk atau hanya item yang memenuhi syarat, serta prioritas harga jika suatu
+item memenuhi syarat partai dan grosir.
 
 **Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
@@ -621,7 +622,7 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-004 | Apakah batas maksimal penjualan dihapus sepenuhnya untuk semua produk atau hanya produk/pelanggan tertentu? | BR-007, FR-PRC-003 | Resolved - bukan batas maksimum; dikoreksi menjadi ambang nilai per klasifikasi |
 | Q-005 | Jika batas dihapus, apakah kuantitas pembelian hanya dibatasi oleh stok tersedia dan tingkat harga? | BR-006, BR-007, aturan stok | Resolved - tidak ada hard limit dari aturan ini; ambang memicu PPh 22 |
 | Q-006 | Apakah surcharge ketika batas terlampaui ikut dihapus jika batas maksimal penjualan dihapus? | BR-008, FR-PRC-004 | Resolved - komponen tersebut adalah PPh 22 |
-| Q-007 | Apakah tiga tingkat harga berdasarkan kuantitas tetap berlaku tanpa perubahan? | BR-006, OPN-013 | Partially resolved - tiga jenis harga wajib; penerapan harga partai masih perlu dikonfirmasi |
+| Q-007 | Apakah tiga tingkat harga berdasarkan kuantitas tetap berlaku tanpa perubahan? | BR-006, OPN-013 | Partially resolved - tiga jenis harga dan syarat minimal satu SKU sebanyak lima unit telah dikonfirmasi; cakupan penerapan harga partai serta prioritas terhadap grosir masih terbuka |
 | Q-008 | Apakah PPh 22 harus tampil sebagai baris terpisah pada cart, checkout, invoice, dan laporan? | BR-015, RULE-006, laporan | Resolved - ditampilkan sebagai komponen terpisah; pada invoice hanya jika transaksi terkena PPh 22 |
 | Q-009 | Apakah konfigurasi klasifikasi, ambang, dan tarif PPh 22 berasal dari POS atau dikelola di website? | BR-008, BR-009, OPN-006 | Resolved - dikelola melalui website |
 | Q-010 | Apa saja “poin-poin yang berkenaan” yang juga ingin dihapus atau diubah oleh klien? | Seluruh traceability terkait | Resolved - tidak ada penghapusan scope berdasarkan CR-004 |
@@ -629,7 +630,7 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-012 | Siapa yang memberikan persetujuan final dan kapan keputusan tersebut efektif menjadi baseline? | OPN-017 | Resolved - klien memberi persetujuan final; efektif setelah persetujuan tertulis kedua pihak pada hari kerja |
 | Q-013 | Apakah data contoh boleh digunakan pada production jika koneksi POS belum tersedia saat go-live? | BR-009, OPN-019 | Resolved - tidak; data production wajib berasal dari POS |
 | Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi kontrak data? | OPN-005, OPN-019 | Resolved - PIC POS adalah Kak Rio; akses dibuka setelah alur website berbasis data contoh berjalan |
-| Q-015 | Untuk harga partai, apakah syarat lima unit harus pada satu produk atau boleh gabungan; dan apakah harga partai berlaku untuk seluruh item dalam struk atau hanya item yang memenuhi syarat? | BR-006, OPN-013 | Open |
+| Q-015 | Untuk harga partai, apakah harga partai berlaku untuk seluruh item dalam struk atau hanya item yang memenuhi syarat; dan bagaimana prioritasnya jika item juga memenuhi syarat grosir? | BR-006, OPN-013 | Partially resolved - lima unit harus berasal dari satu produk/SKU; cakupan penerapan dan prioritas harga masih terbuka |
 | Q-016 | PPh 22 dihitung dari seluruh subtotal klasifikasi, hanya nilai di atas ambang, atau total struk; dan bagaimana jika lebih dari satu klasifikasi terpicu? | BR-008, BR-015, OPN-006 | Open |
 | Q-017 | Status/event apa yang dianggap sebagai penjualan untuk mengurangi stok; apakah perlu reservasi sebelumnya; dan apakah stok retur hanya masuk melalui sinkronisasi POS? | BR-011 - BR-014, OPN-004 | Resolved - `CreateSalesOrder` mengurangi stok; `CancelSalesOrder` menerbitkan retur dan mengembalikan stok |
 | Q-018 | Apakah nama operasi pada diagram sudah final; bagaimana URL/method, autentikasi, payload/response, pagination, rate limit, dan kode error setiap operasi? | OPN-005, SRS 7.1 | Open - vendor POS |
@@ -671,7 +672,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | ID | Bukti yang Dibutuhkan | Owner | Gate | Status Awal |
 |---|---|---|---|---|
 | PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - scope, sumber konfigurasi website, dan tampilan terpisah selesai; formula tetap OPN-006 |
-| PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai; OPN-013 dan OPN-020 masih parsial |
+| PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai dan kelayakan partai pada OPN-013 terjawab; cakupan penerapan/prioritas harga serta OPN-020 masih parsial |
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat/dimensi, area, tarif, SLA. | Klien | G1 pengiriman | Blocker - OPN-010, OPN-021 |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - field wajib invoice selesai; sumber identitas, format/channel invoice, dan notifikasi tetap OPN-022/OPN-023 |

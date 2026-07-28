@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.8 - Invoice Required Fields |
+| Versi | 0.9 - Partai Eligibility Rule |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -58,8 +58,10 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 
 - setiap produk memiliki harga eceran, partai, dan grosir dari POS;
 - harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini;
-- harga grosir memiliki minimum kuantitas per produk, sedangkan penerapan harga
-  partai lintas item masih menunggu OPN-013;
+- harga partai eligible jika sedikitnya satu produk/SKU dalam struk berjumlah
+  minimal lima unit dan kuantitas antar-SKU tidak dijumlahkan; cakupan item yang
+  mendapat harga partai dan prioritas terhadap harga grosir masih menunggu
+  OPN-013;
 - istilah batas maksimal dikoreksi menjadi ambang nilai belanja per klasifikasi;
   melewati ambang tidak menolak checkout;
 - PPh 22 menggunakan tarif configurable, termasuk `0%`, dan dipicu ketika
@@ -417,7 +419,7 @@ Contoh error:
 | product_media | Metadata gambar/video dan object key. |
 | categories | Klasifikasi produk. |
 | brands | Merek produk. |
-| product_prices | Tiga jenis harga dari POS, minimum kuantitas, dan metadata penerapannya. |
+| product_prices | Tiga jenis harga dari POS, minimum kuantitas grosir per produk, dan metadata penerapannya; kelayakan partai dihitung pada struk dari kuantitas per SKU. |
 | category_tax_rules | Klasifikasi terpilih, ambang nilai belanja, tarif PPh 22, status aktif, serta metadata pembuat/perubah konfigurasi website. |
 | inventory_snapshots | Nilai stok terbaru per produk. |
 | inventory_ledger | Riwayat perubahan stok. |
@@ -756,7 +758,7 @@ sebagai sumber stok production.
 
 | Level | Cakupan Minimum |
 |---|---|
-| Unit | Pemilihan harga partai/grosir, visibilitas harga eceran, konfigurasi website untuk ambang/tarif PPh 22, perhitungan dan tampilan komponen PPh 22, status stok, serta auto-cancel D+1. |
+| Unit | Kelayakan harga partai untuk satu SKU minimal lima unit, penolakan agregasi kuantitas antar-SKU, pemilihan harga partai/grosir, visibilitas harga eceran, konfigurasi website untuk ambang/tarif PPh 22, perhitungan dan tampilan komponen PPh 22, status stok, serta auto-cancel D+1. |
 | Feature | Registrasi, approval, cart, checkout, invoice beserta field wajib, pembayaran, pembatalan, dan laporan. |
 | Integration | Seluruh operasi POS kerja, external reference/idempotency, timeout ambigu, rekonsiliasi invoice/retur, transisi seeder-ke-API, dan Biteship quote. |
 | Security | Authorization, IDOR, CSRF, rate limit, dan upload. |

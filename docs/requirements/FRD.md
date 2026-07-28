@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.7 - Invoice Required Fields |
+| Versi | 0.8 - Partai Eligibility Rule |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -172,15 +172,17 @@ Klarifikasi klien Selasa, 28 Juli 2026 menetapkan tiga jenis harga dari POS dan
 mengoreksi istilah batas maksimal menjadi ambang nilai belanja per klasifikasi.
 Ambang tidak menolak checkout; ketika terlampaui, sistem menambahkan PPh 22
 sesuai konfigurasi yang dikelola melalui website. PPh 22 ditampilkan sebagai
-komponen terpisah pada cart, checkout, invoice, dan laporan. Detail penerapan
-harga partai dan dasar pengenaan PPh 22 tetap mengikuti
+komponen terpisah pada cart, checkout, invoice, dan laporan. Harga partai
+memerlukan sedikitnya satu produk/SKU berjumlah minimal lima unit dalam satu
+struk; kuantitas antar-SKU tidak dijumlahkan. Cakupan penerapan harga partai,
+prioritasnya terhadap harga grosir, dan dasar pengenaan PPh 22 tetap mengikuti
 [OPN-013](BRD.md#opn-013) dan
 [OPN-006](BRD.md#opn-006).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-PRC-001 | Worker | Sistem menyinkronkan harga `ECERAN`, `PARTAI`, dan `GROSIR` untuk setiap produk dari POS. | Produk hanya siap dijual setelah ketiga jenis harga lolos validasi kontrak; harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. | Baseline |
-| FR-PRC-002 | Sistem | Sistem memilih harga yang berlaku berdasarkan aturan jenis harga. | Minimum grosir dapat berbeda per produk; skenario harga partai dan prioritas partai/grosir diuji setelah [OPN-013](BRD.md#opn-013) diselesaikan. | Baseline; aturan partai partially open |
+| FR-PRC-002 | Sistem | Sistem memilih harga yang berlaku berdasarkan aturan jenis harga. | Harga partai hanya eligible jika sedikitnya satu produk/SKU dalam struk berjumlah minimal lima unit dan kuantitas antar-SKU tidak dijumlahkan. Minimum grosir dapat berbeda per produk; cakupan penerapan harga partai dan prioritas partai/grosir diuji setelah [OPN-013](BRD.md#opn-013) diselesaikan. | Baseline; kelayakan partai resolved, penerapan partially open |
 | FR-PRC-003 | Admin | Admin dapat memilih klasifikasi produk serta mengatur ambang nilai belanja per klasifikasi melalui website. | Perubahan tervalidasi dan diaudit; nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22, sedangkan melewati ambang tidak menolak checkout. | Baseline |
 | FR-PRC-004 | Sistem | Sistem menghitung PPh 22 menggunakan tarif yang dikelola melalui website, termasuk `0%`, ketika aturan klasifikasi terpicu. | Klasifikasi, ambang, tarif, dasar pengenaan, hasil perhitungan, dan snapshot tervalidasi; rincian formula yang belum final mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
 | FR-PRC-005 | Sistem | Sistem memvalidasi ulang harga saat checkout. | Perubahan harga setelah item masuk cart ditampilkan sebelum konfirmasi order. | Proposed |

@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.3 - Candidate MVP dengan skema API POS |
+| Versi | 0.4 - Candidate MVP dengan baseline PPh 22 |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
@@ -44,16 +44,16 @@ serta diproses admin.
 | MVP-005 | Harga eceran, partai, dan grosir | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-007 | Setiap produk memiliki tiga jenis harga dari POS; harga eceran disiapkan tetapi tidak ditampilkan pada storefront, harga grosir mengikuti minimum per produk, dan aturan harga partai mengikuti OPN-013. |
 | MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh hanya digunakan sebelum akses POS production tersedia. |
 | MVP-007 | Stok efektif dan rekonsiliasi | BR-011 - BR-014; FR-POS-007 - FR-POS-012, FR-POS-017 - FR-POS-020 | Stok berkurang setelah sales order POS berhasil, bertambah setelah retur, dan dapat direkonsiliasi tanpa perubahan ganda. |
-| MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat total yang dihitung server-side. |
-| MVP-009 | Sales order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-010 | Setiap transaksi web membuat sales order POS; referensi invoice POS disimpan; pesanan belum dibayar otomatis dibatalkan pada hari berikutnya. |
+| MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat subtotal, PPh 22, ongkir, serta total yang dihitung server-side; PPh 22 tampil sebagai komponen terpisah. |
+| MVP-009 | Sales order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-010 | Setiap transaksi web membuat sales order POS; referensi invoice POS disimpan dan PPh 22 tampil sebagai komponen invoice terpisah; pesanan belum dibayar otomatis dibatalkan pada hari berikutnya. |
 | MVP-010 | Pembayaran transfer manual | BR-018 - BR-020; FR-PAY-001 - FR-PAY-007 | Pelanggan mengunggah bukti secara privat; admin menerima/menolak; status dan audit tercatat. |
 | MVP-011 | Pembatalan, retur, dan rekonsiliasi stok | BR-021 - BR-022; FR-ORD-006 - FR-ORD-008; FR-POS-012, FR-POS-018 | Pembatalan yang valid diteruskan ke POS, menghasilkan referensi retur, mengembalikan stok, dan tidak membuat retur ganda. |
 | MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025; FR-SHP-001 - FR-SHP-006 | Pelanggan memilih layanan yang tersedia; ongkir masuk invoice; kegagalan tidak menghasilkan ongkir Rp0. |
-| MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi dan omzet berdasarkan periode serta area; transaksi batal dikecualikan. |
+| MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi, omzet, dan PPh 22 berdasarkan periode serta area; PPh 22 tampil terpisah dan transaksi batal dikecualikan. |
 | MVP-014 | Audit dan penanganan gangguan | BR-027 - BR-028; FR-POS-020; FR-AUD-001, FR-AUD-004; FRD Bagian 15 | Pengiriman/pembatalan order ke POS dan gangguan sinkronisasi tercatat; percobaan ulang tidak membuat order, invoice, atau retur ganda. |
 | MVP-015 | Security dan authorization | SRS Bagian 12.3 | CSRF, validation, policy, rate limit, secure session, private upload, dan secret management lulus test relevan. |
 | MVP-016 | Release readiness | SRS Bagian 15 - 18 | Staging, CI, backup, rollback, logging, smoke test, UAT, training, dan sign-off go-live tersedia. |
-| MVP-017 | Ambang klasifikasi dan PPh 22 | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Klasifikasi, ambang nilai belanja, dan tarif dapat dikonfigurasi; transaksi di atas ambang tetap berjalan dengan PPh 22 yang dihitung dan disimpan sesuai OPN-006. |
+| MVP-017 | Ambang klasifikasi dan PPh 22 | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Admin mengelola klasifikasi, ambang nilai belanja, dan tarif melalui website; transaksi di atas ambang tetap berjalan dengan PPh 22 yang dihitung, disimpan, dan ditampilkan terpisah sesuai OPN-006. |
 
 ## 4. Data Contoh Saat Koneksi POS Belum Tersedia
 

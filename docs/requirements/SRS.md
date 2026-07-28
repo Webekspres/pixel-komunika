@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.5 - POS API Working Scheme |
+| Versi | 0.6 - PPh 22 Working Baseline |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -63,7 +63,10 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - istilah batas maksimal dikoreksi menjadi ambang nilai belanja per klasifikasi;
   melewati ambang tidak menolak checkout;
 - PPh 22 menggunakan tarif configurable, termasuk `0%`, dan dipicu ketika
-  ambang klasifikasi terlampaui; dasar pengenaan menunggu OPN-006;
+  ambang klasifikasi terlampaui; klasifikasi, ambang, dan tarif dikelola melalui
+  website, sedangkan dasar pengenaan menunggu OPN-006;
+- PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice,
+  dan laporan;
 - SKU, nama produk, kategori/klasifikasi, merek, harga, dan stok bersumber dari
   POS;
 - master data dan inventory disinkronkan penuh sekali sehari; stok per produk
@@ -333,7 +336,7 @@ menggantikan pengujian koneksi terhadap POS asli sebelum go-live.
 | Harga eceran, partai, dan grosir | POS | Baseline |
 | Minimum kuantitas grosir | POS | Baseline |
 | Kategori/klasifikasi dan merek | POS | Baseline |
-| Konfigurasi ambang klasifikasi dan tarif PPh 22 | POS atau website | Open decision - OPN-006 |
+| Konfigurasi klasifikasi, ambang, dan tarif PPh 22 | Website | Baseline |
 | Gambar/video | POS ketika tersedia; fallback website | Baseline |
 | Deskripsi pemasaran | POS ketika tersedia; fallback website | Baseline |
 | SEO/slug/label/urutan | POS ketika tersedia; fallback website | Baseline |
@@ -408,7 +411,7 @@ Contoh error:
 | categories | Klasifikasi produk. |
 | brands | Merek produk. |
 | product_prices | Tiga jenis harga dari POS, minimum kuantitas, dan metadata penerapannya. |
-| category_tax_rules | Klasifikasi terpilih, ambang nilai belanja, tarif PPh 22, status aktif, dan sumber konfigurasi. |
+| category_tax_rules | Klasifikasi terpilih, ambang nilai belanja, tarif PPh 22, status aktif, serta metadata pembuat/perubah konfigurasi website. |
 | inventory_snapshots | Nilai stok terbaru per produk. |
 | inventory_ledger | Riwayat perubahan stok. |
 | carts / cart_items | Keranjang aktif. |
@@ -426,9 +429,9 @@ Contoh error:
 | sync_errors | Detail item yang gagal. |
 | audit_logs | Jejak tindakan kritis. |
 
-Model data menyimpan konfigurasi PPh 22 terpisah dari snapshot biaya order.
-Perubahan konfigurasi klasifikasi, ambang, atau tarif tidak boleh mengubah
-invoice lama. Dasar pengenaan dan sumber konfigurasi tetap menunggu
+Model data menyimpan konfigurasi PPh 22 yang dikelola melalui website secara
+terpisah dari snapshot biaya order. Perubahan konfigurasi klasifikasi, ambang,
+atau tarif tidak boleh mengubah invoice lama. Dasar pengenaan tetap menunggu
 [`OPN-006`](BRD.md#opn-006). Perubahan skema harus melalui migration, data
 dictionary, test, dan ADR.
 
@@ -733,7 +736,7 @@ sebagai sumber stok production.
 
 | Level | Cakupan Minimum |
 |---|---|
-| Unit | Pemilihan harga partai/grosir, visibilitas harga eceran, ambang klasifikasi, PPh 22, status stok, dan auto-cancel D+1. |
+| Unit | Pemilihan harga partai/grosir, visibilitas harga eceran, konfigurasi website untuk ambang/tarif PPh 22, perhitungan dan tampilan komponen PPh 22, status stok, serta auto-cancel D+1. |
 | Feature | Registrasi, approval, cart, checkout, pembayaran, pembatalan, laporan. |
 | Integration | Seluruh operasi POS kerja, external reference/idempotency, timeout ambigu, rekonsiliasi invoice/retur, transisi seeder-ke-API, dan Biteship quote. |
 | Security | Authorization, IDOR, CSRF, rate limit, dan upload. |
@@ -769,7 +772,7 @@ sebagai sumber stok production.
 | TD-007 | Object storage provider dan kebijakan retensi. | OPN-009 | Open |
 | TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
-| TD-010 | Dasar pengenaan PPh 22, sumber konfigurasinya, dan expiry order belum dibayar. | OPN-006, OPN-007 | PPh 22 partially open; expiry D+1 resolved |
+| TD-010 | Dasar pengenaan PPh 22 dan expiry order belum dibayar. Konfigurasi klasifikasi, ambang, dan tarif telah ditetapkan melalui website. | OPN-006, OPN-007 | Dasar pengenaan PPh 22 partially open; expiry D+1 resolved |
 | TD-011 | Web mengelola lifecycle sampai pengiriman; pembatalan memanggil POS dan menghasilkan retur. Status fulfillment/resi tetap terbuka. | OPN-020 | Partially resolved |
 | TD-012 | Origin, berat/dimensi produk, dan mapping alamat untuk Biteship. | OPN-021 | Open |
 | TD-013 | Format/penyampaian invoice serta event/channel notifikasi. | OPN-022, OPN-023 | Open |

@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.4 - POS API Working Scheme |
+| Versi | 0.5 - PPh 22 Working Baseline |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -170,16 +170,18 @@ stateDiagram-v2
 Klarifikasi klien Selasa, 28 Juli 2026 menetapkan tiga jenis harga dari POS dan
 mengoreksi istilah batas maksimal menjadi ambang nilai belanja per klasifikasi.
 Ambang tidak menolak checkout; ketika terlampaui, sistem menambahkan PPh 22
-sesuai konfigurasi. Detail penerapan harga partai dan dasar pengenaan PPh 22
-tetap mengikuti [OPN-013](BRD.md#opn-013) dan
+sesuai konfigurasi yang dikelola melalui website. PPh 22 ditampilkan sebagai
+komponen terpisah pada cart, checkout, invoice, dan laporan. Detail penerapan
+harga partai dan dasar pengenaan PPh 22 tetap mengikuti
+[OPN-013](BRD.md#opn-013) dan
 [OPN-006](BRD.md#opn-006).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-PRC-001 | Worker | Sistem menyinkronkan harga `ECERAN`, `PARTAI`, dan `GROSIR` untuk setiap produk dari POS. | Produk hanya siap dijual setelah ketiga jenis harga lolos validasi kontrak; harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. | Baseline |
 | FR-PRC-002 | Sistem | Sistem memilih harga yang berlaku berdasarkan aturan jenis harga. | Minimum grosir dapat berbeda per produk; skenario harga partai dan prioritas partai/grosir diuji setelah [OPN-013](BRD.md#opn-013) diselesaikan. | Baseline; aturan partai partially open |
-| FR-PRC-003 | Sistem | Sistem mendukung pemilihan klasifikasi produk serta ambang nilai belanja yang dapat dikonfigurasi per klasifikasi. | Nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22; melewati ambang tidak menolak checkout. | Baseline |
-| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 dengan persentase yang dapat dikonfigurasi, termasuk `0%`, ketika aturan klasifikasi terpicu. | Klasifikasi, ambang, tarif, dasar pengenaan, hasil perhitungan, dan snapshot tervalidasi; rincian yang belum final mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
+| FR-PRC-003 | Admin | Admin dapat memilih klasifikasi produk serta mengatur ambang nilai belanja per klasifikasi melalui website. | Perubahan tervalidasi dan diaudit; nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22, sedangkan melewati ambang tidak menolak checkout. | Baseline |
+| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 menggunakan tarif yang dikelola melalui website, termasuk `0%`, ketika aturan klasifikasi terpicu. | Klasifikasi, ambang, tarif, dasar pengenaan, hasil perhitungan, dan snapshot tervalidasi; rincian formula yang belum final mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
 | FR-PRC-005 | Sistem | Sistem memvalidasi ulang harga saat checkout. | Perubahan harga setelah item masuk cart ditampilkan sebelum konfirmasi order. | Proposed |
 | FR-PRC-006 | Sistem | Harga disimpan sebagai snapshot per item transaksi. | Invoice historis tidak bergantung pada harga produk terkini. | Proposed |
 | FR-PRC-007 | Sistem | Sistem membatasi visibilitas harga berdasarkan status akun dan kanal penjualan. | Guest dan pelanggan pending tidak menerima nilai harga; pelanggan aktif menerima harga jual yang berlaku tanpa harga eceran, sedangkan admin dapat memeriksa data harga hasil sinkronisasi. | Baseline |
@@ -224,7 +226,7 @@ koneksi POS sesuai [`OPN-019`](BRD.md#opn-019).
 | FR-CART-003 | Sistem | Keranjang hanya dapat di-checkout oleh akun aktif. | Pending, rejected, atau suspended menerima penolakan. | Baseline |
 | FR-CART-004 | Sistem | Checkout memvalidasi produk, harga, stok, alamat, dan pengiriman. | Order hanya dibuat jika semua validasi lulus. | Proposed |
 | FR-CART-005 | Pelanggan Aktif | Pelanggan memilih alamat dan metode pengiriman. | Hanya metode yang tersedia untuk area tersebut ditampilkan. | Baseline |
-| FR-CART-006 | Sistem | Sistem menampilkan rincian subtotal, PPh 22 yang aktif, ongkir, dan grand total. | Total server-side sama dengan invoice; tampilan dan dasar pengenaan PPh 22 mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
+| FR-CART-006 | Sistem | Sistem menampilkan rincian subtotal, PPh 22 yang aktif, ongkir, dan grand total. | PPh 22 tampil sebagai komponen terpisah pada cart dan checkout; total server-side sama dengan invoice dan dasar pengenaannya mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
 | FR-CART-007 | Sistem | Pembuatan order terlindungi idempotency. | Pengiriman request yang sama tidak membuat order ganda. | Proposed |
 
 ## 8. Modul Pengiriman dan Biteship
@@ -244,7 +246,7 @@ koneksi POS sesuai [`OPN-019`](BRD.md#opn-019).
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-001 | Sistem | Sistem membuat nomor order web unik dan menyimpan referensi invoice POS. | Constraint unik mencegah duplikasi nomor order, POS sales order ID, dan invoice ID/number; kebutuhan invoice lokal mengikuti [OPN-008](BRD.md#opn-008). | Baseline; invoice mapping partially open |
-| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, jenis harga, harga, kuantitas, ongkir, PPh 22, dan total historis tersedia; dasar pengenaan mengikuti [OPN-006](BRD.md#opn-006). | Proposed |
+| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, jenis harga, harga, kuantitas, ongkir, PPh 22, dan total historis tersedia; PPh 22 tampil sebagai komponen invoice terpisah dan dasar pengenaannya mengikuti [OPN-006](BRD.md#opn-006). | Proposed |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; status pemenuhan dan nomor resi mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle partially open |
@@ -297,7 +299,7 @@ scope pembatalan standar.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-RPT-001 | Admin | Admin dapat melihat jumlah transaksi dan omzet. | Nilai mengikuti definisi status omzet yang disetujui. | Baseline |
+| FR-RPT-001 | Admin | Admin dapat melihat jumlah transaksi, omzet, dan PPh 22. | Nilai PPh 22 ditampilkan sebagai komponen terpisah; omzet mengikuti definisi status yang disetujui. | Baseline |
 | FR-RPT-002 | Admin | Laporan dapat difilter berdasarkan periode. | Tanggal menggunakan zona waktu Asia/Jakarta. | Baseline |
 | FR-RPT-003 | Admin | Laporan dapat difilter berdasarkan area/kecamatan. | Hasil sesuai snapshot alamat transaksi. | Baseline |
 | FR-RPT-004 | Admin | Laporan dapat difilter berdasarkan status dan metode pengiriman. | Filter dapat dikombinasikan. | Proposed |
@@ -343,7 +345,7 @@ disetujui.
 | `CreateSalesOrder` timeout/ambigu | Order tidak dianggap terkonfirmasi dua kali; sistem mencari external reference atau menandai rekonsiliasi sebelum retry. |
 | `CancelSalesOrder` timeout/ambigu | Status cancel/retur direkonsiliasi sebelum retry agar stok tidak dikembalikan dua kali. |
 | Payload POS tidak valid | Record terkait ditolak, error dicatat, proses lain dapat dilanjutkan sesuai kebijakan. |
-| Payload POS memuat konfigurasi PPh 22 | Field hanya memengaruhi checkout setelah sumber konfigurasi dan dasar pengenaan disetujui melalui OPN-006; payload serta keputusan mapping dicatat. |
+| Payload POS memuat konfigurasi PPh 22 | Field tersebut tidak menimpa konfigurasi website; perbedaan dicatat sebagai contract mismatch untuk ditinjau. |
 | Seeder dijalankan ulang | Data inti di-upsert secara idempotent dan enrichment lokal dipertahankan. |
 | Biteship gagal | Checkout tidak memakai ongkir nol; pelanggan mendapat pesan yang dapat ditindaklanjuti. |
 | Stok berubah saat checkout | Checkout dihentikan dan keranjang diperbarui. |
@@ -385,7 +387,7 @@ FRD dapat dibaseline setelah:
 - status/transisi order disetujui;
 - aturan harga partai dan prioritas terhadap harga grosir disetujui melalui
   [OPN-013](BRD.md#opn-013);
-- konfigurasi ambang klasifikasi dan PPh 22 dikonfirmasi melalui
+- konfigurasi ambang klasifikasi dan PPh 22 dikelola melalui website sesuai
   [OPN-018](BRD.md#opn-018), sedangkan dasar pengenaan disetujui melalui
   [OPN-006](BRD.md#opn-006);
 - event pengurangan/reservasi stok disetujui melalui

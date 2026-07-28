@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.5 - PPh 22 Working Baseline |
+| Versi | 0.6 - POS PIC and Access Gate |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -103,6 +103,7 @@ Rincian sprint difinalkan setelah item P0 dan keputusan kritis disetujui.
 | Scheduler/Worker | Proses sistem untuk sinkronisasi dan pekerjaan latar belakang. |
 | Data Contoh (Seeder) | Sumber data dummy untuk development, staging, demo, dan UAT ketika koneksi POS belum tersedia; tidak digunakan pada production. |
 | POS | Sistem eksternal sumber produk dan stok. |
+| Kak Rio - PIC POS | Narahubung untuk pembukaan akses dan validasi kontrak integrasi POS setelah alur website berbasis data contoh berjalan. |
 | Biteship | Sistem eksternal penyedia estimasi ongkir. |
 
 ### 2.2 Matriks Akses
@@ -192,7 +193,9 @@ Koneksi POS menjadi sumber data production dan menyediakan jalur baca master
 data/inventory serta write-back sales order/retur. Jika koneksi belum tersedia,
 data contoh menjadi fallback resmi untuk development, staging, demo, dan UAT.
 Data contoh tidak digunakan pada production; production wajib menggunakan
-koneksi POS sesuai [`OPN-019`](BRD.md#opn-019).
+koneksi POS sesuai [`OPN-019`](BRD.md#opn-019). Kak Rio menjadi PIC POS; akses
+dibuka setelah alur website berbasis data contoh sudah berjalan, kemudian
+kontrak dan koneksi aktual wajib diuji sebelum production.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
@@ -211,7 +214,7 @@ koneksi POS sesuai [`OPN-019`](BRD.md#opn-019).
 | FR-POS-013 | Data Seeder | Sistem dapat memuat produk, tiga jenis harga, dan stok representatif ketika API POS belum tersedia. | Setiap produk memiliki harga eceran, partai, dan grosir; dataset juga mencakup minimum grosir serta status stok tersedia/menipis/habis. | Baseline |
 | FR-POS-014 | Sistem | Seeder mengikuti kontrak data internal yang juga digunakan adapter POS. | SKU/external ID stabil, field wajib tervalidasi, dan perubahan ke API tidak memerlukan perubahan domain transaksi. | Baseline |
 | FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi; nilai source utama diperbarui dan pelengkap lokal untuk field yang tidak tersedia tetap dipertahankan. | Baseline |
-| FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; production selalu menolak eksekusi data contoh. | Baseline |
+| FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; setelah alur website berjalan, akses POS dikoordinasikan dengan Kak Rio; production selalu menolak eksekusi data contoh. | Baseline |
 | FR-POS-017 | Sistem | Setiap order web dikirim melalui `CreateSalesOrder`. | Setelah sukses, POS sales order ID, invoice ID/number, response reference, dan waktu tersimpan; stok efektif berkurang sesuai hasil POS. | Baseline; contract partially open |
 | FR-POS-018 | Sistem | Pembatalan web dikirim melalui `CancelSalesOrder`. | Setelah sukses, referensi retur tersimpan dan stok efektif bertambah; request berulang tidak membuat retur ganda. | Baseline; idempotency contract open |
 | FR-POS-019 | Worker | Sistem merekonsiliasi sales order, invoice, dan retur dengan `GetAllSalesOrder` serta `GetSalesOrderDetail`. | Selisih status/reference dicatat dan tidak menimpa transaksi lokal tanpa audit; arah data final mengikuti [OPN-005](BRD.md#opn-005). | Baseline; direction partially open |
@@ -380,7 +383,8 @@ FRD dapat dibaseline setelah:
 - seluruh item `ON_HOLD` dikeluarkan tertulis dari MVP atau dikembalikan menjadi
   requirement aktif dengan acceptance criteria;
 - operasi baca dan write-back POS dapat diuji atau adapter data contoh lulus
-  acceptance test; sebelum production, contract test `CreateSalesOrder`,
+  acceptance test; setelah alur website berjalan akses dikoordinasikan dengan
+  Kak Rio, dan sebelum production contract test `CreateSalesOrder`,
   `CancelSalesOrder`, lookup sales order, master data, dan inventory wajib
   tersedia serta lulus;
 - API Biteship dapat diuji;

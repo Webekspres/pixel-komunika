@@ -7,7 +7,7 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.6 - PPh 22 Working Baseline |
+| Versi | 0.7 - POS PIC and Access Gate |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
@@ -48,6 +48,7 @@ Status requirement:
 | CR-005 | Selasa, 28 Juli 2026, 12.42-13.43 WIB | Klarifikasi bertahap klien | Klien menjelaskan tiga jenis harga wajib dari POS, ambang nilai belanja per klasifikasi yang memicu PPh 22, master produk dari POS, pola sinkronisasi stok, kesiapan akses POS, dan masa berlaku pesanan belum dibayar. | Konsep batas maksimal dikoreksi menjadi ambang nilai belanja; OPN-003 dan OPN-007 diselesaikan, sedangkan OPN-004, OPN-005, OPN-006, OPN-013, dan OPN-019 diperbarui sebagai keputusan parsial. | Partially resolved |
 | CR-006 | Selasa, 28 Juli 2026 | Diagram dan hasil meeting skema API POS | Master produk dan inventory ditarik sekali sehari; stok per produk dapat dicek berkala untuk rekonsiliasi. Setiap transaksi web membuat sales order POS yang langsung mengurangi stok dan menerbitkan invoice; pembatalan menerbitkan retur. Seluruh field yang tersedia di POS menjadi master, sedangkan website melengkapi field yang belum tersedia. | Write-back sales order/retur menjadi baseline, OPN-004 diselesaikan, OPN-005/OPN-008/OPN-019/OPN-020/OPN-022 diperbarui, dan risiko konsistensi API ditambahkan. | Approved working scheme; API contract partial |
 | CR-007 | Selasa, 28 Juli 2026 | Keputusan working baseline System Analyst Webekspres | Konfigurasi klasifikasi, ambang, dan tarif PPh 22 dikelola melalui website. Nilai PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice, dan laporan. | Q-008 dan Q-009 diselesaikan; BR-007, BR-008, BR-015, BR-026, RULE-006, serta requirement turunannya diperjelas. Dasar pengenaan tetap terbuka pada OPN-006. | Resolved for working baseline |
+| CR-008 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai akses POS | Kak Rio ditetapkan sebagai PIC POS. Akses POS dibuka setelah alur website berbasis data contoh sudah berjalan. | Q-014 diselesaikan; OPN-005 dan OPN-019 diperjelas. Kontak dan trigger akses telah tersedia, sedangkan kontrak teknis API serta contract test tetap terbuka. | Resolved access owner and trigger |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -136,6 +137,7 @@ Proses penjualan membutuhkan kanal digital yang:
 | Pak Endang - Project Manager Webekspres | Menjaga cadence, dependency, risk, keputusan, change log, dan eskalasi hambatan tanpa mengambil alih persetujuan final klien. |
 | Admin operasional | Memverifikasi pelanggan, mengelola katalog lokal, pembayaran, transaksi, pengiriman, dan laporan. |
 | Pelanggan | Melakukan registrasi, melihat katalog, membuat pesanan, membayar, dan memantau transaksi. |
+| Kak Rio - PIC POS | Menjadi narahubung koordinasi akses, kontrak teknis, dan validasi integrasi POS. |
 | Vendor / pengelola POS | Menyediakan API, kredensial, dokumentasi, dan identifier produk yang stabil. |
 | Biteship | Menyediakan layanan estimasi ongkir sesuai kontrak API. |
 | Webekspres | Menganalisis, mengembangkan, menguji, menerapkan, dan memelihara aplikasi sesuai scope. |
@@ -351,7 +353,8 @@ Nilai target final harus disetujui pada technical kickoff
 ## 13. Asumsi dan Dependensi
 
 - Klien menyediakan dokumentasi, kredensial, dan environment koneksi POS
-  ([lihat OPN-003](#opn-003) dan [OPN-005](#opn-005)).
+  melalui koordinasi dengan Kak Rio setelah alur website berbasis data contoh
+  berjalan ([lihat OPN-003](#opn-003) dan [OPN-005](#opn-005)).
 - Jika koneksi POS belum tersedia, Webekspres menggunakan data contoh untuk
   development, staging, demo, dan UAT; data contoh tidak digunakan pada
   production.
@@ -384,7 +387,7 @@ Nilai target final harus disetujui pada technical kickoff
 | RSK-005 | Lonjakan traffic atau bot. | Aplikasi lambat/tidak tersedia. | CDN, cache, rate limit, monitoring, dan scale-up. |
 | RSK-006 | Media produk dan bukti pembayaran membesar. | Storage/bandwidth habis. | Object storage, kompresi, dan kebijakan retensi ([lihat OPN-009](#opn-009)). |
 | RSK-007 | Dasar pengenaan PPh 22 dan penerapan harga partai lintas item belum final. | Perhitungan checkout, invoice, dan laporan salah atau dikerjakan ulang. | Implementasikan struktur konfigurasi minimum; finalisasi formula dan skenario harga melalui [OPN-006](#opn-006) serta [OPN-013](#opn-013). |
-| RSK-008 | Koneksi POS belum tersedia selama development atau menjelang go-live. | Contract mismatch, keterlambatan integrasi, dan stok production tidak aktual. | Gunakan data contoh hanya untuk delivery non-production, definisikan kontrak koneksi, dan lakukan contract test sebelum go-live melalui OPN-019. |
+| RSK-008 | Koneksi POS belum tersedia selama development atau menjelang go-live. | Contract mismatch, keterlambatan integrasi, dan stok production tidak aktual. | Gunakan data contoh hanya untuk delivery non-production; setelah alur website berjalan, koordinasikan akses dengan Kak Rio, finalisasi kontrak, dan lakukan contract test sebelum go-live melalui OPN-019. |
 | RSK-009 | Timeout/retry `CreateSalesOrder` atau `CancelSalesOrder` tidak memiliki idempotency/external reference yang jelas. | Sales order, invoice, retur, atau perubahan stok terduplikasi. | Wajibkan external reference unik, query rekonsiliasi, dan kebijakan retry berbasis status sebelum integration acceptance pada OPN-005. |
 
 ## 15. Keputusan Terbuka
@@ -439,13 +442,14 @@ Working scheme API:
 - data sales order, invoice, dan retur direkonsiliasi bersama proses
   sinkronisasi.
 
-Klien meminta alur website dibuat dahulu menggunakan data contoh dan akan
-membuka akses setelah alur berjalan. Yang masih terbuka adalah tanggal/PIC
-akses; bentuk URL/method/payload/response; autentikasi; external reference atau
-idempotency; kode error, timeout, rate limit; arah dan tujuan tepat sinkronisasi
-sales harian; serta acceptance contract test.
+Kak Rio menjadi PIC POS. Klien akan membuka akses setelah alur website berbasis
+data contoh sudah berjalan; kondisi ini menjadi trigger akses dan tidak
+memerlukan tanggal kalender terpisah sebelum readiness gate tercapai. Yang
+masih terbuka adalah bentuk URL/method/payload/response; autentikasi; external
+reference atau idempotency; kode error, timeout, rate limit; arah dan tujuan
+tepat sinkronisasi sales harian; serta acceptance contract test.
 
-**Pemilik:** Vendor POS · **Target:** Sebelum integration acceptance · **Status:** Partially resolved
+**Pemilik:** Kak Rio / Vendor POS · **Target:** Sebelum integration acceptance · **Status:** Partially resolved
 
 ### OPN-006
 
@@ -558,11 +562,12 @@ OPN-006.
 
 Data contoh hanya digunakan untuk development, staging, demo, dan UAT.
 Production wajib menggunakan data dari POS. Klien akan membuka akses setelah
-alur website menggunakan data contoh telah berjalan. Diagram operasi dan
-cadence menjadi working scheme, tetapi tanggal/PIC akses, kontrak final, serta
-penerimaan hasil uji koneksi masih wajib diselesaikan sebelum go-live.
+alur website menggunakan data contoh telah berjalan, dengan Kak Rio sebagai PIC
+koordinasi. Diagram operasi, cadence, PIC, dan trigger akses menjadi working
+scheme, tetapi kontrak final serta penerimaan hasil uji koneksi masih wajib
+diselesaikan sebelum go-live.
 
-**Pemilik:** Klien / Vendor POS / Webekspres · **Target:** Sebelum go-live · **Status:** Partially resolved
+**Pemilik:** Klien / Kak Rio / Webekspres · **Target:** Sebelum go-live · **Status:** Partially resolved
 
 ### OPN-020
 
@@ -619,7 +624,7 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-011 | Apakah perubahan ini memengaruhi nilai proposal, scope komersial, atau deadline 45 hari kerja? | MVP baseline dan change control | Resolved - mengikuti plan/proposal awal |
 | Q-012 | Siapa yang memberikan persetujuan final dan kapan keputusan tersebut efektif menjadi baseline? | OPN-017 | Resolved - klien memberi persetujuan final; efektif setelah persetujuan tertulis kedua pihak pada hari kerja |
 | Q-013 | Apakah data contoh boleh digunakan pada production jika koneksi POS belum tersedia saat go-live? | BR-009, OPN-019 | Resolved - tidak; data production wajib berasal dari POS |
-| Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi kontrak data? | OPN-005, OPN-019 | Partially resolved - akses dibuka setelah alur website berjalan; tanggal dan PIC masih open |
+| Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi kontrak data? | OPN-005, OPN-019 | Resolved - PIC POS adalah Kak Rio; akses dibuka setelah alur website berbasis data contoh berjalan |
 | Q-015 | Untuk harga partai, apakah syarat lima unit harus pada satu produk atau boleh gabungan; dan apakah harga partai berlaku untuk seluruh item dalam struk atau hanya item yang memenuhi syarat? | BR-006, OPN-013 | Open |
 | Q-016 | PPh 22 dihitung dari seluruh subtotal klasifikasi, hanya nilai di atas ambang, atau total struk; dan bagaimana jika lebih dari satu klasifikasi terpicu? | BR-008, BR-015, OPN-006 | Open |
 | Q-017 | Status/event apa yang dianggap sebagai penjualan untuk mengurangi stok; apakah perlu reservasi sebelumnya; dan apakah stok retur hanya masuk melalui sinkronisasi POS? | BR-011 - BR-014, OPN-004 | Resolved - `CreateSalesOrder` mengurangi stok; `CancelSalesOrder` menerbitkan retur dan mengembalikan stok |
@@ -662,7 +667,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 |---|---|---|---|---|
 | PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - scope, sumber konfigurasi website, dan tampilan terpisah selesai; formula tetap OPN-006 |
 | PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai; OPN-013 dan OPN-020 masih parsial |
-| PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Vendor POS / Webekspres | G1 integrasi | Parsial - operasi/cadence/ownership tersedia; payload, auth, idempotency, akses, dan contract test pada OPN-005/OPN-019 tetap blocker |
+| PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat/dimensi, area, tarif, SLA. | Klien | G1 pengiriman | Blocker - OPN-010, OPN-021 |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Open - OPN-022, OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Open - OPN-001 |

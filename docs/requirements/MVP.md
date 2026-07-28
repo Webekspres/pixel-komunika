@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.4 - Candidate MVP dengan baseline PPh 22 |
+| Versi | 0.5 - Candidate MVP dengan POS access gate |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
@@ -42,7 +42,7 @@ serta diproses admin.
 | MVP-003 | Hak akses guest, pending, aktif, dan admin | FR-AUTH-002; FR-CAT-007; FR-PRC-007; FR-ORD-003 | Guest/pending dapat melihat katalog tanpa harga; hanya pelanggan aktif dapat checkout dan melihat riwayat sendiri. |
 | MVP-004 | Katalog dan pelengkap produk | BR-005; FR-CAT-001 - FR-CAT-007 | Seluruh data yang tersedia di POS disinkronkan sebagai sumber utama; website dapat melengkapi gambar, deskripsi, atau field lain yang belum tersedia di POS. |
 | MVP-005 | Harga eceran, partai, dan grosir | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-007 | Setiap produk memiliki tiga jenis harga dari POS; harga eceran disiapkan tetapi tidak ditampilkan pada storefront, harga grosir mengikuti minimum per produk, dan aturan harga partai mengikuti OPN-013. |
-| MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh hanya digunakan sebelum akses POS production tersedia. |
+| MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh digunakan sampai alur website berjalan, lalu akses POS dikoordinasikan dengan Kak Rio. |
 | MVP-007 | Stok efektif dan rekonsiliasi | BR-011 - BR-014; FR-POS-007 - FR-POS-012, FR-POS-017 - FR-POS-020 | Stok berkurang setelah sales order POS berhasil, bertambah setelah retur, dan dapat direkonsiliasi tanpa perubahan ganda. |
 | MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat subtotal, PPh 22, ongkir, serta total yang dihitung server-side; PPh 22 tampil sebagai komponen terpisah. |
 | MVP-009 | Sales order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-010 | Setiap transaksi web membuat sales order POS; referensi invoice POS disimpan dan PPh 22 tampil sebagai komponen invoice terpisah; pesanan belum dibayar otomatis dibatalkan pada hari berikutnya. |
@@ -68,10 +68,12 @@ Jika koneksi POS belum tersedia:
    duplikasi atau menimpa enrichment lokal.
 4. Data contoh dapat digunakan untuk local, staging, demo, dan UAT.
 5. Data contoh tidak diizinkan sebagai sumber produk atau stok production.
-6. Go-live mensyaratkan koneksi POS tersedia dan berhasil diuji melalui
+6. Setelah alur website berbasis data contoh berjalan, Webekspres
+   mengoordinasikan pembukaan akses POS dengan Kak Rio sebagai PIC.
+7. Go-live mensyaratkan koneksi POS tersedia dan berhasil diuji melalui
    [OPN-019](BRD.md#opn-019).
-7. Ketika koneksi POS tersedia, contract test wajib lulus sebelum go-live.
-8. Adapter data contoh mensimulasikan keberhasilan, kegagalan, timeout ambigu,
+8. Ketika koneksi POS tersedia, contract test wajib lulus sebelum go-live.
+9. Adapter data contoh mensimulasikan keberhasilan, kegagalan, timeout ambigu,
    invoice reference, retur, dan external reference dari operasi POS.
 
 ## 5. Tidak Termasuk P0 Saat Ini
@@ -93,8 +95,9 @@ MVP dapat dinyatakan selesai apabila:
 - seluruh item P0 disetujui sebagai baseline dan memenuhi Definition of Done;
 - seluruh acceptance criteria P0 memiliki test case dan lulus di staging;
 - alur end-to-end registrasi sampai verifikasi pembayaran lulus UAT;
-- koneksi POS production tersedia dan contract test operasi master data,
-  inventory, create/cancel sales order, invoice/retur, serta rekonsiliasi lulus;
+- koneksi POS production yang dikoordinasikan dengan Kak Rio tersedia dan
+  contract test operasi master data, inventory, create/cancel sales order,
+  invoice/retur, serta rekonsiliasi lulus;
 - tidak ada defect kritis atau tinggi yang belum diterima sebagai risiko;
 - backup, rollback, monitoring, security check, training, dan smoke test siap;
 - Sylvi memberikan UAT dan go-live sign-off pada hari kerja;

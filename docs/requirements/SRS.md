@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.6 - PPh 22 Working Baseline |
+| Versi | 0.7 - POS PIC and Access Gate |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -78,7 +78,7 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - field POS menjadi sumber utama ketika tersedia, sedangkan website hanya
   melengkapi field yang belum tersedia;
 - development memakai data contoh sampai akses POS dibuka setelah alur website
-  berjalan;
+  berjalan; koordinasi akses dilakukan dengan Kak Rio sebagai PIC POS;
 - pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya.
 
 Nilai harga, jenis harga, aturan PPh 22 yang terpakai, dasar perhitungan, tarif,
@@ -268,7 +268,10 @@ Working scheme dari klien:
 | Sales Order | `GetSalesOrderDetail` | POS -> Web | Rekonsiliasi/ketika diperlukan | Mencocokkan detail transaksi dan referensi POS. |
 
 Nama di atas adalah nama operasi pada diagram, bukan kontrak HTTP final.
-Klien/vendor POS masih harus menyediakan:
+Kak Rio menjadi PIC untuk koordinasi POS. Akses dibuka setelah alur website
+berbasis data contoh sudah berjalan; keputusan ini menetapkan pemilik dan
+readiness trigger, bukan kontrak HTTP final. Kak Rio/vendor POS masih harus
+menyediakan:
 
 - base URL dan environment sandbox/production;
 - autentikasi dan mekanisme rotasi credential;
@@ -308,6 +311,8 @@ Website:
 Jika koneksi POS belum tersedia:
 
 - development, staging, demo, dan UAT menggunakan data contoh deterministik;
+- setelah alur website berbasis data contoh berjalan, Webekspres
+  mengoordinasikan pembukaan akses POS dengan Kak Rio;
 - data contoh memanggil jalur import/upsert yang sama dengan adapter POS, bukan
   menulis langsung dengan aturan bisnis berbeda;
 - dataset memakai SKU/external ID stabil dan mencakup skenario harga serta stok
@@ -765,7 +770,7 @@ sebagai sumber stok production.
 |---|---|---|---|
 | TD-001 | Shared hosting milik klien sebagai production baseline. | OPN-001 | Resolved |
 | TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
-| TD-003 | Working operation POS tersedia; URL/method/payload/auth/error/idempotency belum final. Data contoh hanya dipakai di non-production. | OPN-005, OPN-019 | Partially resolved; connection contract open |
+| TD-003 | Working operation POS tersedia; Kak Rio menjadi PIC dan akses dibuka setelah alur website berbasis data contoh berjalan. URL/method/payload/auth/error/idempotency belum final; data contoh hanya dipakai di non-production. | OPN-005, OPN-019 | PIC/access trigger resolved; connection contract open |
 | TD-004 | `CreateSalesOrder` mengurangi stok dan menerbitkan invoice; `CancelSalesOrder` membuat retur dan mengembalikan stok. | OPN-004, OPN-005 | Business flow resolved; technical contract open |
 | TD-005 | Master tiga jenis harga, kategori, merek, nama produk, dan SKU. | OPN-003, OPN-013 | Resolved - POS |
 | TD-006 | Full master/inventory sync sekali sehari; stock-by-product berkala bila diperlukan. | OPN-005 | Resolved working cadence; SLA/trigger final open |

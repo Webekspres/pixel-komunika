@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.6 - POS PIC and Access Gate |
+| Versi | 0.7 - Invoice Required Fields |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -249,7 +249,7 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-001 | Sistem | Sistem membuat nomor order web unik dan menyimpan referensi invoice POS. | Constraint unik mencegah duplikasi nomor order, POS sales order ID, dan invoice ID/number; kebutuhan invoice lokal mengikuti [OPN-008](BRD.md#opn-008). | Baseline; invoice mapping partially open |
-| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, jenis harga, harga, kuantitas, ongkir, PPh 22, dan total historis tersedia; PPh 22 tampil sebagai komponen invoice terpisah dan dasar pengenaannya mengikuti [OPN-006](BRD.md#opn-006). | Proposed |
+| FR-ORD-002 | Sistem | Order menyimpan snapshot item, identitas toko, dan biaya yang telah disetujui untuk kebutuhan invoice. | Snapshot mencakup nama/alamat/kontak/NPWP toko; jumlah, nama, SKU, harga satuan, dan total harga setiap item; ongkir; total pembelian keseluruhan; serta nilai rupiah PPh 22 jika berlaku. Dasar pengenaan PPh 22 mengikuti [OPN-006](BRD.md#opn-006). | Baseline; source mapping partially open |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; status pemenuhan dan nomor resi mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle partially open |
@@ -283,7 +283,7 @@ scope pembatalan standar.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice miliknya sesuai format dan channel yang disetujui. | Tampilan, PDF, atau pengiriman invoice hanya diimplementasikan setelah [OPN-022](BRD.md#opn-022) menetapkan kebutuhan. | Proposed |
+| FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice miliknya sesuai format dan channel yang disetujui. | Invoice menampilkan identitas toko, rincian item, total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku sesuai [OPN-022](BRD.md#opn-022); keputusan PDF dan channel tetap terbuka. | Baseline; format/channel partially open |
 | FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1; `CancelSalesOrder` dipanggil jika order POS sudah ada, dan referensi retur/audit tersimpan tanpa duplikasi. | Baseline |
 
 ## 10. Modul Pembayaran Manual
@@ -401,8 +401,9 @@ FRD dapat dibaseline setelah:
   yang sama;
 - data origin, berat/dimensi, serta mapping alamat Biteship tersedia melalui
   [OPN-021](BRD.md#opn-021);
-- format/penyampaian invoice dan kebutuhan notifikasi diputuskan atau eksplisit
-  dikeluarkan dari MVP melalui [OPN-022](BRD.md#opn-022) dan
+- sumber identitas toko, format/penyampaian invoice, dan kebutuhan notifikasi
+  diputuskan atau eksplisit dikeluarkan dari MVP melalui
+  [OPN-022](BRD.md#opn-022) dan
   [OPN-023](BRD.md#opn-023);
 - hak akses katalog dan harga sebelum approval disetujui;
 - setiap item P0 memenuhi Definition of Ready;

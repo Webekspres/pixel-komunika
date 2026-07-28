@@ -7,7 +7,7 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.7 - POS PIC and Access Gate |
+| Versi | 0.8 - Invoice Required Fields |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
@@ -49,6 +49,7 @@ Status requirement:
 | CR-006 | Selasa, 28 Juli 2026 | Diagram dan hasil meeting skema API POS | Master produk dan inventory ditarik sekali sehari; stok per produk dapat dicek berkala untuk rekonsiliasi. Setiap transaksi web membuat sales order POS yang langsung mengurangi stok dan menerbitkan invoice; pembatalan menerbitkan retur. Seluruh field yang tersedia di POS menjadi master, sedangkan website melengkapi field yang belum tersedia. | Write-back sales order/retur menjadi baseline, OPN-004 diselesaikan, OPN-005/OPN-008/OPN-019/OPN-020/OPN-022 diperbarui, dan risiko konsistensi API ditambahkan. | Approved working scheme; API contract partial |
 | CR-007 | Selasa, 28 Juli 2026 | Keputusan working baseline System Analyst Webekspres | Konfigurasi klasifikasi, ambang, dan tarif PPh 22 dikelola melalui website. Nilai PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice, dan laporan. | Q-008 dan Q-009 diselesaikan; BR-007, BR-008, BR-015, BR-026, RULE-006, serta requirement turunannya diperjelas. Dasar pengenaan tetap terbuka pada OPN-006. | Resolved for working baseline |
 | CR-008 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai akses POS | Kak Rio ditetapkan sebagai PIC POS. Akses POS dibuka setelah alur website berbasis data contoh sudah berjalan. | Q-014 diselesaikan; OPN-005 dan OPN-019 diperjelas. Kontak dan trigger akses telah tersedia, sedangkan kontrak teknis API serta contract test tetap terbuka. | Resolved access owner and trigger |
+| CR-009 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai isi invoice | Invoice wajib menampilkan nama, alamat, nomor kontak, dan NPWP toko; jumlah barang, nama barang, SKU, harga satuan, dan total harga item; total pembelian keseluruhan; serta nilai rupiah PPh 22 jika berlaku. | Isi minimum invoice ditetapkan pada BR-016 dan requirement turunannya. OPN-022 tetap parsial untuk sumber data identitas toko, PDF, channel, dan kepemilikan dokumen invoice. | Required fields resolved; delivery format partial |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -238,8 +239,8 @@ flowchart LR
 | BR-012 | Admin harus dapat menentukan batas minimum stok. | Baseline |
 | BR-013 | Sistem harus menyimpan riwayat perubahan stok beserta sumbernya: sinkronisasi penuh, pengecekan per produk, sales order, pembatalan/retur, atau koreksi. | Baseline |
 | BR-014 | Setiap pesanan web harus dikirim ke POS melalui operasi pembuatan sales order. Keberhasilan POS langsung mengurangi stok dan menghasilkan invoice POS; referensi respons disimpan pada pesanan web ([lihat OPN-005](#opn-005)). | Baseline; error contract partially open |
-| BR-015 | Sistem harus menghitung subtotal, ongkir, PPh 22 yang aktif, dan total transaksi. Nilai PPh 22 harus ditampilkan sebagai komponen terpisah pada cart, checkout, dan invoice; perhitungannya mengikuti aturan klasifikasi, ambang, dan dasar pengenaan pada [OPN-006](#opn-006). | Baseline; dasar pengenaan partially open |
-| BR-016 | Sistem harus menyimpan referensi invoice yang diterbitkan POS ketika sales order berhasil dibuat. Kebutuhan nomor invoice lokal, format tampilan, dan penyampaiannya mengikuti [OPN-008](#opn-008) serta [OPN-022](#opn-022). | Baseline; format partially open |
+| BR-015 | Sistem harus menghitung subtotal, ongkir, PPh 22 yang aktif, dan total transaksi. Nilai PPh 22 harus ditampilkan sebagai komponen terpisah pada cart dan checkout, serta pada invoice ketika transaksi terkena PPh 22; perhitungannya mengikuti aturan klasifikasi, ambang, dan dasar pengenaan pada [OPN-006](#opn-006). | Baseline; dasar pengenaan partially open |
+| BR-016 | Sistem harus menyimpan referensi invoice yang diterbitkan POS ketika sales order berhasil dibuat. Invoice wajib memuat identitas toko (nama, alamat, nomor kontak, NPWP), detail item (jumlah, nama barang, SKU, harga satuan, total harga item), total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku. Kebutuhan nomor invoice lokal, sumber identitas toko, format tampilan, serta penyampaiannya mengikuti [OPN-008](#opn-008) dan [OPN-022](#opn-022). | Baseline; required fields resolved, delivery format partially open |
 | BR-017 | Satu pelanggan dapat memiliki lebih dari satu invoice. | Baseline |
 | BR-018 | Pembayaran dilakukan melalui transfer bank dan diverifikasi admin. | Baseline |
 | BR-019 | Pelanggan harus dapat mengunggah bukti pembayaran ([lihat OPN-009](#opn-009)). | Baseline; batas file dan retensi open |
@@ -264,7 +265,7 @@ flowchart LR
 | RULE-003 | Snapshot stok awal hari berasal dari POS. Website memperbarui stok efektif setelah keberhasilan pembuatan/pembatalan sales order dan mencocokkannya melalui sinkronisasi penuh harian atau pengecekan stok per produk. |
 | RULE-004 | Field produk yang tersedia di POS selalu mengikuti POS; gambar, deskripsi, atau data presentasi lain boleh dilengkapi di website hanya ketika belum tersedia dari POS. |
 | RULE-005 | Setiap produk wajib memiliki tiga jenis harga dari POS: `ECERAN`, `PARTAI`, dan `GROSIR`. Harga `ECERAN` disimpan tetapi tidak ditampilkan pada storefront fase saat ini. |
-| RULE-006 | Nilai harga, jenis harga terpilih, nama produk, SKU, ongkir, PPh 22, dan total disimpan sebagai snapshot transaksi. PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice, dan laporan; dasar pengenaannya mengikuti [OPN-006](#opn-006). |
+| RULE-006 | Nilai harga, jenis harga terpilih, nama produk, SKU, ongkir, PPh 22, dan total disimpan sebagai snapshot transaksi. PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, dan laporan, serta pada invoice jika berlaku; dasar pengenaannya mengikuti [OPN-006](#opn-006). |
 | RULE-007 | Upload bukti pembayaran tidak otomatis membuat transaksi berstatus lunas. |
 | RULE-008 | Pembayaran dianggap sah setelah diverifikasi admin. |
 | RULE-009 | Pembatalan menggunakan zona waktu `Asia/Jakarta`. |
@@ -273,7 +274,7 @@ flowchart LR
 | RULE-012 | Produk yang hilang dari respons POS tidak langsung dihapus permanen. |
 | RULE-013 | Sinkronisasi POS harus idempotent dan tidak membuat duplikasi. |
 | RULE-014 | Pemesanan kurir dilakukan di luar website. |
-| RULE-015 | Perubahan data produk setelah order tidak mengubah invoice lama. |
+| RULE-015 | Perubahan data produk atau identitas toko setelah order tidak mengubah invoice lama; invoice menggunakan snapshot identitas toko, item, harga, total, dan PPh 22 transaksi. |
 | RULE-016 | Data contoh harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment non-production. |
 | RULE-017 | Data contoh bukan bukti bahwa koneksi POS production telah lulus; go-live mensyaratkan koneksi POS production berhasil diuji. |
 | RULE-018 | Harga grosir memiliki minimum kuantitas yang dapat berbeda per produk. Aturan kelayakan dan penerapan harga partai dalam satu struk mengikuti [OPN-013](#opn-013). |
@@ -588,10 +589,13 @@ Data operasional untuk estimasi Biteship: origin pengiriman, sumber berat/dimens
 
 ### OPN-022
 
-POS menerbitkan invoice saat sales order dibuat. Yang masih terbuka adalah
-field invoice yang harus ditampilkan kembali oleh website, kebutuhan PDF,
-channel pengiriman, serta apakah website membuat dokumen invoice sendiri atau
-hanya merepresentasikan invoice POS. Nomor dan pemetaan mengikuti OPN-008.
+POS menerbitkan invoice saat sales order dibuat. Field minimum yang wajib
+ditampilkan telah ditetapkan: nama, alamat, nomor kontak, dan NPWP toko; jumlah,
+nama, SKU, harga satuan, dan total harga setiap item; total pembelian
+keseluruhan; serta nilai rupiah PPh 22 jika berlaku. Yang masih terbuka adalah
+sumber/mapping identitas toko, kebutuhan PDF, channel pengiriman, serta apakah
+website membuat dokumen invoice sendiri atau hanya merepresentasikan invoice
+POS. Nomor dan pemetaan mengikuti OPN-008.
 
 **Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
@@ -618,7 +622,7 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-005 | Jika batas dihapus, apakah kuantitas pembelian hanya dibatasi oleh stok tersedia dan tingkat harga? | BR-006, BR-007, aturan stok | Resolved - tidak ada hard limit dari aturan ini; ambang memicu PPh 22 |
 | Q-006 | Apakah surcharge ketika batas terlampaui ikut dihapus jika batas maksimal penjualan dihapus? | BR-008, FR-PRC-004 | Resolved - komponen tersebut adalah PPh 22 |
 | Q-007 | Apakah tiga tingkat harga berdasarkan kuantitas tetap berlaku tanpa perubahan? | BR-006, OPN-013 | Partially resolved - tiga jenis harga wajib; penerapan harga partai masih perlu dikonfirmasi |
-| Q-008 | Apakah PPh 22 harus tampil sebagai baris terpisah pada cart, checkout, invoice, dan laporan? | BR-015, RULE-006, laporan | Resolved - ditampilkan sebagai komponen terpisah pada seluruh titik tersebut |
+| Q-008 | Apakah PPh 22 harus tampil sebagai baris terpisah pada cart, checkout, invoice, dan laporan? | BR-015, RULE-006, laporan | Resolved - ditampilkan sebagai komponen terpisah; pada invoice hanya jika transaksi terkena PPh 22 |
 | Q-009 | Apakah konfigurasi klasifikasi, ambang, dan tarif PPh 22 berasal dari POS atau dikelola di website? | BR-008, BR-009, OPN-006 | Resolved - dikelola melalui website |
 | Q-010 | Apa saja “poin-poin yang berkenaan” yang juga ingin dihapus atau diubah oleh klien? | Seluruh traceability terkait | Resolved - tidak ada penghapusan scope berdasarkan CR-004 |
 | Q-011 | Apakah perubahan ini memengaruhi nilai proposal, scope komersial, atau deadline 45 hari kerja? | MVP baseline dan change control | Resolved - mengikuti plan/proposal awal |
@@ -632,6 +636,7 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-019 | Apakah POS mendukung external reference/idempotency untuk mencegah sales order, invoice, atau retur ganda ketika request timeout dan di-retry? | BR-014, BR-021 - BR-022, OPN-005 | Open - vendor POS |
 | Q-020 | Apakah invoice POS menjadi invoice resmi tunggal, atau website tetap membuat nomor/dokumen invoice sendiri? | BR-016, OPN-008, OPN-022 | Open |
 | Q-021 | Apakah sinkronisasi sales harian hanya untuk rekonsiliasi setelah `CreateSalesOrder`/`CancelSalesOrder` per transaksi, dan data apa yang bergerak pada masing-masing arah? | BR-009, BR-014, OPN-005 | Open - vendor POS |
+| Q-022 | Apakah nama, alamat, nomor kontak, dan NPWP toko pada invoice berasal dari payload POS atau konfigurasi website, dan siapa yang menyediakan nilai finalnya? | BR-016, OPN-022, SRS 9.1 | Open - klien/vendor POS |
 
 ### 15.2 MVP Baseline dan Stage Gates
 
@@ -669,7 +674,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai; OPN-013 dan OPN-020 masih parsial |
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat/dimensi, area, tarif, SLA. | Klien | G1 pengiriman | Blocker - OPN-010, OPN-021 |
-| PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Open - OPN-022, OPN-023 |
+| PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - field wajib invoice selesai; sumber identitas, format/channel invoice, dan notifikasi tetap OPN-022/OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Open - OPN-001 |
 | PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |
 

@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.5 - Candidate MVP dengan POS access gate |
+| Versi | 0.6 - Candidate MVP dengan field invoice wajib |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
@@ -45,7 +45,7 @@ serta diproses admin.
 | MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh digunakan sampai alur website berjalan, lalu akses POS dikoordinasikan dengan Kak Rio. |
 | MVP-007 | Stok efektif dan rekonsiliasi | BR-011 - BR-014; FR-POS-007 - FR-POS-012, FR-POS-017 - FR-POS-020 | Stok berkurang setelah sales order POS berhasil, bertambah setelah retur, dan dapat direkonsiliasi tanpa perubahan ganda. |
 | MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat subtotal, PPh 22, ongkir, serta total yang dihitung server-side; PPh 22 tampil sebagai komponen terpisah. |
-| MVP-009 | Sales order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-010 | Setiap transaksi web membuat sales order POS; referensi invoice POS disimpan dan PPh 22 tampil sebagai komponen invoice terpisah; pesanan belum dibayar otomatis dibatalkan pada hari berikutnya. |
+| MVP-009 | Sales order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-009 - FR-ORD-010 | Setiap transaksi web membuat sales order POS; invoice menyimpan referensi POS dan menampilkan identitas toko, jumlah/nama/SKU/harga satuan/total harga item, total pembelian keseluruhan, serta nilai rupiah PPh 22 jika berlaku; pesanan belum dibayar otomatis dibatalkan pada hari berikutnya. |
 | MVP-010 | Pembayaran transfer manual | BR-018 - BR-020; FR-PAY-001 - FR-PAY-007 | Pelanggan mengunggah bukti secara privat; admin menerima/menolak; status dan audit tercatat. |
 | MVP-011 | Pembatalan, retur, dan rekonsiliasi stok | BR-021 - BR-022; FR-ORD-006 - FR-ORD-008; FR-POS-012, FR-POS-018 | Pembatalan yang valid diteruskan ke POS, menghasilkan referensi retur, mengembalikan stok, dan tidak membuat retur ganda. |
 | MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025; FR-SHP-001 - FR-SHP-006 | Pelanggan memilih layanan yang tersedia; ongkir masuk invoice; kegagalan tidak menghasilkan ongkir Rp0. |
@@ -95,6 +95,8 @@ MVP dapat dinyatakan selesai apabila:
 - seluruh item P0 disetujui sebagai baseline dan memenuhi Definition of Done;
 - seluruh acceptance criteria P0 memiliki test case dan lulus di staging;
 - alur end-to-end registrasi sampai verifikasi pembayaran lulus UAT;
+- invoice menampilkan seluruh field wajib dan mempertahankan snapshot
+  historisnya;
 - koneksi POS production yang dikoordinasikan dengan Kak Rio tersedia dan
   contract test operasi master data, inventory, create/cancel sales order,
   invoice/retur, serta rekonsiliasi lulus;

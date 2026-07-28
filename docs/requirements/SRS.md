@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.7 - POS PIC and Access Gate |
+| Versi | 0.8 - Invoice Required Fields |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -77,6 +77,8 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - lookup sales order digunakan untuk rekonsiliasi invoice, retur, dan status;
 - field POS menjadi sumber utama ketika tersedia, sedangkan website hanya
   melengkapi field yang belum tersedia;
+- invoice wajib memuat identitas toko, rincian item, total pembelian
+  keseluruhan, dan nilai rupiah PPh 22 jika berlaku;
 - development memakai data contoh sampai akses POS dibuka setelah alur website
   berjalan; koordinasi akses dilakukan dengan Kak Rio sebagai PIC POS;
 - pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya.
@@ -286,7 +288,7 @@ menyediakan:
 - kontrak final seluruh operasi yang tercantum pada working scheme;
 - dukungan external reference/idempotency untuk operasi write-back;
 - aturan pencarian berdasarkan external reference;
-- skema invoice dan retur;
+- mapping payload invoice terhadap field invoice wajib dan skema retur;
 - perilaku transaksi ketika request timeout tetapi sudah diproses POS.
 
 Website:
@@ -421,9 +423,9 @@ Contoh error:
 | inventory_ledger | Riwayat perubahan stok. |
 | carts / cart_items | Keranjang aktif. |
 | orders | Header transaksi dan status. |
-| order_items | Snapshot produk, kuantitas, dan harga. |
+| order_items | Snapshot nama produk, SKU, kuantitas, harga satuan, dan total harga item. |
 | order_charge_components | Snapshot komponen biaya aktif, dasar perhitungan, tarif/nilai, dan total. |
-| invoices | Referensi invoice POS, nomor lokal jika disetujui, dan snapshot total. |
+| invoices | Referensi invoice POS, nomor lokal jika disetujui, snapshot nama/alamat/kontak/NPWP toko, total pembelian keseluruhan, dan nilai rupiah PPh 22 kondisional. |
 | pos_integration_operations | External reference, operasi, payload hash, status, attempt, correlation ID, dan hasil rekonsiliasi. |
 | pos_returns | Referensi retur POS, sales order asal, alasan pembatalan, dan perubahan stok. |
 | payments | Pengajuan dan verifikasi pembayaran. |
@@ -439,6 +441,19 @@ terpisah dari snapshot biaya order. Perubahan konfigurasi klasifikasi, ambang,
 atau tarif tidak boleh mengubah invoice lama. Dasar pengenaan tetap menunggu
 [`OPN-006`](BRD.md#opn-006). Perubahan skema harus melalui migration, data
 dictionary, test, dan ADR.
+
+Kontrak tampilan invoice minimum:
+
+- identitas toko: nama, alamat, nomor kontak, dan NPWP;
+- setiap item: jumlah, nama barang, SKU, harga satuan, dan total harga item;
+- ringkasan: total pembelian keseluruhan serta nilai rupiah PPh 22 jika
+  transaksi terkena PPh 22;
+- seluruh nilai disimpan sebagai snapshot agar invoice historis tidak berubah
+  ketika data toko, produk, atau harga diperbarui.
+
+Sumber/mapping identitas toko, status invoice resmi, kebutuhan PDF, dan channel
+penyampaian tetap mengikuti [`OPN-008`](BRD.md#opn-008) serta
+[`OPN-022`](BRD.md#opn-022).
 
 ### 9.2 Relasi Konseptual
 
@@ -742,7 +757,7 @@ sebagai sumber stok production.
 | Level | Cakupan Minimum |
 |---|---|
 | Unit | Pemilihan harga partai/grosir, visibilitas harga eceran, konfigurasi website untuk ambang/tarif PPh 22, perhitungan dan tampilan komponen PPh 22, status stok, serta auto-cancel D+1. |
-| Feature | Registrasi, approval, cart, checkout, pembayaran, pembatalan, laporan. |
+| Feature | Registrasi, approval, cart, checkout, invoice beserta field wajib, pembayaran, pembatalan, dan laporan. |
 | Integration | Seluruh operasi POS kerja, external reference/idempotency, timeout ambigu, rekonsiliasi invoice/retur, transisi seeder-ke-API, dan Biteship quote. |
 | Security | Authorization, IDOR, CSRF, rate limit, dan upload. |
 | Concurrency | Double checkout, duplicate request, dan stock race. |
@@ -780,7 +795,7 @@ sebagai sumber stok production.
 | TD-010 | Dasar pengenaan PPh 22 dan expiry order belum dibayar. Konfigurasi klasifikasi, ambang, dan tarif telah ditetapkan melalui website. | OPN-006, OPN-007 | Dasar pengenaan PPh 22 partially open; expiry D+1 resolved |
 | TD-011 | Web mengelola lifecycle sampai pengiriman; pembatalan memanggil POS dan menghasilkan retur. Status fulfillment/resi tetap terbuka. | OPN-020 | Partially resolved |
 | TD-012 | Origin, berat/dimensi produk, dan mapping alamat untuk Biteship. | OPN-021 | Open |
-| TD-013 | Format/penyampaian invoice serta event/channel notifikasi. | OPN-022, OPN-023 | Open |
+| TD-013 | Field wajib invoice telah ditetapkan; sumber identitas toko, format/penyampaian invoice, serta event/channel notifikasi belum final. | OPN-022, OPN-023 | Invoice content resolved; source/delivery and notification open |
 | TD-014 | POS menerbitkan invoice saat create sales order; status invoice POS sebagai dokumen resmi tunggal atau referensi website belum final. | OPN-008, OPN-022 | Partially resolved |
 
 ## 21. Referensi Teknis

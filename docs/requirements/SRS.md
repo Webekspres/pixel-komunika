@@ -162,7 +162,7 @@ flowchart TB
 
 ## 5. Deployment Profile
 
-### 5.1 Profil A - VPS (Direkomendasikan)
+### 5.1 Profil A - VPS (Opsi Upgrade)
 
 Baseline awal:
 
@@ -188,7 +188,7 @@ flowchart LR
     PHP --> Object[(Object Storage)]
 ```
 
-### 5.2 Profil B - Shared Hosting (Fallback)
+### 5.2 Profil B - Shared Hosting (Production Baseline)
 
 Jika shared hosting dipilih:
 
@@ -200,19 +200,22 @@ Jika shared hosting dipilih:
 - tidak ada Redis lokal, Supervisor, persistent worker, Octane, WebSocket
   server, Docker runtime, Node runtime, atau PM2.
 
-Keterbatasan shared hosting harus diterima tertulis karena dapat memengaruhi
-latensi sinkronisasi, retry, monitoring, dan ketahanan saat lonjakan beban.
+Keterbatasan shared hosting diterima sebagai baseline production. Desain harus
+menjaga sinkronisasi, retry, dan monitoring tetap ringan serta memindahkan
+kebutuhan persistent worker atau resource lebih besar ke opsi upgrade VPS.
 
 ### 5.3 Keputusan Hosting
 
-Status final: **TBD**. Proposal menyebut `Shareserver`, sedangkan SRS
-merekomendasikan VPS karena kebutuhan worker dan integrasi POS.
+Status final: **shared hosting milik klien**. Aplikasi memakai runtime PHP dan
+database yang disediakan hosting; VPS hanya menjadi opsi upgrade jika batas
+resource shared hosting tidak lagi mencukupi.
 
 ## 6. Scalability Strategy
 
 Tahapan peningkatan:
 
-1. Single VPS dengan cache, queue, CDN, dan object storage.
+1. Shared hosting dengan cache/queue berbasis database atau file, cron, dan
+   aset statis hasil build.
 2. Vertical scaling CPU/RAM berdasarkan metrics.
 3. Pindahkan database dan Redis ke resource terpisah.
 4. Jalankan beberapa application node di belakang load balancer.
@@ -256,39 +259,37 @@ Website:
 - mencatat hasil setiap proses;
 - tidak menghapus enrichment lokal.
 
-#### 7.1.1 Fallback Data Seeder
+#### 7.1.1 Data Contoh Non-Production
 
-Jika API POS belum tersedia:
+Jika koneksi POS belum tersedia:
 
-- development, staging, demo, dan UAT menggunakan seeder deterministik;
-- seeder memanggil jalur import/upsert yang sama dengan adapter POS, bukan
+- development, staging, demo, dan UAT menggunakan data contoh deterministik;
+- data contoh memanggil jalur import/upsert yang sama dengan adapter POS, bukan
   menulis langsung dengan aturan bisnis berbeda;
 - dataset memakai SKU/external ID stabil dan mencakup skenario harga serta stok
   representatif;
 - eksekusi ulang bersifat idempotent;
 - enrichment lokal tidak ditimpa;
-- sumber record dapat ditelusuri sebagai `SEEDER` atau `POS_API`;
-- seeder tidak menyimpan credential atau data pribadi production;
-- eksekusi production dinonaktifkan secara default dan hanya dapat diizinkan
-  melalui konfigurasi serta persetujuan tertulis pada
-  [`OPN-019`](BRD.md#opn-019).
+- data contoh tidak menyimpan credential atau data pribadi production;
+- production tidak menjalankan data contoh; produk dan stok production wajib
+  berasal dari koneksi POS yang telah diuji.
 
-Seeder memungkinkan pengembangan dan UAT berlanjut, tetapi tidak menggantikan
-contract test terhadap API POS asli.
+Data contoh memungkinkan pengembangan dan UAT berlanjut, tetapi tidak
+menggantikan pengujian koneksi terhadap POS asli sebelum go-live.
 
 ### 7.2 Data Ownership
 
 | Data | Master Default | Status |
 |---|---|---|
 | External product ID | POS | Amendment |
-| SKU | POS | Perlu konfirmasi |
-| Nama dasar produk | POS | Perlu konfirmasi |
+| SKU | POS atau website sesuai pemetaan | Perlu konfirmasi |
+| Nama dasar produk | POS atau website sesuai pemetaan | Perlu konfirmasi |
 | Stok aktual | POS | Baseline |
-| Produk/stok fallback sebelum API tersedia | Seeder | Baseline non-production |
+| Produk/stok contoh sebelum POS tersedia | Data contoh | Baseline non-production |
 | Status ketersediaan | Dihitung website dari stok POS | Draft |
-| Harga dasar | TBD | Open decision |
+| Harga dasar | POS atau website sesuai pemetaan | Open decision |
 | Harga bertingkat | Website | Draft |
-| Kategori/merek | TBD | Open decision |
+| Kategori/merek | POS atau website sesuai pemetaan | Open decision |
 | Gambar/video | Website | Amendment |
 | Deskripsi pemasaran | Website | Amendment |
 | SEO/slug/label/urutan | Website | Amendment |
@@ -471,7 +472,7 @@ Scheduler minimum:
 | NFR-PERF-002 | Halaman storefront utama | LCP p75 <= 2,5 detik pada kondisi target |
 | NFR-PERF-003 | Endpoint collection | Wajib pagination dan batas maksimum page size |
 | NFR-PERF-004 | Query laporan berat | Tidak memblokir request transaksi; gunakan queue/export |
-| NFR-PERF-005 | Kapasitas | Divalidasi load test setelah target concurrent user tersedia |
+| NFR-PERF-005 | Kapasitas | Baseline pengguna bersamaan normal maksimal 50 pengguna dan divalidasi melalui load test proporsional shared hosting |
 
 ### 12.2 Availability and Resilience
 
@@ -695,17 +696,17 @@ sebagai sumber stok production.
 
 | ID | Decision | Referensi BRD | Status |
 |---|---|---|---|
-| TD-001 | VPS atau shared hosting final. | OPN-001 | Open |
-| TD-002 | MySQL 8.4 atau MariaDB versi provider jika shared hosting. | OPN-001 | Open |
-| TD-003 | Detail kontrak dan autentikasi POS; seeder dipakai sampai API tersedia. | OPN-003, OPN-005, OPN-019 | Seeder fallback approved; API contract open |
+| TD-001 | Shared hosting milik klien sebagai production baseline. | OPN-001 | Resolved |
+| TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
+| TD-003 | Detail kontrak dan autentikasi POS; data contoh hanya dipakai di non-production. | OPN-003, OPN-005, OPN-019 | Production POS mandatory; connection contract open |
 | TD-004 | Mekanisme reservasi/write-back stok. | OPN-004, OPN-005 | Open |
 | TD-005 | Master harga, kategori, merek, dan SKU. | OPN-003, OPN-013 | Open |
 | TD-006 | Interval sinkronisasi dan SLA freshness stok. | OPN-005 | Open |
 | TD-007 | Object storage provider dan kebijakan retensi. | OPN-009 | Open |
-| TD-008 | Target concurrent user, volume produk, dan transaksi harian. | OPN-012 | Open |
+| TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
 | TD-010 | Formula PPh 22/surcharge, mapping POS, dan expiry order belum dibayar. | OPN-003, OPN-006, OPN-007 | Scope retained; formula/mapping/expiry open |
-| TD-011 | Lifecycle fulfillment order, pembatalan setelah pembayaran, dan kebutuhan bukti/resi. | OPN-020 | Open |
+| TD-011 | Lifecycle fulfillment dan kebutuhan bukti/resi; pembatalan baseline hanya oleh admin pada hari yang sama. | OPN-020 | Partially resolved |
 | TD-012 | Origin, berat/dimensi produk, dan mapping alamat untuk Biteship. | OPN-021 | Open |
 | TD-013 | Format/penyampaian invoice serta event/channel notifikasi. | OPN-022, OPN-023 | Open |
 

@@ -39,10 +39,14 @@ Governance utama berada pada:
 
 ## Current Change Notice
 
-Pada Senin, 27 Juli 2026, klien menyampaikan bahwa PPh 22 dan batas maksimal
-penjualan kemungkinan dihapus. Requirement terkait berstatus `ON_HOLD` sampai
-klarifikasi Selasa, 28 Juli 2026. Pertanyaan rapat tersedia pada
+Pada Selasa, 28 Juli 2026, klien mengarahkan agar pengembangan dilanjutkan
+sesuai proposal awal. PPh 22, batas maksimal penjualan, dan surcharge terkait
+tetap berada dalam MVP; detail formula masih menunggu klarifikasi pada
 [BRD Bagian 15.1](requirements/BRD.md#151-klarifikasi-klien-28-juli-2026).
+
+Production menggunakan shared hosting milik klien. Data production produk dan
+stok wajib berasal dari POS; data contoh hanya digunakan untuk development,
+staging, demo, dan UAT.
 
 ## Source Documents
 

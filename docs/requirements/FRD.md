@@ -101,7 +101,7 @@ Rincian sprint difinalkan setelah item P0 dan keputusan kritis disetujui.
 | Pelanggan Aktif | Pengguna yang telah disetujui dan dapat bertransaksi. |
 | Admin | Pengguna internal yang mengelola operasional website. |
 | Scheduler/Worker | Proses sistem untuk sinkronisasi dan pekerjaan latar belakang. |
-| Data Seeder | Sumber data fallback ketika API POS belum tersedia. |
+| Data Contoh (Seeder) | Sumber data dummy untuk development, staging, demo, dan UAT ketika koneksi POS belum tersedia; tidak digunakan pada production. |
 | POS | Sistem eksternal sumber produk dan stok. |
 | Biteship | Sistem eksternal penyedia estimasi ongkir. |
 
@@ -184,10 +184,10 @@ menunggu detail [OPN-006](BRD.md#opn-006).
 
 ## 6. Modul POS dan Stok
 
-API POS tetap menjadi sumber integration target. Jika API belum tersedia, data
-seeder menjadi fallback resmi untuk development, staging, demo, dan UAT.
-Penggunaan seeder pada production memerlukan keputusan tertulis
-[`OPN-019`](BRD.md#opn-019).
+Koneksi POS menjadi sumber data production. Jika koneksi belum tersedia, data
+contoh menjadi fallback resmi untuk development, staging, demo, dan UAT. Data
+contoh tidak digunakan pada production; production wajib menggunakan koneksi
+POS sesuai [`OPN-019`](BRD.md#opn-019).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
@@ -206,7 +206,7 @@ Penggunaan seeder pada production memerlukan keputusan tertulis
 | FR-POS-013 | Data Seeder | Sistem dapat memuat produk, harga, dan stok representatif ketika API POS belum tersedia. | Dataset mencakup variasi produk aktif/nonaktif, tiga tingkat harga, serta status stok tersedia/menipis/habis. | Baseline |
 | FR-POS-014 | Sistem | Seeder mengikuti kontrak data internal yang juga digunakan adapter POS. | SKU/external ID stabil, field wajib tervalidasi, dan perubahan ke API tidak memerlukan perubahan domain transaksi. | Baseline |
 | FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi dan tidak menimpa enrichment lokal yang telah diedit. | Baseline |
-| FR-POS-016 | Sistem | Penggunaan seeder dibatasi berdasarkan environment. | Seeder tersedia untuk local/staging/UAT; production menolak eksekusi kecuali konfigurasi dan persetujuan tertulis mengizinkan. | Baseline |
+| FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; production selalu menolak eksekusi data contoh. | Baseline |
 
 ## 7. Modul Keranjang dan Checkout
 
@@ -240,7 +240,7 @@ Penggunaan seeder pada production memerlukan keputusan tertulis
 | FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, harga, kuantitas, ongkir, komponen biaya aktif, dan total historis tersedia; PPh 22/surcharge terkait batas mengikuti aturan [OPN-006](BRD.md#opn-006). | Proposed |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
-| FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; lifecycle final mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle open |
+| FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; status pemenuhan dan nomor resi mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle partially open |
 | FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta, tindakan ditolak. | Baseline |
 | FR-ORD-007 | Sistem | Pembatalan merekonsiliasi stok terkait. | Penyesuaian stok dan audit log dibuat secara atomik. | Baseline |
 | FR-ORD-008 | Sistem | Order yang sudah dibatalkan tidak dapat diproses lebih lanjut. | Transisi dari `CANCELLED` ditolak. | Proposed |
@@ -260,11 +260,13 @@ stateDiagram-v2
     SHIPPED --> COMPLETED
     WAITING_PAYMENT --> CANCELLED: Admin, hari yang sama
     PAYMENT_SUBMITTED --> CANCELLED: Admin, hari yang sama
-    PAYMENT_VERIFIED --> CANCELLED: Sesuai aturan final
+    PAYMENT_VERIFIED --> PROCESSING
 ```
 
-Lifecycle pemenuhan serta transisi pembatalan setelah pembayaran diverifikasi
-masih memerlukan keputusan bisnis ([OPN-020](BRD.md#opn-020)).
+Pembatalan standar hanya oleh admin pada hari yang sama dengan tanggal
+transaksi. Lifecycle pemenuhan dan kebutuhan nomor resi masih memerlukan
+keputusan bisnis ([OPN-020](BRD.md#opn-020)); pengembalian dana berada di luar
+scope pembatalan standar.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
@@ -365,8 +367,7 @@ FRD dapat dibaseline setelah:
 - seluruh item `ON_HOLD` dikeluarkan tertulis dari MVP atau dikembalikan menjadi
   requirement aktif dengan acceptance criteria;
 - API POS dapat diuji atau fallback seeder lulus acceptance test; contract test
-  API asli tetap menjadi production gate kecuali ada persetujuan tertulis
-  melalui `OPN-019`;
+  koneksi POS production tersedia dan lulus contract test;
 - API Biteship dapat diuji;
 - status/transisi order disetujui;
 - formula harga bertingkat disetujui;
@@ -374,8 +375,9 @@ FRD dapat dibaseline setelah:
   melalui [OPN-018](BRD.md#opn-018), serta formula dan mapping disetujui
   melalui [OPN-006](BRD.md#opn-006) dan [OPN-003](BRD.md#opn-003);
 - waktu reservasi/pengurangan stok disetujui;
-- lifecycle order, pembatalan setelah pembayaran, dan bukti fulfillment
-  disetujui melalui [OPN-020](BRD.md#opn-020);
+- lifecycle order dan bukti fulfillment disetujui melalui
+  [OPN-020](BRD.md#opn-020); pembatalan standar tetap oleh admin pada hari
+  yang sama;
 - data origin, berat/dimensi, serta mapping alamat Biteship tersedia melalui
   [OPN-021](BRD.md#opn-021);
 - format/penyampaian invoice dan kebutuhan notifikasi diputuskan atau eksplisit

@@ -43,7 +43,7 @@ Status requirement:
 |---|---|---|---|---|---|
 | CR-001 | Senin, 27 Juli 2026, 11.54-11.56 WIB | Pesan klien Sylvi | Klien menginformasikan perubahan pada PPh 22 dan batas maksimal penjualan; kedua poin kemungkinan besar dihilangkan, dengan rincian lanjutan menyusul. | Requirement terkait ditempatkan `ON_HOLD`; tidak dihapus dan tidak diimplementasikan sebelum klarifikasi Selasa, 28 Juli 2026. | Under clarification |
 | CR-002 | Senin, 27 Juli 2026 | Klarifikasi governance proyek | Sylvi ditetapkan sebagai perwakilan klien, Sultan sebagai System Analyst Webekspres, dan Pak Endang sebagai Project Manager Webekspres. Persetujuan final berada pada klien. | OPN-017 diselesaikan dan aturan efektivitas baseline diperjelas. | Resolved |
-| CR-003 | Senin, 27 Juli 2026 | Persetujuan working baseline dan fallback POS | Working baseline disetujui dan ditandatangani. Jika API POS belum disediakan, pengembangan serta pengujian menggunakan data seeder. | Tanggal persetujuan ditetapkan dan fallback seeder ditambahkan; kesiapan API production tetap dilacak. | Approved |
+| CR-003 | Senin, 27 Juli 2026 | Persetujuan working baseline dan fallback POS | Working baseline disetujui dan ditandatangani. Jika koneksi POS belum disediakan, pengembangan serta pengujian menggunakan data contoh. | Tanggal persetujuan ditetapkan dan data contoh non-production ditambahkan; kesiapan koneksi POS production tetap dilacak. | Approved |
 | CR-004 | Selasa, 28 Juli 2026 | Pesan klien Sylvi | Klien meminta pengembangan dilanjutkan sesuai plan yang telah dibuat. Sultan mengonfirmasi interpretasi bahwa scope kembali mengikuti proposal awal. | Batas maksimal penjualan serta komponen PPh 22/surcharge tetap berada dalam MVP. Detail formula dan mapping data tetap terbuka pada OPN-006. | Approved working direction |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
@@ -90,12 +90,12 @@ diregistrasi dan disetujui admin. Sistem mengelola katalog, harga bertingkat,
 stok, transaksi, invoice, pembayaran transfer manual, pengiriman, dan laporan
 omzet berdasarkan wilayah.
 
-Website mengonsumsi endpoint POS yang disediakan klien untuk mendapatkan data
-produk dan stok. Selama API belum tersedia, data seeder digunakan sebagai
-fallback pengembangan, staging, dan UAT dengan kontrak data yang menyerupai
-payload POS. Informasi pemasaran yang tidak tersedia di POS, seperti gambar,
-video, deskripsi, dan metadata penayangan, dikelola di website tanpa ditimpa
-oleh proses sinkronisasi atau seeding.
+Website menggunakan koneksi data dari POS yang disediakan klien untuk
+mendapatkan data produk dan stok production. Data contoh hanya digunakan untuk
+development, staging, demo, dan UAT ketika koneksi tersebut belum tersedia.
+Informasi pemasaran yang tidak tersedia di POS, seperti gambar, video,
+deskripsi, dan metadata penayangan, dikelola di website tanpa ditimpa oleh
+proses sinkronisasi data production.
 
 ## 4. Latar Belakang dan Masalah Bisnis
 
@@ -223,7 +223,7 @@ flowchart LR
 | BR-006 | Sistem harus mendukung tiga tingkat harga berdasarkan kuantitas ([lihat OPN-013](#opn-013)). | Baseline; detail open |
 | BR-007 | Sistem harus mendukung batas maksimal pembelian/penjualan pada produk tertentu ([lihat OPN-018](#opn-018)). | Baseline |
 | BR-008 | Sistem harus dapat mengenakan biaya persentase ketika batas pembelian terlampaui; keterkaitannya dengan PPh 22, formula, dan kondisi penerapannya mengikuti [OPN-006](#opn-006). | Baseline; formula open |
-| BR-009 | Website harus mengonsumsi produk dan stok dari API POS; selama API belum tersedia, data seeder digunakan untuk development, staging, dan UAT ([OPN-003](#opn-003), [OPN-005](#opn-005), [OPN-019](#opn-019)). | Baseline; API contract open |
+| BR-009 | Website harus mengonsumsi produk dan stok production dari POS; data contoh hanya digunakan untuk development, staging, demo, dan UAT ketika koneksi POS belum tersedia ([OPN-003](#opn-003), [OPN-005](#opn-005), [OPN-019](#opn-019)). | Baseline; koneksi POS production wajib |
 | BR-010 | Sinkronisasi POS tidak boleh menghapus enrichment produk yang dikelola website. | Amendment |
 | BR-011 | Sistem harus menampilkan status stok Tersedia, Menipis, atau Habis. | Baseline |
 | BR-012 | Admin harus dapat menentukan batas minimum stok. | Baseline |
@@ -264,8 +264,8 @@ flowchart LR
 | RULE-013 | Sinkronisasi POS harus idempotent dan tidak membuat duplikasi. |
 | RULE-014 | Pemesanan kurir dilakukan di luar website. |
 | RULE-015 | Perubahan data produk setelah order tidak mengubah invoice lama. |
-| RULE-016 | Seeder POS harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment yang diizinkan. |
-| RULE-017 | Seeder bukan bukti bahwa kontrak API POS production telah lulus; go-live dengan seeder memerlukan persetujuan tertulis terpisah. |
+| RULE-016 | Data contoh harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment non-production. |
+| RULE-017 | Data contoh bukan bukti bahwa koneksi POS production telah lulus; go-live mensyaratkan koneksi POS production berhasil diuji. |
 
 ## 11. Proses Bisnis Utama
 
@@ -327,13 +327,14 @@ Nilai target final harus disetujui pada technical kickoff
 
 ## 13. Asumsi dan Dependensi
 
-- Klien menyediakan dokumentasi, kredensial, dan environment API POS
+- Klien menyediakan dokumentasi, kredensial, dan environment koneksi POS
   ([lihat OPN-003](#opn-003) dan [OPN-005](#opn-005)).
-- Jika API POS belum tersedia, Webekspres menggunakan data seeder untuk
-  development, staging, demo, dan UAT.
+- Jika koneksi POS belum tersedia, Webekspres menggunakan data contoh untuk
+  development, staging, demo, dan UAT; data contoh tidak digunakan pada
+  production.
 - POS menyediakan identifier produk yang stabil.
-- Endpoint POS dapat diakses dari server production.
-- Kontrak field, rate limit, timeout, dan kebijakan perubahan versi API akan
+- Koneksi POS dapat diakses dari server production sebelum go-live.
+- Kontrak data, rate limit, timeout, dan kebijakan perubahan versi akan
   diberikan sebelum integrasi dimulai.
 - Klien menyediakan akun Biteship yang aktif.
 - Data rekening bank dan prosedur verifikasi pembayaran diberikan klien.
@@ -344,9 +345,8 @@ Nilai target final harus disetujui pada technical kickoff
 - Keputusan lifecycle order, format/penyampaian invoice, dan notifikasi dibuat
   sebelum requirement terkait masuk sprint ([lihat OPN-020](#opn-020),
   [OPN-022](#opn-022), dan [OPN-023](#opn-023)).
-- Infrastruktur production final belum diputuskan
-  ([open question: lihat OPN-001](#opn-001)); VPS direkomendasikan pada SRS,
-  sementara proposal masih menyebut shared server.
+- Infrastruktur production menggunakan shared hosting milik klien
+  ([lihat OPN-001](#opn-001)).
 - Perubahan scope setelah baseline mengikuti change control pada
   [Bagian 2.3](#23-change-control).
 
@@ -356,12 +356,12 @@ Nilai target final harus disetujui pada technical kickoff
 |---|---|---|---|
 | RSK-001 | POS hanya menyediakan endpoint baca tanpa reservasi/write-back. | Overselling. | Validasi stok ulang, aturan reservasi lokal, dan rekonsiliasi ([OPN-004](#opn-004), [OPN-005](#opn-005)). |
 | RSK-002 | Kontrak API POS berubah. | Sinkronisasi gagal. | Versioning, contract test, logging, dan change request ([lihat OPN-003](#opn-003)). |
-| RSK-003 | Shared hosting membatasi worker dan resource. | Sinkronisasi terlambat atau berhenti. | Gunakan VPS atau terima batas operasional tertulis ([lihat OPN-001](#opn-001)). |
+| RSK-003 | Shared hosting membatasi worker dan resource. | Sinkronisasi terlambat atau berhenti. | Gunakan cron, queue berbasis database/file, monitoring ringan, serta upgrade ke VPS bila batas resource tidak lagi mencukupi ([lihat OPN-001](#opn-001)). |
 | RSK-004 | Biteship lambat/tidak tersedia. | Checkout tertunda. | Timeout dan fallback manual yang disetujui ([lihat OPN-016](#opn-016)). |
 | RSK-005 | Lonjakan traffic atau bot. | Aplikasi lambat/tidak tersedia. | CDN, cache, rate limit, monitoring, dan scale-up. |
 | RSK-006 | Media produk dan bukti pembayaran membesar. | Storage/bandwidth habis. | Object storage, kompresi, dan kebijakan retensi ([lihat OPN-009](#opn-009)). |
 | RSK-007 | Formula PPh 22/surcharge dan mapping data terkait belum final. | Perhitungan checkout, invoice, dan laporan salah atau dikerjakan ulang. | Implementasi formula menunggu klarifikasi tertulis pada [OPN-006](#opn-006); scope fitur tetap baseline melalui [OPN-018](#opn-018). |
-| RSK-008 | API POS belum tersedia selama development atau menjelang go-live. | Contract mismatch, keterlambatan integrasi, dan stok production tidak aktual. | Gunakan seeder untuk delivery awal, definisikan adapter contract, lakukan contract test saat API tersedia, dan putuskan production gate melalui OPN-019. |
+| RSK-008 | Koneksi POS belum tersedia selama development atau menjelang go-live. | Contract mismatch, keterlambatan integrasi, dan stok production tidak aktual. | Gunakan data contoh hanya untuk delivery non-production, definisikan kontrak koneksi, dan lakukan contract test sebelum go-live melalui OPN-019. |
 
 ## 15. Keputusan Terbuka
 
@@ -371,9 +371,10 @@ dipindahkan ke requirement atau aturan bisnis terkait.
 
 ### OPN-001
 
-VPS atau shared hosting sebagai production baseline.
+Production menggunakan shared hosting milik klien. Batasan runtime dan
+operasional shared hosting menjadi baseline desain.
 
-**Pemilik:** Klien / Webekspres · **Target:** Sebelum MVP baseline · **Status:** Open
+**Pemilik:** Klien / Webekspres · **Target:** 28 Juli 2026 · **Status:** Resolved
 
 ### OPN-002
 
@@ -383,9 +384,12 @@ Apakah reseller merupakan scope resmi; siapa yang dikategorikan sebagai reseller
 
 ### OPN-003
 
-Field produk dan harga yang menjadi master POS atau website.
+Data produk dan stok production berasal dari POS. Website mengelola informasi
+penayangan yang tidak tersedia dari POS. Pembagian untuk SKU, nama produk,
+kategori, merek, dan harga yang berbeda antara POS dan website masih perlu
+dipetakan.
 
-**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Open
+**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-004
 
@@ -395,7 +399,9 @@ Kapan stok dikurangi atau direservasi: saat checkout, pembuatan invoice, verifik
 
 ### OPN-005
 
-Kapan API POS read tersedia; apakah tersedia endpoint order write-back/reservasi; serta apa kontrak dan batas operasionalnya. Fallback seeder telah disetujui untuk delivery sebelum API tersedia.
+Kapan koneksi data POS tersedia; apakah POS mendukung pembaruan/reservasi order;
+serta apa kontrak dan batas operasionalnya. Data contoh hanya digunakan untuk
+delivery non-production sebelum koneksi POS tersedia.
 
 **Pemilik:** Vendor POS · **Target:** Sebelum integration acceptance · **Status:** Partially resolved
 
@@ -437,9 +443,12 @@ Definisi status transaksi yang dihitung sebagai omzet.
 
 ### OPN-012
 
-Target availability, volume produk, transaksi, concurrent user normal, dan skenario lonjakan beban.
+Baseline internal pengguna bersamaan normal maksimal 50 pengguna dan dapat
+lebih rendah. Volume produk/transaksi, target availability, serta skenario
+lonjakan beban divalidasi Webekspres melalui pengujian proporsional shared
+hosting.
 
-**Pemilik:** Klien · **Target:** Sebelum performance test · **Status:** Open
+**Pemilik:** Webekspres · **Target:** Sebelum performance test · **Status:** Assumption
 
 ### OPN-013
 
@@ -479,15 +488,21 @@ Keputusan scope PPh 22, batas maksimal penjualan, dan surcharge terkait. Scope t
 
 ### OPN-019
 
-Apakah seeder hanya digunakan untuk development/staging/UAT atau juga diizinkan sementara pada production; kapan API POS ditargetkan tersedia; dan siapa yang menyetujui kesesuaian seed data dengan data bisnis.
+Data contoh hanya digunakan untuk development, staging, demo, dan UAT.
+Production wajib menggunakan data dari POS. Yang masih terbuka adalah target
+ketersediaan koneksi POS dan penerimaan hasil uji koneksi tersebut sebelum
+go-live.
 
-**Pemilik:** Klien / Vendor POS / Webekspres · **Target:** Sebelum go-live · **Status:** Open
+**Pemilik:** Klien / Vendor POS / Webekspres · **Target:** Sebelum go-live · **Status:** Partially resolved
 
 ### OPN-020
 
-Lifecycle order setelah pembayaran: status yang digunakan, actor yang boleh mengubah setiap status, bukti/nomor resi yang diperlukan, serta aturan pembatalan atau pengembalian setelah pembayaran terverifikasi.
+Baseline pembatalan adalah hanya oleh admin pada hari yang sama dengan tanggal
+transaksi. Status pemenuhan setelah pembayaran dan kebutuhan nomor resi masih
+perlu ditetapkan. Pengembalian dana tidak termasuk dalam fitur pembatalan
+standar proposal dan membutuhkan change request terpisah.
 
-**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Open
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-021
 
@@ -503,7 +518,9 @@ Format dan penyampaian invoice: field bisnis wajib, tampilan di website dan/atau
 
 ### OPN-023
 
-Kebutuhan notifikasi: event yang perlu diberitahukan kepada pelanggan/admin, channel yang disetujui, pemilik template, serta fallback jika pengiriman notifikasi gagal.
+Kebutuhan notifikasi diputuskan dalam dua langkah: (1) event yang perlu
+diberitahukan kepada pelanggan dan admin; lalu (2) channel, pemilik template,
+dan fallback jika pengiriman notifikasi gagal.
 
 **Pemilik:** Klien / Webekspres · **Target:** Sebelum Sprint 2 · **Status:** Open
 
@@ -527,8 +544,8 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-010 | Apa saja “poin-poin yang berkenaan” yang juga ingin dihapus atau diubah oleh klien? | Seluruh traceability terkait | Resolved - tidak ada penghapusan scope berdasarkan CR-004 |
 | Q-011 | Apakah perubahan ini memengaruhi nilai proposal, scope komersial, atau deadline 45 hari kerja? | MVP baseline dan change control | Resolved - mengikuti plan/proposal awal |
 | Q-012 | Siapa yang memberikan persetujuan final dan kapan keputusan tersebut efektif menjadi baseline? | OPN-017 | Resolved - klien memberi persetujuan final; efektif setelah persetujuan tertulis kedua pihak pada hari kerja |
-| Q-013 | Apakah fallback seeder hanya untuk development/staging/UAT atau diizinkan sementara pada production jika API POS belum tersedia saat go-live? | BR-009, OPN-019 | Open |
-| Q-014 | Kapan API POS ditargetkan tersedia dan siapa yang memvalidasi field serta contoh data seeder? | OPN-003, OPN-005, OPN-019 | Open |
+| Q-013 | Apakah data contoh boleh digunakan pada production jika koneksi POS belum tersedia saat go-live? | BR-009, OPN-019 | Resolved - tidak; data production wajib berasal dari POS |
+| Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi pemetaan data? | OPN-003, OPN-005, OPN-019 | Open |
 
 ### 15.2 MVP Baseline dan Stage Gates
 

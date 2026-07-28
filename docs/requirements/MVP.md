@@ -42,7 +42,7 @@ serta diproses admin.
 | MVP-003 | Hak akses guest, pending, aktif, dan admin | FR-AUTH-002; FR-CAT-007; FR-PRC-007; FR-ORD-003 | Guest/pending dapat melihat katalog tanpa harga; hanya pelanggan aktif dapat checkout dan melihat riwayat sendiri. |
 | MVP-004 | Katalog dan enrichment produk | BR-005; FR-CAT-001 - FR-CAT-007 | Produk aktif, kategori, merek, SKU, deskripsi, dan media dapat dikelola tanpa kehilangan enrichment lokal. |
 | MVP-005 | Tiga tingkat harga | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-007 | Harga yang benar dipilih berdasarkan kuantitas, tervalidasi saat checkout, dan disimpan sebagai snapshot. Detail mengikuti OPN-013. |
-| MVP-006 | Sumber produk/stok POS atau seeder | BR-009 - BR-013; FR-POS-001 - FR-POS-003, FR-POS-007 - FR-POS-009, FR-POS-013 - FR-POS-016 | Sistem dapat dikembangkan dan diuji dengan dataset stabil; API digunakan ketika tersedia tanpa mengubah domain transaksi. |
+| MVP-006 | Sumber produk/stok POS dengan data contoh non-production | BR-009 - BR-013; FR-POS-001 - FR-POS-003, FR-POS-007 - FR-POS-009, FR-POS-013 - FR-POS-016 | Data production berasal dari POS; data contoh hanya digunakan untuk development dan pengujian tanpa mengubah domain transaksi. |
 | MVP-007 | Status dan validasi stok | BR-011 - BR-013; FR-POS-007 - FR-POS-009, FR-POS-011 | Status tersedia/menipis/habis benar dan stok divalidasi kembali sebelum order dibuat. |
 | MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat total yang dihitung server-side. |
 | MVP-009 | Order, invoice, dan riwayat | BR-016 - BR-017; FR-ORD-001 - FR-ORD-005 | Order/invoice unik dibuat dengan snapshot; pelanggan aktif melihat miliknya dan admin mengelola seluruh order. |
@@ -55,21 +55,21 @@ serta diproses admin.
 | MVP-016 | Release readiness | SRS Bagian 15 - 18 | Staging, CI, backup, rollback, logging, smoke test, UAT, training, dan sign-off go-live tersedia. |
 | MVP-017 | Batas pembelian dan komponen biaya | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Batas aktif tervalidasi saat checkout; komponen biaya aktif dihitung dan disimpan sebagai snapshot sesuai OPN-006. |
 
-## 4. Fallback API POS
+## 4. Data Contoh Saat Koneksi POS Belum Tersedia
 
-Jika API POS belum tersedia:
+Jika koneksi POS belum tersedia:
 
-1. Sprint menggunakan seeder deterministik melalui jalur import/upsert yang sama
+1. Sprint menggunakan data contoh deterministik melalui jalur import/upsert yang sama
    dengan adapter POS.
 2. Dataset minimal mencakup produk aktif/nonaktif, tiga tingkat harga, serta stok
    tersedia/menipis/habis.
-3. SKU dan external ID stabil; menjalankan seeder berulang kali tidak membuat
+3. SKU dan external ID stabil; menjalankan data contoh berulang kali tidak membuat
    duplikasi atau menimpa enrichment lokal.
-4. Seeder dapat digunakan untuk local, staging, demo, dan UAT.
-5. Seeder tidak otomatis diizinkan sebagai sumber stok production.
-6. Go-live tanpa API POS memerlukan persetujuan tertulis melalui
+4. Data contoh dapat digunakan untuk local, staging, demo, dan UAT.
+5. Data contoh tidak diizinkan sebagai sumber produk atau stok production.
+6. Go-live mensyaratkan koneksi POS tersedia dan berhasil diuji melalui
    [OPN-019](BRD.md#opn-019).
-7. Ketika API tersedia, contract test wajib lulus sebelum sumber data diganti.
+7. Ketika koneksi POS tersedia, contract test wajib lulus sebelum go-live.
 
 ## 5. Tidak Termasuk P0 Saat Ini
 
@@ -91,7 +91,7 @@ MVP dapat dinyatakan selesai apabila:
 - seluruh item P0 disetujui sebagai baseline dan memenuhi Definition of Done;
 - seluruh acceptance criteria P0 memiliki test case dan lulus di staging;
 - alur end-to-end registrasi sampai verifikasi pembayaran lulus UAT;
-- strategi sumber data POS/seeder untuk production diputuskan tertulis;
+- koneksi POS production tersedia dan lulus contract test;
 - tidak ada defect kritis atau tinggi yang belum diterima sebagai risiko;
 - backup, rollback, monitoring, security check, training, dan smoke test siap;
 - Sylvi memberikan UAT dan go-live sign-off pada hari kerja;

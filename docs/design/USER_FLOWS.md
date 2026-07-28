@@ -4,7 +4,7 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.1 - Working Baseline |
+| Versi | 0.2 - Biteship Maps/Rates Flow |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -31,7 +31,7 @@
 | [UF-04](#uf-04-login-dan-routing-akses) | Login dan routing akses | Pengguna | Sesi sesuai role/status |
 | [UF-05](#uf-05-detail-produk-dan-cart) | Detail produk dan cart | Pelanggan aktif | Cart terisi |
 | [UF-06](#uf-06-rekalkulasi-harga-dan-pph-22) | Rekalkulasi harga dan PPh 22 | Sistem | Total cart server-side |
-| [UF-07](#uf-07-alamat-dan-pengiriman) | Alamat dan pengiriman | Pelanggan aktif, Biteship | Quote/ongkir terpilih |
+| [UF-07](#uf-07-alamat-dan-pengiriman) | Alamat dan pengiriman | Pelanggan aktif, Biteship Maps/Rates | Snapshot ongkir terpilih |
 | [UF-08](#uf-08-validasi-checkout) | Validasi checkout | Pelanggan aktif, sistem | Draft order idempotent |
 | [UF-09](#uf-09-sales-order-pos-dan-invoice) | Sales order POS dan invoice | Sistem, POS | Order aktif dan invoice |
 | [UF-10](#uf-10-pengajuan-pembayaran) | Pengajuan pembayaran | Pelanggan aktif | Bukti pembayaran submitted |
@@ -215,27 +215,30 @@ Lanjutan: [UF-07 Alamat dan Pengiriman](#uf-07-alamat-dan-pengiriman).
 ```mermaid
 flowchart TD
     A([Mulai pengiriman]) --> B["Pilih atau kelola alamat"]
-    B --> C{"Alamat lengkap dan area dikenali?"}
-    C -->|Tidak| D["Minta pelanggan memperbaiki alamat"]
+    B --> B1["Cari area setelah pelanggan selesai mengetik"]
+    B1 --> B2["Backend memanggil Biteship Maps"]
+    B2 --> C{"Alamat lengkap dan area ID dikenali?"}
+    C -->|Tidak| D["Minta pelanggan memilih atau memperbaiki area"]
     D --> B
     C -->|Ya| E{"Metode pengiriman?"}
     E -->|Kurir toko| F{"Tarif aktif tersedia untuk area?"}
     F -->|Tidak| G["Blokir metode kurir toko"]
     G --> E
     F -->|Ya| H["Pilih tarif dan ETA kurir toko"]
-    E -->|Biteship| I["Validasi origin, alamat, berat, dan dimensi"]
+    E -->|Biteship| I["Validasi area origin/destination, daftar kurir,<br/>nama, nilai, kuantitas, dan berat setiap item"]
     I --> J{"Data quote lengkap?"}
     J -->|Tidak| K["Blokir quote dan catat data yang kurang"]
     K --> E
-    J -->|Ya| L["Backend meminta quote Biteship"]
-    L --> M{"Quote berhasil?"}
-    M -->|Ya| N["Pilih layanan, ETA, dan biaya"]
+    J -->|Ya| L["Backend memanggil Biteship Rates;<br/>kirim dimensi bila tersedia"]
+    L --> M{"Respons dan rate valid?"}
+    M -->|Ya| N["Pilih kurir/layanan, durasi,<br/>mata uang, dan harga final"]
     M -->|Tidak| O{"Fallback sudah disetujui?"}
     O -->|Tidak| P["Hentikan checkout; ongkir tidak boleh Rp0"]
     P --> E
     O -->|Ya| H
     H --> Q["Simpan pilihan sementara"]
-    N --> Q
+    N --> R["Simpan snapshot provider, kurir, layanan,<br/>area ID, price, hash request, dan waktu quote"]
+    R --> Q
     Q --> C_UF08(["→ UF-08"])
 
     click C_UF08 "#uf-08-validasi-checkout"
@@ -245,6 +248,8 @@ Data operasional dan fallback mengikuti
 [OPN-010](../requirements/BRD.md#opn-010),
 [OPN-016](../requirements/BRD.md#opn-016), dan
 [OPN-021](../requirements/BRD.md#opn-021).
+Biteship di flow ini adalah external Maps/Rates provider; flow tidak membuat
+order, pickup, label, atau tracking di Biteship.
 
 Lanjutan: [UF-08 Validasi Checkout](#uf-08-validasi-checkout).
 
@@ -597,5 +602,5 @@ melalui queue dan tidak boleh memblokir transaksi.
 | [OPN-013](../requirements/BRD.md#opn-013) | Cakupan harga partai dan prioritas terhadap grosir pada UF-06. |
 | [OPN-016](../requirements/BRD.md#opn-016) | Perilaku fallback ketika quote Biteship gagal pada UF-07. |
 | [OPN-020](../requirements/BRD.md#opn-020) | Lifecycle fulfillment dan tracking pada UF-12. |
-| [OPN-021](../requirements/BRD.md#opn-021) | Origin, berat, dimensi, dan data quote pada UF-07. |
+| [OPN-021](../requirements/BRD.md#opn-021) | Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya provider pada UF-07. |
 | [OPN-022](../requirements/BRD.md#opn-022) | Sumber identitas toko, nomor/ownership, PDF, dan channel invoice pada UF-09. |

@@ -7,7 +7,7 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.9 - Partai Eligibility Rule |
+| Versi | 0.10 - Biteship Maps/Rates Contract |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
@@ -51,6 +51,7 @@ Status requirement:
 | CR-008 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai akses POS | Kak Rio ditetapkan sebagai PIC POS. Akses POS dibuka setelah alur website berbasis data contoh sudah berjalan. | Q-014 diselesaikan; OPN-005 dan OPN-019 diperjelas. Kontak dan trigger akses telah tersedia, sedangkan kontrak teknis API serta contract test tetap terbuka. | Resolved access owner and trigger |
 | CR-009 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai isi invoice | Invoice wajib menampilkan nama, alamat, nomor kontak, dan NPWP toko; jumlah barang, nama barang, SKU, harga satuan, dan total harga item; total pembelian keseluruhan; serta nilai rupiah PPh 22 jika berlaku. | Isi minimum invoice ditetapkan pada BR-016 dan requirement turunannya. OPN-022 tetap parsial untuk sumber data identitas toko, PDF, channel, dan kepemilikan dokumen invoice. | Required fields resolved; delivery format partial |
 | CR-010 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai syarat harga partai | Dalam satu pembelian, sedikitnya satu produk/SKU harus berjumlah minimal lima unit agar transaksi memenuhi syarat harga partai. Kuantitas produk/SKU berbeda tidak dijumlahkan. | Kriteria kelayakan harga partai pada BR-006, RULE-018, OPN-013, dan Q-015 diperjelas. Cakupan item yang mendapat harga partai serta prioritas terhadap harga grosir tetap terbuka. | Eligibility resolved; application partial |
+| CR-011 | Selasa, 28 Juli 2026 | Dokumentasi resmi Biteship | Biteship diidentifikasi sebagai API pengiriman multi-kurir eksternal. Scope proyek memakai Maps API untuk standardisasi area dan Rates API untuk memperoleh pilihan layanan serta estimasi ongkir; API order, pickup, label, tracking, dan webhook Biteship tidak termasuk baseline. | Kontrak teknis dasar BR-024 dan requirement turunannya diperjelas. Nilai origin, sumber berat, daftar kurir, metode lokasi, serta fallback tetap dibahas melalui OPN-016 dan OPN-021. | Technical reference adopted; business scope unchanged |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -141,7 +142,7 @@ Proses penjualan membutuhkan kanal digital yang:
 | Pelanggan | Melakukan registrasi, melihat katalog, membuat pesanan, membayar, dan memantau transaksi. |
 | Kak Rio - PIC POS | Menjadi narahubung koordinasi akses, kontrak teknis, dan validasi integrasi POS. |
 | Vendor / pengelola POS | Menyediakan API, kredensial, dokumentasi, dan identifier produk yang stabil. |
-| Biteship | Menyediakan layanan estimasi ongkir sesuai kontrak API. |
+| Biteship | Penyedia API pengiriman multi-kurir eksternal; pada baseline hanya menyediakan standardisasi area melalui Maps API serta layanan dan estimasi ongkir melalui Rates API. |
 | Webekspres | Menganalisis, mengembangkan, menguji, menerapkan, dan memelihara aplikasi sesuai scope. |
 | Pixel Komunika | Penerima hasil akhir pengembangan dan pihak koordinasi proyek. |
 
@@ -216,7 +217,7 @@ flowchart LR
     Customer[Pelanggan] --> Web[Website E-Commerce]
     Admin[Admin Operasional] --> Web
     Web <--> POS[Sistem POS Klien]
-    Web --> Biteship[Biteship - Estimasi Ongkir]
+    Web --> Biteship[Biteship API - Maps dan Rates]
     Web --> Bank[Transfer Bank Manual]
     Admin --> Bank
     Web --> Report[Laporan Transaksi dan Omzet]
@@ -249,7 +250,7 @@ flowchart LR
 | BR-021 | Admin dapat membatalkan transaksi hanya pada tanggal kalender yang sama dengan transaksi; pembatalan sales order POS dilakukan melalui operasi pembatalan. | Baseline |
 | BR-022 | Pembatalan POS harus menerbitkan retur, mengembalikan stok, serta menyimpan referensi retur dan hasil rekonsiliasi pada website. | Baseline |
 | BR-023 | Sistem harus mendukung kurir toko beserta biaya berdasarkan wilayah ([lihat OPN-010](#opn-010)). | Baseline; area, tarif, dan SLA open |
-| BR-024 | Biteship hanya digunakan untuk menampilkan layanan dan estimasi ongkir ([lihat OPN-021](#opn-021)). | Baseline; data origin/dimensi open |
+| BR-024 | Biteship digunakan sebagai provider eksternal untuk standardisasi area melalui Maps API dan pilihan layanan/estimasi ongkir melalui Rates API; Biteship bukan sumber order, stok, invoice, atau pembayaran website ([lihat OPN-021](#opn-021)). | Baseline; data operasional dan kurir open |
 | BR-025 | Ongkir terpilih harus masuk ke total transaksi dan invoice. | Baseline |
 | BR-026 | Sistem harus menyediakan laporan transaksi dan omzet per periode dan wilayah, dengan nilai PPh 22 ditampilkan sebagai komponen terpisah ([lihat OPN-011](#opn-011)). | Baseline; definisi omzet open |
 | BR-027 | Sistem harus mempertahankan jejak audit untuk tindakan administratif kritis. | [Proposed; lihat OPN-015](#opn-015) |
@@ -274,7 +275,7 @@ flowchart LR
 | RULE-011 | Kegagalan Biteship tidak boleh otomatis menghasilkan ongkir Rp0. |
 | RULE-012 | Produk yang hilang dari respons POS tidak langsung dihapus permanen. |
 | RULE-013 | Sinkronisasi POS harus idempotent dan tidak membuat duplikasi. |
-| RULE-014 | Pemesanan kurir dilakukan di luar website. |
+| RULE-014 | Pemesanan/pickup, label, dan tracking kurir melalui API Biteship dilakukan di luar baseline website. |
 | RULE-015 | Perubahan data produk atau identitas toko setelah order tidak mengubah invoice lama; invoice menggunakan snapshot identitas toko, item, harga, total, dan PPh 22 transaksi. |
 | RULE-016 | Data contoh harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment non-production. |
 | RULE-017 | Data contoh bukan bukti bahwa koneksi POS production telah lulus; go-live mensyaratkan koneksi POS production berhasil diuji. |
@@ -368,8 +369,10 @@ Nilai target final harus disetujui pada technical kickoff
 - Data rekening bank dan prosedur verifikasi pembayaran diberikan klien.
 - Daftar wilayah kurir toko dan tarifnya diberikan klien
   ([lihat OPN-010](#opn-010)).
-- Data origin serta berat/dimensi produk untuk estimasi Biteship diberikan klien
-  atau disepakati sebagai aturan operasional ([lihat OPN-021](#opn-021)).
+- Data origin, berat produk, daftar kurir, serta pemetaan area untuk estimasi
+  Biteship diberikan klien atau disepakati sebagai aturan operasional; dimensi
+  produk diperlukan hanya jika dipakai dalam perhitungan layanan
+  ([lihat OPN-021](#opn-021)).
 - Keputusan lifecycle order, format/penyampaian invoice, dan notifikasi dibuat
   sebelum requirement terkait masuk sprint ([lihat OPN-020](#opn-020),
   [OPN-022](#opn-022), dan [OPN-023](#opn-023)).
@@ -584,7 +587,12 @@ di luar pembatalan/retur stok standar membutuhkan change request terpisah.
 
 ### OPN-021
 
-Data operasional untuk estimasi Biteship: origin pengiriman, sumber berat/dimensi produk, nilai default bila data belum lengkap, dan mapping alamat pelanggan ke input Biteship.
+Data operasional untuk integrasi Biteship: origin pengiriman; sumber berat
+produk dan nilai default bila data belum lengkap; penggunaan dimensi paket;
+daftar kode kurir/layanan yang ditawarkan; serta metode lokasi untuk origin dan
+destination. Area ID Biteship menjadi pilihan utama untuk layanan reguler,
+sedangkan koordinat diperlukan jika kurir instan masuk scope. Perlu dipastikan
+juga siapa yang menanggung akun, aktivasi production, dan biaya penggunaan API.
 
 **Pemilik:** Klien / Webekspres · **Target:** Sebelum integrasi Biteship · **Status:** Open
 
@@ -674,7 +682,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - scope, sumber konfigurasi website, dan tampilan terpisah selesai; formula tetap OPN-006 |
 | PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai dan kelayakan partai pada OPN-013 terjawab; cakupan penerapan/prioritas harga serta OPN-020 masih parsial |
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
-| PRE-004 | Data Biteship dan kurir toko: origin, berat/dimensi, area, tarif, SLA. | Klien | G1 pengiriman | Blocker - OPN-010, OPN-021 |
+| PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Blocker operasional - OPN-010, OPN-016, OPN-021; kontrak Maps/Rates sudah teridentifikasi |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - field wajib invoice selesai; sumber identitas, format/channel invoice, dan notifikasi tetap OPN-022/OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Open - OPN-001 |
 | PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |

@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.11 - Granular User Flow Working Baseline |
+| Versi | 0.12 - Biteship Maps/Rates Contract |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -148,7 +148,7 @@ flowchart TB
     Redis[(Redis)]
     Storage[(S3-compatible Storage)]
     POS[POS API]
-    Biteship[Biteship API]
+    Biteship[Biteship API<br/>Maps + Rates]
 
     Browser --> CDN --> App
     App --> DB
@@ -160,7 +160,6 @@ flowchart TB
     Redis --> Worker
     Worker --> DB
     Worker --> POS
-    Worker --> Biteship
     Worker --> Storage
 ```
 
@@ -361,34 +360,77 @@ menggantikan pengujian koneksi terhadap POS asli sebelum go-live.
 | Gambar/video | POS ketika tersedia; fallback website | Baseline |
 | Deskripsi pemasaran | POS ketika tersedia; fallback website | Baseline |
 | SEO/slug/label/urutan | POS ketika tersedia; fallback website | Baseline |
+| Area ID dan pilihan rate sementara | Biteship | Baseline external/transient |
+| Pilihan pengiriman dan harga final saat checkout | Snapshot website | Baseline |
 
 ### 7.3 Biteship API
 
-Input minimum:
+Biteship diidentifikasi sebagai **external multi-carrier shipping API**. Dalam
+sistem ini perannya dibatasi sebagai **location/rate provider**, bukan system of
+record produk, stok, order, invoice, pembayaran, atau fulfillment. Website
+menyimpan snapshot pilihan pengiriman yang disetujui pelanggan.
 
-- origin;
-- destination;
-- berat/dimensi sesuai kontrak;
-- kurir atau preferensi layanan.
+#### 7.3.1 Endpoint Baseline
 
-Nilai origin, berat/dimensi, dan mapping alamat tidak boleh diasumsikan dalam
-kode; sumber serta nilai defaultnya menunggu
+| Fungsi | Method dan Path | Penggunaan |
+|---|---|---|
+| Standardisasi/pencarian area | `GET /v1/maps/areas` | Mencari area tujuan dan menyimpan Biteship area ID bersama alamat pelanggan. Pemanggilan dari input pencarian harus di-debounce. |
+| Pilihan layanan dan ongkir | `POST /v1/rates/couriers` | Mengambil layanan, estimasi durasi, dan harga final berdasarkan origin, destination, kurir, dan item. |
+
+Base URL production/test adalah `https://api.biteship.com` melalui HTTPS.
+Secret key hanya disimpan pada backend/environment dan tidak pernah dikirim ke
+browser atau log. Key test dan live harus dipisahkan; mode ditentukan oleh key.
+
+#### 7.3.2 Kontrak Request Rates
+
+Origin dan destination dapat dikirim sebagai area ID, kode pos, koordinat, atau
+kombinasi yang didukung Biteship. Area ID menjadi default yang disarankan untuk
+layanan reguler karena merepresentasikan area sampai kecamatan. Koordinat harus
+tersedia jika kurir instan masuk scope.
+
+Request minimum memuat:
+
+- origin dan destination dalam format lokasi yang disepakati;
+- daftar kode kurir yang diizinkan;
+- `items`, dengan setiap item memiliki nama, nilai, kuantitas, dan berat dalam
+  gram;
+- panjang, lebar, dan tinggi hanya bila tersedia atau diperlukan layanan,
+  karena dimensi dapat memengaruhi biaya.
+
+Nilai origin, sumber/default berat, penggunaan dimensi, daftar kurir, dan mode
+lokasi tidak boleh diasumsikan dalam kode; keputusan operasionalnya mengikuti
 [OPN-021](BRD.md#opn-021).
 
-Output yang digunakan:
+#### 7.3.3 Kontrak Response dan Snapshot
 
-- kode layanan;
-- nama layanan;
-- estimasi waktu;
-- biaya.
+Sistem hanya menawarkan rate yang lolos validasi. Snapshot minimum memuat:
 
-Ketentuan:
+- provider `BITESHIP`;
+- kode dan nama kurir;
+- kode/tipe dan nama layanan;
+- estimasi durasi beserta unitnya;
+- mata uang;
+- area ID origin/destination yang digunakan;
+- harga final dari field `price`;
+- waktu quote dan hash request teredaksi.
 
-- tidak melakukan booking/pickup;
-- credential hanya di backend;
-- response tervalidasi;
-- timeout dan error dicatat;
-- kegagalan tidak menghasilkan ongkir nol.
+`price` dipakai sebagai ongkir final karena telah mencerminkan komponen harga
+aktif dari Biteship; sistem tidak menghitung ulang dari `shipping_fee`. Respons
+rate tidak diperlakukan sebagai reservasi, booking, atau jaminan ketersediaan
+kurir sampai fulfillment.
+
+#### 7.3.4 Scope, Error, dan Environment
+
+- API Draft Orders/Orders, booking/pickup, label, Tracking, Webhooks, dan
+  Locations Biteship tidak dipanggil dalam baseline.
+- Response dan tipe data divalidasi sebelum ditampilkan atau disimpan.
+- Gangguan jaringan dan respons 5xx dapat dicoba ulang secara terbatas dengan
+  backoff; respons 4xx autentikasi/validasi tidak diulang tanpa koreksi.
+- Error dicatat dengan correlation ID dan payload teredaksi.
+- Kegagalan tidak menghasilkan ongkir nol; fallback mengikuti
+  [OPN-016](BRD.md#opn-016).
+- Sandbox/test digunakan sebelum live, tetapi penggunaan Maps/Rates tetap perlu
+  memperhatikan akun, aktivasi, dan biaya provider.
 
 ## 8. API Internal
 
@@ -775,7 +817,7 @@ sebagai sumber stok production.
 |---|---|
 | Unit | Kelayakan harga partai untuk satu SKU minimal lima unit, penolakan agregasi kuantitas antar-SKU, pemilihan harga partai/grosir, visibilitas harga eceran, konfigurasi website untuk ambang/tarif PPh 22, perhitungan dan tampilan komponen PPh 22, status stok, serta auto-cancel D+1. |
 | Feature | Registrasi, approval, cart, checkout, invoice beserta field wajib, pembayaran, pembatalan, dan laporan. |
-| Integration | Seluruh operasi POS kerja, external reference/idempotency, timeout ambigu, rekonsiliasi invoice/retur, transisi seeder-ke-API, dan Biteship quote. |
+| Integration | Seluruh operasi POS kerja, external reference/idempotency, timeout ambigu, rekonsiliasi invoice/retur, transisi seeder-ke-API, serta kontrak Biteship Maps/Rates, validasi `price`, 4xx/5xx, dan pemisahan key test/live. |
 | Security | Authorization, IDOR, CSRF, rate limit, dan upload. |
 | Concurrency | Double checkout, duplicate request, dan stock race. |
 | Performance | Katalog, checkout, laporan, dan traffic spike. |
@@ -811,7 +853,7 @@ sebagai sumber stok production.
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
 | TD-010 | Dasar pengenaan PPh 22 dan expiry order belum dibayar. Konfigurasi klasifikasi, ambang, dan tarif telah ditetapkan melalui website. | OPN-006, OPN-007 | Dasar pengenaan PPh 22 partially open; expiry D+1 resolved |
 | TD-011 | Web mengelola lifecycle sampai pengiriman; pembatalan memanggil POS dan menghasilkan retur. Status fulfillment/resi tetap terbuka. | OPN-020 | Partially resolved |
-| TD-012 | Origin, berat/dimensi produk, dan mapping alamat untuk Biteship. | OPN-021 | Open |
+| TD-012 | Biteship berperan sebagai external location/rate provider melalui Maps dan Rates; endpoint serta field teknis dasar sudah teridentifikasi. Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya masih perlu keputusan operasional. | OPN-021 | Technical contract resolved; operations open |
 | TD-013 | Field wajib invoice telah ditetapkan; sumber identitas toko, format/penyampaian invoice, serta event/channel notifikasi belum final. | OPN-022, OPN-023 | Invoice content resolved; source/delivery and notification open |
 | TD-014 | POS menerbitkan invoice saat create sales order; status invoice POS sebagai dokumen resmi tunggal atau referensi website belum final. | OPN-008, OPN-022 | Partially resolved |
 
@@ -822,3 +864,10 @@ sebagai sumber stok production.
 - Laravel scheduler: <https://laravel.com/docs/13.x/scheduling>
 - Laravel Livewire: <https://livewire.laravel.com/>
 - MySQL InnoDB: <https://dev.mysql.com/doc/refman/8.4/en/innodb-introduction.html>
+- Biteship introduction: <https://biteship.com/en/docs/intro>
+- Biteship authentication: <https://biteship.com/en/docs/api/authentication>
+- Biteship base URL: <https://biteship.com/en/docs/api/base_url>
+- Biteship Maps - Search Area: <https://biteship.com/en/docs/api/maps/search_area>
+- Biteship Rates - Retrieve Rates: <https://biteship.com/en/docs/api/rates/retrieve>
+- Biteship error handling: <https://biteship.com/en/docs/errors>
+- Biteship sandbox: <https://biteship.com/en/docs/sandbox>

@@ -4,7 +4,7 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.1 - Working Baseline                                                                                                         |
+| Versi    | 0.2 - Biteship Maps/Rates Model                                                                                                |
 | Tanggal  | Selasa, 28 Juli 2026                                                                                                           |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
@@ -74,24 +74,25 @@ baru dibuat hanya jika role operasional bertambah.
 
 ### 2.4 `addresses`
 
-| Kolom           | Tipe            | Null  | Key/Default | Deskripsi                               |
-| --------------- | --------------- | :---: | ----------- | --------------------------------------- |
-| id              | BIGINT UNSIGNED | Tidak | PK          | Identifier alamat.                      |
-| user_id         | BIGINT UNSIGNED | Tidak | FK, IDX     | Pemilik alamat.                         |
-| label           | VARCHAR(100)    |   Ya  | —           | Contoh: Toko Utama.                     |
-| recipient_name  | VARCHAR(150)    | Tidak | —           | Penerima.                               |
-| recipient_phone | VARCHAR(32)     | Tidak | —           | Nomor penerima.                         |
-| address_line    | TEXT            | Tidak | —           | Alamat lengkap.                         |
-| province_code   | VARCHAR(32)     |   Ya  | IDX         | Kode provinsi dari provider/alur final. |
-| province_name   | VARCHAR(100)    | Tidak | —           | Snapshot nama provinsi.                 |
-| city_code       | VARCHAR(32)     |   Ya  | IDX         | Kode kota/kabupaten.                    |
-| city_name       | VARCHAR(100)    | Tidak | —           | Snapshot nama kota/kabupaten.           |
-| district_code   | VARCHAR(32)     |   Ya  | IDX         | Kode kecamatan.                         |
-| district_name   | VARCHAR(100)    | Tidak | IDX         | Nama kecamatan untuk laporan.           |
-| postal_code     | VARCHAR(16)     |   Ya  | —           | Kode pos.                               |
-| is_default      | BOOLEAN         | Tidak | `false`     | Penanda alamat utama.                   |
-| created_at      | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                        |
-| updated_at      | DATETIME(6)     | Tidak | —           | Waktu perubahan.                        |
+| Kolom            | Tipe            | Null  | Key/Default | Deskripsi                                  |
+| ---------------- | --------------- | :---: | ----------- | ------------------------------------------ |
+| id               | BIGINT UNSIGNED | Tidak | PK          | Identifier alamat.                         |
+| user_id          | BIGINT UNSIGNED | Tidak | FK, IDX     | Pemilik alamat.                            |
+| label            | VARCHAR(100)    |   Ya  | —           | Contoh: Toko Utama.                        |
+| recipient_name   | VARCHAR(150)    | Tidak | —           | Penerima.                                  |
+| recipient_phone  | VARCHAR(32)     | Tidak | —           | Nomor penerima.                            |
+| address_line     | TEXT            | Tidak | —           | Alamat lengkap.                            |
+| province_code    | VARCHAR(32)     |   Ya  | IDX         | Kode provinsi dari provider/alur final.    |
+| province_name    | VARCHAR(100)    | Tidak | —           | Snapshot nama provinsi.                    |
+| city_code        | VARCHAR(32)     |   Ya  | IDX         | Kode kota/kabupaten.                       |
+| city_name        | VARCHAR(100)    | Tidak | —           | Snapshot nama kota/kabupaten.              |
+| district_code    | VARCHAR(32)     |   Ya  | IDX         | Kode kecamatan.                            |
+| district_name    | VARCHAR(100)    | Tidak | IDX         | Nama kecamatan untuk laporan.              |
+| postal_code      | VARCHAR(16)     |   Ya  | —           | Kode pos.                                  |
+| biteship_area_id | VARCHAR(191)    |   Ya  | IDX         | Area ID Biteship Maps untuk quote reguler. |
+| is_default       | BOOLEAN         | Tidak | `false`     | Penanda alamat utama.                      |
+| created_at       | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                           |
+| updated_at       | DATETIME(6)     | Tidak | —           | Waktu perubahan.                           |
 
 ## 3. Product, Pricing, dan Inventory
 
@@ -123,22 +124,27 @@ baru dibuat hanya jika role operasional bertambah.
 
 ### 3.3 `products`
 
-| Kolom          | Tipe            | Null  | Key/Default | Deskripsi                                                                         |
-| -------------- | --------------- | :---: | ----------- | --------------------------------------------------------------------------------- |
-| id             | BIGINT UNSIGNED | Tidak | PK          | Identifier produk.                                                                |
-| category_id    | BIGINT UNSIGNED | Tidak | FK, IDX     | Klasifikasi produk.                                                               |
-| brand_id       | BIGINT UNSIGNED |   Ya  | FK, IDX     | Merek produk.                                                                     |
-| pos_product_id | VARCHAR(191)    | Tidak | UK          | Identifier stabil POS/seeder.                                                     |
-| sku            | VARCHAR(191)    | Tidak | UK          | SKU produk.                                                                       |
-| name           | VARCHAR(255)    | Tidak | IDX         | Nama produk dari POS.                                                             |
-| weight_grams   | INT UNSIGNED    |   Ya  | —           | Berat untuk quote ongkir; sumber masih [OPN-021](../requirements/BRD.md#opn-021). |
-| length_cm      | DECIMAL(10,2)   |   Ya  | —           | Panjang kemasan; provisional.                                                     |
-| width_cm       | DECIMAL(10,2)   |   Ya  | —           | Lebar kemasan; provisional.                                                       |
-| height_cm      | DECIMAL(10,2)   |   Ya  | —           | Tinggi kemasan; provisional.                                                      |
-| is_active      | BOOLEAN         | Tidak | `true`, IDX | Aktif pada master.                                                                |
-| synced_at      | DATETIME(6)     |   Ya  | —           | Sinkronisasi berhasil terakhir.                                                   |
-| created_at     | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                                                  |
-| updated_at     | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                                                  |
+| Kolom          | Tipe            | Null  | Key/Default | Deskripsi                                        |
+| -------------- | --------------- | :---: | ----------- | ------------------------------------------------ |
+| id             | BIGINT UNSIGNED | Tidak | PK          | Identifier produk.                               |
+| category_id    | BIGINT UNSIGNED | Tidak | FK, IDX     | Klasifikasi produk.                              |
+| brand_id       | BIGINT UNSIGNED |   Ya  | FK, IDX     | Merek produk.                                    |
+| pos_product_id | VARCHAR(191)    | Tidak | UK          | Identifier stabil POS/seeder.                    |
+| sku            | VARCHAR(191)    | Tidak | UK          | SKU produk.                                      |
+| name           | VARCHAR(255)    | Tidak | IDX         | Nama produk dari POS.                            |
+| weight_grams   | INT UNSIGNED    |   Ya  | —           | Berat dalam gram untuk request Biteship Rates.   |
+| length_cm      | DECIMAL(10,2)   |   Ya  | —           | Panjang kemasan opsional.                        |
+| width_cm       | DECIMAL(10,2)   |   Ya  | —           | Lebar kemasan opsional.                          |
+| height_cm      | DECIMAL(10,2)   |   Ya  | —           | Tinggi kemasan opsional.                         |
+| is_active      | BOOLEAN         | Tidak | `true`, IDX | Aktif pada master.                               |
+| synced_at      | DATETIME(6)     |   Ya  | —           | Sinkronisasi berhasil terakhir.                  |
+| created_at     | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                 |
+| updated_at     | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                 |
+
+`weight_grams` wajib tersedia saat meminta rate; produk tanpa berat tidak dapat
+di-quote. Sumber/default berat dan penggunaan dimensi mengikuti
+[OPN-021](../requirements/BRD.md#opn-021). Dimensi dikirim hanya jika tersedia
+atau diperlukan layanan.
 
 ### 3.4 `product_enrichments`
 
@@ -275,16 +281,18 @@ kuantitas antar-SKU tidak dijumlahkan.
 
 ### 5.1 `store_profiles`
 
-| Kolom          | Tipe            | Null  | Key/Default | Deskripsi                  |
-| -------------- | --------------- | :---: | ----------- | -------------------------- |
-| id             | BIGINT UNSIGNED | Tidak | PK          | Identifier profil toko.    |
-| store_name     | VARCHAR(191)    | Tidak | —           | Nama pada invoice.         |
-| address        | TEXT            | Tidak | —           | Alamat pada invoice.       |
-| contact_number | VARCHAR(32)     | Tidak | —           | Nomor kontak pada invoice. |
-| npwp           | VARCHAR(32)     | Tidak | —           | NPWP pada invoice.         |
-| is_active      | BOOLEAN         | Tidak | `true`, IDX | Profil aktif.              |
-| created_at     | DATETIME(6)     | Tidak | —           | Waktu pembuatan.           |
-| updated_at     | DATETIME(6)     | Tidak | —           | Waktu perubahan.           |
+| Kolom                   | Tipe            | Null  | Key/Default | Deskripsi                                      |
+| ----------------------- | --------------- | :---: | ----------- | ---------------------------------------------- |
+| id                      | BIGINT UNSIGNED | Tidak | PK          | Identifier profil toko.                        |
+| store_name              | VARCHAR(191)    | Tidak | —           | Nama pada invoice.                             |
+| address                 | TEXT            | Tidak | —           | Alamat pada invoice.                           |
+| contact_number          | VARCHAR(32)     | Tidak | —           | Nomor kontak pada invoice.                     |
+| npwp                    | VARCHAR(32)     | Tidak | —           | NPWP pada invoice.                             |
+| origin_biteship_area_id | VARCHAR(191)    |   Ya  | IDX         | Area ID origin untuk rate reguler.             |
+| origin_postal_code      | VARCHAR(16)     |   Ya  | —           | Kode pos origin sebagai data lokasi tambahan. |
+| is_active               | BOOLEAN         | Tidak | `true`, IDX | Profil aktif.                                  |
+| created_at              | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                               |
+| updated_at              | DATETIME(6)     | Tidak | —           | Waktu perubahan.                               |
 
 Sumber/mapping final profil toko masih
 [OPN-022](../requirements/BRD.md#opn-022).
@@ -439,30 +447,41 @@ Data operasional masih [OPN-010](../requirements/BRD.md#opn-010).
 
 ### 6.2 `shipments`
 
-| Kolom                    | Tipe            | Null  | Key/Default      | Deskripsi                               |
-| ------------------------ | --------------- | :---: | ---------------- | --------------------------------------- |
-| id                       | BIGINT UNSIGNED | Tidak | PK               | Identifier shipment.                    |
-| order_id                 | BIGINT UNSIGNED | Tidak | FK, UK           | Satu shipment per order baseline.       |
-| store_courier_rate_id    | BIGINT UNSIGNED |   Ya  | FK               | Tarif sumber bila kurir toko.           |
-| method                   | VARCHAR(32)     | Tidak | IDX              | `STORE_COURIER` atau `BITESHIP`.        |
-| service_code             | VARCHAR(100)    |   Ya  | —                | Kode layanan provider.                  |
-| service_name_snapshot    | VARCHAR(191)    | Tidak | —                | Nama layanan saat checkout.             |
-| eta_snapshot             | VARCHAR(100)    |   Ya  | —                | Estimasi saat checkout.                 |
-| recipient_name_snapshot  | VARCHAR(150)    | Tidak | —                | Penerima historis.                      |
-| recipient_phone_snapshot | VARCHAR(32)     | Tidak | —                | Kontak historis.                        |
-| address_snapshot         | TEXT            | Tidak | —                | Alamat lengkap historis.                |
-| province_snapshot        | VARCHAR(100)    | Tidak | —                | Provinsi historis.                      |
-| city_snapshot            | VARCHAR(100)    | Tidak | —                | Kota/kabupaten historis.                |
-| district_snapshot        | VARCHAR(100)    | Tidak | IDX              | Kecamatan untuk laporan.                |
-| postal_code_snapshot     | VARCHAR(16)     |   Ya  | —                | Kode pos historis.                      |
-| shipping_amount          | DECIMAL(19,2)   | Tidak | —                | Ongkir snapshot.                        |
-| quote_reference          | VARCHAR(191)    |   Ya  | IDX              | Referensi quote Biteship jika tersedia. |
-| tracking_number          | VARCHAR(191)    |   Ya  | IDX, Provisional | Nomor resi menunggu OPN-020.            |
-| status                   | VARCHAR(32)     | Tidak | IDX              | Lifecycle fulfillment provisional.      |
-| shipped_at               | DATETIME(6)     |   Ya  | —                | Waktu dikirim.                          |
-| delivered_at             | DATETIME(6)     |   Ya  | —                | Waktu selesai.                          |
-| created_at               | DATETIME(6)     | Tidak | —                | Waktu pembuatan.                        |
-| updated_at               | DATETIME(6)     | Tidak | —                | Waktu perubahan.                        |
+| Kolom                                | Tipe            | Null  | Key/Default      | Deskripsi                                                    |
+| ------------------------------------ | --------------- | :---: | ---------------- | ------------------------------------------------------------ |
+| id                                   | BIGINT UNSIGNED | Tidak | PK               | Identifier shipment.                                         |
+| order_id                             | BIGINT UNSIGNED | Tidak | FK, UK           | Satu shipment per order baseline.                            |
+| store_courier_rate_id                | BIGINT UNSIGNED |   Ya  | FK               | Tarif sumber bila kurir toko.                                |
+| rate_provider                        | VARCHAR(32)     | Tidak | IDX              | `STORE_COURIER` atau `BITESHIP`.                             |
+| courier_code                         | VARCHAR(100)    |   Ya  | —                | Kode kurir dari Biteship.                                    |
+| courier_name_snapshot                | VARCHAR(191)    |   Ya  | —                | Nama kurir saat checkout.                                    |
+| service_code                         | VARCHAR(100)    |   Ya  | —                | Kode/tipe layanan provider.                                  |
+| service_name_snapshot                | VARCHAR(191)    | Tidak | —                | Nama layanan saat checkout.                                  |
+| eta_snapshot                         | VARCHAR(100)    |   Ya  | —                | Estimasi durasi dan unit saat checkout.                      |
+| origin_biteship_area_id_snapshot     | VARCHAR(191)    |   Ya  | —                | Area ID origin yang dipakai untuk rate.                      |
+| destination_biteship_area_id_snapshot | VARCHAR(191)    |   Ya  | —                | Area ID destination yang dipakai untuk rate.                 |
+| recipient_name_snapshot              | VARCHAR(150)    | Tidak | —                | Penerima historis.                                           |
+| recipient_phone_snapshot             | VARCHAR(32)     | Tidak | —                | Kontak historis.                                             |
+| address_snapshot                     | TEXT            | Tidak | —                | Alamat lengkap historis.                                     |
+| province_snapshot                    | VARCHAR(100)    | Tidak | —                | Provinsi historis.                                           |
+| city_snapshot                        | VARCHAR(100)    | Tidak | —                | Kota/kabupaten historis.                                     |
+| district_snapshot                    | VARCHAR(100)    | Tidak | IDX              | Kecamatan untuk laporan.                                     |
+| postal_code_snapshot                 | VARCHAR(16)     |   Ya  | —                | Kode pos historis.                                           |
+| currency                             | CHAR(3)         | Tidak | `IDR`            | Mata uang rate.                                              |
+| shipping_amount                      | DECIMAL(19,2)   | Tidak | —                | Harga final dari field `price` Biteship atau tarif kurir toko. |
+| rate_request_hash                    | VARCHAR(128)    |   Ya  | IDX              | Hash request canonical teredaksi untuk traceability.         |
+| quoted_at                            | DATETIME(6)     |   Ya  | —                | Waktu rate dipilih.                                          |
+| tracking_number                      | VARCHAR(191)    |   Ya  | IDX, Provisional | Nomor resi menunggu OPN-020.                                 |
+| status                               | VARCHAR(32)     | Tidak | IDX              | Lifecycle fulfillment provisional.                           |
+| shipped_at                           | DATETIME(6)     |   Ya  | —                | Waktu dikirim.                                               |
+| delivered_at                         | DATETIME(6)     |   Ya  | —                | Waktu selesai.                                               |
+| created_at                           | DATETIME(6)     | Tidak | —                | Waktu pembuatan.                                             |
+| updated_at                           | DATETIME(6)     | Tidak | —                | Waktu perubahan.                                             |
+
+Biteship tidak menyediakan identifier quote yang wajib pada respons Rates.
+Karena itu model menyimpan field rate yang dipilih, `quoted_at`, dan
+`rate_request_hash`, bukan `quote_reference`. Tidak ada tabel Biteship order
+karena booking/pickup dan tracking berada di luar baseline.
 
 ## 7. POS Integration dan Synchronization
 

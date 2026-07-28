@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.8 - Partai Eligibility Rule |
+| Versi | 0.9 - Biteship Maps/Rates Contract |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -104,7 +104,7 @@ Rincian sprint difinalkan setelah item P0 dan keputusan kritis disetujui.
 | Data Contoh (Seeder) | Sumber data dummy untuk development, staging, demo, dan UAT ketika koneksi POS belum tersedia; tidak digunakan pada production. |
 | POS | Sistem eksternal sumber produk dan stok. |
 | Kak Rio - PIC POS | Narahubung untuk pembukaan akses dan validasi kontrak integrasi POS setelah alur website berbasis data contoh berjalan. |
-| Biteship | Sistem eksternal penyedia estimasi ongkir. |
+| Biteship | API pengiriman multi-kurir eksternal; pada baseline berperan sebagai provider Maps dan Rates, bukan system of record order atau stok. |
 
 ### 2.2 Matriks Akses
 
@@ -239,12 +239,12 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-SHP-001 | Admin | Admin dapat mengelola wilayah dan tarif kurir toko. | Area aktif memiliki tarif dan estimasi pengiriman. | Baseline |
-| FR-SHP-002 | Sistem | Sistem meminta estimasi ongkir Biteship melalui backend. | Credential tidak pernah dikirim ke browser; origin, berat/dimensi, dan alamat tervalidasi sesuai [OPN-021](BRD.md#opn-021). | Baseline; data operasional open |
-| FR-SHP-003 | Pelanggan | Pelanggan dapat memilih layanan pengiriman yang tersedia. | Layanan menampilkan nama, estimasi, dan biaya. | Baseline |
-| FR-SHP-004 | Sistem | Ongkir terpilih masuk ke total dan invoice. | Snapshot layanan serta biaya tersimpan pada transaksi. | Baseline |
+| FR-SHP-002 | Sistem | Sistem menstandardisasi alamat melalui Biteship Maps API dan meminta pilihan layanan/estimasi ongkir melalui Rates API dari backend. | Credential tidak pernah dikirim ke browser; request memakai origin, destination, daftar kurir, serta item dengan nama, nilai, kuantitas, dan berat dalam gram; dimensi dikirim bila tersedia. Nilai operasional mengikuti [OPN-021](BRD.md#opn-021). | Baseline; data operasional open |
+| FR-SHP-003 | Pelanggan | Pelanggan dapat memilih layanan pengiriman dari respons rate yang valid. | Layanan menampilkan nama kurir, nama/kode layanan, estimasi durasi, dan harga final. | Baseline |
+| FR-SHP-004 | Sistem | Ongkir terpilih masuk ke total dan invoice. | Snapshot menyimpan provider, kode/nama kurir, kode/nama layanan, estimasi, mata uang, harga final, area origin/destination, dan waktu quote; website tetap menjadi pemilik transaksi. | Baseline |
 | FR-SHP-005 | Sistem | Kegagalan Biteship tidak menghasilkan ongkir Rp0 otomatis. | Checkout dihentikan atau memakai fallback yang disetujui. | Proposed |
-| FR-SHP-006 | Sistem | Website tidak membuat booking/pickup kurir Biteship. | Tidak ada request pemesanan kurir dari alur baseline. | Baseline |
-| FR-SHP-007 | Sistem | Request Biteship memiliki timeout dan retry terbatas. | Error dapat dilihat pada integration log. | Proposed |
+| FR-SHP-006 | Sistem | Website hanya memakai Biteship Maps dan Rates pada baseline. | Tidak ada request Biteship untuk draft order/order, booking/pickup, label, tracking, webhook, atau location management. | Baseline |
+| FR-SHP-007 | Sistem | Request Biteship memiliki timeout, validasi respons, dan retry terbatas. | Gangguan jaringan/5xx dapat dicoba ulang secara terbatas; 4xx autentikasi/validasi tidak diulang tanpa koreksi; request dan error teredaksi dapat ditelusuri melalui correlation ID. | Proposed |
 
 ## 9. Modul Order, Invoice, dan Status
 
@@ -389,7 +389,8 @@ FRD dapat dibaseline setelah:
   Kak Rio, dan sebelum production contract test `CreateSalesOrder`,
   `CancelSalesOrder`, lookup sales order, master data, dan inventory wajib
   tersedia serta lulus;
-- API Biteship dapat diuji;
+- kredensial test dan live Biteship dipisahkan, API Maps/Rates dapat diuji dari
+  backend, dan akun production siap digunakan;
 - status/transisi order disetujui;
 - aturan harga partai dan prioritas terhadap harga grosir disetujui melalui
   [OPN-013](BRD.md#opn-013);
@@ -401,8 +402,8 @@ FRD dapat dibaseline setelah:
 - lifecycle order dan bukti fulfillment disetujui melalui
   [OPN-020](BRD.md#opn-020); pembatalan standar tetap oleh admin pada hari
   yang sama;
-- data origin, berat/dimensi, serta mapping alamat Biteship tersedia melalui
-  [OPN-021](BRD.md#opn-021);
+- data origin, berat produk, penggunaan dimensi, daftar kurir, serta mapping
+  area ID/koordinat Biteship tersedia melalui [OPN-021](BRD.md#opn-021);
 - sumber identitas toko, format/penyampaian invoice, dan kebutuhan notifikasi
   diputuskan atau eksplisit dikeluarkan dari MVP melalui
   [OPN-022](BRD.md#opn-022) dan

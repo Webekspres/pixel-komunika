@@ -4,7 +4,7 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.1 - Working Baseline |
+| Versi | 0.2 - Biteship Maps/Rates Model |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Internal - siap menjadi dasar migration MVP |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -68,6 +68,7 @@ erDiagram
         VARCHAR recipient_name
         VARCHAR district
         VARCHAR postal_code
+        VARCHAR biteship_area_id
         BOOLEAN is_default
     }
 
@@ -169,6 +170,8 @@ erDiagram
         TEXT address
         VARCHAR contact_number
         VARCHAR npwp
+        VARCHAR origin_biteship_area_id
+        VARCHAR origin_postal_code
         BOOLEAN is_active
     }
 
@@ -253,10 +256,18 @@ erDiagram
         BIGINT id PK
         BIGINT order_id FK,UK
         BIGINT store_courier_rate_id FK
-        VARCHAR method
+        VARCHAR rate_provider
+        VARCHAR courier_code
+        VARCHAR courier_name_snapshot
         VARCHAR service_code
+        VARCHAR service_name_snapshot
         VARCHAR district_snapshot
+        VARCHAR origin_biteship_area_id_snapshot
+        VARCHAR destination_biteship_area_id_snapshot
+        VARCHAR currency
         DECIMAL shipping_amount
+        VARCHAR rate_request_hash
+        DATETIME quoted_at
         VARCHAR status
     }
 
@@ -371,6 +382,10 @@ erDiagram
   belum dibuat karena role baseline hanya admin dan pelanggan.
 - Satu order hanya memiliki satu shipment. Split shipment dan penggabungan
   beberapa order belum menjadi baseline.
+- Biteship hanya menjadi provider Maps/Rates. Website menyimpan area ID dan
+  snapshot rate terpilih; model tidak membuat entitas booking/order Biteship.
+- `shipments.shipping_amount` menyimpan field `price` final dari rate Biteship,
+  bukan hasil perhitungan ulang dari komponen respons.
 - Harga partai dihitung dari kuantitas per SKU pada cart/order; kuantitas
   antar-SKU tidak dijumlahkan.
 - Data laporan dibaca dari tabel transaksi dan snapshot. Tabel agregasi khusus

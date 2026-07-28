@@ -23,6 +23,8 @@ klien.
 1. [ERD](design/ERD.md) - diagram relasi data working baseline dalam Mermaid.
 2. [Data Dictionary](design/DATA_DICTIONARY.md) - definisi field, tipe data,
    constraint, index, snapshot, dan penanda provisional.
+3. [User Flows](design/USER_FLOWS.md) - flow MVP granular dalam Mermaid dengan
+   konektor lintas-flow `UF-01` sampai `UF-18`.
 
 ## Delivery Method
 

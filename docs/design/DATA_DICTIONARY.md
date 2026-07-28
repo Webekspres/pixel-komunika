@@ -324,7 +324,9 @@ Sumber/mapping final profil toko masih
 | created_at | DATETIME(6) | Tidak | IDX | Waktu order dibuat. |
 | updated_at | DATETIME(6) | Tidak |  | Waktu perubahan. |
 
-Status draft: `WAITING_PAYMENT`, `PAYMENT_SUBMITTED`, `PAYMENT_REJECTED`,
+Status internal sebelum konfirmasi POS: `DRAFT` dan
+`RECONCILIATION_REQUIRED`. Status customer-facing:
+`WAITING_PAYMENT`, `PAYMENT_SUBMITTED`, `PAYMENT_REJECTED`,
 `PAYMENT_VERIFIED`, `PROCESSING`, `READY_FOR_DELIVERY`, `SHIPPED`,
 `COMPLETED`, dan `CANCELLED`. Bagian fulfillment masih
 [OPN-020](../requirements/BRD.md#opn-020).

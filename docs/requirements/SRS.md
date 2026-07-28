@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.10 - ERD/Data Dictionary Working Baseline |
+| Versi | 0.11 - Granular User Flow Working Baseline |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -87,6 +87,18 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 
 Nilai harga, jenis harga, aturan PPh 22 yang terpakai, dasar perhitungan, tarif,
 dan hasilnya harus disimpan sebagai snapshot transaksi.
+
+### 2.3 Design Artifacts
+
+- [ERD](../design/ERD.md) menetapkan relasi dan cardinality working baseline.
+- [Data Dictionary](../design/DATA_DICTIONARY.md) menetapkan field, tipe,
+  constraint, index, dan penanda `Provisional`.
+- [User Flows](../design/USER_FLOWS.md) memecah alur MVP menjadi flow granular
+  berkode `UF-01` sampai `UF-18` dengan konektor lintas-flow.
+
+Perubahan pada artifact desain yang memengaruhi requirement, kontrak data,
+acceptance criteria, atau open question mengikuti change control yang sama
+dengan SRS.
 
 ## 3. Keputusan Arsitektur
 

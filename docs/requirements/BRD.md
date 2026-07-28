@@ -7,9 +7,9 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.3 - Revised Working Baseline |
+| Versi | 0.4 - Incremental Client Clarification |
 | Tanggal | Selasa, 28 Juli 2026 |
-| Status | Approved Working Baseline - scope proposal awal diteruskan |
+| Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
 | MVP delivery | `MVP.md` |
 
@@ -45,6 +45,7 @@ Status requirement:
 | CR-002 | Senin, 27 Juli 2026 | Klarifikasi governance proyek | Sylvi ditetapkan sebagai perwakilan klien, Sultan sebagai System Analyst Webekspres, dan Pak Endang sebagai Project Manager Webekspres. Persetujuan final berada pada klien. | OPN-017 diselesaikan dan aturan efektivitas baseline diperjelas. | Resolved |
 | CR-003 | Senin, 27 Juli 2026 | Persetujuan working baseline dan fallback POS | Working baseline disetujui dan ditandatangani. Jika koneksi POS belum disediakan, pengembangan serta pengujian menggunakan data contoh. | Tanggal persetujuan ditetapkan dan data contoh non-production ditambahkan; kesiapan koneksi POS production tetap dilacak. | Approved |
 | CR-004 | Selasa, 28 Juli 2026 | Pesan klien Sylvi | Klien meminta pengembangan dilanjutkan sesuai plan yang telah dibuat. Sultan mengonfirmasi interpretasi bahwa scope kembali mengikuti proposal awal. | Batas maksimal penjualan serta komponen PPh 22/surcharge tetap berada dalam MVP. Detail formula dan mapping data tetap terbuka pada OPN-006. | Approved working direction |
+| CR-005 | Selasa, 28 Juli 2026, 12.42-13.43 WIB | Klarifikasi bertahap klien | Klien menjelaskan tiga jenis harga wajib dari POS, ambang nilai belanja per klasifikasi yang memicu PPh 22, master produk dari POS, pola sinkronisasi stok, kesiapan akses POS, dan masa berlaku pesanan belum dibayar. | Konsep batas maksimal dikoreksi menjadi ambang nilai belanja; OPN-003 dan OPN-007 diselesaikan, sedangkan OPN-004, OPN-005, OPN-006, OPN-013, dan OPN-019 diperbarui sebagai keputusan parsial. | Partially resolved |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -86,7 +87,7 @@ mengubah baseline sampai dikonfirmasi kembali pada hari kerja.
 ## 3. Ringkasan Eksekutif
 
 Proyek membangun website penjualan responsif untuk pelanggan yang telah
-diregistrasi dan disetujui admin. Sistem mengelola katalog, harga bertingkat,
+diregistrasi dan disetujui admin. Sistem mengelola katalog, tiga jenis harga,
 stok, transaksi, invoice, pembayaran transfer manual, pengiriman, dan laporan
 omzet berdasarkan wilayah.
 
@@ -153,11 +154,13 @@ Proses penjualan membutuhkan kanal digital yang:
   [OPN-005](#opn-005)).
 - Enrichment produk lokal berupa gambar, video, deskripsi pemasaran, SEO, dan
   pengaturan tampil.
-- Tiga tingkat harga berdasarkan kuantitas
-  ([open question: lihat OPN-013](#opn-013)).
-- Batas maksimal pembelian/penjualan dan biaya tambahan yang berkaitan dengan
-  PPh 22 atau pelampauan batas
-  ([lihat OPN-006](#opn-006) dan [OPN-018](#opn-018)).
+- Tiga jenis harga wajib per produk: eceran, partai, dan grosir. Seluruh harga
+  disinkronkan dari POS; harga eceran disiapkan tetapi tidak ditampilkan pada
+  storefront fase saat ini ([keputusan parsial: lihat OPN-013](#opn-013)).
+- Ambang nilai belanja yang dapat dikonfigurasi per klasifikasi produk serta
+  PPh 22 persentase ketika ambang terlampaui
+  ([keputusan parsial: lihat OPN-006](#opn-006) dan
+  [OPN-018](#opn-018)).
 - Keranjang, checkout, transaksi, invoice, dan riwayat transaksi.
 - Pembayaran transfer bank dan upload bukti pembayaran
   ([open question: lihat OPN-009](#opn-009)).
@@ -219,17 +222,17 @@ flowchart LR
 | BR-002 | Pelanggan harus registrasi sebelum dapat melakukan transaksi. | Baseline |
 | BR-003 | Admin harus menyetujui pelanggan sebelum akses pembelian diberikan. | Baseline |
 | BR-004 | Admin harus dapat mengaktifkan dan menonaktifkan akun pelanggan. | Baseline |
-| BR-005 | Sistem harus mengelola produk, kategori, merek, SKU, deskripsi, dan media ([lihat OPN-003](#opn-003)). | Baseline; data ownership open |
-| BR-006 | Sistem harus mendukung tiga tingkat harga berdasarkan kuantitas ([lihat OPN-013](#opn-013)). | Baseline; detail open |
-| BR-007 | Sistem harus mendukung batas maksimal pembelian/penjualan pada produk tertentu ([lihat OPN-018](#opn-018)). | Baseline |
-| BR-008 | Sistem harus dapat mengenakan biaya persentase ketika batas pembelian terlampaui; keterkaitannya dengan PPh 22, formula, dan kondisi penerapannya mengikuti [OPN-006](#opn-006). | Baseline; formula open |
+| BR-005 | Sistem harus menyinkronkan SKU, nama produk, klasifikasi/kategori, merek, dan harga dari POS serta mengelola enrichment penayangan yang tidak disediakan POS ([lihat OPN-003](#opn-003)). | Baseline |
+| BR-006 | Setiap produk harus memiliki harga eceran, partai, dan grosir dari POS. Harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini; aturan penerapan harga partai dan grosir mengikuti [OPN-013](#opn-013). | Baseline; aturan partai partially open |
+| BR-007 | Sistem harus mendukung pemilihan klasifikasi produk dan pengaturan ambang nilai belanja untuk masing-masing klasifikasi terpilih ([lihat OPN-018](#opn-018)). | Baseline |
+| BR-008 | Sistem harus menambahkan PPh 22 dengan persentase yang dapat dikonfigurasi, termasuk `0%`, ketika nilai belanja pada klasifikasi terpilih melampaui ambangnya; dasar pengenaan dan rincian formula mengikuti [OPN-006](#opn-006). | Baseline; formula partially open |
 | BR-009 | Website harus mengonsumsi produk dan stok production dari POS; data contoh hanya digunakan untuk development, staging, demo, dan UAT ketika koneksi POS belum tersedia ([OPN-003](#opn-003), [OPN-005](#opn-005), [OPN-019](#opn-019)). | Baseline; koneksi POS production wajib |
 | BR-010 | Sinkronisasi POS tidak boleh menghapus enrichment produk yang dikelola website. | Amendment |
 | BR-011 | Sistem harus menampilkan status stok Tersedia, Menipis, atau Habis. | Baseline |
 | BR-012 | Admin harus dapat menentukan batas minimum stok. | Baseline |
 | BR-013 | Sistem harus menyimpan riwayat perubahan stok. | Baseline |
 | BR-014 | Pelanggan terverifikasi harus dapat membuat pesanan melalui website. | Baseline |
-| BR-015 | Sistem harus menghitung subtotal, ongkir, biaya tambahan yang aktif, dan total transaksi. Komponen PPh 22/surcharge terkait batas dihitung sesuai aturan yang disetujui pada [OPN-006](#opn-006). | Baseline; formula open |
+| BR-015 | Sistem harus menghitung subtotal, ongkir, PPh 22 yang aktif, dan total transaksi. PPh 22 dihitung dari aturan klasifikasi dan ambang nilai yang disetujui pada [OPN-006](#opn-006). | Baseline; dasar pengenaan partially open |
 | BR-016 | Sistem harus membuat invoice unik untuk setiap transaksi ([lihat OPN-008](#opn-008) dan [OPN-022](#opn-022)). | Baseline; nomor, format, dan penyampaian open |
 | BR-017 | Satu pelanggan dapat memiliki lebih dari satu invoice. | Baseline |
 | BR-018 | Pembayaran dilakukan melalui transfer bank dan diverifikasi admin. | Baseline |
@@ -244,6 +247,7 @@ flowchart LR
 | BR-027 | Sistem harus mempertahankan jejak audit untuk tindakan administratif kritis. | [Proposed; lihat OPN-015](#opn-015) |
 | BR-028 | Kegagalan POS atau Biteship harus dapat ditelusuri dan tidak boleh diam-diam menghasilkan data transaksi salah. | [Proposed; lihat OPN-015](#opn-015) |
 | BR-029 | Sistem harus dapat ditingkatkan kapasitasnya tanpa mengubah domain bisnis utama. | [Proposed; lihat OPN-015](#opn-015) |
+| BR-030 | Pesanan yang belum dibayar hanya berlaku pada hari pembuatannya dan otomatis dibatalkan pada hari kalender berikutnya dalam zona waktu `Asia/Jakarta` ([lihat OPN-007](#opn-007)). | Baseline |
 
 ## 10. Business Rules
 
@@ -251,10 +255,10 @@ flowchart LR
 |---|---|
 | RULE-001 | Akun yang belum disetujui tidak boleh checkout. |
 | RULE-002 | SKU atau external product ID dari POS harus unik dan stabil. |
-| RULE-003 | Data stok POS merupakan sumber kebenaran stok aktual, kecuali disepakati mekanisme stok lokal ([lihat OPN-004](#opn-004)). |
+| RULE-003 | Data stok POS merupakan sumber kebenaran saat rekonsiliasi; website mengurangi stok ketika terjadi penjualan dan hasil sinkronisasi dapat menambah stok setelah retur di POS. Definisi event penjualan dan mekanisme reservasi mengikuti [OPN-004](#opn-004). |
 | RULE-004 | Gambar, video, deskripsi pemasaran, SEO, slug, dan urutan tampil merupakan data lokal website. |
-| RULE-005 | Tingkat harga dipilih berdasarkan kuantitas pada saat checkout ([lihat OPN-013](#opn-013)). |
-| RULE-006 | Nilai harga, nama produk, SKU, ongkir, komponen biaya aktif, dan total disimpan sebagai snapshot transaksi; PPh 22/surcharge terkait batas dicatat sesuai aturan yang disetujui pada [OPN-006](#opn-006). |
+| RULE-005 | Setiap produk wajib memiliki tiga jenis harga dari POS: `ECERAN`, `PARTAI`, dan `GROSIR`. Harga `ECERAN` disimpan tetapi tidak ditampilkan pada storefront fase saat ini. |
+| RULE-006 | Nilai harga, jenis harga terpilih, nama produk, SKU, ongkir, PPh 22, dan total disimpan sebagai snapshot transaksi; dasar pengenaan PPh 22 mengikuti [OPN-006](#opn-006). |
 | RULE-007 | Upload bukti pembayaran tidak otomatis membuat transaksi berstatus lunas. |
 | RULE-008 | Pembayaran dianggap sah setelah diverifikasi admin. |
 | RULE-009 | Pembatalan menggunakan zona waktu `Asia/Jakarta`. |
@@ -266,6 +270,9 @@ flowchart LR
 | RULE-015 | Perubahan data produk setelah order tidak mengubah invoice lama. |
 | RULE-016 | Data contoh harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment non-production. |
 | RULE-017 | Data contoh bukan bukti bahwa koneksi POS production telah lulus; go-live mensyaratkan koneksi POS production berhasil diuji. |
+| RULE-018 | Harga grosir memiliki minimum kuantitas yang dapat berbeda per produk. Aturan kelayakan dan penerapan harga partai dalam satu struk mengikuti [OPN-013](#opn-013). |
+| RULE-019 | Ambang PPh 22 berbasis nilai belanja pada klasifikasi terpilih, bukan batas kuantitas maksimum dan bukan alasan untuk menolak checkout. Persentase `0%` menonaktifkan pungutan untuk aturan tersebut. |
+| RULE-020 | Pesanan tanpa pembayaran yang masih aktif pada hari pembuatannya otomatis menjadi `CANCELLED` pada hari kalender berikutnya. |
 
 ## 11. Proses Bisnis Utama
 
@@ -290,8 +297,10 @@ flowchart TD
     C --> D[Pilih pengiriman]
     D --> E[Hitung ongkir dan total]
     E --> F[Buat transaksi dan invoice]
-    F --> G[Transfer bank]
-    G --> H[Upload bukti pembayaran]
+    F --> G[Menunggu transfer bank]
+    G --> X{Bukti pembayaran diajukan hari yang sama?}
+    X -->|Tidak| Y[Otomatis batal hari berikutnya]
+    X -->|Ya| H[Upload bukti pembayaran]
     H --> I{Verifikasi admin}
     I -->|Terima| J[Proses pesanan]
     I -->|Tolak| K[Perlu pembayaran ulang]
@@ -303,7 +312,7 @@ flowchart TD
 flowchart TD
     A[Scheduler atau admin memulai sinkronisasi] --> B[Ambil data POS]
     B --> C[Validasi kontrak dan identifier]
-    C --> D[Upsert produk dan stok]
+    C --> D[Upsert master produk, tiga harga, dan stok]
     D --> E[Pertahankan enrichment lokal]
     E --> F[Simpan hasil dan error log]
 ```
@@ -360,7 +369,7 @@ Nilai target final harus disetujui pada technical kickoff
 | RSK-004 | Biteship lambat/tidak tersedia. | Checkout tertunda. | Timeout dan fallback manual yang disetujui ([lihat OPN-016](#opn-016)). |
 | RSK-005 | Lonjakan traffic atau bot. | Aplikasi lambat/tidak tersedia. | CDN, cache, rate limit, monitoring, dan scale-up. |
 | RSK-006 | Media produk dan bukti pembayaran membesar. | Storage/bandwidth habis. | Object storage, kompresi, dan kebijakan retensi ([lihat OPN-009](#opn-009)). |
-| RSK-007 | Formula PPh 22/surcharge dan mapping data terkait belum final. | Perhitungan checkout, invoice, dan laporan salah atau dikerjakan ulang. | Implementasi formula menunggu klarifikasi tertulis pada [OPN-006](#opn-006); scope fitur tetap baseline melalui [OPN-018](#opn-018). |
+| RSK-007 | Dasar pengenaan PPh 22 dan penerapan harga partai lintas item belum final. | Perhitungan checkout, invoice, dan laporan salah atau dikerjakan ulang. | Implementasikan struktur konfigurasi minimum; finalisasi formula dan skenario harga melalui [OPN-006](#opn-006) serta [OPN-013](#opn-013). |
 | RSK-008 | Koneksi POS belum tersedia selama development atau menjelang go-live. | Contract mismatch, keterlambatan integrasi, dan stok production tidak aktual. | Gunakan data contoh hanya untuk delivery non-production, definisikan kontrak koneksi, dan lakukan contract test sebelum go-live melalui OPN-019. |
 
 ## 15. Keputusan Terbuka
@@ -384,38 +393,53 @@ Apakah reseller merupakan scope resmi; siapa yang dikategorikan sebagai reseller
 
 ### OPN-003
 
-Data produk dan stok production berasal dari POS. Website mengelola informasi
-penayangan yang tidak tersedia dari POS. Pembagian untuk SKU, nama produk,
-kategori, merek, dan harga yang berbeda antara POS dan website masih perlu
-dipetakan.
+SKU, nama produk, klasifikasi/kategori, merek, harga, dan stok production
+berasal dari sinkronisasi POS. Website mengelola enrichment penayangan yang
+tidak disediakan POS, seperti gambar/video, deskripsi pemasaran, SEO, slug,
+label, urutan, dan status tampil. Detail field API tetap menjadi bagian kontrak
+integrasi pada OPN-005.
 
-**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
+**Pemilik:** Klien / Vendor POS · **Target:** 28 Juli 2026 · **Status:** Resolved
 
 ### OPN-004
 
-Kapan stok dikurangi atau direservasi: saat checkout, pembuatan invoice, verifikasi pembayaran, atau tahap lain.
+Website mengurangi stok ketika terjadi penjualan dan sinkronisasi POS dapat
+menambah stok setelah retur. Yang masih perlu ditetapkan adalah status/event
+yang secara tepat dianggap sebagai penjualan, apakah stok perlu direservasi
+sebelum event tersebut, serta apakah penambahan karena retur hanya berasal dari
+sinkronisasi POS.
 
-**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Open
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-005
 
-Kapan koneksi data POS tersedia; apakah POS mendukung pembaruan/reservasi order;
-serta apa kontrak dan batas operasionalnya. Data contoh hanya digunakan untuk
-delivery non-production sebelum koneksi POS tersedia.
+Klien meminta alur website dibuat terlebih dahulu menggunakan data contoh;
+akses POS dibuka setelah alur tersebut berjalan. Yang masih terbuka adalah
+tanggal/PIC pemberian akses, kontrak field dan autentikasi, interval
+sinkronisasi, arah sinkronisasi data penjualan, dukungan pembaruan/reservasi
+order, rate limit, dan penerimaan contract test.
 
 **Pemilik:** Vendor POS · **Target:** Sebelum integration acceptance · **Status:** Partially resolved
 
 ### OPN-006
 
-Apakah biaya persentase/surcharge pada dokumen sebelumnya merupakan PPh 22; jika tetap ada, apa dasar, formula, produk, dan kondisi penerapannya.
+Biaya persentase dikonfirmasi sebagai PPh 22. Admin dapat memilih klasifikasi
+yang terkena aturan, menetapkan ambang nilai belanja per klasifikasi, dan
+menetapkan persentase termasuk `0%`; contoh klien adalah ambang
+Rp2.200.000 dan tarif `0,5%`. Yang masih terbuka adalah dasar pengenaan
+(seluruh subtotal klasifikasi, nilai di atas ambang, atau total struk),
+agregasi jika lebih dari satu klasifikasi terpicu, sumber konfigurasi POS atau
+website, serta tampilan pada checkout, invoice, dan laporan.
 
-**Pemilik:** Klien · **Target:** Sebelum Sprint 2 · **Status:** Open
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-007
 
-Masa berlaku transaksi yang belum dibayar.
+Pesanan yang belum dibayar hanya berlaku pada hari pembuatannya dan otomatis
+dibatalkan pada hari kalender berikutnya menggunakan zona waktu
+`Asia/Jakarta`.
 
-**Pemilik:** Klien · **Target:** Sebelum Sprint 2 · **Status:** Open
+**Pemilik:** Klien · **Target:** 28 Juli 2026 · **Status:** Resolved
 
 ### OPN-008
 
@@ -452,9 +476,21 @@ hosting.
 
 ### OPN-013
 
-Definisi tiga tingkat harga: rentang kuantitas per produk; apakah tiga tingkat bersifat wajib atau maksimal; apakah harga terpilih berlaku untuk seluruh unit atau progresif; serta apakah harga dikelola di POS atau website.
+Setiap produk wajib memiliki tiga jenis harga dari POS:
 
-**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Open
+1. **Eceran** untuk penjualan langsung ke konsumen; disiapkan dan disinkronkan,
+   tetapi tidak ditampilkan pada storefront fase saat ini.
+2. **Partai** dengan indikasi minimum lima unit dalam satu struk.
+3. **Grosir** dengan minimum kuantitas dan harga yang dapat berbeda per produk;
+   contoh klien adalah minimum 200 unit dengan harga Rp10.800.
+
+Yang masih terbuka untuk harga partai adalah apakah lima unit harus berasal dari
+satu produk atau boleh gabungan, serta apakah harga partai kemudian berlaku
+untuk semua item dalam struk termasuk item berkuantitas satu atau hanya item
+yang memenuhi syarat. Perlu dikonfirmasi pula prioritas harga jika suatu item
+memenuhi syarat partai dan grosir.
+
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-014
 
@@ -482,15 +518,20 @@ Perwakilan klien/Product Owner: Sylvi; System Analyst Webekspres: Sultan; Projec
 
 ### OPN-018
 
-Keputusan scope PPh 22, batas maksimal penjualan, dan surcharge terkait. Scope tetap mengikuti proposal awal dan masuk MVP; detail formula, kondisi penerapan, serta mapping field tetap mengikuti OPN-006 dan OPN-003.
+Scope PPh 22 tetap berada dalam MVP. Istilah “batas maksimal penjualan”
+dikoreksi berdasarkan klarifikasi klien menjadi ambang nilai belanja pada
+klasifikasi terpilih: transaksi tidak ditolak ketika melewati ambang, tetapi
+PPh 22 diterapkan sesuai konfigurasi. Detail dasar pengenaan tetap mengikuti
+OPN-006.
 
-**Pemilik:** Klien · **Target:** 28 Juli 2026 · **Status:** Resolved - scope retained in MVP
+**Pemilik:** Klien · **Target:** 28 Juli 2026 · **Status:** Resolved - scope corrected and retained
 
 ### OPN-019
 
 Data contoh hanya digunakan untuk development, staging, demo, dan UAT.
-Production wajib menggunakan data dari POS. Yang masih terbuka adalah target
-ketersediaan koneksi POS dan penerimaan hasil uji koneksi tersebut sebelum
+Production wajib menggunakan data dari POS. Klien akan membuka akses setelah
+alur website menggunakan data contoh telah berjalan. Yang masih terbuka adalah
+tanggal dan PIC akses, kontrak API, serta penerimaan hasil uji koneksi sebelum
 go-live.
 
 **Pemilik:** Klien / Vendor POS / Webekspres · **Target:** Sebelum go-live · **Status:** Partially resolved
@@ -532,20 +573,23 @@ trail karena sudah dijawab pada 27 Juli 2026.
 
 | ID | Pertanyaan | Requirement Terdampak | Status |
 |---|---|---|---|
-| Q-001 | Apakah PPh 22 dihapus sepenuhnya dari MVP atau hanya cara perhitungannya yang berubah? | BR-008, BR-015, RULE-006 | Resolved - tetap dalam MVP; formula mengikuti Q-003/OPN-006 |
-| Q-002 | Apakah istilah “biaya tambahan berbentuk persentase/surcharge” pada proposal dan dokumen saat ini merujuk pada PPh 22? | BR-008, OPN-006 | Open |
-| Q-003 | Jika PPh 22 tetap digunakan, siapa yang dikenakan, produk/transaksi apa yang terkena, berapa tarifnya, dan apa dasar perhitungannya? | BR-008, FR-PRC-004 | Open |
-| Q-004 | Apakah batas maksimal penjualan dihapus sepenuhnya untuk semua produk atau hanya produk/pelanggan tertentu? | BR-007, FR-PRC-003 | Resolved - tetap dalam MVP |
-| Q-005 | Jika batas dihapus, apakah kuantitas pembelian hanya dibatasi oleh stok tersedia dan tingkat harga? | BR-006, BR-007, aturan stok | Not applicable - batas tetap dalam MVP |
-| Q-006 | Apakah surcharge ketika batas terlampaui ikut dihapus jika batas maksimal penjualan dihapus? | BR-008, FR-PRC-004 | Resolved - tetap dalam MVP; formula mengikuti Q-003/OPN-006 |
-| Q-007 | Apakah tiga tingkat harga berdasarkan kuantitas tetap berlaku tanpa perubahan? | BR-006, OPN-013 | Resolved - tetap dalam MVP |
-| Q-008 | Apakah PPh 22, batas penjualan, atau surcharge harus tampil sebagai baris terpisah pada cart, checkout, invoice, dan laporan? | BR-015, RULE-006, laporan | Open |
-| Q-009 | Apakah API POS memiliki field PPh 22 atau batas penjualan; jika ada, apakah field tersebut diabaikan atau tetap disimpan? | BR-009, OPN-003 | Open |
+| Q-001 | Apakah PPh 22 dihapus sepenuhnya dari MVP atau hanya cara perhitungannya yang berubah? | BR-008, BR-015, RULE-006 | Resolved - PPh 22 tetap dalam MVP |
+| Q-002 | Apakah istilah “biaya tambahan berbentuk persentase/surcharge” pada proposal dan dokumen saat ini merujuk pada PPh 22? | BR-008, OPN-006 | Resolved - dikonfirmasi sebagai PPh 22 |
+| Q-003 | Jika PPh 22 tetap digunakan, siapa yang dikenakan, produk/transaksi apa yang terkena, berapa tarifnya, dan apa dasar perhitungannya? | BR-008, FR-PRC-004 | Partially resolved - klasifikasi, ambang, dan tarif dapat dikonfigurasi; dasar pengenaan mengikuti OPN-006 |
+| Q-004 | Apakah batas maksimal penjualan dihapus sepenuhnya untuk semua produk atau hanya produk/pelanggan tertentu? | BR-007, FR-PRC-003 | Resolved - bukan batas maksimum; dikoreksi menjadi ambang nilai per klasifikasi |
+| Q-005 | Jika batas dihapus, apakah kuantitas pembelian hanya dibatasi oleh stok tersedia dan tingkat harga? | BR-006, BR-007, aturan stok | Resolved - tidak ada hard limit dari aturan ini; ambang memicu PPh 22 |
+| Q-006 | Apakah surcharge ketika batas terlampaui ikut dihapus jika batas maksimal penjualan dihapus? | BR-008, FR-PRC-004 | Resolved - komponen tersebut adalah PPh 22 |
+| Q-007 | Apakah tiga tingkat harga berdasarkan kuantitas tetap berlaku tanpa perubahan? | BR-006, OPN-013 | Partially resolved - tiga jenis harga wajib; penerapan harga partai masih perlu dikonfirmasi |
+| Q-008 | Apakah PPh 22 harus tampil sebagai baris terpisah pada cart, checkout, invoice, dan laporan? | BR-015, RULE-006, laporan | Open |
+| Q-009 | Apakah konfigurasi klasifikasi, ambang, dan tarif PPh 22 berasal dari POS atau dikelola di website? | BR-008, BR-009, OPN-006 | Open |
 | Q-010 | Apa saja “poin-poin yang berkenaan” yang juga ingin dihapus atau diubah oleh klien? | Seluruh traceability terkait | Resolved - tidak ada penghapusan scope berdasarkan CR-004 |
 | Q-011 | Apakah perubahan ini memengaruhi nilai proposal, scope komersial, atau deadline 45 hari kerja? | MVP baseline dan change control | Resolved - mengikuti plan/proposal awal |
 | Q-012 | Siapa yang memberikan persetujuan final dan kapan keputusan tersebut efektif menjadi baseline? | OPN-017 | Resolved - klien memberi persetujuan final; efektif setelah persetujuan tertulis kedua pihak pada hari kerja |
 | Q-013 | Apakah data contoh boleh digunakan pada production jika koneksi POS belum tersedia saat go-live? | BR-009, OPN-019 | Resolved - tidak; data production wajib berasal dari POS |
-| Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi pemetaan data? | OPN-003, OPN-005, OPN-019 | Open |
+| Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi kontrak data? | OPN-005, OPN-019 | Partially resolved - akses dibuka setelah alur website berjalan; tanggal dan PIC masih open |
+| Q-015 | Untuk harga partai, apakah syarat lima unit harus pada satu produk atau boleh gabungan; dan apakah harga partai berlaku untuk seluruh item dalam struk atau hanya item yang memenuhi syarat? | BR-006, OPN-013 | Open |
+| Q-016 | PPh 22 dihitung dari seluruh subtotal klasifikasi, hanya nilai di atas ambang, atau total struk; dan bagaimana jika lebih dari satu klasifikasi terpicu? | BR-008, BR-015, OPN-006 | Open |
+| Q-017 | Status/event apa yang dianggap sebagai penjualan untuk mengurangi stok; apakah perlu reservasi sebelumnya; dan apakah stok retur hanya masuk melalui sinkronisasi POS? | BR-011 - BR-013, OPN-004 | Open |
 
 ### 15.2 MVP Baseline dan Stage Gates
 
@@ -579,9 +623,9 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 
 | ID | Bukti yang Dibutuhkan | Owner | Gate | Status Awal |
 |---|---|---|---|---|
-| PRE-001 | Keputusan scope PPh 22, batas maksimal penjualan, surcharge, dan dampak scope. | Klien | G0 | Selesai - OPN-018; formula tetap OPN-006 |
-| PRE-002 | Definisi harga bertingkat dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Blocker - OPN-013, OPN-020 |
-| PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Vendor POS / Webekspres | G1 integrasi | Blocker - OPN-003, OPN-005, OPN-019 |
+| PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - scope dan konfigurasi dasar selesai; formula tetap OPN-006 |
+| PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai; OPN-013 dan OPN-020 masih parsial |
+| PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Vendor POS / Webekspres | G1 integrasi | Parsial - ownership inti selesai pada OPN-003; OPN-005/OPN-019 tetap blocker integrasi |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat/dimensi, area, tarif, SLA. | Klien | G1 pengiriman | Blocker - OPN-010, OPN-021 |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Open - OPN-022, OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Open - OPN-001 |

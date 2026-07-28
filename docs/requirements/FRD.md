@@ -4,9 +4,9 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.2 - Approved Working Baseline |
-| Tanggal | Senin, 27 Juli 2026 |
-| Status | Revised Working Baseline - scope proposal awal diteruskan |
+| Versi | 0.3 - Incremental Client Clarification |
+| Tanggal | Selasa, 28 Juli 2026 |
+| Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Dokumen induk | `BRD.md` |
 | Spesifikasi teknis | `SRS.md` |
@@ -84,7 +84,7 @@ Urutan increment draft:
 | Increment | Fokus | Gate |
 |---|---|---|
 | Sprint 1 | Registrasi, approval akun, akses, katalog, dan visibilitas harga. | Demo dan acceptance increment |
-| Sprint 2 | Harga bertingkat, cart, checkout, order, dan invoice. | Demo dan acceptance increment |
+| Sprint 2 | Tiga jenis harga, PPh 22, cart, checkout, order, dan invoice. | Demo dan acceptance increment |
 | Sprint 3 | POS/stok, pembayaran, pengiriman, laporan, audit, dan hardening. | System integration test |
 | UAT/Release | End-to-end MVP, perbaikan, deployment, training, dan go-live. | UAT sign-off dan release gate |
 
@@ -157,7 +157,7 @@ stateDiagram-v2
 |---|---|---|---|---|
 | FR-CAT-001 | Sistem | Produk memiliki external product ID dan/atau SKU yang unik. | Produk POS yang sama tidak membuat record ganda. | Amendment |
 | FR-CAT-002 | Admin | Admin dapat melihat daftar produk dan status sinkronisasinya. | Daftar dapat dicari, difilter, diurutkan, dan dipaginasi. | Baseline |
-| FR-CAT-003 | Admin | Admin dapat mengelola kategori/klasifikasi dan merek. | Relasi produk dapat diperbarui sesuai pembagian master data. | Baseline |
+| FR-CAT-003 | Sistem | Sistem menyinkronkan kategori/klasifikasi dan merek dari POS. | Perubahan master POS di-upsert tanpa membuat kategori, merek, atau relasi produk duplikat. | Baseline |
 | FR-CAT-004 | Admin | Admin dapat mengelola enrichment lokal. | Gambar, video, deskripsi pemasaran, SEO, slug, label, dan urutan tampil dapat disimpan. | Amendment |
 | FR-CAT-005 | Sistem | Sinkronisasi tidak menimpa enrichment lokal. | Enrichment tetap sama setelah sync produk/stok. | Amendment |
 | FR-CAT-006 | Admin | Admin dapat mengaktifkan/nonaktifkan penayangan produk. | Produk nonaktif tidak dapat ditambahkan ke cart. | Baseline |
@@ -165,22 +165,24 @@ stateDiagram-v2
 | FR-CAT-008 | Guest dan Pengguna | Guest, pelanggan pending, dan pelanggan aktif dapat mencari dan memfilter katalog. | Filter minimal mencakup kategori, merek, dan ketersediaan tanpa membocorkan harga kepada guest atau pelanggan pending. | Proposed |
 | FR-CAT-009 | Sistem | Perubahan nama/harga produk tidak mengubah transaksi historis. | Invoice lama tetap menampilkan snapshot transaksi. | Proposed |
 
-## 5. Modul Harga dan Batas Pembelian
+## 5. Modul Harga dan PPh 22
 
-Change notice klien Selasa, 28 Juli 2026 mengembalikan PPh 22 dan batas maksimal
-penjualan ke scope proposal/MVP melalui [OPN-018 pada BRD](BRD.md#opn-018).
-`FR-PRC-003` dapat masuk backlog; implementasi formula pada `FR-PRC-004` tetap
-menunggu detail [OPN-006](BRD.md#opn-006).
+Klarifikasi klien Selasa, 28 Juli 2026 menetapkan tiga jenis harga dari POS dan
+mengoreksi istilah batas maksimal menjadi ambang nilai belanja per klasifikasi.
+Ambang tidak menolak checkout; ketika terlampaui, sistem menambahkan PPh 22
+sesuai konfigurasi. Detail penerapan harga partai dan dasar pengenaan PPh 22
+tetap mengikuti [OPN-013](BRD.md#opn-013) dan
+[OPN-006](BRD.md#opn-006).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-PRC-001 | Admin | Sistem mendukung minimal tiga tingkat harga per produk. | Setiap tingkat memiliki rentang kuantitas yang tidak tumpang tindih. | Baseline |
-| FR-PRC-002 | Sistem | Harga dipilih berdasarkan kuantitas. | Boundary minimum/maksimum menghasilkan tingkat harga yang benar. | Baseline |
-| FR-PRC-003 | Admin | Admin dapat menentukan batas maksimal pembelian/penjualan produk tertentu. | Checkout menolak kuantitas yang melampaui batas aktif produk dan menjelaskan batas tersebut kepada pelanggan. | Baseline |
-| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 atau surcharge persentase apabila aturan final mewajibkan. | Jenis komponen, formula, dasar perhitungan, kondisi penerapan, dan snapshot mengikuti [OPN-006](BRD.md#opn-006). | Baseline; formula open |
+| FR-PRC-001 | Worker | Sistem menyinkronkan harga `ECERAN`, `PARTAI`, dan `GROSIR` untuk setiap produk dari POS. | Produk hanya siap dijual setelah ketiga jenis harga lolos validasi kontrak; harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. | Baseline |
+| FR-PRC-002 | Sistem | Sistem memilih harga yang berlaku berdasarkan aturan jenis harga. | Minimum grosir dapat berbeda per produk; skenario harga partai dan prioritas partai/grosir diuji setelah [OPN-013](BRD.md#opn-013) diselesaikan. | Baseline; aturan partai partially open |
+| FR-PRC-003 | Sistem | Sistem mendukung pemilihan klasifikasi produk serta ambang nilai belanja yang dapat dikonfigurasi per klasifikasi. | Nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22; melewati ambang tidak menolak checkout. | Baseline |
+| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 dengan persentase yang dapat dikonfigurasi, termasuk `0%`, ketika aturan klasifikasi terpicu. | Klasifikasi, ambang, tarif, dasar pengenaan, hasil perhitungan, dan snapshot tervalidasi; rincian yang belum final mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
 | FR-PRC-005 | Sistem | Sistem memvalidasi ulang harga saat checkout. | Perubahan harga setelah item masuk cart ditampilkan sebelum konfirmasi order. | Proposed |
 | FR-PRC-006 | Sistem | Harga disimpan sebagai snapshot per item transaksi. | Invoice historis tidak bergantung pada harga produk terkini. | Proposed |
-| FR-PRC-007 | Sistem | Sistem membatasi visibilitas harga berdasarkan status akun. | Guest dan pelanggan pending tidak menerima nilai harga pada halaman katalog, detail produk, pencarian, atau response terkait; pelanggan aktif dan admin dapat melihat harga. | Baseline |
+| FR-PRC-007 | Sistem | Sistem membatasi visibilitas harga berdasarkan status akun dan kanal penjualan. | Guest dan pelanggan pending tidak menerima nilai harga; pelanggan aktif menerima harga jual yang berlaku tanpa harga eceran, sedangkan admin dapat memeriksa data harga hasil sinkronisasi. | Baseline |
 
 ## 6. Modul POS dan Stok
 
@@ -191,9 +193,9 @@ POS sesuai [`OPN-019`](BRD.md#opn-019).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-POS-001 | Worker | Sistem mengambil produk dan stok melalui API POS klien. | Request memakai kredensial server-side dan kontrak field tervalidasi. | Amendment |
+| FR-POS-001 | Worker | Sistem mengambil SKU, nama produk, kategori/klasifikasi, merek, tiga jenis harga, dan stok melalui API POS klien. | Request memakai kredensial server-side dan setiap field master mengikuti kontrak tervalidasi. | Amendment |
 | FR-POS-002 | Worker | Sinkronisasi melakukan upsert berdasarkan identifier stabil. | Menjalankan payload sama berulang kali tidak membuat duplikasi. | Amendment |
-| FR-POS-003 | Worker | Sinkronisasi dapat berjalan terjadwal. | Jadwal dapat dikonfigurasi dan eksekusi overlap dicegah. | Baseline |
+| FR-POS-003 | Worker | Sinkronisasi dapat berjalan setiap pagi atau berkala sesuai jadwal konfigurasi. | Interval dapat diubah, eksekusi overlap dicegah, dan waktu keberhasilan terakhir tercatat. | Baseline |
 | FR-POS-004 | Admin | Admin dapat memulai sinkronisasi manual. | Sistem menolak trigger baru jika sync yang sama masih berjalan. | Proposed |
 | FR-POS-005 | Sistem | Setiap sinkronisasi memiliki log. | Waktu mulai/selesai, status, jumlah sukses/gagal, dan pesan error tersimpan. | Proposed |
 | FR-POS-006 | Sistem | Produk yang tidak lagi muncul dari POS tidak langsung dihapus. | Produk ditandai untuk rekonsiliasi atau dinonaktifkan menurut aturan final. | Proposed |
@@ -201,9 +203,9 @@ POS sesuai [`OPN-019`](BRD.md#opn-019).
 | FR-POS-008 | Admin | Admin dapat mengatur batas minimum stok. | Status `MENIPIS` berubah sesuai nilai terbaru. | Baseline |
 | FR-POS-009 | Sistem | Perubahan stok disimpan sebagai ledger/riwayat. | Setiap perubahan memiliki jumlah sebelum/sesudah, sumber, dan waktu. | Baseline |
 | FR-POS-010 | Sistem | Kegagalan sementara POS dapat di-retry. | Retry tidak membuat duplikasi dan berhenti setelah batas percobaan. | Proposed |
-| FR-POS-011 | Sistem | Checkout memvalidasi stok terbaru. | Order tidak dibuat jika stok tidak memenuhi kebutuhan. | Proposed |
+| FR-POS-011 | Sistem | Checkout memvalidasi stok terhadap snapshot sinkronisasi terakhir dan penyesuaian lokal setelahnya. | Order tidak dibuat jika stok efektif tidak memenuhi kebutuhan; mekanisme reservasi final mengikuti [OPN-004](BRD.md#opn-004). | Baseline; reservation partially open |
 | FR-POS-012 | Sistem | Penyesuaian stok pembatalan dapat ditelusuri. | Referensi transaksi dan sumber `CANCELLATION` tersimpan. | Baseline |
-| FR-POS-013 | Data Seeder | Sistem dapat memuat produk, harga, dan stok representatif ketika API POS belum tersedia. | Dataset mencakup variasi produk aktif/nonaktif, tiga tingkat harga, serta status stok tersedia/menipis/habis. | Baseline |
+| FR-POS-013 | Data Seeder | Sistem dapat memuat produk, tiga jenis harga, dan stok representatif ketika API POS belum tersedia. | Setiap produk memiliki harga eceran, partai, dan grosir; dataset juga mencakup minimum grosir serta status stok tersedia/menipis/habis. | Baseline |
 | FR-POS-014 | Sistem | Seeder mengikuti kontrak data internal yang juga digunakan adapter POS. | SKU/external ID stabil, field wajib tervalidasi, dan perubahan ke API tidak memerlukan perubahan domain transaksi. | Baseline |
 | FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi dan tidak menimpa enrichment lokal yang telah diedit. | Baseline |
 | FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; production selalu menolak eksekusi data contoh. | Baseline |
@@ -213,11 +215,11 @@ POS sesuai [`OPN-019`](BRD.md#opn-019).
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-CART-001 | Pelanggan Aktif | Pelanggan dapat menambahkan produk aktif ke keranjang. | Kuantitas divalidasi terhadap aturan produk. | Baseline |
-| FR-CART-002 | Pelanggan Aktif | Pelanggan dapat mengubah kuantitas atau menghapus item. | Harga tingkat dan total diperbarui. | Baseline |
+| FR-CART-002 | Pelanggan Aktif | Pelanggan dapat mengubah kuantitas atau menghapus item. | Jenis harga yang berlaku, PPh 22 jika terpicu, dan total diperbarui. | Baseline |
 | FR-CART-003 | Sistem | Keranjang hanya dapat di-checkout oleh akun aktif. | Pending, rejected, atau suspended menerima penolakan. | Baseline |
 | FR-CART-004 | Sistem | Checkout memvalidasi produk, harga, stok, alamat, dan pengiriman. | Order hanya dibuat jika semua validasi lulus. | Proposed |
 | FR-CART-005 | Pelanggan Aktif | Pelanggan memilih alamat dan metode pengiriman. | Hanya metode yang tersedia untuk area tersebut ditampilkan. | Baseline |
-| FR-CART-006 | Sistem | Sistem menampilkan rincian subtotal, komponen biaya aktif, ongkir, dan grand total. | Total server-side sama dengan invoice; PPh 22/surcharge terkait batas ditampilkan sesuai aturan [OPN-006](BRD.md#opn-006). | Baseline; formula open |
+| FR-CART-006 | Sistem | Sistem menampilkan rincian subtotal, PPh 22 yang aktif, ongkir, dan grand total. | Total server-side sama dengan invoice; tampilan dan dasar pengenaan PPh 22 mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
 | FR-CART-007 | Sistem | Pembuatan order terlindungi idempotency. | Pengiriman request yang sama tidak membuat order ganda. | Proposed |
 
 ## 8. Modul Pengiriman dan Biteship
@@ -237,7 +239,7 @@ POS sesuai [`OPN-019`](BRD.md#opn-019).
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-001 | Sistem | Sistem membuat nomor order dan invoice yang unik. | Constraint unik mencegah duplikasi nomor. | Baseline |
-| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, harga, kuantitas, ongkir, komponen biaya aktif, dan total historis tersedia; PPh 22/surcharge terkait batas mengikuti aturan [OPN-006](BRD.md#opn-006). | Proposed |
+| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, jenis harga, harga, kuantitas, ongkir, PPh 22, dan total historis tersedia; dasar pengenaan mengikuti [OPN-006](BRD.md#opn-006). | Proposed |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; status pemenuhan dan nomor resi mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle partially open |
@@ -259,6 +261,7 @@ stateDiagram-v2
     READY_FOR_DELIVERY --> SHIPPED
     SHIPPED --> COMPLETED
     WAITING_PAYMENT --> CANCELLED: Admin, hari yang sama
+    WAITING_PAYMENT --> CANCELLED: Sistem, hari berikutnya
     PAYMENT_SUBMITTED --> CANCELLED: Admin, hari yang sama
     PAYMENT_VERIFIED --> PROCESSING
 ```
@@ -271,6 +274,7 @@ scope pembatalan standar.
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice miliknya sesuai format dan channel yang disetujui. | Tampilan, PDF, atau pengiriman invoice hanya diimplementasikan setelah [OPN-022](BRD.md#opn-022) menetapkan kebutuhan. | Proposed |
+| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1 dalam zona waktu `Asia/Jakarta`; pembatalan idempotent dan tercatat pada audit log. | Baseline |
 
 ## 10. Modul Pembayaran Manual
 
@@ -350,7 +354,7 @@ disetujui.
 | BR-006 | FR-PRC-001, FR-PRC-002, FR-PRC-005 - FR-PRC-007 |
 | BR-007 - BR-008 | FR-PRC-003 - FR-PRC-004, FR-CART-006, FR-ORD-002 |
 | BR-009 - BR-013 | FR-POS-001 - FR-POS-016 |
-| BR-014 - BR-017 | FR-CART-001 - FR-CART-007, FR-ORD-001 - FR-ORD-009 |
+| BR-014 - BR-017, BR-030 | FR-CART-001 - FR-CART-007, FR-ORD-001 - FR-ORD-010 |
 | BR-018 - BR-020 | FR-PAY-001 - FR-PAY-007 |
 | BR-021 - BR-022 | FR-ORD-006 - FR-ORD-008, FR-POS-012 |
 | BR-023 - BR-025 | FR-SHP-001 - FR-SHP-007 |
@@ -370,11 +374,13 @@ FRD dapat dibaseline setelah:
   koneksi POS production tersedia dan lulus contract test;
 - API Biteship dapat diuji;
 - status/transisi order disetujui;
-- formula harga bertingkat disetujui;
-- scope PPh 22, batas maksimal penjualan, dan surcharge terkait dikonfirmasi
-  melalui [OPN-018](BRD.md#opn-018), serta formula dan mapping disetujui
-  melalui [OPN-006](BRD.md#opn-006) dan [OPN-003](BRD.md#opn-003);
-- waktu reservasi/pengurangan stok disetujui;
+- aturan harga partai dan prioritas terhadap harga grosir disetujui melalui
+  [OPN-013](BRD.md#opn-013);
+- konfigurasi ambang klasifikasi dan PPh 22 dikonfirmasi melalui
+  [OPN-018](BRD.md#opn-018), sedangkan dasar pengenaan disetujui melalui
+  [OPN-006](BRD.md#opn-006);
+- event pengurangan/reservasi stok disetujui melalui
+  [OPN-004](BRD.md#opn-004);
 - lifecycle order dan bukti fulfillment disetujui melalui
   [OPN-020](BRD.md#opn-020); pembatalan standar tetap oleh admin pada hari
   yang sama;

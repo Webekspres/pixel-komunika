@@ -4,9 +4,9 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.3 - Revised Working Baseline |
+| Versi | 0.4 - Incremental Client Clarification |
 | Tanggal | Selasa, 28 Juli 2026 |
-| Status | Revised Working Baseline - scope proposal awal diteruskan |
+| Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Kebutuhan bisnis | `BRD.md` |
 | Kebutuhan fungsional | `FRD.md` |
@@ -52,20 +52,26 @@ implementasi dilakukan iteratif per sprint.
 - Perubahan tetap harus menjaga backward compatibility, migration safety, test,
   observability, dan rollback.
 
-### 2.2 Change Notice 27-28 Juli 2026
+### 2.2 Change Notice dan Klarifikasi 27-28 Juli 2026
 
-Pada 28 Juli 2026, scope PPh 22, batas maksimal penjualan, dan surcharge
-dikembalikan ke plan/proposal awal melalui [OPN-018](BRD.md#opn-018). Teknis
-implementasi mengikuti ketentuan berikut:
+Klarifikasi klien pada 28 Juli 2026 menetapkan:
 
-- batas pembelian dapat dimodelkan sebagai aturan produk dan divalidasi saat
-  checkout;
-- komponen biaya aktif harus disimpan sebagai snapshot transaksi;
-- field POS terkait hanya digunakan setelah mapping disetujui pada OPN-003 dan
-  OPN-006;
-- desain tidak boleh mengasumsikan bahwa surcharge sama dengan PPh 22;
-- formula, basis perhitungan, kondisi penerapan, dan tampilan komponen tetap
-  menunggu OPN-006 serta Q-008/Q-009 pada BRD.
+- setiap produk memiliki harga eceran, partai, dan grosir dari POS;
+- harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini;
+- harga grosir memiliki minimum kuantitas per produk, sedangkan penerapan harga
+  partai lintas item masih menunggu OPN-013;
+- istilah batas maksimal dikoreksi menjadi ambang nilai belanja per klasifikasi;
+  melewati ambang tidak menolak checkout;
+- PPh 22 menggunakan tarif configurable, termasuk `0%`, dan dipicu ketika
+  ambang klasifikasi terlampaui; dasar pengenaan menunggu OPN-006;
+- SKU, nama produk, kategori/klasifikasi, merek, harga, dan stok bersumber dari
+  POS;
+- development memakai data contoh sampai akses POS dibuka setelah alur website
+  berjalan;
+- pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya.
+
+Nilai harga, jenis harga, aturan PPh 22 yang terpakai, dasar perhitungan, tarif,
+dan hasilnya harus disimpan sebagai snapshot transaksi.
 
 ## 3. Keputusan Arsitektur
 
@@ -267,7 +273,8 @@ Jika koneksi POS belum tersedia:
 - data contoh memanggil jalur import/upsert yang sama dengan adapter POS, bukan
   menulis langsung dengan aturan bisnis berbeda;
 - dataset memakai SKU/external ID stabil dan mencakup skenario harga serta stok
-  representatif;
+  representatif, termasuk harga eceran, partai, grosir, minimum grosir, dan
+  aturan ambang klasifikasi;
 - eksekusi ulang bersifat idempotent;
 - enrichment lokal tidak ditimpa;
 - data contoh tidak menyimpan credential atau data pribadi production;
@@ -282,14 +289,15 @@ menggantikan pengujian koneksi terhadap POS asli sebelum go-live.
 | Data | Master Default | Status |
 |---|---|---|
 | External product ID | POS | Amendment |
-| SKU | POS atau website sesuai pemetaan | Perlu konfirmasi |
-| Nama dasar produk | POS atau website sesuai pemetaan | Perlu konfirmasi |
+| SKU | POS | Baseline |
+| Nama dasar produk | POS | Baseline |
 | Stok aktual | POS | Baseline |
 | Produk/stok contoh sebelum POS tersedia | Data contoh | Baseline non-production |
 | Status ketersediaan | Dihitung website dari stok POS | Draft |
-| Harga dasar | POS atau website sesuai pemetaan | Open decision |
-| Harga bertingkat | Website | Draft |
-| Kategori/merek | POS atau website sesuai pemetaan | Open decision |
+| Harga eceran, partai, dan grosir | POS | Baseline |
+| Minimum kuantitas grosir | POS | Baseline |
+| Kategori/klasifikasi dan merek | POS | Baseline |
+| Konfigurasi ambang klasifikasi dan tarif PPh 22 | POS atau website | Open decision - OPN-006 |
 | Gambar/video | Website | Amendment |
 | Deskripsi pemasaran | Website | Amendment |
 | SEO/slug/label/urutan | Website | Amendment |
@@ -363,7 +371,8 @@ Contoh error:
 | product_media | Metadata gambar/video dan object key. |
 | categories | Klasifikasi produk. |
 | brands | Merek produk. |
-| product_price_tiers | Rentang kuantitas dan harga. |
+| product_prices | Tiga jenis harga dari POS, minimum kuantitas, dan metadata penerapannya. |
+| category_tax_rules | Klasifikasi terpilih, ambang nilai belanja, tarif PPh 22, status aktif, dan sumber konfigurasi. |
 | inventory_snapshots | Nilai stok terbaru per produk. |
 | inventory_ledger | Riwayat perubahan stok. |
 | carts / cart_items | Keranjang aktif. |
@@ -379,11 +388,11 @@ Contoh error:
 | sync_errors | Detail item yang gagal. |
 | audit_logs | Jejak tindakan kritis. |
 
-Model data menggunakan komponen biaya generik untuk PPh 22/surcharge terkait
-batas agar snapshot transaksi tidak bergantung pada konfigurasi masa depan.
-Nama komponen, formula, dan mapping POS tetap menunggu
-[`OPN-006`](BRD.md#opn-006) serta [`OPN-003`](BRD.md#opn-003). Perubahan skema
-harus melalui migration, data dictionary, test, dan ADR.
+Model data menyimpan konfigurasi PPh 22 terpisah dari snapshot biaya order.
+Perubahan konfigurasi klasifikasi, ambang, atau tarif tidak boleh mengubah
+invoice lama. Dasar pengenaan dan sumber konfigurasi tetap menunggu
+[`OPN-006`](BRD.md#opn-006). Perubahan skema harus melalui migration, data
+dictionary, test, dan ADR.
 
 ### 9.2 Relasi Konseptual
 
@@ -393,10 +402,11 @@ erDiagram
     USER ||--o{ ADDRESS : owns
     USER ||--o{ ORDER : places
     PRODUCT }o--|| CATEGORY : classified_as
+    CATEGORY ||--o{ CATEGORY_TAX_RULE : governed_by
     PRODUCT }o--|| BRAND : branded_as
     PRODUCT ||--|| PRODUCT_ENRICHMENT : enriched_by
     PRODUCT ||--o{ PRODUCT_MEDIA : has
-    PRODUCT ||--o{ PRODUCT_PRICE_TIER : priced_by
+    PRODUCT ||--o{ PRODUCT_PRICE : priced_by
     PRODUCT ||--|| INVENTORY_SNAPSHOT : has
     PRODUCT ||--o{ INVENTORY_LEDGER : changes
     ORDER ||--|{ ORDER_ITEM : contains
@@ -429,7 +439,10 @@ Ketentuan:
 - constraint database mencegah duplicate invoice, SKU, dan external ID;
 - validasi stok dilakukan kembali sebelum commit order.
 
-Mekanisme final reservasi stok masih `TBD`.
+Website mengurangi stok ketika event penjualan yang disepakati terjadi, dan
+sinkronisasi dapat menaikkan stok setelah retur dicatat di POS. Event penjualan,
+reservasi sebelum penjualan, dan arah data retur masih mengikuti
+[OPN-004](BRD.md#opn-004).
 
 ## 11. Queue and Scheduler
 
@@ -456,7 +469,9 @@ untuk mengirim email, WhatsApp, atau channel lain.
 
 Scheduler minimum:
 
-- sinkronisasi POS;
+- sinkronisasi POS setiap pagi atau berkala sesuai interval konfigurasi;
+- pembatalan idempotent untuk order `WAITING_PAYMENT` dari hari kalender
+  sebelumnya;
 - retry/reconciliation;
 - pembersihan temporary upload;
 - pruning log sesuai retention;
@@ -669,7 +684,7 @@ sebagai sumber stok production.
 
 | Level | Cakupan Minimum |
 |---|---|
-| Unit | Harga bertingkat, batas pembelian, komponen biaya aktif, status stok, dan aturan tanggal pembatalan. |
+| Unit | Pemilihan harga partai/grosir, visibilitas harga eceran, ambang klasifikasi, PPh 22, status stok, dan auto-cancel D+1. |
 | Feature | Registrasi, approval, cart, checkout, pembayaran, pembatalan, laporan. |
 | Integration | Contract POS atau adapter contract melalui seeder, retry/idempotency sync, transisi seeder-ke-API, dan Biteship quote. |
 | Security | Authorization, IDOR, CSRF, rate limit, dan upload. |
@@ -699,13 +714,13 @@ sebagai sumber stok production.
 | TD-001 | Shared hosting milik klien sebagai production baseline. | OPN-001 | Resolved |
 | TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
 | TD-003 | Detail kontrak dan autentikasi POS; data contoh hanya dipakai di non-production. | OPN-003, OPN-005, OPN-019 | Production POS mandatory; connection contract open |
-| TD-004 | Mekanisme reservasi/write-back stok. | OPN-004, OPN-005 | Open |
-| TD-005 | Master harga, kategori, merek, dan SKU. | OPN-003, OPN-013 | Open |
-| TD-006 | Interval sinkronisasi dan SLA freshness stok. | OPN-005 | Open |
+| TD-004 | Mekanisme pengurangan/reservasi/write-back stok. | OPN-004, OPN-005 | Partially resolved - stok berkurang saat penjualan; event dan reservasi open |
+| TD-005 | Master tiga jenis harga, kategori, merek, nama produk, dan SKU. | OPN-003, OPN-013 | Resolved - POS |
+| TD-006 | Interval sinkronisasi dan SLA freshness stok. | OPN-005 | Partially resolved - setiap pagi/berkala; interval final open |
 | TD-007 | Object storage provider dan kebijakan retensi. | OPN-009 | Open |
 | TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
-| TD-010 | Formula PPh 22/surcharge, mapping POS, dan expiry order belum dibayar. | OPN-003, OPN-006, OPN-007 | Scope retained; formula/mapping/expiry open |
+| TD-010 | Dasar pengenaan PPh 22, sumber konfigurasinya, dan expiry order belum dibayar. | OPN-006, OPN-007 | PPh 22 partially open; expiry D+1 resolved |
 | TD-011 | Lifecycle fulfillment dan kebutuhan bukti/resi; pembatalan baseline hanya oleh admin pada hari yang sama. | OPN-020 | Partially resolved |
 | TD-012 | Origin, berat/dimensi produk, dan mapping alamat untuk Biteship. | OPN-021 | Open |
 | TD-013 | Format/penyampaian invoice serta event/channel notifikasi. | OPN-022, OPN-023 | Open |

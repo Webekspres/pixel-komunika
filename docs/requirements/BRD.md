@@ -370,29 +370,29 @@ dipindahkan ke requirement atau aturan bisnis terkait.
 
 | ID | Keputusan yang Dibutuhkan | Pemilik | Target | Status |
 |---|---|---|---|---|
-| <a id="opn-001">OPN-001</a> | VPS atau shared hosting sebagai production baseline. | Klien / Webekspres | Sebelum MVP baseline | Open |
-| <a id="opn-002">OPN-002</a> | Apakah reseller merupakan scope resmi; siapa yang dikategorikan sebagai reseller; apakah reseller dapat melihat harga; dan apakah pemesanan dilakukan melalui website atau WhatsApp. | Klien | Sebelum backlog final | Open |
-| <a id="opn-003">OPN-003</a> | Field produk dan harga yang menjadi master POS atau website. | Klien / Vendor POS | Sebelum Sprint 2 | Open |
-| <a id="opn-004">OPN-004</a> | Kapan stok dikurangi atau direservasi: saat checkout, pembuatan invoice, verifikasi pembayaran, atau tahap lain. | Klien / System Analyst | Sebelum Sprint 2 | Open |
-| <a id="opn-005">OPN-005</a> | Kapan API POS read tersedia; apakah tersedia endpoint order write-back/reservasi; serta apa kontrak dan batas operasionalnya. Fallback seeder telah disetujui untuk delivery sebelum API tersedia. | Vendor POS | Sebelum integration acceptance | Partially resolved |
-| <a id="opn-006">OPN-006</a> | Apakah biaya persentase/surcharge pada dokumen sebelumnya merupakan PPh 22; jika tetap ada, apa dasar, formula, produk, dan kondisi penerapannya. | Klien | 28 Juli 2026 | ON_HOLD / clarification |
-| <a id="opn-007">OPN-007</a> | Masa berlaku transaksi yang belum dibayar. | Klien | Sebelum Sprint 2 | Open |
-| <a id="opn-008">OPN-008</a> | Format nomor invoice. | Klien | Sebelum Sprint 2 | Open |
-| <a id="opn-009">OPN-009</a> | Batas file dan retensi bukti pembayaran. | Klien / Webekspres | Sebelum Sprint 3 | Open |
-| <a id="opn-010">OPN-010</a> | Daftar area, tarif, dan SLA kurir toko. | Klien | Sebelum Sprint 3 | Open |
-| <a id="opn-011">OPN-011</a> | Definisi status transaksi yang dihitung sebagai omzet. | Klien | Sebelum Sprint 3 | Open |
-| <a id="opn-012">OPN-012</a> | Target availability, volume produk, transaksi, concurrent user normal, dan skenario lonjakan beban. | Klien | Sebelum performance test | Open |
-| <a id="opn-013">OPN-013</a> | Definisi tiga tingkat harga: rentang kuantitas per produk; apakah tiga tingkat bersifat wajib atau maksimal; apakah harga terpilih berlaku untuk seluruh unit atau progresif; serta apakah harga dikelola di POS atau website. | Klien / Vendor POS | Sebelum Sprint 2 | Open |
-| <a id="opn-014">OPN-014</a> | Apakah beberapa transaksi dapat digabungkan menjadi satu pengiriman; kriteria penggabungan; dan dampaknya terhadap ongkir, invoice, serta status transaksi. | Klien | Sebelum backlog final | Open |
-| <a id="opn-015">OPN-015</a> | Persetujuan BR-027 sampai BR-029 sebagai baseline, termasuk batas minimum audit trail, ketahanan integrasi, dan kesiapan scaling. | Klien / Webekspres | Sebelum MVP baseline | Open |
-| <a id="opn-016">OPN-016</a> | Perilaku checkout ketika Biteship tidak tersedia: menunggu, mencoba ulang, memakai tarif manual, atau meminta pelanggan menghubungi admin. | Klien | Sebelum Sprint 3 | Open |
-| <a id="opn-017">OPN-017</a> | Perwakilan klien/Product Owner: Sylvi; System Analyst Webekspres: Sultan; Project Manager Webekspres: Pak Endang. Persetujuan final berada pada klien dan perubahan efektif menjadi baseline setelah disetujui tertulis oleh klien serta Webekspres pada hari kerja. | Klien / Webekspres | 27 Juli 2026 | Resolved |
-| <a id="opn-018">OPN-018</a> | Keputusan final apakah PPh 22 dan batas maksimal penjualan dihapus dari MVP, serta daftar seluruh requirement, tampilan, perhitungan, invoice, laporan, field POS, dan acceptance criteria yang ikut berubah. | Klien | 28 Juli 2026 | ON_HOLD / clarification |
-| <a id="opn-019">OPN-019</a> | Apakah seeder hanya digunakan untuk development/staging/UAT atau juga diizinkan sementara pada production; kapan API POS ditargetkan tersedia; dan siapa yang menyetujui kesesuaian seed data dengan data bisnis. | Klien / Vendor POS / Webekspres | Sebelum go-live | Open |
-| <a id="opn-020">OPN-020</a> | Lifecycle order setelah pembayaran: status yang digunakan, actor yang boleh mengubah setiap status, bukti/nomor resi yang diperlukan, serta aturan pembatalan atau pengembalian setelah pembayaran terverifikasi. | Klien / System Analyst | Sebelum Sprint 2 | Open |
-| <a id="opn-021">OPN-021</a> | Data operasional untuk estimasi Biteship: origin pengiriman, sumber berat/dimensi produk, nilai default bila data belum lengkap, dan mapping alamat pelanggan ke input Biteship. | Klien / Webekspres | Sebelum integrasi Biteship | Open |
-| <a id="opn-022">OPN-022</a> | Format dan penyampaian invoice: field bisnis wajib, tampilan di website dan/atau PDF, serta apakah invoice perlu dikirim melalui channel tertentu. Nomor invoice tetap ditetapkan melalui OPN-008. | Klien | Sebelum Sprint 2 | Open |
-| <a id="opn-023">OPN-023</a> | Kebutuhan notifikasi: event yang perlu diberitahukan kepada pelanggan/admin, channel yang disetujui, pemilik template, serta fallback jika pengiriman notifikasi gagal. | Klien / Webekspres | Sebelum Sprint 2 | Open |
+| <span id="opn-001">OPN-001</span> | VPS atau shared hosting sebagai production baseline. | Klien / Webekspres | Sebelum MVP baseline | Open |
+| <span id="opn-002">OPN-002</span> | Apakah reseller merupakan scope resmi; siapa yang dikategorikan sebagai reseller; apakah reseller dapat melihat harga; dan apakah pemesanan dilakukan melalui website atau WhatsApp. | Klien | Sebelum backlog final | Open |
+| <span id="opn-003">OPN-003</span> | Field produk dan harga yang menjadi master POS atau website. | Klien / Vendor POS | Sebelum Sprint 2 | Open |
+| <span id="opn-004">OPN-004</span> | Kapan stok dikurangi atau direservasi: saat checkout, pembuatan invoice, verifikasi pembayaran, atau tahap lain. | Klien / System Analyst | Sebelum Sprint 2 | Open |
+| <span id="opn-005">OPN-005</span> | Kapan API POS read tersedia; apakah tersedia endpoint order write-back/reservasi; serta apa kontrak dan batas operasionalnya. Fallback seeder telah disetujui untuk delivery sebelum API tersedia. | Vendor POS | Sebelum integration acceptance | Partially resolved |
+| <span id="opn-006">OPN-006</span> | Apakah biaya persentase/surcharge pada dokumen sebelumnya merupakan PPh 22; jika tetap ada, apa dasar, formula, produk, dan kondisi penerapannya. | Klien | 28 Juli 2026 | ON_HOLD / clarification |
+| <span id="opn-007">OPN-007</span> | Masa berlaku transaksi yang belum dibayar. | Klien | Sebelum Sprint 2 | Open |
+| <span id="opn-008">OPN-008</span> | Format nomor invoice. | Klien | Sebelum Sprint 2 | Open |
+| <span id="opn-009">OPN-009</span> | Batas file dan retensi bukti pembayaran. | Klien / Webekspres | Sebelum Sprint 3 | Open |
+| <span id="opn-010">OPN-010</span> | Daftar area, tarif, dan SLA kurir toko. | Klien | Sebelum Sprint 3 | Open |
+| <span id="opn-011">OPN-011</span> | Definisi status transaksi yang dihitung sebagai omzet. | Klien | Sebelum Sprint 3 | Open |
+| <span id="opn-012">OPN-012</span> | Target availability, volume produk, transaksi, concurrent user normal, dan skenario lonjakan beban. | Klien | Sebelum performance test | Open |
+| <span id="opn-013">OPN-013</span> | Definisi tiga tingkat harga: rentang kuantitas per produk; apakah tiga tingkat bersifat wajib atau maksimal; apakah harga terpilih berlaku untuk seluruh unit atau progresif; serta apakah harga dikelola di POS atau website. | Klien / Vendor POS | Sebelum Sprint 2 | Open |
+| <span id="opn-014">OPN-014</span> | Apakah beberapa transaksi dapat digabungkan menjadi satu pengiriman; kriteria penggabungan; dan dampaknya terhadap ongkir, invoice, serta status transaksi. | Klien | Sebelum backlog final | Open |
+| <span id="opn-015">OPN-015</span> | Persetujuan BR-027 sampai BR-029 sebagai baseline, termasuk batas minimum audit trail, ketahanan integrasi, dan kesiapan scaling. | Klien / Webekspres | Sebelum MVP baseline | Open |
+| <span id="opn-016">OPN-016</span> | Perilaku checkout ketika Biteship tidak tersedia: menunggu, mencoba ulang, memakai tarif manual, atau meminta pelanggan menghubungi admin. | Klien | Sebelum Sprint 3 | Open |
+| <span id="opn-017">OPN-017</span> | Perwakilan klien/Product Owner: Sylvi; System Analyst Webekspres: Sultan; Project Manager Webekspres: Pak Endang. Persetujuan final berada pada klien dan perubahan efektif menjadi baseline setelah disetujui tertulis oleh klien serta Webekspres pada hari kerja. | Klien / Webekspres | 27 Juli 2026 | Resolved |
+| <span id="opn-018">OPN-018</span> | Keputusan final apakah PPh 22 dan batas maksimal penjualan dihapus dari MVP, serta daftar seluruh requirement, tampilan, perhitungan, invoice, laporan, field POS, dan acceptance criteria yang ikut berubah. | Klien | 28 Juli 2026 | ON_HOLD / clarification |
+| <span id="opn-019">OPN-019</span> | Apakah seeder hanya digunakan untuk development/staging/UAT atau juga diizinkan sementara pada production; kapan API POS ditargetkan tersedia; dan siapa yang menyetujui kesesuaian seed data dengan data bisnis. | Klien / Vendor POS / Webekspres | Sebelum go-live | Open |
+| <span id="opn-020">OPN-020</span> | Lifecycle order setelah pembayaran: status yang digunakan, actor yang boleh mengubah setiap status, bukti/nomor resi yang diperlukan, serta aturan pembatalan atau pengembalian setelah pembayaran terverifikasi. | Klien / System Analyst | Sebelum Sprint 2 | Open |
+| <span id="opn-021">OPN-021</span> | Data operasional untuk estimasi Biteship: origin pengiriman, sumber berat/dimensi produk, nilai default bila data belum lengkap, dan mapping alamat pelanggan ke input Biteship. | Klien / Webekspres | Sebelum integrasi Biteship | Open |
+| <span id="opn-022">OPN-022</span> | Format dan penyampaian invoice: field bisnis wajib, tampilan di website dan/atau PDF, serta apakah invoice perlu dikirim melalui channel tertentu. Nomor invoice tetap ditetapkan melalui OPN-008. | Klien | Sebelum Sprint 2 | Open |
+| <span id="opn-023">OPN-023</span> | Kebutuhan notifikasi: event yang perlu diberitahukan kepada pelanggan/admin, channel yang disetujui, pemilik template, serta fallback jika pengiriman notifikasi gagal. | Klien / Webekspres | Sebelum Sprint 2 | Open |
 
 <a id="klarifikasi-klien-2026-07-28"></a>
 

@@ -368,35 +368,145 @@ Setiap penanda *open question*, `TBD`, atau requirement berstatus `Proposed`
 harus merujuk ke item pada bagian ini. Jawaban yang telah disepakati kemudian
 dipindahkan ke requirement atau aturan bisnis terkait.
 
-| ID | Keputusan yang Dibutuhkan | Pemilik | Target | Status |
-|---|---|---|---|---|
-| <span id="opn-001">OPN-001</span> | VPS atau shared hosting sebagai production baseline. | Klien / Webekspres | Sebelum MVP baseline | Open |
-| <span id="opn-002">OPN-002</span> | Apakah reseller merupakan scope resmi; siapa yang dikategorikan sebagai reseller; apakah reseller dapat melihat harga; dan apakah pemesanan dilakukan melalui website atau WhatsApp. | Klien | Sebelum backlog final | Open |
-| <span id="opn-003">OPN-003</span> | Field produk dan harga yang menjadi master POS atau website. | Klien / Vendor POS | Sebelum Sprint 2 | Open |
-| <span id="opn-004">OPN-004</span> | Kapan stok dikurangi atau direservasi: saat checkout, pembuatan invoice, verifikasi pembayaran, atau tahap lain. | Klien / System Analyst | Sebelum Sprint 2 | Open |
-| <span id="opn-005">OPN-005</span> | Kapan API POS read tersedia; apakah tersedia endpoint order write-back/reservasi; serta apa kontrak dan batas operasionalnya. Fallback seeder telah disetujui untuk delivery sebelum API tersedia. | Vendor POS | Sebelum integration acceptance | Partially resolved |
-| <span id="opn-006">OPN-006</span> | Apakah biaya persentase/surcharge pada dokumen sebelumnya merupakan PPh 22; jika tetap ada, apa dasar, formula, produk, dan kondisi penerapannya. | Klien | 28 Juli 2026 | ON_HOLD / clarification |
-| <span id="opn-007">OPN-007</span> | Masa berlaku transaksi yang belum dibayar. | Klien | Sebelum Sprint 2 | Open |
-| <span id="opn-008">OPN-008</span> | Format nomor invoice. | Klien | Sebelum Sprint 2 | Open |
-| <span id="opn-009">OPN-009</span> | Batas file dan retensi bukti pembayaran. | Klien / Webekspres | Sebelum Sprint 3 | Open |
-| <span id="opn-010">OPN-010</span> | Daftar area, tarif, dan SLA kurir toko. | Klien | Sebelum Sprint 3 | Open |
-| <span id="opn-011">OPN-011</span> | Definisi status transaksi yang dihitung sebagai omzet. | Klien | Sebelum Sprint 3 | Open |
-| <span id="opn-012">OPN-012</span> | Target availability, volume produk, transaksi, concurrent user normal, dan skenario lonjakan beban. | Klien | Sebelum performance test | Open |
-| <span id="opn-013">OPN-013</span> | Definisi tiga tingkat harga: rentang kuantitas per produk; apakah tiga tingkat bersifat wajib atau maksimal; apakah harga terpilih berlaku untuk seluruh unit atau progresif; serta apakah harga dikelola di POS atau website. | Klien / Vendor POS | Sebelum Sprint 2 | Open |
-| <span id="opn-014">OPN-014</span> | Apakah beberapa transaksi dapat digabungkan menjadi satu pengiriman; kriteria penggabungan; dan dampaknya terhadap ongkir, invoice, serta status transaksi. | Klien | Sebelum backlog final | Open |
-| <span id="opn-015">OPN-015</span> | Persetujuan BR-027 sampai BR-029 sebagai baseline, termasuk batas minimum audit trail, ketahanan integrasi, dan kesiapan scaling. | Klien / Webekspres | Sebelum MVP baseline | Open |
-| <span id="opn-016">OPN-016</span> | Perilaku checkout ketika Biteship tidak tersedia: menunggu, mencoba ulang, memakai tarif manual, atau meminta pelanggan menghubungi admin. | Klien | Sebelum Sprint 3 | Open |
-| <span id="opn-017">OPN-017</span> | Perwakilan klien/Product Owner: Sylvi; System Analyst Webekspres: Sultan; Project Manager Webekspres: Pak Endang. Persetujuan final berada pada klien dan perubahan efektif menjadi baseline setelah disetujui tertulis oleh klien serta Webekspres pada hari kerja. | Klien / Webekspres | 27 Juli 2026 | Resolved |
-| <span id="opn-018">OPN-018</span> | Keputusan final apakah PPh 22 dan batas maksimal penjualan dihapus dari MVP, serta daftar seluruh requirement, tampilan, perhitungan, invoice, laporan, field POS, dan acceptance criteria yang ikut berubah. | Klien | 28 Juli 2026 | ON_HOLD / clarification |
-| <span id="opn-019">OPN-019</span> | Apakah seeder hanya digunakan untuk development/staging/UAT atau juga diizinkan sementara pada production; kapan API POS ditargetkan tersedia; dan siapa yang menyetujui kesesuaian seed data dengan data bisnis. | Klien / Vendor POS / Webekspres | Sebelum go-live | Open |
-| <span id="opn-020">OPN-020</span> | Lifecycle order setelah pembayaran: status yang digunakan, actor yang boleh mengubah setiap status, bukti/nomor resi yang diperlukan, serta aturan pembatalan atau pengembalian setelah pembayaran terverifikasi. | Klien / System Analyst | Sebelum Sprint 2 | Open |
-| <span id="opn-021">OPN-021</span> | Data operasional untuk estimasi Biteship: origin pengiriman, sumber berat/dimensi produk, nilai default bila data belum lengkap, dan mapping alamat pelanggan ke input Biteship. | Klien / Webekspres | Sebelum integrasi Biteship | Open |
-| <span id="opn-022">OPN-022</span> | Format dan penyampaian invoice: field bisnis wajib, tampilan di website dan/atau PDF, serta apakah invoice perlu dikirim melalui channel tertentu. Nomor invoice tetap ditetapkan melalui OPN-008. | Klien | Sebelum Sprint 2 | Open |
-| <span id="opn-023">OPN-023</span> | Kebutuhan notifikasi: event yang perlu diberitahukan kepada pelanggan/admin, channel yang disetujui, pemilik template, serta fallback jika pengiriman notifikasi gagal. | Klien / Webekspres | Sebelum Sprint 2 | Open |
+### OPN-001
 
-<a id="klarifikasi-klien-2026-07-28"></a>
+VPS atau shared hosting sebagai production baseline.
 
-### 15.1 Pertanyaan Klarifikasi Klien - Selasa, 28 Juli 2026
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum MVP baseline · **Status:** Open
+
+### OPN-002
+
+Apakah reseller merupakan scope resmi; siapa yang dikategorikan sebagai reseller; apakah reseller dapat melihat harga; dan apakah pemesanan dilakukan melalui website atau WhatsApp.
+
+**Pemilik:** Klien · **Target:** Sebelum backlog final · **Status:** Open
+
+### OPN-003
+
+Field produk dan harga yang menjadi master POS atau website.
+
+**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-004
+
+Kapan stok dikurangi atau direservasi: saat checkout, pembuatan invoice, verifikasi pembayaran, atau tahap lain.
+
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-005
+
+Kapan API POS read tersedia; apakah tersedia endpoint order write-back/reservasi; serta apa kontrak dan batas operasionalnya. Fallback seeder telah disetujui untuk delivery sebelum API tersedia.
+
+**Pemilik:** Vendor POS · **Target:** Sebelum integration acceptance · **Status:** Partially resolved
+
+### OPN-006
+
+Apakah biaya persentase/surcharge pada dokumen sebelumnya merupakan PPh 22; jika tetap ada, apa dasar, formula, produk, dan kondisi penerapannya.
+
+**Pemilik:** Klien · **Target:** 28 Juli 2026 · **Status:** ON_HOLD / clarification
+
+### OPN-007
+
+Masa berlaku transaksi yang belum dibayar.
+
+**Pemilik:** Klien · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-008
+
+Format nomor invoice.
+
+**Pemilik:** Klien · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-009
+
+Batas file dan retensi bukti pembayaran.
+
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum Sprint 3 · **Status:** Open
+
+### OPN-010
+
+Daftar area, tarif, dan SLA kurir toko.
+
+**Pemilik:** Klien · **Target:** Sebelum Sprint 3 · **Status:** Open
+
+### OPN-011
+
+Definisi status transaksi yang dihitung sebagai omzet.
+
+**Pemilik:** Klien · **Target:** Sebelum Sprint 3 · **Status:** Open
+
+### OPN-012
+
+Target availability, volume produk, transaksi, concurrent user normal, dan skenario lonjakan beban.
+
+**Pemilik:** Klien · **Target:** Sebelum performance test · **Status:** Open
+
+### OPN-013
+
+Definisi tiga tingkat harga: rentang kuantitas per produk; apakah tiga tingkat bersifat wajib atau maksimal; apakah harga terpilih berlaku untuk seluruh unit atau progresif; serta apakah harga dikelola di POS atau website.
+
+**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-014
+
+Apakah beberapa transaksi dapat digabungkan menjadi satu pengiriman; kriteria penggabungan; dan dampaknya terhadap ongkir, invoice, serta status transaksi.
+
+**Pemilik:** Klien · **Target:** Sebelum backlog final · **Status:** Open
+
+### OPN-015
+
+Persetujuan BR-027 sampai BR-029 sebagai baseline, termasuk batas minimum audit trail, ketahanan integrasi, dan kesiapan scaling.
+
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum MVP baseline · **Status:** Open
+
+### OPN-016
+
+Perilaku checkout ketika Biteship tidak tersedia: menunggu, mencoba ulang, memakai tarif manual, atau meminta pelanggan menghubungi admin.
+
+**Pemilik:** Klien · **Target:** Sebelum Sprint 3 · **Status:** Open
+
+### OPN-017
+
+Perwakilan klien/Product Owner: Sylvi; System Analyst Webekspres: Sultan; Project Manager Webekspres: Pak Endang. Persetujuan final berada pada klien dan perubahan efektif menjadi baseline setelah disetujui tertulis oleh klien serta Webekspres pada hari kerja.
+
+**Pemilik:** Klien / Webekspres · **Target:** 27 Juli 2026 · **Status:** Resolved
+
+### OPN-018
+
+Keputusan final apakah PPh 22 dan batas maksimal penjualan dihapus dari MVP, serta daftar seluruh requirement, tampilan, perhitungan, invoice, laporan, field POS, dan acceptance criteria yang ikut berubah.
+
+**Pemilik:** Klien · **Target:** 28 Juli 2026 · **Status:** ON_HOLD / clarification
+
+### OPN-019
+
+Apakah seeder hanya digunakan untuk development/staging/UAT atau juga diizinkan sementara pada production; kapan API POS ditargetkan tersedia; dan siapa yang menyetujui kesesuaian seed data dengan data bisnis.
+
+**Pemilik:** Klien / Vendor POS / Webekspres · **Target:** Sebelum go-live · **Status:** Open
+
+### OPN-020
+
+Lifecycle order setelah pembayaran: status yang digunakan, actor yang boleh mengubah setiap status, bukti/nomor resi yang diperlukan, serta aturan pembatalan atau pengembalian setelah pembayaran terverifikasi.
+
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-021
+
+Data operasional untuk estimasi Biteship: origin pengiriman, sumber berat/dimensi produk, nilai default bila data belum lengkap, dan mapping alamat pelanggan ke input Biteship.
+
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum integrasi Biteship · **Status:** Open
+
+### OPN-022
+
+Format dan penyampaian invoice: field bisnis wajib, tampilan di website dan/atau PDF, serta apakah invoice perlu dikirim melalui channel tertentu. Nomor invoice tetap ditetapkan melalui OPN-008.
+
+**Pemilik:** Klien · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### OPN-023
+
+Kebutuhan notifikasi: event yang perlu diberitahukan kepada pelanggan/admin, channel yang disetujui, pemilik template, serta fallback jika pengiriman notifikasi gagal.
+
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum Sprint 2 · **Status:** Open
+
+### 15.1 Klarifikasi Klien 28 Juli 2026
 
 Pertanyaan berstatus `Open` harus dijawab dan dicatat tertulis sebelum
 requirement terdampak dipindahkan dari `ON_HOLD`. Q-012 dipertahankan sebagai

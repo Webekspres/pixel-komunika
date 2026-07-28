@@ -53,6 +53,7 @@ serta diproses admin.
 | MVP-014 | Audit dan penanganan error minimum | BR-027 - BR-028; FR-AUD-001, FR-AUD-004; FRD Bagian 15 | Tindakan kritis dan kegagalan integrasi dapat ditelusuri tanpa menyimpan secret mentah. |
 | MVP-015 | Security dan authorization | SRS Bagian 12.3 | CSRF, validation, policy, rate limit, secure session, private upload, dan secret management lulus test relevan. |
 | MVP-016 | Release readiness | SRS Bagian 15 - 18 | Staging, CI, backup, rollback, logging, smoke test, UAT, training, dan sign-off go-live tersedia. |
+| MVP-017 | Batas pembelian dan komponen biaya | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Batas aktif tervalidasi saat checkout; komponen biaya aktif dihitung dan disimpan sebagai snapshot sesuai OPN-006. |
 
 ## 4. Fallback API POS
 
@@ -74,7 +75,6 @@ Jika API POS belum tersedia:
 
 | Kategori | Item | Status |
 |---|---|---|
-| ON_HOLD | PPh 22, batas maksimal penjualan, dan surcharge terkait | Menunggu OPN-018 |
 | Candidate | Segmentasi/reseller dan pemesanan WhatsApp | Menunggu CND-001/CND-002 |
 | Candidate | Penggabungan beberapa transaksi menjadi satu pengiriman | Menunggu CND-003 |
 | Candidate | Write-back order atau reservasi stok ke POS | Menunggu CND-004/OPN-005 |

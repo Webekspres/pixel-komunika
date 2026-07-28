@@ -6,7 +6,7 @@
 |---|---|
 | Versi | 0.2 - Approved Working Baseline |
 | Tanggal | Senin, 27 Juli 2026 |
-| Status | Approved Working Baseline - item OPN-018 tetap `ON_HOLD` |
+| Status | Revised Working Baseline - scope proposal awal diteruskan |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Dokumen induk | `BRD.md` |
 | Spesifikasi teknis | `SRS.md` |
@@ -167,17 +167,17 @@ stateDiagram-v2
 
 ## 5. Modul Harga dan Batas Pembelian
 
-Change notice klien Senin, 27 Juli 2026 menempatkan PPh 22 dan batas maksimal
-penjualan pada status `ON_HOLD`. `FR-PRC-003` dan `FR-PRC-004` dipertahankan
-untuk audit trail, tetapi tidak boleh masuk backlog sprint sampai
-[OPN-018 pada BRD](BRD.md#opn-018) diselesaikan.
+Change notice klien Selasa, 28 Juli 2026 mengembalikan PPh 22 dan batas maksimal
+penjualan ke scope proposal/MVP melalui [OPN-018 pada BRD](BRD.md#opn-018).
+`FR-PRC-003` dapat masuk backlog; implementasi formula pada `FR-PRC-004` tetap
+menunggu detail [OPN-006](BRD.md#opn-006).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-PRC-001 | Admin | Sistem mendukung minimal tiga tingkat harga per produk. | Setiap tingkat memiliki rentang kuantitas yang tidak tumpang tindih. | Baseline |
 | FR-PRC-002 | Sistem | Harga dipilih berdasarkan kuantitas. | Boundary minimum/maksimum menghasilkan tingkat harga yang benar. | Baseline |
-| FR-PRC-003 | Admin | Admin dapat menentukan batas maksimal pembelian/penjualan produk tertentu. | Acceptance criteria ditetapkan hanya jika klien mempertahankan fitur. | ON_HOLD - kemungkinan dihapus |
-| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 atau surcharge persentase apabila aturan final mewajibkan. | Jenis komponen, formula, dasar perhitungan, dan snapshot ditetapkan hanya jika fitur dipertahankan. | ON_HOLD - kemungkinan dihapus |
+| FR-PRC-003 | Admin | Admin dapat menentukan batas maksimal pembelian/penjualan produk tertentu. | Checkout menolak kuantitas yang melampaui batas aktif produk dan menjelaskan batas tersebut kepada pelanggan. | Baseline |
+| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 atau surcharge persentase apabila aturan final mewajibkan. | Jenis komponen, formula, dasar perhitungan, kondisi penerapan, dan snapshot mengikuti [OPN-006](BRD.md#opn-006). | Baseline; formula open |
 | FR-PRC-005 | Sistem | Sistem memvalidasi ulang harga saat checkout. | Perubahan harga setelah item masuk cart ditampilkan sebelum konfirmasi order. | Proposed |
 | FR-PRC-006 | Sistem | Harga disimpan sebagai snapshot per item transaksi. | Invoice historis tidak bergantung pada harga produk terkini. | Proposed |
 | FR-PRC-007 | Sistem | Sistem membatasi visibilitas harga berdasarkan status akun. | Guest dan pelanggan pending tidak menerima nilai harga pada halaman katalog, detail produk, pencarian, atau response terkait; pelanggan aktif dan admin dapat melihat harga. | Baseline |
@@ -217,7 +217,7 @@ Penggunaan seeder pada production memerlukan keputusan tertulis
 | FR-CART-003 | Sistem | Keranjang hanya dapat di-checkout oleh akun aktif. | Pending, rejected, atau suspended menerima penolakan. | Baseline |
 | FR-CART-004 | Sistem | Checkout memvalidasi produk, harga, stok, alamat, dan pengiriman. | Order hanya dibuat jika semua validasi lulus. | Proposed |
 | FR-CART-005 | Pelanggan Aktif | Pelanggan memilih alamat dan metode pengiriman. | Hanya metode yang tersedia untuk area tersebut ditampilkan. | Baseline |
-| FR-CART-006 | Sistem | Sistem menampilkan rincian subtotal, komponen biaya yang telah disetujui, ongkir, dan grand total. | Total server-side sama dengan invoice; PPh 22/surcharge terkait batas tidak ditampilkan selama `ON_HOLD`. | Baseline |
+| FR-CART-006 | Sistem | Sistem menampilkan rincian subtotal, komponen biaya aktif, ongkir, dan grand total. | Total server-side sama dengan invoice; PPh 22/surcharge terkait batas ditampilkan sesuai aturan [OPN-006](BRD.md#opn-006). | Baseline; formula open |
 | FR-CART-007 | Sistem | Pembuatan order terlindungi idempotency. | Pengiriman request yang sama tidak membuat order ganda. | Proposed |
 
 ## 8. Modul Pengiriman dan Biteship
@@ -237,7 +237,7 @@ Penggunaan seeder pada production memerlukan keputusan tertulis
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-001 | Sistem | Sistem membuat nomor order dan invoice yang unik. | Constraint unik mencegah duplikasi nomor. | Baseline |
-| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, harga, kuantitas, ongkir, komponen biaya aktif, dan total historis tersedia; PPh 22/surcharge terkait batas dikecualikan selama `ON_HOLD`. | Proposed |
+| FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, harga, kuantitas, ongkir, komponen biaya aktif, dan total historis tersedia; PPh 22/surcharge terkait batas mengikuti aturan [OPN-006](BRD.md#opn-006). | Proposed |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; lifecycle final mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle open |
@@ -330,7 +330,7 @@ disetujui.
 |---|---|
 | POS timeout | Sync ditandai gagal/parsial, di-retry terbatas, dan tidak menghapus data lama. |
 | Payload POS tidak valid | Record terkait ditolak, error dicatat, proses lain dapat dilanjutkan sesuai kebijakan. |
-| Payload POS memuat PPh 22/batas penjualan | Field tidak memengaruhi harga atau checkout selama `ON_HOLD`; payload dan keputusan mapping dicatat untuk klarifikasi. |
+| Payload POS memuat PPh 22/batas penjualan | Field hanya memengaruhi harga atau checkout setelah mapping disetujui melalui OPN-003 dan OPN-006; payload serta keputusan mapping dicatat. |
 | Seeder dijalankan ulang | Data inti di-upsert secara idempotent dan enrichment lokal dipertahankan. |
 | Biteship gagal | Checkout tidak memakai ongkir nol; pelanggan mendapat pesan yang dapat ditindaklanjuti. |
 | Stok berubah saat checkout | Checkout dihentikan dan keranjang diperbarui. |
@@ -346,7 +346,7 @@ disetujui.
 | BR-002 - BR-004 | FR-AUTH-001 - FR-AUTH-011 |
 | BR-005 | FR-CAT-001 - FR-CAT-009 |
 | BR-006 | FR-PRC-001, FR-PRC-002, FR-PRC-005 - FR-PRC-007 |
-| BR-007 - BR-008 (`ON_HOLD`) | FR-PRC-003 - FR-PRC-004 (`ON_HOLD`), FR-CART-006, FR-ORD-002 |
+| BR-007 - BR-008 | FR-PRC-003 - FR-PRC-004, FR-CART-006, FR-ORD-002 |
 | BR-009 - BR-013 | FR-POS-001 - FR-POS-016 |
 | BR-014 - BR-017 | FR-CART-001 - FR-CART-007, FR-ORD-001 - FR-ORD-009 |
 | BR-018 - BR-020 | FR-PAY-001 - FR-PAY-007 |
@@ -370,8 +370,9 @@ FRD dapat dibaseline setelah:
 - API Biteship dapat diuji;
 - status/transisi order disetujui;
 - formula harga bertingkat disetujui;
-- keputusan PPh 22, batas maksimal penjualan, dan surcharge terkait disetujui
-  melalui [OPN-018](BRD.md#opn-018);
+- scope PPh 22, batas maksimal penjualan, dan surcharge terkait dikonfirmasi
+  melalui [OPN-018](BRD.md#opn-018), serta formula dan mapping disetujui
+  melalui [OPN-006](BRD.md#opn-006) dan [OPN-003](BRD.md#opn-003);
 - waktu reservasi/pengurangan stok disetujui;
 - lifecycle order, pembatalan setelah pembayaran, dan bukti fulfillment
   disetujui melalui [OPN-020](BRD.md#opn-020);

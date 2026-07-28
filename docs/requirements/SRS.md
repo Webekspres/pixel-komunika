@@ -4,9 +4,9 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.2 - Approved Working Baseline |
-| Tanggal | Senin, 27 Juli 2026 |
-| Status | Approved Working Baseline - item OPN-018 tetap `ON_HOLD` |
+| Versi | 0.3 - Revised Working Baseline |
+| Tanggal | Selasa, 28 Juli 2026 |
+| Status | Revised Working Baseline - scope proposal awal diteruskan |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Kebutuhan bisnis | `BRD.md` |
 | Kebutuhan fungsional | `FRD.md` |
@@ -52,17 +52,20 @@ implementasi dilakukan iteratif per sprint.
 - Perubahan tetap harus menjaga backward compatibility, migration safety, test,
   observability, dan rollback.
 
-### 2.2 Change Notice Senin, 27 Juli 2026
+### 2.2 Change Notice 27-28 Juli 2026
 
-PPh 22 dan batas maksimal penjualan berstatus `ON_HOLD` sampai klarifikasi
-klien Selasa, 28 Juli 2026. Selama status tersebut:
+Pada 28 Juli 2026, scope PPh 22, batas maksimal penjualan, dan surcharge
+dikembalikan ke plan/proposal awal melalui [OPN-018](BRD.md#opn-018). Teknis
+implementasi mengikuti ketentuan berikut:
 
-- tidak dibuat formula, field database, konfigurasi admin, validasi checkout,
-  line item invoice, atau agregasi laporan khusus untuk kedua fitur;
-- field terkait dari POS tidak boleh memengaruhi transaksi;
+- batas pembelian dapat dimodelkan sebagai aturan produk dan divalidasi saat
+  checkout;
+- komponen biaya aktif harus disimpan sebagai snapshot transaksi;
+- field POS terkait hanya digunakan setelah mapping disetujui pada OPN-003 dan
+  OPN-006;
 - desain tidak boleh mengasumsikan bahwa surcharge sama dengan PPh 22;
-- requirement dapat diaktifkan kembali hanya setelah BRD/FRD, test case, dan
-  acceptance criteria diperbarui serta disetujui.
+- formula, basis perhitungan, kondisi penerapan, dan tampilan komponen tetap
+  menunggu OPN-006 serta Q-008/Q-009 pada BRD.
 
 ## 3. Keputusan Arsitektur
 
@@ -365,6 +368,7 @@ Contoh error:
 | carts / cart_items | Keranjang aktif. |
 | orders | Header transaksi dan status. |
 | order_items | Snapshot produk, kuantitas, dan harga. |
+| order_charge_components | Snapshot komponen biaya aktif, dasar perhitungan, tarif/nilai, dan total. |
 | invoices | Nomor dan snapshot total invoice. |
 | payments | Pengajuan dan verifikasi pembayaran. |
 | payment_proofs | Metadata file bukti pembayaran. |
@@ -374,10 +378,11 @@ Contoh error:
 | sync_errors | Detail item yang gagal. |
 | audit_logs | Jejak tindakan kritis. |
 
-Model data tidak menambahkan field/entitas khusus PPh 22, surcharge terkait
-batas, atau batas maksimal penjualan selama
-[`OPN-018`](BRD.md#opn-018) belum diselesaikan. Jika fitur dipertahankan,
-perubahan skema harus melalui migration, data dictionary, test, dan ADR.
+Model data menggunakan komponen biaya generik untuk PPh 22/surcharge terkait
+batas agar snapshot transaksi tidak bergantung pada konfigurasi masa depan.
+Nama komponen, formula, dan mapping POS tetap menunggu
+[`OPN-006`](BRD.md#opn-006) serta [`OPN-003`](BRD.md#opn-003). Perubahan skema
+harus melalui migration, data dictionary, test, dan ADR.
 
 ### 9.2 Relasi Konseptual
 
@@ -663,7 +668,7 @@ sebagai sumber stok production.
 
 | Level | Cakupan Minimum |
 |---|---|
-| Unit | Harga bertingkat, status stok, dan aturan tanggal pembatalan; PPh 22/batas/surcharge hanya diuji jika diaktifkan kembali. |
+| Unit | Harga bertingkat, batas pembelian, komponen biaya aktif, status stok, dan aturan tanggal pembatalan. |
 | Feature | Registrasi, approval, cart, checkout, pembayaran, pembatalan, laporan. |
 | Integration | Contract POS atau adapter contract melalui seeder, retry/idempotency sync, transisi seeder-ke-API, dan Biteship quote. |
 | Security | Authorization, IDOR, CSRF, rate limit, dan upload. |
@@ -699,7 +704,7 @@ sebagai sumber stok production.
 | TD-007 | Object storage provider dan kebijakan retensi. | OPN-009 | Open |
 | TD-008 | Target concurrent user, volume produk, dan transaksi harian. | OPN-012 | Open |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
-| TD-010 | Keputusan PPh 22, batas maksimal penjualan, surcharge terkait, dan expiry order belum dibayar. | OPN-007, OPN-018 | PPh 22/batas/surcharge `ON_HOLD`; expiry open |
+| TD-010 | Formula PPh 22/surcharge, mapping POS, dan expiry order belum dibayar. | OPN-003, OPN-006, OPN-007 | Scope retained; formula/mapping/expiry open |
 | TD-011 | Lifecycle fulfillment order, pembatalan setelah pembayaran, dan kebutuhan bukti/resi. | OPN-020 | Open |
 | TD-012 | Origin, berat/dimensi produk, dan mapping alamat untuk Biteship. | OPN-021 | Open |
 | TD-013 | Format/penyampaian invoice serta event/channel notifikasi. | OPN-022, OPN-023 | Open |

@@ -13,10 +13,16 @@ Dokumen direview berurutan dari kebutuhan bisnis ke spesifikasi teknis:
 4. [MVP Baseline](requirements/MVP.md) - daftar P0/Must Have, fallback POS,
    non-MVP, dan acceptance gate 45 hari.
 
-BRD, FRD, dan SRS versi 0.2 berstatus **Approved Working Baseline** sejak
-27 Juli 2026. Item `TBD`, `ON_HOLD`, dan keputusan terbuka tetap menjadi
-pengecualian eksplisit. Dokumen MVP masih berstatus candidate sampai daftar P0
-disetujui klien.
+BRD, FRD, dan SRS berstatus **Approved Working Baseline** sejak 27 Juli 2026.
+Item `TBD`, `ON_HOLD`, dan keputusan terbuka tetap menjadi pengecualian
+eksplisit. Dokumen MVP masih berstatus candidate sampai daftar P0 disetujui
+klien.
+
+## Design Documents
+
+1. [ERD](design/ERD.md) - diagram relasi data working baseline dalam Mermaid.
+2. [Data Dictionary](design/DATA_DICTIONARY.md) - definisi field, tipe data,
+   constraint, index, snapshot, dan penanda provisional.
 
 ## Delivery Method
 

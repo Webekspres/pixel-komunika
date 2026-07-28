@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.9 - Partai Eligibility Rule |
+| Versi | 0.10 - ERD/Data Dictionary Working Baseline |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -483,8 +483,11 @@ erDiagram
     SYNC_RUN ||--o{ SYNC_ERROR : records
 ```
 
-ERD detail, cardinality final, field, index, dan constraint akan ditetapkan pada
-dokumen ERD/Data Dictionary setelah keputusan terbuka diselesaikan.
+ERD detail, field, index, dan constraint working baseline ditetapkan pada
+[ERD](../design/ERD.md) dan
+[Data Dictionary](../design/DATA_DICTIONARY.md). Bagian yang bergantung pada
+keputusan terbuka diberi label `Provisional` dan diperbarui melalui migration
+serta change control setelah keputusan disetujui.
 
 ## 10. Transaction and Concurrency
 

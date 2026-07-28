@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.3 - Incremental Client Clarification |
+| Versi | 0.4 - POS API Working Scheme |
 | Tanggal | Selasa, 28 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -158,8 +158,8 @@ stateDiagram-v2
 | FR-CAT-001 | Sistem | Produk memiliki external product ID dan/atau SKU yang unik. | Produk POS yang sama tidak membuat record ganda. | Amendment |
 | FR-CAT-002 | Admin | Admin dapat melihat daftar produk dan status sinkronisasinya. | Daftar dapat dicari, difilter, diurutkan, dan dipaginasi. | Baseline |
 | FR-CAT-003 | Sistem | Sistem menyinkronkan kategori/klasifikasi dan merek dari POS. | Perubahan master POS di-upsert tanpa membuat kategori, merek, atau relasi produk duplikat. | Baseline |
-| FR-CAT-004 | Admin | Admin dapat mengelola enrichment lokal. | Gambar, video, deskripsi pemasaran, SEO, slug, label, dan urutan tampil dapat disimpan. | Amendment |
-| FR-CAT-005 | Sistem | Sinkronisasi tidak menimpa enrichment lokal. | Enrichment tetap sama setelah sync produk/stok. | Amendment |
+| FR-CAT-004 | Admin | Admin dapat melengkapi data presentasi yang belum tersedia dari POS. | Gambar, video, deskripsi pemasaran, SEO, slug, label, dan urutan tampil dapat disimpan sebagai pelengkap lokal. | Amendment |
+| FR-CAT-005 | Sistem | Sinkronisasi menerapkan precedence field POS dan fallback lokal. | Nilai POS digunakan ketika tersedia; nilai pelengkap lokal dipertahankan ketika field tidak dikirim atau kosong menurut kontrak. | Amendment |
 | FR-CAT-006 | Admin | Admin dapat mengaktifkan/nonaktifkan penayangan produk. | Produk nonaktif tidak dapat ditambahkan ke cart. | Baseline |
 | FR-CAT-007 | Guest dan Pengguna | Guest, pelanggan pending, dan pelanggan aktif dapat membuka katalog serta detail produk. | Hanya produk aktif yang ditampilkan; harga hanya disertakan untuk pelanggan aktif dan admin. | Baseline |
 | FR-CAT-008 | Guest dan Pengguna | Guest, pelanggan pending, dan pelanggan aktif dapat mencari dan memfilter katalog. | Filter minimal mencakup kategori, merek, dan ketersediaan tanpa membocorkan harga kepada guest atau pelanggan pending. | Proposed |
@@ -186,29 +186,34 @@ tetap mengikuti [OPN-013](BRD.md#opn-013) dan
 
 ## 6. Modul POS dan Stok
 
-Koneksi POS menjadi sumber data production. Jika koneksi belum tersedia, data
-contoh menjadi fallback resmi untuk development, staging, demo, dan UAT. Data
-contoh tidak digunakan pada production; production wajib menggunakan koneksi
-POS sesuai [`OPN-019`](BRD.md#opn-019).
+Koneksi POS menjadi sumber data production dan menyediakan jalur baca master
+data/inventory serta write-back sales order/retur. Jika koneksi belum tersedia,
+data contoh menjadi fallback resmi untuk development, staging, demo, dan UAT.
+Data contoh tidak digunakan pada production; production wajib menggunakan
+koneksi POS sesuai [`OPN-019`](BRD.md#opn-019).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-POS-001 | Worker | Sistem mengambil SKU, nama produk, kategori/klasifikasi, merek, tiga jenis harga, dan stok melalui API POS klien. | Request memakai kredensial server-side dan setiap field master mengikuti kontrak tervalidasi. | Amendment |
+| FR-POS-001 | Worker | Sistem mengambil kategori, produk, detail produk, daftar harga, dan inventory melalui operasi API POS yang disediakan. | Working operation mencakup `GetCategory`, `GetAllProducts`, `GetProductDetail`, `GetPriceList`, `GetAllStock`, dan `GetStockByProduct`; nama final dan kontrak mengikuti [OPN-005](BRD.md#opn-005). | Baseline; contract partially open |
 | FR-POS-002 | Worker | Sinkronisasi melakukan upsert berdasarkan identifier stabil. | Menjalankan payload sama berulang kali tidak membuat duplikasi. | Amendment |
-| FR-POS-003 | Worker | Sinkronisasi dapat berjalan setiap pagi atau berkala sesuai jadwal konfigurasi. | Interval dapat diubah, eksekusi overlap dicegah, dan waktu keberhasilan terakhir tercatat. | Baseline |
-| FR-POS-004 | Admin | Admin dapat memulai sinkronisasi manual. | Sistem menolak trigger baru jika sync yang sama masih berjalan. | Proposed |
+| FR-POS-003 | Worker | Sinkronisasi penuh master data dan inventory berjalan sekali sehari. | Eksekusi overlap dicegah, waktu keberhasilan terakhir tercatat, dan kegagalan tidak menghapus snapshot valid sebelumnya. | Baseline |
+| FR-POS-004 | Admin / Worker | Sistem dapat memanggil stok per produk untuk pencocokan berkala atau pemeriksaan terarah. | `GetStockByProduct` hanya memperbarui produk terkait, mencatat sumber/waktu, dan tidak membuat job overlap untuk produk yang sama. | Baseline |
 | FR-POS-005 | Sistem | Setiap sinkronisasi memiliki log. | Waktu mulai/selesai, status, jumlah sukses/gagal, dan pesan error tersimpan. | Proposed |
 | FR-POS-006 | Sistem | Produk yang tidak lagi muncul dari POS tidak langsung dihapus. | Produk ditandai untuk rekonsiliasi atau dinonaktifkan menurut aturan final. | Proposed |
 | FR-POS-007 | Sistem | Sistem menentukan status `TERSEDIA`, `MENIPIS`, atau `HABIS`. | Status mengikuti stok aktual dan batas minimum produk. | Baseline |
 | FR-POS-008 | Admin | Admin dapat mengatur batas minimum stok. | Status `MENIPIS` berubah sesuai nilai terbaru. | Baseline |
-| FR-POS-009 | Sistem | Perubahan stok disimpan sebagai ledger/riwayat. | Setiap perubahan memiliki jumlah sebelum/sesudah, sumber, dan waktu. | Baseline |
+| FR-POS-009 | Sistem | Perubahan stok disimpan sebagai ledger/riwayat. | Setiap perubahan memiliki jumlah sebelum/sesudah, sumber `FULL_SYNC`, `PRODUCT_SYNC`, `SALE`, `CANCEL_RETURN`, atau `CORRECTION`, referensi eksternal, dan waktu. | Baseline |
 | FR-POS-010 | Sistem | Kegagalan sementara POS dapat di-retry. | Retry tidak membuat duplikasi dan berhenti setelah batas percobaan. | Proposed |
-| FR-POS-011 | Sistem | Checkout memvalidasi stok terhadap snapshot sinkronisasi terakhir dan penyesuaian lokal setelahnya. | Order tidak dibuat jika stok efektif tidak memenuhi kebutuhan; mekanisme reservasi final mengikuti [OPN-004](BRD.md#opn-004). | Baseline; reservation partially open |
-| FR-POS-012 | Sistem | Penyesuaian stok pembatalan dapat ditelusuri. | Referensi transaksi dan sumber `CANCELLATION` tersimpan. | Baseline |
+| FR-POS-011 | Sistem | Checkout memvalidasi stok efektif dari snapshot terakhir ditambah perubahan sales order/retur setelah sinkronisasi. | Order tidak diteruskan jika stok efektif tidak memenuhi kebutuhan; pengecekan per produk dapat dijalankan ketika kebijakan rekonsiliasi memerlukannya. | Baseline |
+| FR-POS-012 | Sistem | Penyesuaian stok pembatalan dapat ditelusuri. | Respons `CancelSalesOrder`, referensi retur POS, perubahan stok, dan order web terkait tersimpan. | Baseline |
 | FR-POS-013 | Data Seeder | Sistem dapat memuat produk, tiga jenis harga, dan stok representatif ketika API POS belum tersedia. | Setiap produk memiliki harga eceran, partai, dan grosir; dataset juga mencakup minimum grosir serta status stok tersedia/menipis/habis. | Baseline |
 | FR-POS-014 | Sistem | Seeder mengikuti kontrak data internal yang juga digunakan adapter POS. | SKU/external ID stabil, field wajib tervalidasi, dan perubahan ke API tidak memerlukan perubahan domain transaksi. | Baseline |
-| FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi dan tidak menimpa enrichment lokal yang telah diedit. | Baseline |
+| FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi; nilai source utama diperbarui dan pelengkap lokal untuk field yang tidak tersedia tetap dipertahankan. | Baseline |
 | FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; production selalu menolak eksekusi data contoh. | Baseline |
+| FR-POS-017 | Sistem | Setiap order web dikirim melalui `CreateSalesOrder`. | Setelah sukses, POS sales order ID, invoice ID/number, response reference, dan waktu tersimpan; stok efektif berkurang sesuai hasil POS. | Baseline; contract partially open |
+| FR-POS-018 | Sistem | Pembatalan web dikirim melalui `CancelSalesOrder`. | Setelah sukses, referensi retur tersimpan dan stok efektif bertambah; request berulang tidak membuat retur ganda. | Baseline; idempotency contract open |
+| FR-POS-019 | Worker | Sistem merekonsiliasi sales order, invoice, dan retur dengan `GetAllSalesOrder` serta `GetSalesOrderDetail`. | Selisih status/reference dicatat dan tidak menimpa transaksi lokal tanpa audit; arah data final mengikuti [OPN-005](BRD.md#opn-005). | Baseline; direction partially open |
+| FR-POS-020 | Sistem | Timeout atau respons ambigu pada operasi write-back tidak di-retry secara buta. | Sistem mencari external reference/status terlebih dahulu atau menandai `RECONCILIATION_REQUIRED`; kebijakan final mengikuti kontrak idempotency POS. | Baseline; contract open |
 
 ## 7. Modul Keranjang dan Checkout
 
@@ -238,13 +243,13 @@ POS sesuai [`OPN-019`](BRD.md#opn-019).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-ORD-001 | Sistem | Sistem membuat nomor order dan invoice yang unik. | Constraint unik mencegah duplikasi nomor. | Baseline |
+| FR-ORD-001 | Sistem | Sistem membuat nomor order web unik dan menyimpan referensi invoice POS. | Constraint unik mencegah duplikasi nomor order, POS sales order ID, dan invoice ID/number; kebutuhan invoice lokal mengikuti [OPN-008](BRD.md#opn-008). | Baseline; invoice mapping partially open |
 | FR-ORD-002 | Sistem | Order menyimpan snapshot item dan biaya yang telah disetujui. | Nama, SKU, jenis harga, harga, kuantitas, ongkir, PPh 22, dan total historis tersedia; dasar pengenaan mengikuti [OPN-006](BRD.md#opn-006). | Proposed |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; status pemenuhan dan nomor resi mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle partially open |
-| FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta, tindakan ditolak. | Baseline |
-| FR-ORD-007 | Sistem | Pembatalan merekonsiliasi stok terkait. | Penyesuaian stok dan audit log dibuat secara atomik. | Baseline |
+| FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta tindakan manual ditolak; pembatalan yang valid memanggil `CancelSalesOrder`. | Baseline |
+| FR-ORD-007 | Sistem | Pembatalan merekonsiliasi retur dan stok POS. | Referensi retur, penyesuaian stok efektif, status order, dan audit log tercatat konsisten. | Baseline |
 | FR-ORD-008 | Sistem | Order yang sudah dibatalkan tidak dapat diproses lebih lanjut. | Transisi dari `CANCELLED` ditolak. | Proposed |
 
 ### 9.1 Status Transaksi Draft
@@ -274,7 +279,7 @@ scope pembatalan standar.
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice miliknya sesuai format dan channel yang disetujui. | Tampilan, PDF, atau pengiriman invoice hanya diimplementasikan setelah [OPN-022](BRD.md#opn-022) menetapkan kebutuhan. | Proposed |
-| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1 dalam zona waktu `Asia/Jakarta`; pembatalan idempotent dan tercatat pada audit log. | Baseline |
+| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1; `CancelSalesOrder` dipanggil jika order POS sudah ada, dan referensi retur/audit tersimpan tanpa duplikasi. | Baseline |
 
 ## 10. Modul Pembayaran Manual
 
@@ -334,9 +339,11 @@ disetujui.
 
 | Kondisi | Perilaku yang Diharapkan |
 |---|---|
-| POS timeout | Sync ditandai gagal/parsial, di-retry terbatas, dan tidak menghapus data lama. |
+| POS read timeout | Sync ditandai gagal/parsial, di-retry terbatas, dan tidak menghapus data lama. |
+| `CreateSalesOrder` timeout/ambigu | Order tidak dianggap terkonfirmasi dua kali; sistem mencari external reference atau menandai rekonsiliasi sebelum retry. |
+| `CancelSalesOrder` timeout/ambigu | Status cancel/retur direkonsiliasi sebelum retry agar stok tidak dikembalikan dua kali. |
 | Payload POS tidak valid | Record terkait ditolak, error dicatat, proses lain dapat dilanjutkan sesuai kebijakan. |
-| Payload POS memuat PPh 22/batas penjualan | Field hanya memengaruhi harga atau checkout setelah mapping disetujui melalui OPN-003 dan OPN-006; payload serta keputusan mapping dicatat. |
+| Payload POS memuat konfigurasi PPh 22 | Field hanya memengaruhi checkout setelah sumber konfigurasi dan dasar pengenaan disetujui melalui OPN-006; payload serta keputusan mapping dicatat. |
 | Seeder dijalankan ulang | Data inti di-upsert secara idempotent dan enrichment lokal dipertahankan. |
 | Biteship gagal | Checkout tidak memakai ongkir nol; pelanggan mendapat pesan yang dapat ditindaklanjuti. |
 | Stok berubah saat checkout | Checkout dihentikan dan keranjang diperbarui. |
@@ -353,7 +360,7 @@ disetujui.
 | BR-005 | FR-CAT-001 - FR-CAT-009 |
 | BR-006 | FR-PRC-001, FR-PRC-002, FR-PRC-005 - FR-PRC-007 |
 | BR-007 - BR-008 | FR-PRC-003 - FR-PRC-004, FR-CART-006, FR-ORD-002 |
-| BR-009 - BR-013 | FR-POS-001 - FR-POS-016 |
+| BR-009 - BR-014 | FR-POS-001 - FR-POS-020 |
 | BR-014 - BR-017, BR-030 | FR-CART-001 - FR-CART-007, FR-ORD-001 - FR-ORD-010 |
 | BR-018 - BR-020 | FR-PAY-001 - FR-PAY-007 |
 | BR-021 - BR-022 | FR-ORD-006 - FR-ORD-008, FR-POS-012 |
@@ -370,8 +377,10 @@ FRD dapat dibaseline setelah:
 - seluruh item `TBD` kritis mendapat keputusan;
 - seluruh item `ON_HOLD` dikeluarkan tertulis dari MVP atau dikembalikan menjadi
   requirement aktif dengan acceptance criteria;
-- API POS dapat diuji atau fallback seeder lulus acceptance test; contract test
-  koneksi POS production tersedia dan lulus contract test;
+- operasi baca dan write-back POS dapat diuji atau adapter data contoh lulus
+  acceptance test; sebelum production, contract test `CreateSalesOrder`,
+  `CancelSalesOrder`, lookup sales order, master data, dan inventory wajib
+  tersedia serta lulus;
 - API Biteship dapat diuji;
 - status/transisi order disetujui;
 - aturan harga partai dan prioritas terhadap harga grosir disetujui melalui

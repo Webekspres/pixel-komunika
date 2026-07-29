@@ -5,13 +5,15 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.5 |
+| Versi | 1.6 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
 | Pengembang | PT Webekspres Teknologi Indonesia |
 | Target pengerjaan | 45 hari kerja |
 | Status | Menunggu pemeriksaan dan persetujuan klien |
+
+<a id="document-position" name="document-position"></a>
 
 ## Pemberitahuan Penting: Kedudukan Dokumen
 
@@ -56,22 +58,24 @@ Klien diharapkan:
 4. menyetujui ruang lingkup versi pertama sebagai dasar pengerjaan.
 
 Kedudukan dan batas fungsi dokumen dijelaskan pada
-[Pemberitahuan Penting](#pemberitahuan-penting-kedudukan-dokumen).
+[Pemberitahuan Penting](#document-position).
 
 ### TL;DR
 
 Untuk pemeriksaan paling cepat:
 
 1. pahami terlebih dahulu
-   [kedudukan dan batas fungsi dokumen](#pemberitahuan-penting-kedudukan-dokumen);
-2. periksa [fitur yang termasuk dalam versi pertama](#3-fitur-yang-termasuk-dalam-versi-pertama);
+   [kedudukan dan batas fungsi dokumen](#document-position);
+2. periksa [fitur yang termasuk dalam versi pertama](#first-version-scope);
 3. sampaikan persetujuan, revisi, penolakan, atau pilihan lain dengan mengikuti
-   [cara memberikan tanggapan melalui grup WhatsApp](#11-cara-memberikan-tanggapan-melalui-grup-whatsapp);
-4. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien),
-   termasuk [cara memastikan barang telah diterima](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima);
-5. periksa [kriteria penerimaan versi pertama](#9-kriteria-penerimaan-versi-pertama);
+   [cara memberikan tanggapan melalui grup WhatsApp](#whatsapp-response);
+4. jawab [keputusan yang masih diperlukan dari klien](#client-decisions),
+   termasuk [cara memastikan barang telah diterima](#delivery-confirmation);
+5. periksa [kriteria penerimaan versi pertama](#first-version-acceptance);
    dan
-6. berikan [persetujuan akhir](#11-persetujuan) melalui grup WhatsApp proyek.
+6. berikan [persetujuan akhir](#client-approval) melalui grup WhatsApp proyek.
+
+<a id="whatsapp-response" name="whatsapp-response"></a>
 
 ### 1.1 Cara Memberikan Tanggapan melalui Grup WhatsApp
 
@@ -87,7 +91,7 @@ Klien dapat memberikan tanggapan dengan cara:
 4. memberikan pilihan atau solusi lain yang lebih sesuai dengan operasional
    Pixel Komunika; dan
 5. menjawab pertanyaan pada
-   [Bagian 8](#8-keputusan-yang-masih-diperlukan-dari-klien).
+   [Bagian 8](#client-decisions).
 
 Jawaban dapat diberikan sekaligus atau bertahap. Agar mudah dicatat, tanggapan
 dapat menggunakan format berikut:
@@ -122,6 +126,8 @@ status pesanannya.
 Website membuat transaksi dan invoice. Sistem POS menyediakan data produk,
 harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 
+<a id="first-version-scope" name="first-version-scope"></a>
+
 ## 3. Fitur yang Termasuk dalam Versi Pertama
 
 | Area | Hasil yang Akan Tersedia |
@@ -140,7 +146,7 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 | Pesanan dan invoice | Website membuat pesanan dan invoice serta menyimpan rincian harga pada saat transaksi terjadi. |
 | Pembayaran | Pembayaran dilakukan melalui transfer bank. Pelanggan mengunggah bukti pembayaran dan admin menerima atau menolaknya. |
 | Masa berlaku pesanan | Pesanan yang belum dibayar hanya berlaku pada tanggal pembuatannya dan otomatis dibatalkan pada hari berikutnya. |
-| Pemrosesan pesanan | Setelah pembayaran diterima, urutan status pesanan adalah Diproses, Dikemas, Dikirim, dan Selesai. Syarat perpindahan status dan cara mengonfirmasi barang diterima harus diputuskan pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima). |
+| Pemrosesan pesanan | Setelah pembayaran diterima, urutan status pesanan adalah Diproses, Dikemas, Dikirim, dan Selesai. Syarat perpindahan status dan cara mengonfirmasi barang diterima harus diputuskan pada [Bagian 8.11](#delivery-confirmation). |
 | Nomor resi | Nomor resi ditampilkan kepada pelanggan ketika sudah tersedia. |
 | Pengiriman | Website mendukung kurir toko dan pilihan layanan serta perkiraan ongkir dari Biteship. |
 | Pembatalan dan retur | Admin dapat membatalkan pesanan secara manual hanya pada tanggal transaksi. Pesanan yang belum dibayar dibatalkan otomatis oleh sistem pada hari berikutnya. Keduanya memakai status `Dibatalkan`, disertai keterangan apakah pembatalan dilakukan oleh admin atau sistem. Pembatalan mengembalikan stok website dan dilaporkan ke POS sebagai retur. |
@@ -254,7 +260,7 @@ flowchart TD
 Melihat nomor resi **tidak** otomatis mengubah status pesanan menjadi
 `Selesai`. Pesanan tetap berstatus `Dikirim` sampai penerimaan barang telah
 dikonfirmasi dengan cara yang disetujui klien. Pilihan cara konfirmasi dibahas
-pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima).
+pada [Bagian 8.11](#delivery-confirmation).
 
 ### 5.4 Pembatalan oleh Admin atau Sistem
 
@@ -329,6 +335,8 @@ tertulis:
 8. pencarian dan penyaringan katalog lanjutan;
 9. ekspor laporan ke CSV atau Excel; dan
 10. fitur tambahan di luar ruang lingkup yang disepakati dalam dokumen ini.
+
+<a id="client-decisions" name="client-decisions"></a>
 
 ## 8. Keputusan yang Masih Diperlukan dari Klien
 
@@ -479,6 +487,8 @@ Apakah beberapa pesanan boleh digabungkan menjadi satu pengiriman?
 Jika diperbolehkan, mohon jelaskan pengaruhnya terhadap ongkir dan invoice:
 __________________________________________________________________.
 
+<a id="delivery-confirmation" name="delivery-confirmation"></a>
+
 ### 8.11 Perubahan Status Pengiriman dan Konfirmasi Barang Diterima
 
 Usulan alur perubahan status:
@@ -517,6 +527,8 @@ Jika barang belum diterima atau pelanggan melaporkan kendala:
 - [ ] gunakan status tambahan: _________________________________;
 - [ ] penanganan lain: _________________________________________.
 
+<a id="first-version-acceptance" name="first-version-acceptance"></a>
+
 ## 9. Kriteria Penerimaan Versi Pertama
 
 Versi pertama dapat diterima apabila:
@@ -533,7 +545,7 @@ Versi pertama dapat diterima apabila:
   rincian pesanan menunjukkan bahwa pembatalan dilakukan oleh sistem;
 - pesanan yang dibayar dapat diproses sampai selesai sesuai pemicu status yang
   disetujui pada
-  [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima),
+  [Bagian 8.11](#delivery-confirmation),
   dan nomor resi dapat dilihat pelanggan;
 - data produk, harga, dan stok dapat dipertukarkan dengan POS tanpa
   menggandakan transaksi;
@@ -559,6 +571,8 @@ Jika perubahan memengaruhi fitur utama, perhitungan, integrasi POS, jadwal, atau
 biaya, Webekspres akan menyampaikan dampaknya terlebih dahulu. Perubahan mulai
 berlaku setelah disetujui secara tertulis oleh klien dan Webekspres pada hari
 kerja.
+
+<a id="client-approval" name="client-approval"></a>
 
 ## 11. Persetujuan
 

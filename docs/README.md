@@ -1,5 +1,13 @@
 # Dokumentasi Proyek
 
+## Client Deliverable
+
+- [Ringkasan Ruang Lingkup dan Persetujuan Klien](client/DOKUMEN_REVIEW_DAN_PERSETUJUAN_KLIEN.md)
+  - dokumen client-facing yang diringkas dari baseline internal untuk review,
+    klarifikasi, dan persetujuan klien;
+  - konversi ke PDF harus menggunakan renderer yang mendukung Mermaid atau
+    melakukan render diagram terlebih dahulu.
+
 ## Requirement Documents
 
 Dokumen direview berurutan dari kebutuhan bisnis ke spesifikasi teknis:

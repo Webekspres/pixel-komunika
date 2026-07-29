@@ -4,7 +4,7 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.3 - Web-owned Transaction and Notification Model                                                                             |
+| Versi    | 0.4 - Fulfillment Transition Clarification                                                                                     |
 | Tanggal  | Rabu, 29 Juli 2026                                                                                                              |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
@@ -484,7 +484,7 @@ Data operasional masih [OPN-010](../requirements/BRD.md#opn-010).
 | tracking_number                      | VARCHAR(191)    |   Ya  | IDX              | Nomor resi yang ditampilkan kepada pelanggan ketika tersedia. |
 | status                               | VARCHAR(32)     | Tidak | IDX              | `PROCESSING`, `PACKED`, `SHIPPED`, atau `COMPLETED`.           |
 | shipped_at                           | DATETIME(6)     |   Ya  | —                | Waktu dikirim.                                               |
-| delivered_at                         | DATETIME(6)     |   Ya  | —                | Waktu selesai.                                               |
+| delivered_at                         | DATETIME(6)     |   Ya  | —                | Waktu penerimaan dikonfirmasi dan status menjadi `COMPLETED`; sumber konfirmasi mengikuti [OPN-020](../requirements/BRD.md#opn-020). |
 | created_at                           | DATETIME(6)     | Tidak | —                | Waktu pembuatan.                                             |
 | updated_at                           | DATETIME(6)     | Tidak | —                | Waktu perubahan.                                             |
 

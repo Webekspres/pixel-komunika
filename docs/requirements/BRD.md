@@ -7,7 +7,7 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.12 - Closed Questions and Standardized Business Flows |
+| Versi | 0.13 - Fulfillment Transition Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
@@ -54,6 +54,7 @@ Status requirement:
 | CR-011 | Selasa, 28 Juli 2026 | Dokumentasi resmi Biteship | Biteship diidentifikasi sebagai API pengiriman multi-kurir eksternal. Scope proyek memakai Maps API untuk standardisasi area dan Rates API untuk memperoleh pilihan layanan serta estimasi ongkir; API order, pickup, label, tracking, dan webhook Biteship tidak termasuk baseline. | Kontrak teknis dasar BR-024 dan requirement turunannya diperjelas. Nilai origin, sumber berat, daftar kurir, metode lokasi, serta fallback tetap dibahas melalui OPN-016 dan OPN-021. | Technical reference adopted; business scope unchanged |
 | CR-012 | Selasa, 28 Juli 2026, 20.03-20.04 WIB | Klarifikasi klien Sylvi | PPh 22 dari lebih dari satu klasifikasi digabungkan. Transaksi dan invoice web dibuat oleh website; POS menerima laporan penjualan untuk mencatat transaksi dan mengurangi stok, serta laporan retur untuk mencatat retur dan menambah stok. Setelah pembayaran diverifikasi, alur berlanjut ke diproses, dikemas, dikirim, dan selesai; nomor resi ditampilkan. Admin menerima notifikasi order baru melalui indikator merah di website dan WhatsApp dengan bunyi; template WhatsApp belum tersedia. | CR-006 superseded untuk ownership transaksi/invoice dan arah pelaporan. OPN-004, OPN-005, OPN-006, OPN-008, OPN-020, OPN-022, dan OPN-023 diperbarui; requirement, model data, dan user flow diselaraskan. | Approved business flow; API/notification contract partial |
 | CR-013 | Rabu, 29 Juli 2026 | Review dokumentasi internal | Pertanyaan yang telah selesai ditandai strikethrough tanpa menghapus ID dan bukti keputusan. Diagram proses bisnis memakai notasi flowchart yang konsisten; diagram konteks tetap diperlakukan sebagai context diagram. | Keterbacaan dan audit trail diperbaiki tanpa mengubah scope atau aturan bisnis. | Documentation-only |
+| CR-014 | Rabu, 29 Juli 2026 | Review alur fulfillment | Urutan `PROCESSING` → `PACKED` → `SHIPPED` → `COMPLETED` telah disetujui, tetapi pemicu setiap transisi dan cara memastikan barang diterima belum pernah ditetapkan. Melihat nomor resi tidak dapat dianggap sebagai bukti penerimaan. | OPN-020 dibuka kembali sebagai keputusan parsial; Q-025 ditambahkan dan alur client-facing serta user flow diperinci tanpa memilih mekanisme konfirmasi secara sepihak. | Clarification required |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -305,7 +306,7 @@ flowchart LR
 | RULE-022 | Pembatalan yang valid membuat retur website dan menambah stok efektif secara atomik; laporan retur POS dikirim idempotent setelah laporan penjualan asal berhasil diterima atau direkonsiliasi. |
 | RULE-023 | POS menerima laporan penjualan dan retur dari website; POS bukan penerbit invoice atau source of truth lifecycle order website. Status acknowledgement digunakan untuk rekonsiliasi, bukan untuk membatalkan transaksi lokal yang sah. |
 | RULE-024 | Operasi pelaporan POS wajib memiliki external reference/idempotency mechanism yang disepakati sebelum integration acceptance. |
-| RULE-025 | Status setelah pembayaran diterima adalah `PROCESSING`, `PACKED`, `SHIPPED`, lalu `COMPLETED`; nomor resi ditampilkan kepada pelanggan ketika tersedia. |
+| RULE-025 | Status setelah pembayaran diterima adalah `PROCESSING`, `PACKED`, `SHIPPED`, lalu `COMPLETED`; nomor resi ditampilkan kepada pelanggan ketika tersedia. Melihat nomor resi tidak memicu `COMPLETED`; pemicu transisi operasional dan konfirmasi penerimaan mengikuti [OPN-020](#opn-020). |
 | RULE-026 | Notifikasi WhatsApp menggunakan perilaku bunyi aplikasi/perangkat WhatsApp; website tidak membuat audio notifikasi WhatsApp sendiri. |
 
 ## 11. Proses Bisnis Utama
@@ -377,9 +378,13 @@ flowchart TD
     U --> V{"Pembayaran diterima?"}
     V -->|Tidak| W[("Status pembayaran REJECTED tersimpan")]
     W --> O
-    V -->|Ya| X[["Proses fulfillment:<br/>PROCESSING → PACKED → SHIPPED → COMPLETED"]]
-    X --> Y(["Selesai: pesanan selesai"])
+    V -->|Ya| X[["Proses fulfillment:<br/>PROCESSING → PACKED → SHIPPED → COMPLETED<br/>sesuai OPN-020"]]
+    X --> Y(["Selesai setelah penerimaan<br/>dikonfirmasi sesuai keputusan klien"])
 ```
+
+Urutan status fulfillment telah disepakati. Syarat perpindahan status dan
+metode konfirmasi barang diterima masih mengikuti
+[OPN-020](#opn-020); tampilan nomor resi bukan pemicu penyelesaian pesanan.
 
 ### 11.3 Sinkronisasi POS
 
@@ -435,7 +440,9 @@ Nilai target final harus disetujui pada technical kickoff
   Biteship diberikan klien atau disepakati sebagai aturan operasional; dimensi
   produk diperlukan hanya jika dipakai dalam perhitungan layanan
   ([lihat OPN-021](#opn-021)).
-- Lifecycle order mengikuti keputusan resolved pada [OPN-020](#opn-020).
+- Urutan lifecycle order mengikuti [OPN-020](#opn-020); pemicu perpindahan
+  status dan metode konfirmasi penerimaan harus diputuskan sebelum implementasi
+  fulfillment dibaseline.
   Format/penyampaian invoice dan kontrak notifikasi WhatsApp diselesaikan
   sebelum integration acceptance ([lihat OPN-022](#opn-022) dan
   [OPN-023](#opn-023)).
@@ -636,9 +643,27 @@ diselesaikan sebelum go-live.
 
 ### OPN-020
 
-~~Web menjadi pengelola lifecycle pesanan. Setelah pembayaran diverifikasi, status berlanjut ke `PROCESSING`, `PACKED`, `SHIPPED`, lalu `COMPLETED`. Nomor resi ditampilkan kepada pelanggan ketika tersedia. Pembatalan baseline tetap hanya oleh admin pada hari yang sama atau otomatis untuk pesanan belum dibayar pada hari berikutnya; website mencatat retur dan mengirim laporan retur ke POS. Pengembalian dana di luar retur stok standar membutuhkan change request terpisah.~~
+Web menjadi pengelola lifecycle pesanan. Setelah pembayaran diverifikasi,
+urutan status yang telah disepakati adalah `PROCESSING`, `PACKED`, `SHIPPED`,
+lalu `COMPLETED`. Nomor resi ditampilkan kepada pelanggan ketika tersedia.
+Pembatalan baseline tetap hanya oleh admin pada hari yang sama atau otomatis
+untuk pesanan belum dibayar pada hari berikutnya; website mencatat retur dan
+mengirim laporan retur ke POS. Pengembalian dana di luar retur stok standar
+membutuhkan change request terpisah.
 
-**Pemilik:** Klien / System Analyst · **Target:** 28 Juli 2026 · **Status:** Resolved
+Yang masih terbuka adalah:
+
+- kondisi operasional yang mengizinkan `PROCESSING` menjadi `PACKED`;
+- waktu `PACKED` menjadi `SHIPPED` dan apakah nomor resi wajib;
+- pihak atau mekanisme yang mengonfirmasi barang telah diterima;
+- apakah `COMPLETED` dipicu pelanggan, admin, otomatis setelah beberapa hari,
+  atau kombinasi; dan
+- penanganan status ketika barang belum diterima atau bermasalah.
+
+Melihat status atau nomor resi tidak boleh otomatis mengubah order menjadi
+`COMPLETED`.
+
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum implementasi fulfillment · **Status:** Partially resolved - sequence resolved; transition triggers open
 
 ### OPN-021
 
@@ -704,6 +729,7 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-022 | Apakah nama, alamat, nomor kontak, dan NPWP toko pada invoice berasal dari payload POS atau konfigurasi website, dan siapa yang menyediakan nilai finalnya? | BR-016, OPN-022, SRS 9.1 | Open - klien/Webekspres |
 | Q-023 | Siapa admin/nomor penerima WhatsApp, provider apa yang digunakan, bagaimana isi/approval template, retry/fallback, serta kapan indikator website dianggap sudah dibaca? | BR-031, OPN-023 | Open - klien/Webekspres |
 | Q-024 | Apakah payload stok POS memiliki timestamp/cutoff dan bagaimana website mengetahui laporan penjualan/retur mana yang sudah tercakup agar delta stok tidak dihitung dua kali? | BR-009, BR-014, OPN-005 | Open - vendor POS |
+| Q-025 | Kondisi apa yang memindahkan order dari `PROCESSING` ke `PACKED`, `PACKED` ke `SHIPPED`, dan `SHIPPED` ke `COMPLETED`; apakah nomor resi wajib; siapa yang mengonfirmasi barang diterima; dan bagaimana menangani barang yang belum diterima? | RULE-025, OPN-020, FR-ORD-005 | Open - klien/System Analyst |
 
 ### 15.2 MVP Baseline dan Stage Gates
 

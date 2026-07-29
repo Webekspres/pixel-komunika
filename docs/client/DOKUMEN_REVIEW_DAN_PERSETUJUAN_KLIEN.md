@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.2 |
+| Versi | 1.3 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -41,7 +41,8 @@ Untuk pemeriksaan paling cepat:
 1. periksa [fitur yang termasuk dalam versi pertama](#3-fitur-yang-termasuk-dalam-versi-pertama);
 2. sampaikan persetujuan, revisi, penolakan, atau pilihan lain dengan mengikuti
    [cara memberikan tanggapan melalui grup WhatsApp](#11-cara-memberikan-tanggapan-melalui-grup-whatsapp);
-3. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien);
+3. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien),
+   termasuk [cara memastikan barang telah diterima](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima);
 4. periksa [kriteria penerimaan versi pertama](#9-kriteria-penerimaan-versi-pertama);
    dan
 5. berikan [persetujuan akhir](#11-persetujuan) melalui grup WhatsApp proyek.
@@ -113,7 +114,7 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 | Pesanan dan invoice | Website membuat pesanan dan invoice serta menyimpan rincian harga pada saat transaksi terjadi. |
 | Pembayaran | Pembayaran dilakukan melalui transfer bank. Pelanggan mengunggah bukti pembayaran dan admin menerima atau menolaknya. |
 | Masa berlaku pesanan | Pesanan yang belum dibayar hanya berlaku pada tanggal pembuatannya dan otomatis dibatalkan pada hari berikutnya. |
-| Pemrosesan pesanan | Setelah pembayaran diterima, status pesanan berjalan melalui tahap Diproses, Dikemas, Dikirim, dan Selesai. |
+| Pemrosesan pesanan | Setelah pembayaran diterima, urutan status pesanan adalah Diproses, Dikemas, Dikirim, dan Selesai. Syarat perpindahan status dan cara mengonfirmasi barang diterima harus diputuskan pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima). |
 | Nomor resi | Nomor resi ditampilkan kepada pelanggan ketika sudah tersedia. |
 | Pengiriman | Website mendukung kurir toko dan pilihan layanan serta perkiraan ongkir dari Biteship. |
 | Pembatalan dan retur | Admin dapat membatalkan pesanan secara manual hanya pada tanggal transaksi. Pesanan yang belum dibayar dibatalkan otomatis pada hari berikutnya. Pembatalan mengembalikan stok website dan dilaporkan ke POS sebagai retur. |
@@ -142,8 +143,9 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
     stok, serta laporan retur untuk mencatat retur dan menambah stok.
 12. Pesanan yang belum dibayar otomatis dibatalkan pada hari berikutnya.
 13. Pembatalan manual oleh admin hanya dapat dilakukan pada tanggal transaksi.
-14. Setelah pembayaran diterima, pesanan diproses sampai selesai dan nomor resi
-    ditampilkan ketika tersedia.
+14. Setelah pembayaran diterima, urutan statusnya adalah Diproses, Dikemas,
+    Dikirim, lalu Selesai; nomor resi ditampilkan ketika tersedia. Pemicu setiap
+    perubahan status belum termasuk dalam keputusan ini.
 15. Admin menerima pemberitahuan order baru melalui website dan WhatsApp.
 16. Akses POS akan dibuka setelah alur website dengan data contoh sudah
     berjalan. Koordinasi akses dilakukan dengan Kak Rio.
@@ -193,16 +195,37 @@ flowchart TD
 
 ### 5.3 Pemrosesan dan Pengiriman
 
+Diagram berikut merupakan usulan alur yang masih memerlukan konfirmasi klien
+pada Bagian 8.11.
+
 ```mermaid
 flowchart TD
     A(["Pembayaran<br/>diterima"]) --> B[("Status:<br/>Diproses")]
-    B --> C[("Status:<br/>Dikemas")]
-    C --> D[/"Admin memasukkan<br/>nomor resi"/]
-    D --> E[("Status:<br/>Dikirim")]
-    E --> F[/"Pelanggan melihat<br/>nomor resi"/]
-    F --> G[("Status:<br/>Selesai")]
-    G --> H(["Pesanan selesai"])
+    B --> C["Admin menyiapkan dan<br/>memeriksa pesanan"]
+    C --> D{"Barang selesai<br/>dikemas?"}
+    D -->|Belum| C
+    D -->|Ya| E["Admin mengubah<br/>status ke Dikemas"]
+    E --> F[("Status:<br/>Dikemas")]
+    F --> G["Siapkan penyerahan ke<br/>kurir yang dipilih"]
+    G --> H{"Barang sudah<br/>diserahkan ke kurir?"}
+    H -->|Belum| G
+    H -->|Ya| I{"Nomor resi<br/>tersedia?"}
+    I -->|Ya| J[/"Admin memasukkan<br/>nomor resi"/]
+    I -->|Tidak| K["Admin mengubah<br/>status ke Dikirim"]
+    J --> K
+    K --> L[("Status:<br/>Dikirim")]
+    L --> M[/"Tampilkan status dan<br/>nomor resi jika tersedia"/]
+    M --> N{"Penerimaan barang<br/>sudah dikonfirmasi?"}
+    N -->|Belum| O(["Status tetap Dikirim;<br/>menunggu konfirmasi"])
+    N -->|Ya| P["Ubah status<br/>menjadi Selesai"]
+    P --> Q[("Status:<br/>Selesai")]
+    Q --> R(["Pesanan selesai"])
 ```
+
+Melihat nomor resi **tidak** otomatis mengubah status pesanan menjadi
+`Selesai`. Pesanan tetap berstatus `Dikirim` sampai penerimaan barang telah
+dikonfirmasi dengan cara yang disetujui klien. Pilihan cara konfirmasi dibahas
+pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima).
 
 ### 5.4 Pembatalan Otomatis
 
@@ -417,6 +440,44 @@ Apakah beberapa pesanan boleh digabungkan menjadi satu pengiriman?
 Jika diperbolehkan, mohon jelaskan pengaruhnya terhadap ongkir dan invoice:
 __________________________________________________________________.
 
+### 8.11 Perubahan Status Pengiriman dan Konfirmasi Barang Diterima
+
+Usulan alur perubahan status:
+
+1. status `Diproses` dimulai setelah pembayaran diterima;
+2. admin mengubah status menjadi `Dikemas` setelah seluruh barang selesai
+   disiapkan, diperiksa, dan dikemas;
+3. admin mengubah status menjadi `Dikirim` setelah barang diserahkan kepada
+   kurir; dan
+4. status `Selesai` hanya diberikan setelah penerimaan barang dikonfirmasi.
+
+Apakah usulan tersebut disetujui?
+
+- [ ] Ya.
+- [ ] Perlu revisi: ____________________________________________.
+
+Apakah nomor resi wajib diisi sebelum status menjadi `Dikirim`?
+
+- [ ] Ya, untuk seluruh metode pengiriman.
+- [ ] Ya, hanya untuk pengiriman yang memang memiliki nomor resi.
+- [ ] Tidak.
+- [ ] Aturan lain: _____________________________________________.
+
+Siapa atau proses apa yang mengonfirmasi bahwa barang telah diterima?
+
+- [ ] pelanggan menekan tombol **Pesanan Diterima** pada website;
+- [ ] admin mengubah status setelah memperoleh konfirmasi pelanggan atau kurir;
+- [ ] sistem otomatis menyelesaikan pesanan setelah ______ hari sejak dikirim;
+- [ ] pelanggan atau admin dapat mengonfirmasi, kemudian sistem otomatis
+      menyelesaikan setelah ______ hari jika belum ada tindakan;
+- [ ] cara lain: _______________________________________________.
+
+Jika barang belum diterima atau pelanggan melaporkan kendala:
+
+- [ ] status tetap `Dikirim` sampai admin menyelesaikan kendala;
+- [ ] gunakan status tambahan: _________________________________;
+- [ ] penanganan lain: _________________________________________.
+
 ## 9. Kriteria Penerimaan Versi Pertama
 
 Versi pertama dapat diterima apabila:
@@ -430,8 +491,10 @@ Versi pertama dapat diterima apabila:
 - invoice menampilkan seluruh informasi wajib;
 - pelanggan dapat mengirim bukti pembayaran dan admin dapat memeriksanya;
 - pesanan yang tidak dibayar otomatis dibatalkan pada hari berikutnya;
-- pesanan yang dibayar dapat diproses sampai selesai dan nomor resi dapat
-  dilihat pelanggan;
+- pesanan yang dibayar dapat diproses sampai selesai sesuai pemicu status yang
+  disetujui pada
+  [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima),
+  dan nomor resi dapat dilihat pelanggan;
 - data produk, harga, dan stok dapat dipertukarkan dengan POS tanpa
   menggandakan transaksi;
 - penjualan dan retur dari website tercatat pada POS;

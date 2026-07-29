@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.13 - Web-owned Transaction and Fulfillment Baseline |
+| Versi | 0.14 - Fulfillment Transition Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -89,7 +89,9 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - invoice wajib memuat identitas toko, rincian item, total pembelian
   keseluruhan, dan nilai rupiah PPh 22 jika berlaku;
 - setelah pembayaran diverifikasi, order berlanjut melalui `PROCESSING`,
-  `PACKED`, `SHIPPED`, dan `COMPLETED`; nomor resi ditampilkan ketika tersedia;
+  `PACKED`, `SHIPPED`, dan `COMPLETED`; nomor resi ditampilkan ketika tersedia.
+  Urutan status telah disetujui, sedangkan trigger operasional dan konfirmasi
+  penerimaan mengikuti OPN-020;
 - order baru memicu indikator merah pada website admin dan pesan WhatsApp;
   template/provider/penerima/fallback WhatsApp masih menunggu OPN-023;
 - development memakai data contoh sampai akses POS dibuka setelah alur website
@@ -893,7 +895,7 @@ dicoret meskipun sebagian keputusan bisnisnya sudah selesai.
 | TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
 | TD-010 | Dasar pengenaan PPh 22 dan expiry order belum dibayar. Konfigurasi klasifikasi, ambang, dan tarif ditetapkan melalui website; multi-klasifikasi menghasilkan satu total gabungan. | OPN-006, OPN-007 | Hasil gabungan and expiry resolved; dasar/urutan agregasi partially open |
-| TD-011 | ~~Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; nomor resi ditampilkan.~~ | OPN-020 | Resolved |
+| TD-011 | Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; nomor resi ditampilkan ketika tersedia dan tidak memicu `COMPLETED`. Kondisi setiap transisi, pihak yang mengonfirmasi penerimaan, serta kebijakan penyelesaian otomatis mengikuti OPN-020. | OPN-020 | Sequence resolved; transition triggers open |
 | TD-012 | Biteship berperan sebagai external location/rate provider melalui Maps dan Rates; endpoint serta field teknis dasar sudah teridentifikasi. Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya masih perlu keputusan operasional. | OPN-021 | Technical contract resolved; operations open |
 | TD-013 | Field wajib invoice ditetapkan; event order baru dan channel website/WhatsApp disetujui. Sumber identitas toko, format/penyampaian invoice, serta kontrak WhatsApp belum final. | OPN-022, OPN-023 | Business behavior resolved; data/provider contract open |
 | TD-014 | Website menerbitkan invoice transaksi web; format/awalan nomor invoice masih perlu ditetapkan. | OPN-008, OPN-022 | Ownership resolved; number/delivery format open |

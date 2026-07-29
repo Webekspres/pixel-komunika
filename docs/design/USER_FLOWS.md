@@ -4,7 +4,7 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.4 - Web-owned Transaction and Admin Notification Flows |
+| Versi | 0.5 - Fulfillment Transition Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -60,7 +60,7 @@ konektor juga dapat dinonaktifkan oleh renderer dengan security mode ketat.
 | [UF-09](#uf-09-pembuatan-order-invoice-dan-pelaporan-pos) | Pembuatan order, invoice, dan pelaporan POS | Sistem, POS | Order/invoice aktif dan laporan penjualan tercatat |
 | [UF-10](#uf-10-pengajuan-pembayaran) | Pengajuan pembayaran | Pelanggan aktif | Bukti pembayaran submitted |
 | [UF-11](#uf-11-verifikasi-pembayaran) | Verifikasi pembayaran | Admin | Pembayaran verified/rejected |
-| [UF-12](#uf-12-fulfillment-dan-penyelesaian) | Fulfillment dan penyelesaian | Admin | Order completed |
+| [UF-12](#uf-12-fulfillment-dan-penyelesaian) | Fulfillment dan penyelesaian | Admin, pelanggan, sistem | Order completed atau menunggu konfirmasi penerimaan |
 | [UF-13](#uf-13-pembatalan-dan-pelaporan-retur) | Pembatalan dan pelaporan retur | Admin, scheduler, POS | Order cancelled, stok kembali, dan retur dilaporkan |
 | [UF-14](#uf-14-sinkronisasi-master-dan-harga-pos) | Sinkronisasi master dan harga | Worker, POS/seeder | Master produk terkini |
 | [UF-15](#uf-15-sinkronisasi-dan-stok-efektif) | Sinkronisasi dan stok efektif | Worker, POS | Snapshot dan ledger stok |
@@ -402,25 +402,36 @@ Lanjutan: pelanggan mengunggah ulang melalui
 
 ```mermaid
 flowchart TD
-    A(["Order PROCESSING"]) --> B["Admin menyiapkan pesanan"]
-    B --> C["Set PACKED"]
-    C --> D{"Transisi valid?"}
-    D -->|Tidak| E[/"Tampilkan transisi ditolak dan catat audit"/]
-    E --> B
-    D -->|Ya| F["Serahkan ke metode pengiriman terpilih"]
-    F --> G[/"Admin mengisi nomor resi ketika tersedia"/]
-    G --> H["Set SHIPPED dan shipped_at"]
-    H --> H1[/"Tampilkan status SHIPPED dan nomor resi kepada pelanggan"/]
-    H1 --> I[/"Admin mengonfirmasi penyelesaian"/]
-    I --> J["Set COMPLETED dan delivered_at"]
-    J --> C_UF18((UF-18))
+    A(["Order PROCESSING"]) --> B["Admin menyiapkan dan memeriksa pesanan"]
+    B --> C{"Packing selesai?"}
+    C -->|Belum| B
+    C -->|Ya| D["Admin set PACKED"]
+    D --> E[("Order PACKED tersimpan")]
+    E --> F["Siapkan penyerahan ke metode pengiriman terpilih"]
+    F --> G{"Barang sudah diserahkan?"}
+    G -->|Belum| F
+    G -->|Ya| H{"Nomor resi tersedia?"}
+    H -->|Ya| I[/"Admin mengisi nomor resi"/]
+    H -->|Tidak| J["Admin set SHIPPED dan shipped_at"]
+    I --> J
+    J --> K[("Order SHIPPED tersimpan")]
+    K --> L[/"Tampilkan status dan nomor resi jika tersedia"/]
+    L --> M{"Penerimaan dikonfirmasi<br/>sesuai OPN-020?"}
+    M -->|Belum| N[("Order tetap SHIPPED")]
+    N --> O(["Selesai sementara:<br/>menunggu konfirmasi"])
+    M -->|Ya| P["Set COMPLETED dan delivered_at"]
+    P --> Q[("Order COMPLETED tersimpan")]
+    Q --> C_UF18((UF-18))
 
     click C_UF18 "#uf-18-laporan-dan-audit"
 ```
 
 Lifecycle fulfillment adalah `PROCESSING` -> `PACKED` -> `SHIPPED` ->
-`COMPLETED`. Nomor resi ditampilkan ketika tersedia. Booking/pickup Biteship
-tidak dilakukan website.
+`COMPLETED`. Urutannya telah disetujui, tetapi kondisi packing selesai,
+kewajiban nomor resi, pihak yang mengonfirmasi penerimaan, trigger
+`COMPLETED`, dan penanganan barang belum diterima masih provisional melalui
+[OPN-020](../requirements/BRD.md#opn-020). Melihat nomor resi tidak memicu
+`COMPLETED`. Booking/pickup Biteship tidak dilakukan website.
 
 Lanjutan: [UF-18 Laporan](#uf-18-laporan-dan-audit).
 

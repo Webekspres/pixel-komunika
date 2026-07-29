@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.12 - Cancellation Source Clarification |
+| Versi | 0.13 - Mermaid State Diagram Fix |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -271,12 +271,11 @@ stateDiagram-v2
     PAYMENT_SUBMITTED --> PAYMENT_REJECTED: Admin menolak
     PAYMENT_REJECTED --> PAYMENT_SUBMITTED: Upload ulang
     PAYMENT_VERIFIED --> PROCESSING: Pembayaran diterima
-    PROCESSING --> PACKED: Packing selesai; konfirmasi OPN-020
-    PACKED --> SHIPPED: Diserahkan ke kurir; konfirmasi OPN-020
-    SHIPPED --> COMPLETED: Barang diterima; mekanisme OPN-020
-    WAITING_PAYMENT --> CANCELLED: source ADMIN; hari yang sama
-    WAITING_PAYMENT --> CANCELLED: source SYSTEM; hari berikutnya
-    PAYMENT_SUBMITTED --> CANCELLED: source ADMIN; hari yang sama
+    PROCESSING --> PACKED: Packing selesai, lihat OPN-020
+    PACKED --> SHIPPED: Diserahkan ke kurir, lihat OPN-020
+    SHIPPED --> COMPLETED: Barang diterima, lihat OPN-020
+    WAITING_PAYMENT --> CANCELLED: Admin hari yang sama atau Sistem hari berikutnya
+    PAYMENT_SUBMITTED --> CANCELLED: Admin hari yang sama
 ```
 
 Pembatalan manual hanya dapat dilakukan admin pada hari yang sama dengan tanggal

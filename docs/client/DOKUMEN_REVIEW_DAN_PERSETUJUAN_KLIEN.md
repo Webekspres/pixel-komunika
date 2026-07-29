@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.0 |
+| Versi | 1.1 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -118,51 +118,51 @@ Panah pada diagram berikut menunjukkan urutan proses.
 
 ```mermaid
 flowchart TD
-    A(["Mulai"]) --> B[/"Pelanggan mengisi formulir pendaftaran"/]
-    B --> C{"Data lengkap dan valid?"}
-    C -->|Tidak| D[/"Tampilkan bagian yang perlu diperbaiki"/]
+    A(["Mulai"]) --> B[/"Isi formulir<br/>pendaftaran"/]
+    B --> C{"Data lengkap<br/>dan valid?"}
+    C -->|Tidak| D[/"Tampilkan data<br/>pendaftaran yang<br/>perlu diperbaiki"/]
     D --> B
-    C -->|Ya| E[("Akun menunggu persetujuan admin")]
-    E --> F[/"Admin memeriksa data pelanggan"/]
+    C -->|Ya| E[("Akun menunggu<br/>persetujuan admin")]
+    E --> F[/"Admin memeriksa<br/>data pelanggan"/]
     F --> G{"Keputusan admin?"}
-    G -->|Disetujui| H[("Akun aktif")]
-    G -->|Ditolak| I[("Akun ditolak")]
-    H --> J(["Pelanggan dapat melihat harga dan berbelanja"])
-    I --> K(["Pelanggan tidak dapat bertransaksi"])
+    G -->|Disetujui| H[("Status akun:<br/>Aktif")]
+    G -->|Ditolak| I[("Status akun:<br/>Ditolak")]
+    H --> J(["Pelanggan dapat<br/>melihat harga dan<br/>melakukan pembelian"])
+    I --> K(["Pelanggan tidak dapat<br/>melakukan transaksi"])
 ```
 
 ### 5.2 Pemesanan dan Pembayaran
 
 ```mermaid
 flowchart TD
-    A(["Mulai"]) --> B[/"Pelanggan memilih produk dan jumlah"/]
-    B --> C["Website memeriksa harga, stok, dan PPh 22"]
-    C --> D{"Pesanan dapat dilanjutkan?"}
-    D -->|Tidak| E[/"Tampilkan informasi yang perlu diperbaiki"/]
+    A(["Mulai"]) --> B[/"Pilih produk<br/>dan jumlah"/]
+    B --> C["Periksa harga,<br/>stok, dan PPh 22"]
+    C --> D{"Data pesanan<br/>valid?"}
+    D -->|Tidak| E[/"Tampilkan data pesanan<br/>yang perlu diperbaiki"/]
     E --> B
-    D -->|Ya| F[/"Pelanggan memilih alamat dan pengiriman"/]
-    F --> G["Website menghitung total akhir"]
-    G --> H[["Buat pesanan dan invoice"]]
-    H --> I[/"Tampilkan invoice dan petunjuk transfer"/]
-    I --> J[/"Pelanggan mengunggah bukti pembayaran"/]
-    J --> K[/"Admin memeriksa pembayaran"/]
-    K --> L{"Pembayaran diterima?"}
-    L -->|Tidak| M[/"Pelanggan diminta memperbaiki pembayaran"/]
-    M --> I
-    L -->|Ya| N[("Pesanan siap diproses")]
-    N --> O(["Lanjut ke proses pengiriman"])
+    D -->|Ya| F[/"Pilih alamat<br/>dan pengiriman"/]
+    F --> G["Hitung total<br/>pembayaran"]
+    G --> H[["Buat pesanan<br/>dan invoice"]]
+    H --> I[/"Tampilkan invoice<br/>dan petunjuk transfer"/]
+    I --> J[/"Unggah bukti<br/>pembayaran"/]
+    J --> K[/"Admin memeriksa<br/>bukti pembayaran"/]
+    K --> L{"Pembayaran<br/>diterima?"}
+    L -->|Tidak| M[/"Minta pelanggan<br/>mengunggah ulang bukti"/]
+    M --> J
+    L -->|Ya| N[("Pesanan siap<br/>diproses")]
+    N --> O(["Lanjut ke alur<br/>pengiriman"])
 ```
 
 ### 5.3 Pemrosesan dan Pengiriman
 
 ```mermaid
 flowchart TD
-    A(["Pembayaran diterima"]) --> B[("Status: Diproses")]
-    B --> C[("Status: Dikemas")]
-    C --> D[/"Admin memasukkan nomor resi"/]
-    D --> E[("Status: Dikirim")]
-    E --> F[/"Pelanggan melihat nomor resi"/]
-    F --> G[("Status: Selesai")]
+    A(["Pembayaran<br/>diterima"]) --> B[("Status:<br/>Diproses")]
+    B --> C[("Status:<br/>Dikemas")]
+    C --> D[/"Admin memasukkan<br/>nomor resi"/]
+    D --> E[("Status:<br/>Dikirim")]
+    E --> F[/"Pelanggan melihat<br/>nomor resi"/]
+    F --> G[("Status:<br/>Selesai")]
     G --> H(["Pesanan selesai"])
 ```
 
@@ -170,13 +170,13 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A(["Pesanan menunggu pembayaran"]) --> B{"Sudah berganti hari?"}
-    B -->|Belum| C[/"Pesanan tetap menunggu pembayaran"/]
+    A(["Pesanan menunggu<br/>pembayaran"]) --> B{"Tanggal transaksi<br/>sudah berlalu?"}
+    B -->|Belum| C[/"Tetap menunggu<br/>pembayaran"/]
     C --> B
-    B -->|Ya| D[["Batalkan pesanan secara otomatis"]]
-    D --> E["Kembalikan stok website"]
-    E --> F[["Kirim laporan retur ke POS"]]
-    F --> G[("Status: Dibatalkan")]
+    B -->|Ya| D[["Batalkan pesanan<br/>secara otomatis"]]
+    D --> E["Kembalikan stok<br/>website"]
+    E --> F[["Laporkan retur<br/>ke POS"]]
+    F --> G[("Status:<br/>Dibatalkan")]
     G --> H(["Selesai"])
 ```
 
@@ -186,10 +186,9 @@ Diagram berikut menunjukkan pertukaran data, bukan urutan waktu.
 
 ```mermaid
 flowchart LR
-    POS["Sistem POS"] -->|Produk, harga, dan stok| WEB(("Website"))
-    WEB -->|Laporan penjualan| POS
-    WEB -->|Laporan retur| POS
-    WEB --> INV[("Invoice pelanggan")]
+    POS["Sistem POS"] -->|Produk, harga,<br/>dan stok| WEB(("Website"))
+    WEB -->|Laporan penjualan<br/>dan retur| POS
+    WEB -->|Membuat| INV[("Invoice<br/>pelanggan")]
 ```
 
 Invoice pelanggan dibuat oleh website, bukan oleh POS.

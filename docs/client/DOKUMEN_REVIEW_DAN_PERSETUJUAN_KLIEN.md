@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.1 |
+| Versi | 1.2 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -34,14 +34,52 @@ Klien diharapkan:
 Dokumen ini tidak menggantikan proposal penawaran atau kesepakatan komersial
 yang telah dibuat.
 
-### Cara Pemeriksaan Singkat
+### TL;DR
 
 Untuk pemeriksaan paling cepat:
 
-1. periksa daftar fitur pada Bagian 3;
-2. jawab pilihan pada Bagian 8;
-3. periksa kriteria penerimaan pada Bagian 9; dan
-4. isi persetujuan pada Bagian 11.
+1. periksa [fitur yang termasuk dalam versi pertama](#3-fitur-yang-termasuk-dalam-versi-pertama);
+2. sampaikan persetujuan, revisi, penolakan, atau pilihan lain dengan mengikuti
+   [cara memberikan tanggapan melalui grup WhatsApp](#11-cara-memberikan-tanggapan-melalui-grup-whatsapp);
+3. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien);
+4. periksa [kriteria penerimaan versi pertama](#9-kriteria-penerimaan-versi-pertama);
+   dan
+5. berikan [persetujuan akhir](#11-persetujuan) melalui grup WhatsApp proyek.
+
+### 1.1 Cara Memberikan Tanggapan melalui Grup WhatsApp
+
+Klien **tidak perlu mengisi, mengedit, menandatangani, atau mengirimkan ulang
+dokumen ini**. Seluruh tanggapan cukup disampaikan secara tertulis melalui grup
+WhatsApp proyek.
+
+Klien dapat memberikan tanggapan dengan cara:
+
+1. menyetujui seluruh dokumen atau poin tertentu;
+2. memberikan daftar poin yang perlu direvisi;
+3. menolak saran tertentu dan, jika memungkinkan, menjelaskan alasannya;
+4. memberikan pilihan atau solusi lain yang lebih sesuai dengan operasional
+   Pixel Komunika; dan
+5. menjawab pertanyaan pada
+   [Bagian 8](#8-keputusan-yang-masih-diperlukan-dari-klien).
+
+Jawaban dapat diberikan sekaligus atau bertahap. Agar mudah dicatat, tanggapan
+dapat menggunakan format berikut:
+
+> **Status:** Setuju / Setuju dengan revisi / Belum setuju
+>
+> **Bagian atau poin:** Contoh, Bagian 8.1
+>
+> **Jawaban atau revisi:** ...
+>
+> **Saran yang ditolak:** ...
+>
+> **Pilihan lain:** ...
+
+Webekspres akan mencatat jawaban tersebut, memperbarui dokumentasi proyek, dan
+mengirimkan ringkasan apabila diperlukan. Pesan persetujuan dari perwakilan
+klien di grup WhatsApp menjadi arahan tertulis dari pihak klien. Keputusan baru
+efektif menjadi dasar pengerjaan setelah dikonfirmasi oleh Webekspres pada hari
+kerja.
 
 ## 2. Ringkasan Website
 
@@ -420,6 +458,11 @@ berlaku setelah disetujui secara tertulis oleh klien dan Webekspres pada hari
 kerja.
 
 ## 11. Persetujuan
+
+Klien tidak perlu mengisi atau mengirimkan ulang tabel di bawah ini.
+Persetujuan cukup disampaikan oleh perwakilan klien melalui grup WhatsApp
+proyek. Webekspres akan mengisi tabel ini sebagai rekap berdasarkan pesan
+persetujuan dan konfirmasi kedua pihak pada hari kerja.
 
 Dengan memberikan persetujuan, para pihak menyatakan bahwa:
 

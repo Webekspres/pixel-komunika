@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.6 |
+| Versi | 1.7 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -93,8 +93,13 @@ Klien dapat memberikan tanggapan dengan cara:
 5. menjawab pertanyaan pada
    [Bagian 8](#client-decisions).
 
-Jawaban dapat diberikan sekaligus atau bertahap. Agar mudah dicatat, tanggapan
-dapat menggunakan format berikut:
+Jawaban dapat diberikan sekaligus atau bertahap. Format berikut **hanya contoh
+dan tidak wajib digunakan**. Format ini disediakan agar poin tanggapan mudah
+dipahami dan dirujuk kembali oleh klien maupun Webekspres. Klien tetap boleh
+memberikan tanggapan tertulis dengan kalimat bebas melalui grup WhatsApp selama
+bagian atau keputusan yang dimaksud cukup jelas.
+
+Contoh format tanggapan:
 
 > **Status:** Setuju / Setuju dengan revisi / Belum setuju
 >

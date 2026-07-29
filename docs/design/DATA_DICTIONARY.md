@@ -4,8 +4,8 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.2 - Biteship Maps/Rates Model                                                                                                |
-| Tanggal  | Selasa, 28 Juli 2026                                                                                                           |
+| Versi    | 0.3 - Web-owned Transaction and Notification Model                                                                             |
+| Tanggal  | Rabu, 29 Juli 2026                                                                                                              |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
 | Sumber   | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -207,7 +207,7 @@ prioritas terhadap `GROSIR` masih
 | category_id       | BIGINT UNSIGNED | Tidak | FK, IDX     | Klasifikasi terpilih.                                           |
 | threshold_amount  | DECIMAL(19,2)   | Tidak | —           | Ambang nilai belanja.                                           |
 | rate_percent      | DECIMAL(8,4)    | Tidak | `0`         | Tarif PPh 22; `0` menonaktifkan pungutan.                       |
-| calculation_basis | VARCHAR(32)     |   Ya  | Provisional | Nilai final menunggu [OPN-006](../requirements/BRD.md#opn-006). |
+| calculation_basis | VARCHAR(32)     |   Ya  | Provisional | Dasar pengenaan final menunggu [OPN-006](../requirements/BRD.md#opn-006). |
 | is_active         | BOOLEAN         | Tidak | `true`, IDX | Aturan aktif.                                                   |
 | effective_from    | DATETIME(6)     | Tidak | —           | Awal masa berlaku.                                              |
 | effective_until   | DATETIME(6)     |   Ya  | —           | Akhir masa berlaku.                                             |
@@ -238,14 +238,20 @@ prioritas terhadap `GROSIR` masih
 | id                 | BIGINT UNSIGNED | Tidak | PK          | Identifier perubahan stok.                                               |
 | product_id         | BIGINT UNSIGNED | Tidak | FK, IDX     | Produk.                                                                  |
 | sync_run_id        | BIGINT UNSIGNED |   Ya  | FK, IDX     | Sync pemicu jika ada.                                                    |
-| pos_return_id      | BIGINT UNSIGNED |   Ya  | FK, IDX     | Retur pemicu jika ada.                                                   |
-| source_type        | VARCHAR(32)     | Tidak | IDX         | `FULL_SYNC`, `PRODUCT_SYNC`, `SALE`, `CANCEL_RETURN`, atau `CORRECTION`. |
+| sales_return_id    | BIGINT UNSIGNED |   Ya  | FK, IDX     | Retur website pemicu jika ada.                                           |
+| source_type        | VARCHAR(32)     | Tidak | IDX         | `FULL_SYNC`, `PRODUCT_SYNC`, `WEB_SALE`, `WEB_RETURN`, atau `CORRECTION`. |
 | quantity_before    | INT             | Tidak | —           | Nilai sebelum.                                                           |
 | quantity_change    | INT             | Tidak | —           | Delta bertanda.                                                          |
 | quantity_after     | INT             | Tidak | —           | Nilai sesudah.                                                           |
-| external_reference | VARCHAR(191)    |   Ya  | IDX         | Referensi POS/order/sync.                                                |
+| external_reference | VARCHAR(191)    |   Ya  | IDX         | Referensi order/retur/POS/sync.                                         |
 | occurred_at        | DATETIME(6)     | Tidak | IDX         | Waktu perubahan bisnis.                                                  |
 | created_at         | DATETIME(6)     | Tidak | —           | Waktu pencatatan.                                                        |
+
+`inventory_snapshots.source_updated_at`, acknowledgement operasi, dan ledger
+dipakai untuk menentukan delta web yang belum tercakup snapshot POS. Kontrak
+cutoff final mengikuti [OPN-005](../requirements/BRD.md#opn-005); full sync
+tidak boleh menghitung delta dua kali atau menghapus delta lokal yang belum
+terserap POS.
 
 ## 4. Cart dan Checkout
 
@@ -319,7 +325,6 @@ Sumber/mapping final profil toko masih
 | source_address_id   | BIGINT UNSIGNED |   Ya  | FK          | Alamat sumber sebelum snapshot shipment.           |
 | order_number        | VARCHAR(64)     | Tidak | UK          | Nomor order web.                                   |
 | idempotency_key     | VARCHAR(191)    | Tidak | UK          | Pencegah checkout ganda.                           |
-| pos_sales_order_id  | VARCHAR(191)    |   Ya  | UK          | Referensi `CreateSalesOrder`.                      |
 | status              | VARCHAR(32)     | Tidak | IDX         | Status lifecycle pada FRD 9.1.                     |
 | order_date_local    | DATE            | Tidak | IDX         | Tanggal bisnis Asia/Jakarta untuk auto-cancel D+1. |
 | subtotal_amount     | DECIMAL(19,2)   | Tidak | —           | Total seluruh `order_items.line_total`.            |
@@ -332,12 +337,11 @@ Sumber/mapping final profil toko masih
 | created_at          | DATETIME(6)     | Tidak | IDX         | Waktu order dibuat.                                |
 | updated_at          | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                   |
 
-Status internal sebelum konfirmasi POS: `DRAFT` dan
-`RECONCILIATION_REQUIRED`. Status customer-facing:
+Status internal checkout: `DRAFT`. Status customer-facing:
 `WAITING_PAYMENT`, `PAYMENT_SUBMITTED`, `PAYMENT_REJECTED`,
-`PAYMENT_VERIFIED`, `PROCESSING`, `READY_FOR_DELIVERY`, `SHIPPED`,
-`COMPLETED`, dan `CANCELLED`. Bagian fulfillment masih
-[OPN-020](../requirements/BRD.md#opn-020).
+`PAYMENT_VERIFIED`, `PROCESSING`, `PACKED`, `SHIPPED`, `COMPLETED`, dan
+`CANCELLED`. `RECONCILIATION_REQUIRED` hanya menjadi status operasi integrasi,
+bukan status order pelanggan.
 
 ### 5.4 `order_items`
 
@@ -373,6 +377,12 @@ Constraint: satu SKU muncul maksimal sekali dalam satu order.
 | config_snapshot      | JSON            | Tidak | —           | Klasifikasi, ambang, formula, dan metadata aturan teredaksi. |
 | created_at           | DATETIME(6)     | Tidak | —           | Waktu snapshot.                                              |
 
+Jumlah baris komponen bersifat provisional: dapat berupa satu baris agregat atau
+beberapa baris per klasifikasi. `orders.pph22_amount` dan
+`invoices.pph22_amount` selalu menyimpan satu hasil gabungan transaksi. Dasar
+pengenaan dan urutan agregasi mengikuti
+[OPN-006](../requirements/BRD.md#opn-006).
+
 ### 5.6 `invoices`
 
 | Kolom                  | Tipe            | Null  | Key/Default | Deskripsi                                       |
@@ -380,8 +390,7 @@ Constraint: satu SKU muncul maksimal sekali dalam satu order.
 | id                     | BIGINT UNSIGNED | Tidak | PK          | Identifier invoice.                             |
 | order_id               | BIGINT UNSIGNED | Tidak | FK, UK      | Satu invoice per order baseline.                |
 | store_profile_id       | BIGINT UNSIGNED |   Ya  | FK          | Profil sumber untuk traceability.               |
-| pos_invoice_id         | VARCHAR(191)    |   Ya  | UK          | Identifier invoice POS.                         |
-| invoice_number         | VARCHAR(100)    | Tidak | UK          | Nomor invoice POS/lokal sesuai keputusan final. |
+| invoice_number         | VARCHAR(100)    | Tidak | UK          | Nomor invoice yang diterbitkan website.         |
 | issued_at              | DATETIME(6)     | Tidak | IDX         | Waktu terbit.                                   |
 | store_name_snapshot    | VARCHAR(191)    | Tidak | —           | Nama toko wajib.                                |
 | store_address_snapshot | TEXT            | Tidak | —           | Alamat toko wajib.                              |
@@ -394,8 +403,9 @@ Constraint: satu SKU muncul maksimal sekali dalam satu order.
 | created_at             | DATETIME(6)     | Tidak | —           | Waktu penyimpanan.                              |
 | updated_at             | DATETIME(6)     | Tidak | —           | Waktu perubahan metadata.                       |
 
-Item invoice dibaca dari `order_items`. Format PDF, channel, dan ownership
-invoice POS/lokal masih [OPN-022](../requirements/BRD.md#opn-022).
+Item invoice dibaca dari `order_items`. Format/awalan nomor mengikuti OPN-008;
+sumber identitas toko, format PDF, dan channel masih
+[OPN-022](../requirements/BRD.md#opn-022).
 
 ### 5.7 `payments`
 
@@ -471,8 +481,8 @@ Data operasional masih [OPN-010](../requirements/BRD.md#opn-010).
 | shipping_amount                      | DECIMAL(19,2)   | Tidak | —                | Harga final dari field `price` Biteship atau tarif kurir toko. |
 | rate_request_hash                    | VARCHAR(128)    |   Ya  | IDX              | Hash request canonical teredaksi untuk traceability.         |
 | quoted_at                            | DATETIME(6)     |   Ya  | —                | Waktu rate dipilih.                                          |
-| tracking_number                      | VARCHAR(191)    |   Ya  | IDX, Provisional | Nomor resi menunggu OPN-020.                                 |
-| status                               | VARCHAR(32)     | Tidak | IDX              | Lifecycle fulfillment provisional.                           |
+| tracking_number                      | VARCHAR(191)    |   Ya  | IDX              | Nomor resi yang ditampilkan kepada pelanggan ketika tersedia. |
+| status                               | VARCHAR(32)     | Tidak | IDX              | `PROCESSING`, `PACKED`, `SHIPPED`, atau `COMPLETED`.           |
 | shipped_at                           | DATETIME(6)     |   Ya  | —                | Waktu dikirim.                                               |
 | delivered_at                         | DATETIME(6)     |   Ya  | —                | Waktu selesai.                                               |
 | created_at                           | DATETIME(6)     | Tidak | —                | Waktu pembuatan.                                             |
@@ -492,7 +502,7 @@ karena booking/pickup dan tracking berada di luar baseline.
 | id                        | BIGINT UNSIGNED | Tidak | PK          | Identifier operasi.                                                            |
 | order_id                  | BIGINT UNSIGNED |   Ya  | FK, IDX     | Order terkait.                                                                 |
 | sync_run_id               | BIGINT UNSIGNED |   Ya  | FK, IDX     | Batch terkait.                                                                 |
-| operation                 | VARCHAR(64)     | Tidak | IDX         | Working name operasi POS.                                                      |
+| operation                 | VARCHAR(64)     | Tidak | IDX         | `WEB_SALE_REPORT` atau `WEB_RETURN_REPORT`; nama endpoint POS dipetakan adapter. |
 | external_reference        | VARCHAR(191)    | Tidak | UK          | Idempotency/reconciliation reference.                                          |
 | request_hash              | VARCHAR(128)    | Tidak | IDX         | Hash payload canonical.                                                        |
 | status                    | VARCHAR(32)     | Tidak | IDX         | `PENDING`, `SUCCEEDED`, `FAILED`, `AMBIGUOUS`, atau `RECONCILIATION_REQUIRED`. |
@@ -511,19 +521,24 @@ karena booking/pickup dan tracking berada di luar baseline.
 Nama operasi, payload, auth, error, dan kontrak idempotency masih
 [OPN-005](../requirements/BRD.md#opn-005).
 
-### 7.2 `pos_returns`
+### 7.2 `sales_returns`
 
-| Kolom              | Tipe            | Null  | Key/Default | Deskripsi                                                         |
-| ------------------ | --------------- | :---: | ----------- | ----------------------------------------------------------------- |
-| id                 | BIGINT UNSIGNED | Tidak | PK          | Identifier retur.                                                 |
-| order_id           | BIGINT UNSIGNED | Tidak | FK, UK      | Order yang dibatalkan.                                            |
-| pos_return_id      | VARCHAR(191)    | Tidak | UK          | Referensi retur POS.                                              |
-| pos_sales_order_id | VARCHAR(191)    | Tidak | IDX         | Sales order asal.                                                 |
-| reason             | TEXT            | Tidak | —           | Alasan pembatalan.                                                |
-| status             | VARCHAR(24)     | Tidak | IDX         | `PENDING`, `SUCCEEDED`, `FAILED`, atau `RECONCILIATION_REQUIRED`. |
-| returned_at        | DATETIME(6)     |   Ya  | —           | Waktu retur berhasil.                                             |
-| created_at         | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                                  |
-| updated_at         | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                                  |
+| Kolom            | Tipe            | Null  | Key/Default | Deskripsi                                                         |
+| ---------------- | --------------- | :---: | ----------- | ----------------------------------------------------------------- |
+| id               | BIGINT UNSIGNED | Tidak | PK          | Identifier retur website.                                         |
+| order_id         | BIGINT UNSIGNED | Tidak | FK, UK      | Order yang dibatalkan.                                            |
+| return_number    | VARCHAR(64)     | Tidak | UK          | Nomor retur website.                                              |
+| reason           | TEXT            | Tidak | —           | Alasan pembatalan.                                                |
+| reporting_status | VARCHAR(24)     | Tidak | IDX         | `PENDING`, `SUCCEEDED`, `FAILED`, atau `RECONCILIATION_REQUIRED`. |
+| pos_ack_reference | VARCHAR(191)   |   Ya  | IDX         | Referensi acknowledgement retur POS bila tersedia.                |
+| returned_at      | DATETIME(6)     | Tidak | IDX         | Waktu retur dan stok efektif dikembalikan.                        |
+| reported_at      | DATETIME(6)     |   Ya  | —           | Waktu laporan retur diterima POS.                                 |
+| created_at       | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                                  |
+| updated_at       | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                                  |
+
+Retur adalah data milik website. Operasi `WEB_RETURN_REPORT` hanya dikirim
+setelah operasi `WEB_SALE_REPORT` untuk order yang sama berstatus `SUCCEEDED`
+atau telah direkonsiliasi.
 
 ### 7.3 `sync_runs`
 
@@ -555,9 +570,32 @@ Nama operasi, payload, auth, error, dan kontrak idempotency masih
 | retryable                | BOOLEAN         | Tidak | `false`     | Dapat di-retry atau tidak.     |
 | created_at               | DATETIME(6)     | Tidak | —           | Waktu error.                   |
 
-## 8. Audit
+## 8. Notifications
 
-### 8.1 `audit_logs`
+### 8.1 `notifications`
+
+| Kolom              | Tipe            | Null  | Key/Default | Deskripsi                                                        |
+| ------------------ | --------------- | :---: | ----------- | ---------------------------------------------------------------- |
+| id                 | BIGINT UNSIGNED | Tidak | PK          | Identifier notifikasi.                                           |
+| user_id            | BIGINT UNSIGNED | Tidak | FK, IDX     | Admin penerima.                                                   |
+| order_id           | BIGINT UNSIGNED | Tidak | FK, IDX     | Order baru yang diberitahukan.                                   |
+| channel            | VARCHAR(16)     | Tidak | IDX         | `DATABASE` atau `WHATSAPP`.                                      |
+| type               | VARCHAR(64)     | Tidak | IDX         | Baseline `NEW_ORDER`.                                            |
+| data               | JSON            | Tidak | —           | Payload tampilan minimum tanpa credential.                       |
+| status             | VARCHAR(24)     | Tidak | IDX         | `PENDING`, `SENT`, `FAILED`; `DATABASE` langsung `SENT`.         |
+| external_message_id | VARCHAR(191)   |   Ya  | IDX         | Referensi provider WhatsApp bila tersedia.                       |
+| read_at            | DATETIME(6)     |   Ya  | IDX         | Waktu indikator website dibaca; null untuk belum dibaca.         |
+| sent_at            | DATETIME(6)     |   Ya  | —           | Waktu pesan/channel berhasil dibuat atau dikirim.                |
+| created_at         | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                                  |
+| updated_at         | DATETIME(6)     | Tidak | —           | Waktu perubahan status.                                          |
+
+Provider, penerima, template, retry/fallback WhatsApp, serta perilaku read/clear
+website masih [OPN-023](../requirements/BRD.md#opn-023). Bunyi berasal dari
+aplikasi/perangkat WhatsApp.
+
+## 9. Audit
+
+### 9.1 `audit_logs`
 
 | Kolom          | Tipe            | Null  | Key/Default  | Deskripsi                                       |
 | -------------- | --------------- | :---: | ------------ | ----------------------------------------------- |
@@ -576,26 +614,28 @@ Nama operasi, payload, auth, error, dan kontrak idempotency masih
 Password, token, credential POS/Biteship, nomor rekening mentah dalam log, dan
 isi file bukti pembayaran tidak boleh masuk `old_values` atau `new_values`.
 
-## 9. Constraint dan Index Minimum
+## 10. Constraint dan Index Minimum
 
 | Area       | Constraint/Index                                                                                                                  |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | Identity   | UK `users.email`, UK `users.phone`, UK `customer_profiles.user_id`.                                                               |
 | Product    | UK `products.pos_product_id`, UK `products.sku`, UK gabungan `product_prices(product_id, price_type)`.                            |
 | Cart       | UK parsial/logis satu `carts` aktif per user; UK `cart_items(cart_id, product_id)`.                                               |
-| Order      | UK `orders.order_number`, UK `orders.idempotency_key`, UK nullable `orders.pos_sales_order_id`.                                   |
+| Order      | UK `orders.order_number`, UK `orders.idempotency_key`.                                                                          |
 | Snapshot   | Index `order_items.sku_snapshot`, `shipments.district_snapshot`, dan tanggal/status order untuk laporan.                          |
-| Invoice    | UK `invoices.order_id`, UK `invoices.invoice_number`, UK nullable `invoices.pos_invoice_id`.                                      |
-| POS        | UK `pos_integration_operations.external_reference`, UK `pos_returns.order_id`, UK `pos_returns.pos_return_id`.                    |
+| Invoice    | UK `invoices.order_id`, UK `invoices.invoice_number`.                                                                            |
+| POS        | UK `pos_integration_operations.external_reference`; index `(order_id, operation, status)`.                                         |
+| Return     | UK `sales_returns.order_id`, UK `sales_returns.return_number`.                                                                    |
+| Notification | Index `notifications(user_id, channel, read_at)` dan `notifications(order_id, type)`.                                             |
 | Inventory  | UK `inventory_snapshots.product_id`; index `inventory_ledger(product_id, occurred_at)`.                                           |
 | Sync/Audit | Index `sync_runs(sync_type, started_at)`, `sync_errors(sync_run_id)`, dan `audit_logs(auditable_type, auditable_id, created_at)`. |
 
-## 10. Delete dan Retention
+## 11. Delete dan Retention
 
 - Master POS tidak dihapus otomatis ketika hilang dari payload; tandai nonaktif
   dan rekonsiliasi.
 - Order, item, invoice, payment, shipment, inventory ledger, integration
-  operation, retur, dan audit log tidak menggunakan cascade delete.
+  operation, retur, notifikasi, dan audit log tidak menggunakan cascade delete.
 - Penghapusan user tidak boleh menghilangkan transaksi historis; kebijakan
   anonimisasi/retention final mengikuti kebijakan privacy dan operasional.
 - Media produk dan bukti pembayaran dihapus melalui service agar record dan

@@ -7,8 +7,8 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.10 - Biteship Maps/Rates Contract |
-| Tanggal | Selasa, 28 Juli 2026 |
+| Versi | 0.11 - Web-owned Transaction and Fulfillment Baseline |
+| Tanggal | Rabu, 29 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
 | MVP delivery | `MVP.md` |
@@ -46,12 +46,13 @@ Status requirement:
 | CR-003 | Senin, 27 Juli 2026 | Persetujuan working baseline dan fallback POS | Working baseline disetujui dan ditandatangani. Jika koneksi POS belum disediakan, pengembangan serta pengujian menggunakan data contoh. | Tanggal persetujuan ditetapkan dan data contoh non-production ditambahkan; kesiapan koneksi POS production tetap dilacak. | Approved |
 | CR-004 | Selasa, 28 Juli 2026 | Pesan klien Sylvi | Klien meminta pengembangan dilanjutkan sesuai plan yang telah dibuat. Sultan mengonfirmasi interpretasi bahwa scope kembali mengikuti proposal awal. | Batas maksimal penjualan serta komponen PPh 22/surcharge tetap berada dalam MVP. Detail formula dan mapping data tetap terbuka pada OPN-006. | Approved working direction |
 | CR-005 | Selasa, 28 Juli 2026, 12.42-13.43 WIB | Klarifikasi bertahap klien | Klien menjelaskan tiga jenis harga wajib dari POS, ambang nilai belanja per klasifikasi yang memicu PPh 22, master produk dari POS, pola sinkronisasi stok, kesiapan akses POS, dan masa berlaku pesanan belum dibayar. | Konsep batas maksimal dikoreksi menjadi ambang nilai belanja; OPN-003 dan OPN-007 diselesaikan, sedangkan OPN-004, OPN-005, OPN-006, OPN-013, dan OPN-019 diperbarui sebagai keputusan parsial. | Partially resolved |
-| CR-006 | Selasa, 28 Juli 2026 | Diagram dan hasil meeting skema API POS | Master produk dan inventory ditarik sekali sehari; stok per produk dapat dicek berkala untuk rekonsiliasi. Setiap transaksi web membuat sales order POS yang langsung mengurangi stok dan menerbitkan invoice; pembatalan menerbitkan retur. Seluruh field yang tersedia di POS menjadi master, sedangkan website melengkapi field yang belum tersedia. | Write-back sales order/retur menjadi baseline, OPN-004 diselesaikan, OPN-005/OPN-008/OPN-019/OPN-020/OPN-022 diperbarui, dan risiko konsistensi API ditambahkan. | Approved working scheme; API contract partial |
+| CR-006 | Selasa, 28 Juli 2026 | Diagram dan hasil meeting skema API POS | Master produk dan inventory ditarik sekali sehari; stok per produk dapat dicek berkala untuk rekonsiliasi. Diagram awal menggambarkan transaksi web membuat sales order POS yang mengurangi stok dan menerbitkan invoice, serta pembatalan menerbitkan retur. Seluruh field yang tersedia di POS menjadi master, sedangkan website melengkapi field yang belum tersedia. | Menjadi working scheme awal; ownership transaksi/invoice dan arah pelaporan kemudian digantikan oleh klarifikasi CR-012. | Partially superseded by CR-012 |
 | CR-007 | Selasa, 28 Juli 2026 | Keputusan working baseline System Analyst Webekspres | Konfigurasi klasifikasi, ambang, dan tarif PPh 22 dikelola melalui website. Nilai PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice, dan laporan. | Q-008 dan Q-009 diselesaikan; BR-007, BR-008, BR-015, BR-026, RULE-006, serta requirement turunannya diperjelas. Dasar pengenaan tetap terbuka pada OPN-006. | Resolved for working baseline |
 | CR-008 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai akses POS | Kak Rio ditetapkan sebagai PIC POS. Akses POS dibuka setelah alur website berbasis data contoh sudah berjalan. | Q-014 diselesaikan; OPN-005 dan OPN-019 diperjelas. Kontak dan trigger akses telah tersedia, sedangkan kontrak teknis API serta contract test tetap terbuka. | Resolved access owner and trigger |
 | CR-009 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai isi invoice | Invoice wajib menampilkan nama, alamat, nomor kontak, dan NPWP toko; jumlah barang, nama barang, SKU, harga satuan, dan total harga item; total pembelian keseluruhan; serta nilai rupiah PPh 22 jika berlaku. | Isi minimum invoice ditetapkan pada BR-016 dan requirement turunannya. OPN-022 tetap parsial untuk sumber data identitas toko, PDF, channel, dan kepemilikan dokumen invoice. | Required fields resolved; delivery format partial |
 | CR-010 | Selasa, 28 Juli 2026 | Klarifikasi klien mengenai syarat harga partai | Dalam satu pembelian, sedikitnya satu produk/SKU harus berjumlah minimal lima unit agar transaksi memenuhi syarat harga partai. Kuantitas produk/SKU berbeda tidak dijumlahkan. | Kriteria kelayakan harga partai pada BR-006, RULE-018, OPN-013, dan Q-015 diperjelas. Cakupan item yang mendapat harga partai serta prioritas terhadap harga grosir tetap terbuka. | Eligibility resolved; application partial |
 | CR-011 | Selasa, 28 Juli 2026 | Dokumentasi resmi Biteship | Biteship diidentifikasi sebagai API pengiriman multi-kurir eksternal. Scope proyek memakai Maps API untuk standardisasi area dan Rates API untuk memperoleh pilihan layanan serta estimasi ongkir; API order, pickup, label, tracking, dan webhook Biteship tidak termasuk baseline. | Kontrak teknis dasar BR-024 dan requirement turunannya diperjelas. Nilai origin, sumber berat, daftar kurir, metode lokasi, serta fallback tetap dibahas melalui OPN-016 dan OPN-021. | Technical reference adopted; business scope unchanged |
+| CR-012 | Selasa, 28 Juli 2026, 20.03-20.04 WIB | Klarifikasi klien Sylvi | PPh 22 dari lebih dari satu klasifikasi digabungkan. Transaksi dan invoice web dibuat oleh website; POS menerima laporan penjualan untuk mencatat transaksi dan mengurangi stok, serta laporan retur untuk mencatat retur dan menambah stok. Setelah pembayaran diverifikasi, alur berlanjut ke diproses, dikemas, dikirim, dan selesai; nomor resi ditampilkan. Admin menerima notifikasi order baru melalui indikator merah di website dan WhatsApp dengan bunyi; template WhatsApp belum tersedia. | CR-006 superseded untuk ownership transaksi/invoice dan arah pelaporan. OPN-004, OPN-005, OPN-006, OPN-008, OPN-020, OPN-022, dan OPN-023 diperbarui; requirement, model data, dan user flow diselaraskan. | Approved business flow; API/notification contract partial |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -159,9 +160,10 @@ Proses penjualan membutuhkan kanal digital yang:
   sampai API tersedia
   ([open question: lihat OPN-003](#opn-003) dan
   [OPN-005](#opn-005)).
-- Pembuatan sales order POS pada setiap transaksi web, penyimpanan referensi
-  invoice POS, pembatalan sales order yang menerbitkan retur, serta
-  rekonsiliasi sales order ([lihat OPN-005](#opn-005)).
+- Pembuatan transaksi dan invoice di website, pengiriman laporan penjualan ke
+  POS untuk pencatatan transaksi dan pengurangan stok, serta pengiriman laporan
+  retur untuk pencatatan retur dan penambahan stok
+  ([lihat OPN-005](#opn-005)).
 - Enrichment produk lokal berupa gambar, video, deskripsi pemasaran, SEO, dan
   pengaturan tampil.
 - Tiga jenis harga wajib per produk: eceran, partai, dan grosir. Seluruh harga
@@ -175,6 +177,10 @@ Proses penjualan membutuhkan kanal digital yang:
 - Pembayaran transfer bank dan upload bukti pembayaran
   ([open question: lihat OPN-009](#opn-009)).
 - Verifikasi pembayaran oleh admin.
+- Pemrosesan, pengemasan, pengiriman, penyelesaian pesanan, dan tampilan nomor
+  resi kepada pelanggan.
+- Notifikasi order baru kepada admin melalui indikator merah di website dan
+  WhatsApp ([keputusan parsial: lihat OPN-023](#opn-023)).
 - Pembatalan transaksi oleh admin pada hari kalender yang sama.
 - Pengiriman kurir toko
   ([open question: lihat OPN-010](#opn-010)).
@@ -208,7 +214,6 @@ menjadi baseline:
 | CND-001 | Segmentasi pelanggan menjadi customer biasa dan reseller. | [Open question: OPN-002](#opn-002) |
 | CND-002 | Reseller tidak melihat harga dan memesan melalui WhatsApp. | [Open question: OPN-002](#opn-002) |
 | CND-003 | Grouping beberapa transaksi untuk satu pengiriman. | [Open question: OPN-014](#opn-014) |
-| CND-005 | Notifikasi otomatis kepada pelanggan atau admin. | [Open question: OPN-023](#opn-023) |
 
 ## 8. Konteks Bisnis
 
@@ -216,7 +221,8 @@ menjadi baseline:
 flowchart LR
     Customer[Pelanggan] --> Web[Website E-Commerce]
     Admin[Admin Operasional] --> Web
-    Web <--> POS[Sistem POS Klien]
+    POS -->|Master produk, harga, dan stok| Web
+    Web -->|Laporan penjualan dan retur| POS[Sistem POS Klien]
     Web --> Biteship[Biteship API - Maps dan Rates]
     Web --> Bank[Transfer Bank Manual]
     Admin --> Bank
@@ -239,16 +245,16 @@ flowchart LR
 | BR-010 | Sinkronisasi POS tidak boleh menghapus data pelengkap website ketika field POS tidak tersedia; ketika POS menyediakan field tersebut, nilai POS menjadi sumber utama. | Amendment |
 | BR-011 | Sistem harus menampilkan status stok Tersedia, Menipis, atau Habis. | Baseline |
 | BR-012 | Admin harus dapat menentukan batas minimum stok. | Baseline |
-| BR-013 | Sistem harus menyimpan riwayat perubahan stok beserta sumbernya: sinkronisasi penuh, pengecekan per produk, sales order, pembatalan/retur, atau koreksi. | Baseline |
-| BR-014 | Setiap pesanan web harus dikirim ke POS melalui operasi pembuatan sales order. Keberhasilan POS langsung mengurangi stok dan menghasilkan invoice POS; referensi respons disimpan pada pesanan web ([lihat OPN-005](#opn-005)). | Baseline; error contract partially open |
-| BR-015 | Sistem harus menghitung subtotal, ongkir, PPh 22 yang aktif, dan total transaksi. Nilai PPh 22 harus ditampilkan sebagai komponen terpisah pada cart dan checkout, serta pada invoice ketika transaksi terkena PPh 22; perhitungannya mengikuti aturan klasifikasi, ambang, dan dasar pengenaan pada [OPN-006](#opn-006). | Baseline; dasar pengenaan partially open |
-| BR-016 | Sistem harus menyimpan referensi invoice yang diterbitkan POS ketika sales order berhasil dibuat. Invoice wajib memuat identitas toko (nama, alamat, nomor kontak, NPWP), detail item (jumlah, nama barang, SKU, harga satuan, total harga item), total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku. Kebutuhan nomor invoice lokal, sumber identitas toko, format tampilan, serta penyampaiannya mengikuti [OPN-008](#opn-008) dan [OPN-022](#opn-022). | Baseline; required fields resolved, delivery format partially open |
+| BR-013 | Sistem harus menyimpan riwayat perubahan stok efektif website beserta sumbernya: sinkronisasi penuh, pengecekan per produk, penjualan web, retur web, atau koreksi. | Baseline |
+| BR-014 | Website harus membuat order dan invoice secara atomik, mengurangi stok efektif website ketika penjualan tercatat, lalu mengirim laporan penjualan ke POS untuk mencatat transaksi dan mengurangi stok POS. Gangguan pelaporan POS tidak boleh menghapus atau menggandakan transaksi website; status pelaporan harus dapat direkonsiliasi ([lihat OPN-005](#opn-005)). | Baseline; API contract partially open |
+| BR-015 | Sistem harus menghitung subtotal, ongkir, PPh 22 yang aktif, dan total transaksi. Ketika lebih dari satu klasifikasi terpicu, perhitungannya digabungkan menjadi satu total PPh 22 dan ditampilkan sebagai komponen terpisah pada cart, checkout, invoice, dan laporan; urutan agregasi serta dasar pengenaan mengikuti [OPN-006](#opn-006). | Baseline; hasil gabungan resolved, formula partially open |
+| BR-016 | Website harus menerbitkan invoice untuk setiap transaksi. Invoice wajib memuat identitas toko (nama, alamat, nomor kontak, NPWP), detail item (jumlah, nama barang, SKU, harga satuan, total harga item), total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku. Format nomor, sumber identitas toko, kebutuhan PDF, serta channel penyampaiannya mengikuti [OPN-008](#opn-008) dan [OPN-022](#opn-022). | Baseline; ownership and required fields resolved, delivery format partially open |
 | BR-017 | Satu pelanggan dapat memiliki lebih dari satu invoice. | Baseline |
 | BR-018 | Pembayaran dilakukan melalui transfer bank dan diverifikasi admin. | Baseline |
 | BR-019 | Pelanggan harus dapat mengunggah bukti pembayaran ([lihat OPN-009](#opn-009)). | Baseline; batas file dan retensi open |
 | BR-020 | Admin harus dapat menerima atau menolak bukti pembayaran. | Baseline |
-| BR-021 | Admin dapat membatalkan transaksi hanya pada tanggal kalender yang sama dengan transaksi; pembatalan sales order POS dilakukan melalui operasi pembatalan. | Baseline |
-| BR-022 | Pembatalan POS harus menerbitkan retur, mengembalikan stok, serta menyimpan referensi retur dan hasil rekonsiliasi pada website. | Baseline |
+| BR-021 | Admin dapat membatalkan transaksi hanya pada tanggal kalender yang sama dengan transaksi; website mencatat retur dan mengembalikan stok efektif secara atomik. | Baseline |
+| BR-022 | Setiap retur website harus dilaporkan ke POS untuk mencatat retur dan menambah stok POS. Laporan retur tidak boleh diterapkan di POS sebelum laporan penjualan asal berhasil diterima atau direkonsiliasi, dan retry tidak boleh membuat retur ganda. | Baseline; API contract partially open |
 | BR-023 | Sistem harus mendukung kurir toko beserta biaya berdasarkan wilayah ([lihat OPN-010](#opn-010)). | Baseline; area, tarif, dan SLA open |
 | BR-024 | Biteship digunakan sebagai provider eksternal untuk standardisasi area melalui Maps API dan pilihan layanan/estimasi ongkir melalui Rates API; Biteship bukan sumber order, stok, invoice, atau pembayaran website ([lihat OPN-021](#opn-021)). | Baseline; data operasional dan kurir open |
 | BR-025 | Ongkir terpilih harus masuk ke total transaksi dan invoice. | Baseline |
@@ -256,7 +262,8 @@ flowchart LR
 | BR-027 | Sistem harus mempertahankan jejak audit untuk tindakan administratif kritis. | [Proposed; lihat OPN-015](#opn-015) |
 | BR-028 | Kegagalan POS atau Biteship harus dapat ditelusuri dan tidak boleh diam-diam menghasilkan data transaksi salah. | [Proposed; lihat OPN-015](#opn-015) |
 | BR-029 | Sistem harus dapat ditingkatkan kapasitasnya tanpa mengubah domain bisnis utama. | [Proposed; lihat OPN-015](#opn-015) |
-| BR-030 | Pesanan yang belum dibayar hanya berlaku pada hari pembuatannya dan otomatis dibatalkan pada hari kalender berikutnya dalam zona waktu `Asia/Jakarta`; jika sales order POS telah dibuat, pembatalan otomatis juga memanggil operasi pembatalan POS. | Baseline |
+| BR-030 | Pesanan yang belum dibayar hanya berlaku pada hari pembuatannya dan otomatis dibatalkan pada hari kalender berikutnya dalam zona waktu `Asia/Jakarta`; pembatalan otomatis membuat retur website dan menjadwalkan laporan retur POS secara idempotent. | Baseline |
+| BR-031 | Ketika order baru berhasil dibuat, sistem harus memberi tahu admin melalui indikator notifikasi merah di website dan pesan WhatsApp. Bunyi mengikuti notifikasi aplikasi/perangkat WhatsApp; provider, penerima, template, dan fallback mengikuti [OPN-023](#opn-023). | Baseline; channel behavior partially open |
 
 ## 10. Business Rules
 
@@ -264,10 +271,10 @@ flowchart LR
 |---|---|
 | RULE-001 | Akun yang belum disetujui tidak boleh checkout. |
 | RULE-002 | SKU atau external product ID dari POS harus unik dan stabil. |
-| RULE-003 | Snapshot stok awal hari berasal dari POS. Website memperbarui stok efektif setelah keberhasilan pembuatan/pembatalan sales order dan mencocokkannya melalui sinkronisasi penuh harian atau pengecekan stok per produk. |
+| RULE-003 | Snapshot stok awal hari berasal dari POS. Website mengurangi stok efektif ketika penjualan web dicatat dan menambahnya kembali ketika retur web dicatat, lalu mencocokkannya melalui sinkronisasi penuh harian atau pengecekan stok per produk. |
 | RULE-004 | Field produk yang tersedia di POS selalu mengikuti POS; gambar, deskripsi, atau data presentasi lain boleh dilengkapi di website hanya ketika belum tersedia dari POS. |
 | RULE-005 | Setiap produk wajib memiliki tiga jenis harga dari POS: `ECERAN`, `PARTAI`, dan `GROSIR`. Harga `ECERAN` disimpan tetapi tidak ditampilkan pada storefront fase saat ini. |
-| RULE-006 | Nilai harga, jenis harga terpilih, nama produk, SKU, ongkir, PPh 22, dan total disimpan sebagai snapshot transaksi. PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, dan laporan, serta pada invoice jika berlaku; dasar pengenaannya mengikuti [OPN-006](#opn-006). |
+| RULE-006 | Nilai harga, jenis harga terpilih, nama produk, SKU, ongkir, PPh 22, dan total disimpan sebagai snapshot transaksi. Seluruh klasifikasi terpicu menghasilkan satu `pph22_amount` gabungan yang ditampilkan terpisah pada cart, checkout, invoice, dan laporan. Urutan agregasi dan dasar pengenaannya mengikuti [OPN-006](#opn-006). |
 | RULE-007 | Upload bukti pembayaran tidak otomatis membuat transaksi berstatus lunas. |
 | RULE-008 | Pembayaran dianggap sah setelah diverifikasi admin. |
 | RULE-009 | Pembatalan menggunakan zona waktu `Asia/Jakarta`. |
@@ -282,10 +289,12 @@ flowchart LR
 | RULE-018 | Transaksi memenuhi syarat harga partai jika sedikitnya satu baris produk/SKU memiliki kuantitas minimal lima unit; kuantitas dari SKU berbeda tidak dapat digabung untuk memenuhi syarat. Harga grosir memiliki minimum kuantitas yang dapat berbeda per produk. Cakupan penerapan harga partai dan prioritas terhadap harga grosir mengikuti [OPN-013](#opn-013). |
 | RULE-019 | Ambang PPh 22 berbasis nilai belanja pada klasifikasi terpilih, bukan batas kuantitas maksimum dan bukan alasan untuk menolak checkout. Persentase `0%` menonaktifkan pungutan untuk aturan tersebut. |
 | RULE-020 | Pesanan tanpa pembayaran yang masih aktif pada hari pembuatannya otomatis menjadi `CANCELLED` pada hari kalender berikutnya. |
-| RULE-021 | Keberhasilan `CreateSalesOrder` menjadi event pengurangan stok POS dan penerbitan invoice; website harus menyimpan POS sales order ID, invoice ID/number, serta status sinkronisasinya. |
-| RULE-022 | `CancelSalesOrder` harus menghasilkan retur di POS dan pengembalian stok; retry tidak boleh membuat pembatalan atau retur ganda. |
-| RULE-023 | Sinkronisasi sales order/invoice/retur digunakan untuk rekonsiliasi terhadap write-back per transaksi, bukan menggantikan jalur transaksi utama. |
-| RULE-024 | Operasi POS yang mengubah data wajib memiliki external reference/idempotency mechanism yang disepakati sebelum integration acceptance. |
+| RULE-021 | Commit transaksi website menjadi event pembuatan invoice, pengurangan stok efektif, dan pembuatan laporan penjualan POS dengan external reference unik. |
+| RULE-022 | Pembatalan yang valid membuat retur website dan menambah stok efektif secara atomik; laporan retur POS dikirim idempotent setelah laporan penjualan asal berhasil diterima atau direkonsiliasi. |
+| RULE-023 | POS menerima laporan penjualan dan retur dari website; POS bukan penerbit invoice atau source of truth lifecycle order website. Status acknowledgement digunakan untuk rekonsiliasi, bukan untuk membatalkan transaksi lokal yang sah. |
+| RULE-024 | Operasi pelaporan POS wajib memiliki external reference/idempotency mechanism yang disepakati sebelum integration acceptance. |
+| RULE-025 | Status setelah pembayaran diterima adalah `PROCESSING`, `PACKED`, `SHIPPED`, lalu `COMPLETED`; nomor resi ditampilkan kepada pelanggan ketika tersedia. |
+| RULE-026 | Notifikasi WhatsApp menggunakan perilaku bunyi aplikasi/perangkat WhatsApp; website tidak membuat audio notifikasi WhatsApp sendiri. |
 
 ## 11. Proses Bisnis Utama
 
@@ -309,12 +318,15 @@ flowchart TD
     B --> C[Validasi harga dan stok]
     C --> D[Pilih pengiriman]
     D --> E[Hitung ongkir dan total]
-    E --> F[Kirim CreateSalesOrder ke POS]
-    F --> L{POS berhasil?}
-    L -->|Ya| M[POS kurangi stok dan terbitkan invoice]
-    L -->|Tidak/timeout| N[Tahan finalisasi dan rekonsiliasi]
-    M --> G[Catat order dan invoice POS]
-    G --> O[Menunggu transfer bank]
+    E --> F[Buat order dan invoice website]
+    F --> G[Kurangi stok efektif website]
+    G --> N[Kirim laporan penjualan ke POS]
+    N --> L{Laporan diterima?}
+    L -->|Ya| M[Simpan acknowledgement POS]
+    L -->|Tidak/timeout| P[Tandai untuk retry atau rekonsiliasi]
+    M --> O[Menunggu transfer bank]
+    P --> O
+    F --> Q[Notifikasi order baru ke admin]
     O --> X{Bukti pembayaran diajukan hari yang sama?}
     X -->|Tidak| Y[Otomatis batal hari berikutnya]
     X -->|Ya| H[Upload bukti pembayaran]
@@ -330,7 +342,7 @@ flowchart TD
     A[Sinkronisasi penuh sekali sehari] --> B[Ambil kategori, produk, harga, dan stok]
     B --> C[Validasi kontrak dan identifier]
     C --> D[Upsert field POS dan pertahankan pelengkap lokal]
-    D --> E[Rekonsiliasi sales order, invoice, dan retur]
+    D --> E[Rekonsiliasi acknowledgement laporan penjualan dan retur]
     E --> F[Simpan hasil dan error log]
     G[Kebutuhan pencocokan stok] --> H[GetStockByProduct berkala]
     H --> F
@@ -373,9 +385,10 @@ Nilai target final harus disetujui pada technical kickoff
   Biteship diberikan klien atau disepakati sebagai aturan operasional; dimensi
   produk diperlukan hanya jika dipakai dalam perhitungan layanan
   ([lihat OPN-021](#opn-021)).
-- Keputusan lifecycle order, format/penyampaian invoice, dan notifikasi dibuat
-  sebelum requirement terkait masuk sprint ([lihat OPN-020](#opn-020),
-  [OPN-022](#opn-022), dan [OPN-023](#opn-023)).
+- Lifecycle order mengikuti keputusan resolved pada [OPN-020](#opn-020).
+  Format/penyampaian invoice dan kontrak notifikasi WhatsApp diselesaikan
+  sebelum integration acceptance ([lihat OPN-022](#opn-022) dan
+  [OPN-023](#opn-023)).
 - Infrastruktur production menggunakan shared hosting milik klien
   ([lihat OPN-001](#opn-001)).
 - Perubahan scope setelah baseline mengikuti change control pada
@@ -385,15 +398,17 @@ Nilai target final harus disetujui pada technical kickoff
 
 | ID | Risiko | Dampak | Mitigasi |
 |---|---|---|---|
-| RSK-001 | Stok penuh hanya disinkronkan sekali sehari sementara transaksi POS lain dapat mengubah stok. | Stok website stale dan terjadi overselling. | Perbarui stok efektif setelah write-back web, gunakan pengecekan stok per produk saat rekonsiliasi diperlukan, dan pantau selisih ([OPN-005](#opn-005)). |
-| RSK-002 | Kontrak API POS berubah. | Sinkronisasi atau write-back transaksi gagal. | Versioning, contract test, logging, dan change request ([lihat OPN-005](#opn-005)). |
+| RSK-001 | Stok penuh hanya disinkronkan sekali sehari sementara transaksi POS lain dapat mengubah stok. | Stok website stale dan terjadi overselling. | Perbarui stok efektif saat transaksi/retur website di-commit, gunakan pengecekan stok per produk saat rekonsiliasi diperlukan, dan pantau selisih ([OPN-005](#opn-005)). |
+| RSK-002 | Kontrak API POS berubah. | Sinkronisasi atau pelaporan penjualan/retur gagal. | Versioning, contract test, logging, dan change request ([lihat OPN-005](#opn-005)). |
 | RSK-003 | Shared hosting membatasi worker dan resource. | Sinkronisasi terlambat atau berhenti. | Gunakan cron, queue berbasis database/file, monitoring ringan, serta upgrade ke VPS bila batas resource tidak lagi mencukupi ([lihat OPN-001](#opn-001)). |
 | RSK-004 | Biteship lambat/tidak tersedia. | Checkout tertunda. | Timeout dan fallback manual yang disetujui ([lihat OPN-016](#opn-016)). |
 | RSK-005 | Lonjakan traffic atau bot. | Aplikasi lambat/tidak tersedia. | CDN, cache, rate limit, monitoring, dan scale-up. |
 | RSK-006 | Media produk dan bukti pembayaran membesar. | Storage/bandwidth habis. | Object storage, kompresi, dan kebijakan retensi ([lihat OPN-009](#opn-009)). |
 | RSK-007 | Dasar pengenaan PPh 22 dan penerapan harga partai lintas item belum final. | Perhitungan checkout, invoice, dan laporan salah atau dikerjakan ulang. | Implementasikan struktur konfigurasi minimum; finalisasi formula dan skenario harga melalui [OPN-006](#opn-006) serta [OPN-013](#opn-013). |
 | RSK-008 | Koneksi POS belum tersedia selama development atau menjelang go-live. | Contract mismatch, keterlambatan integrasi, dan stok production tidak aktual. | Gunakan data contoh hanya untuk delivery non-production; setelah alur website berjalan, koordinasikan akses dengan Kak Rio, finalisasi kontrak, dan lakukan contract test sebelum go-live melalui OPN-019. |
-| RSK-009 | Timeout/retry `CreateSalesOrder` atau `CancelSalesOrder` tidak memiliki idempotency/external reference yang jelas. | Sales order, invoice, retur, atau perubahan stok terduplikasi. | Wajibkan external reference unik, query rekonsiliasi, dan kebijakan retry berbasis status sebelum integration acceptance pada OPN-005. |
+| RSK-009 | Timeout/retry laporan penjualan atau retur POS tidak memiliki idempotency/external reference yang jelas. | Penjualan, retur, atau perubahan stok POS terduplikasi. | Wajibkan external reference unik, acknowledgement/lookup, dan kebijakan retry berbasis status sebelum integration acceptance pada OPN-005. |
+| RSK-010 | Laporan retur diterima POS sebelum laporan penjualan asal. | Stok POS dapat bertambah tanpa penjualan asal tercatat. | Tahan laporan retur sampai laporan penjualan asal berstatus berhasil atau sudah direkonsiliasi. |
+| RSK-011 | Provider, template, penerima, atau fallback WhatsApp belum final. | Admin tidak menerima notifikasi order baru melalui WhatsApp. | Website badge tetap menjadi channel minimum; selesaikan OPN-023 sebelum integration acceptance WhatsApp. |
 
 ## 15. Keputusan Terbuka
 
@@ -427,10 +442,10 @@ kontrak integrasi pada OPN-005.
 
 ### OPN-004
 
-Keberhasilan `CreateSalesOrder` langsung mengurangi stok POS dan menerbitkan
-invoice. `CancelSalesOrder` menerbitkan retur dan mengembalikan stok POS.
-Website memperbarui stok efektif dan menyimpan referensi hasil kedua operasi;
-sinkronisasi berikutnya digunakan untuk rekonsiliasi.
+Website membuat transaksi dan invoice serta memperbarui stok efektif. POS
+menerima laporan penjualan dari website untuk mencatat transaksi dan mengurangi
+stok POS, serta laporan retur untuk mencatat retur dan menambah stok POS.
+Acknowledgement dan sinkronisasi berikutnya digunakan untuk rekonsiliasi.
 
 **Pemilik:** Klien / Vendor POS · **Target:** 28 Juli 2026 · **Status:** Resolved
 
@@ -442,17 +457,19 @@ Working scheme API:
   `GetProductDetail`, dan `GetPriceList`;
 - inventory sekali sehari: `GetAllStock`; `GetStockByProduct` dapat dipanggil
   berkala ketika diperlukan untuk pencocokan;
-- transaksi per kejadian: `CreateSalesOrder`, `CancelSalesOrder`,
-  `GetAllSalesOrder`, dan `GetSalesOrderDetail`;
-- data sales order, invoice, dan retur direkonsiliasi bersama proses
+- transaksi per kejadian: website mengirim laporan penjualan dan laporan retur
+  ke POS; nama operasi final belum ditetapkan;
+- acknowledgement laporan penjualan/retur direkonsiliasi bersama proses
   sinkronisasi.
 
 Kak Rio menjadi PIC POS. Klien akan membuka akses setelah alur website berbasis
 data contoh sudah berjalan; kondisi ini menjadi trigger akses dan tidak
 memerlukan tanggal kalender terpisah sebelum readiness gate tercapai. Yang
-masih terbuka adalah bentuk URL/method/payload/response; autentikasi; external
-reference atau idempotency; kode error, timeout, rate limit; arah dan tujuan
-tepat sinkronisasi sales harian; serta acceptance contract test.
+masih terbuka adalah nama operasi final; bentuk URL/method/payload/response;
+autentikasi; external reference atau idempotency; acknowledgement/lookup; kode
+error, timeout, rate limit; detail data laporan penjualan/retur; timestamp/cutoff
+snapshot stok dan cara membuktikan penjualan/retur web sudah tercakup pada
+snapshot POS; serta acceptance contract test.
 
 **Pemilik:** Kak Rio / Vendor POS · **Target:** Sebelum integration acceptance · **Status:** Partially resolved
 
@@ -462,9 +479,11 @@ Biaya persentase dikonfirmasi sebagai PPh 22. Admin dapat memilih klasifikasi
 yang terkena aturan, menetapkan ambang nilai belanja per klasifikasi, dan
 menetapkan persentase termasuk `0%` melalui website; contoh klien adalah ambang
 Rp2.200.000 dan tarif `0,5%`. PPh 22 ditampilkan sebagai komponen terpisah pada
-cart, checkout, invoice, dan laporan. Yang masih terbuka adalah dasar pengenaan
-(seluruh subtotal klasifikasi, nilai di atas ambang, atau total struk) serta
-agregasi jika lebih dari satu klasifikasi terpicu.
+cart, checkout, invoice, dan laporan. Jika lebih dari satu klasifikasi terpicu,
+perhitungannya digabungkan menjadi satu total PPh 22 transaksi. Yang masih
+terbuka adalah dasar pengenaan (seluruh subtotal klasifikasi, hanya nilai di
+atas ambang, atau dasar lain) dan urutan agregasi: menggabungkan dasar lebih
+dahulu atau menghitung per klasifikasi lalu menjumlahkan hasilnya.
 
 **Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
@@ -478,11 +497,11 @@ dibatalkan pada hari kalender berikutnya menggunakan zona waktu
 
 ### OPN-008
 
-POS menerbitkan invoice ketika `CreateSalesOrder` berhasil. Yang masih terbuka
-adalah apakah nomor invoice POS menjadi nomor resmi tunggal atau website juga
-membuat nomor internal, termasuk format dan aturan pemetaannya.
+Website menerbitkan invoice ketika transaksi berhasil dibuat. Ownership
+invoice telah diselesaikan; yang masih terbuka adalah format/awalan nomor
+invoice website dan aturan penomorannya.
 
-**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
+**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-009
 
@@ -576,14 +595,15 @@ diselesaikan sebelum go-live.
 
 ### OPN-020
 
-Web menjadi pengelola lifecycle pesanan sampai proses pengiriman selesai.
-Pembatalan baseline tetap hanya oleh admin pada hari yang sama atau otomatis
-untuk pesanan belum dibayar pada hari berikutnya; keduanya memanggil
-`CancelSalesOrder` dan menyimpan referensi retur POS. Status pemenuhan setelah
-pembayaran dan kebutuhan nomor resi masih perlu ditetapkan. Pengembalian dana
-di luar pembatalan/retur stok standar membutuhkan change request terpisah.
+Web menjadi pengelola lifecycle pesanan. Setelah pembayaran diverifikasi,
+status berlanjut ke `PROCESSING`, `PACKED`, `SHIPPED`, lalu `COMPLETED`.
+Nomor resi ditampilkan kepada pelanggan ketika tersedia. Pembatalan baseline
+tetap hanya oleh admin pada hari yang sama atau otomatis untuk pesanan belum
+dibayar pada hari berikutnya; website mencatat retur dan mengirim laporan retur
+ke POS. Pengembalian dana di luar retur stok standar membutuhkan change request
+terpisah.
 
-**Pemilik:** Klien / System Analyst · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
+**Pemilik:** Klien / System Analyst · **Target:** 28 Juli 2026 · **Status:** Resolved
 
 ### OPN-021
 
@@ -598,23 +618,24 @@ juga siapa yang menanggung akun, aktivasi production, dan biaya penggunaan API.
 
 ### OPN-022
 
-POS menerbitkan invoice saat sales order dibuat. Field minimum yang wajib
+Website menerbitkan invoice saat transaksi dibuat. Field minimum yang wajib
 ditampilkan telah ditetapkan: nama, alamat, nomor kontak, dan NPWP toko; jumlah,
 nama, SKU, harga satuan, dan total harga setiap item; total pembelian
 keseluruhan; serta nilai rupiah PPh 22 jika berlaku. Yang masih terbuka adalah
-sumber/mapping identitas toko, kebutuhan PDF, channel pengiriman, serta apakah
-website membuat dokumen invoice sendiri atau hanya merepresentasikan invoice
-POS. Nomor dan pemetaan mengikuti OPN-008.
+sumber/mapping identitas toko, kebutuhan PDF, dan channel pengiriman. Format
+nomor mengikuti OPN-008.
 
-**Pemilik:** Klien / Vendor POS · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
 ### OPN-023
 
-Kebutuhan notifikasi diputuskan dalam dua langkah: (1) event yang perlu
-diberitahukan kepada pelanggan dan admin; lalu (2) channel, pemilik template,
-dan fallback jika pengiriman notifikasi gagal.
+Event minimum yang telah disetujui adalah order baru kepada admin. Channel
+minimum adalah indikator merah di website dan pesan WhatsApp dengan bunyi dari
+aplikasi/perangkat WhatsApp. Template belum tersedia. Yang masih terbuka adalah
+admin/nomor penerima, provider dan credential WhatsApp, isi serta approval
+template, aturan retry/fallback, dan perilaku baca/hapus indikator website.
 
-**Pemilik:** Klien / Webekspres · **Target:** Sebelum Sprint 2 · **Status:** Open
+**Pemilik:** Klien / Webekspres · **Target:** Sebelum integration acceptance notifikasi · **Status:** Partially resolved
 
 ### 15.1 Klarifikasi Klien 28 Juli 2026
 
@@ -639,13 +660,15 @@ trail karena sudah dijawab pada 27 Juli 2026.
 | Q-013 | Apakah data contoh boleh digunakan pada production jika koneksi POS belum tersedia saat go-live? | BR-009, OPN-019 | Resolved - tidak; data production wajib berasal dari POS |
 | Q-014 | Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi kontrak data? | OPN-005, OPN-019 | Resolved - PIC POS adalah Kak Rio; akses dibuka setelah alur website berbasis data contoh berjalan |
 | Q-015 | Untuk harga partai, apakah harga partai berlaku untuk seluruh item dalam struk atau hanya item yang memenuhi syarat; dan bagaimana prioritasnya jika item juga memenuhi syarat grosir? | BR-006, OPN-013 | Partially resolved - lima unit harus berasal dari satu produk/SKU; cakupan penerapan dan prioritas harga masih terbuka |
-| Q-016 | PPh 22 dihitung dari seluruh subtotal klasifikasi, hanya nilai di atas ambang, atau total struk; dan bagaimana jika lebih dari satu klasifikasi terpicu? | BR-008, BR-015, OPN-006 | Open |
-| Q-017 | Status/event apa yang dianggap sebagai penjualan untuk mengurangi stok; apakah perlu reservasi sebelumnya; dan apakah stok retur hanya masuk melalui sinkronisasi POS? | BR-011 - BR-014, OPN-004 | Resolved - `CreateSalesOrder` mengurangi stok; `CancelSalesOrder` menerbitkan retur dan mengembalikan stok |
+| Q-016 | PPh 22 dihitung dari seluruh subtotal klasifikasi, hanya nilai di atas ambang, atau dasar lain; apakah multi-klasifikasi digabung sebelum tarif atau dihitung per klasifikasi lalu dijumlahkan? | BR-008, BR-015, OPN-006 | Partially resolved - wajib menjadi satu hasil gabungan; dasar pengenaan dan urutan agregasi masih open |
+| Q-017 | Status/event apa yang dianggap sebagai penjualan untuk mengurangi stok; apakah perlu reservasi sebelumnya; dan bagaimana retur menambah stok? | BR-011 - BR-014, OPN-004 | Resolved - commit penjualan/retur website memperbarui stok efektif; POS menerima laporan penjualan/retur |
 | Q-018 | Apakah nama operasi pada diagram sudah final; bagaimana URL/method, autentikasi, payload/response, pagination, rate limit, dan kode error setiap operasi? | OPN-005, SRS 7.1 | Open - vendor POS |
-| Q-019 | Apakah POS mendukung external reference/idempotency untuk mencegah sales order, invoice, atau retur ganda ketika request timeout dan di-retry? | BR-014, BR-021 - BR-022, OPN-005 | Open - vendor POS |
-| Q-020 | Apakah invoice POS menjadi invoice resmi tunggal, atau website tetap membuat nomor/dokumen invoice sendiri? | BR-016, OPN-008, OPN-022 | Open |
-| Q-021 | Apakah sinkronisasi sales harian hanya untuk rekonsiliasi setelah `CreateSalesOrder`/`CancelSalesOrder` per transaksi, dan data apa yang bergerak pada masing-masing arah? | BR-009, BR-014, OPN-005 | Open - vendor POS |
-| Q-022 | Apakah nama, alamat, nomor kontak, dan NPWP toko pada invoice berasal dari payload POS atau konfigurasi website, dan siapa yang menyediakan nilai finalnya? | BR-016, OPN-022, SRS 9.1 | Open - klien/vendor POS |
+| Q-019 | Apakah POS mendukung external reference/idempotency dan lookup untuk mencegah laporan penjualan atau retur ganda ketika request timeout dan di-retry? | BR-014, BR-021 - BR-022, OPN-005 | Open - vendor POS |
+| Q-020 | Apakah invoice POS menjadi invoice resmi tunggal, atau website tetap membuat nomor/dokumen invoice sendiri? | BR-016, OPN-008, OPN-022 | Resolved - transaksi dan invoice dibuat di website; format nomor masih mengikuti OPN-008 |
+| Q-021 | Bagaimana kontrak laporan penjualan dan retur dari website ke POS, termasuk acknowledgement, lookup, dan data yang disinkronkan berkala? | BR-009, BR-014, OPN-005 | Partially resolved - arah dan tujuan bisnis resolved; kontrak vendor POS open |
+| Q-022 | Apakah nama, alamat, nomor kontak, dan NPWP toko pada invoice berasal dari payload POS atau konfigurasi website, dan siapa yang menyediakan nilai finalnya? | BR-016, OPN-022, SRS 9.1 | Open - klien/Webekspres |
+| Q-023 | Siapa admin/nomor penerima WhatsApp, provider apa yang digunakan, bagaimana isi/approval template, retry/fallback, serta kapan indikator website dianggap sudah dibaca? | BR-031, OPN-023 | Open - klien/Webekspres |
+| Q-024 | Apakah payload stok POS memiliki timestamp/cutoff dan bagaimana website mengetahui laporan penjualan/retur mana yang sudah tercakup agar delta stok tidak dihitung dua kali? | BR-009, BR-014, OPN-005 | Open - vendor POS |
 
 ### 15.2 MVP Baseline dan Stage Gates
 
@@ -679,12 +702,12 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 
 | ID | Bukti yang Dibutuhkan | Owner | Gate | Status Awal |
 |---|---|---|---|---|
-| PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - scope, sumber konfigurasi website, dan tampilan terpisah selesai; formula tetap OPN-006 |
-| PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - OPN-007 selesai dan kelayakan partai pada OPN-013 terjawab; cakupan penerapan/prioritas harga serta OPN-020 masih parsial |
+| PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - scope, sumber konfigurasi, tampilan, dan kewajiban satu hasil gabungan selesai; dasar pengenaan serta urutan agregasi tetap OPN-006 |
+| PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - expiry dan lifecycle selesai; kelayakan partai terjawab, tetapi cakupan penerapan/prioritas harga tetap OPN-013 |
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Blocker operasional - OPN-010, OPN-016, OPN-021; kontrak Maps/Rates sudah teridentifikasi |
-| PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - field wajib invoice selesai; sumber identitas, format/channel invoice, dan notifikasi tetap OPN-022/OPN-023 |
-| PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Open - OPN-001 |
+| PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - ownership/field invoice dan event/channel notifikasi selesai; sumber identitas, format/channel invoice, serta provider/penerima/template/fallback WhatsApp tetap OPN-022/OPN-023 |
+| PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Parsial - shared hosting resolved pada OPN-001; domain/DNS, akun layanan, dan akses environment masih perlu disediakan |
 | PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |
 
 ## 16. Persetujuan

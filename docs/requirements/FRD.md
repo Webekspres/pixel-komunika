@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.9 - Biteship Maps/Rates Contract |
-| Tanggal | Selasa, 28 Juli 2026 |
+| Versi | 0.10 - Web-owned Transaction and Fulfillment Baseline |
+| Tanggal | Rabu, 29 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Dokumen induk | `BRD.md` |
@@ -172,7 +172,8 @@ Klarifikasi klien Selasa, 28 Juli 2026 menetapkan tiga jenis harga dari POS dan
 mengoreksi istilah batas maksimal menjadi ambang nilai belanja per klasifikasi.
 Ambang tidak menolak checkout; ketika terlampaui, sistem menambahkan PPh 22
 sesuai konfigurasi yang dikelola melalui website. PPh 22 ditampilkan sebagai
-komponen terpisah pada cart, checkout, invoice, dan laporan. Harga partai
+komponen terpisah pada cart, checkout, invoice, dan laporan. Jika beberapa
+klasifikasi terpicu, perhitungannya digabungkan menjadi satu total PPh 22. Harga partai
 memerlukan sedikitnya satu produk/SKU berjumlah minimal lima unit dalam satu
 struk; kuantitas antar-SKU tidak dijumlahkan. Cakupan penerapan harga partai,
 prioritasnya terhadap harga grosir, dan dasar pengenaan PPh 22 tetap mengikuti
@@ -184,7 +185,7 @@ prioritasnya terhadap harga grosir, dan dasar pengenaan PPh 22 tetap mengikuti
 | FR-PRC-001 | Worker | Sistem menyinkronkan harga `ECERAN`, `PARTAI`, dan `GROSIR` untuk setiap produk dari POS. | Produk hanya siap dijual setelah ketiga jenis harga lolos validasi kontrak; harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. | Baseline |
 | FR-PRC-002 | Sistem | Sistem memilih harga yang berlaku berdasarkan aturan jenis harga. | Harga partai hanya eligible jika sedikitnya satu produk/SKU dalam struk berjumlah minimal lima unit dan kuantitas antar-SKU tidak dijumlahkan. Minimum grosir dapat berbeda per produk; cakupan penerapan harga partai dan prioritas partai/grosir diuji setelah [OPN-013](BRD.md#opn-013) diselesaikan. | Baseline; kelayakan partai resolved, penerapan partially open |
 | FR-PRC-003 | Admin | Admin dapat memilih klasifikasi produk serta mengatur ambang nilai belanja per klasifikasi melalui website. | Perubahan tervalidasi dan diaudit; nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22, sedangkan melewati ambang tidak menolak checkout. | Baseline |
-| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 menggunakan tarif yang dikelola melalui website, termasuk `0%`, ketika aturan klasifikasi terpicu. | Klasifikasi, ambang, tarif, dasar pengenaan, hasil perhitungan, dan snapshot tervalidasi; rincian formula yang belum final mengikuti [OPN-006](BRD.md#opn-006). | Baseline; dasar pengenaan partially open |
+| FR-PRC-004 | Sistem | Sistem menghitung PPh 22 menggunakan tarif yang dikelola melalui website, termasuk `0%`, ketika aturan klasifikasi terpicu. | Klasifikasi, ambang, tarif, dasar pengenaan, serta metadata agregasi tersimpan sebagai snapshot dan menghasilkan satu total PPh 22. Dasar pengenaan serta urutan agregasi final mengikuti [OPN-006](BRD.md#opn-006). | Baseline; hasil gabungan resolved, formula partially open |
 | FR-PRC-005 | Sistem | Sistem memvalidasi ulang harga saat checkout. | Perubahan harga setelah item masuk cart ditampilkan sebelum konfirmasi order. | Proposed |
 | FR-PRC-006 | Sistem | Harga disimpan sebagai snapshot per item transaksi. | Invoice historis tidak bergantung pada harga produk terkini. | Proposed |
 | FR-PRC-007 | Sistem | Sistem membatasi visibilitas harga berdasarkan status akun dan kanal penjualan. | Guest dan pelanggan pending tidak menerima nilai harga; pelanggan aktif menerima harga jual yang berlaku tanpa harga eceran, sedangkan admin dapat memeriksa data harga hasil sinkronisasi. | Baseline |
@@ -192,7 +193,8 @@ prioritasnya terhadap harga grosir, dan dasar pengenaan PPh 22 tetap mengikuti
 ## 6. Modul POS dan Stok
 
 Koneksi POS menjadi sumber data production dan menyediakan jalur baca master
-data/inventory serta write-back sales order/retur. Jika koneksi belum tersedia,
+data/inventory serta penerimaan laporan penjualan/retur dari website. Website
+menjadi source of truth transaksi, invoice, dan lifecycle order. Jika koneksi belum tersedia,
 data contoh menjadi fallback resmi untuk development, staging, demo, dan UAT.
 Data contoh tidak digunakan pada production; production wajib menggunakan
 koneksi POS sesuai [`OPN-019`](BRD.md#opn-019). Kak Rio menjadi PIC POS; akses
@@ -209,18 +211,18 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 | FR-POS-006 | Sistem | Produk yang tidak lagi muncul dari POS tidak langsung dihapus. | Produk ditandai untuk rekonsiliasi atau dinonaktifkan menurut aturan final. | Proposed |
 | FR-POS-007 | Sistem | Sistem menentukan status `TERSEDIA`, `MENIPIS`, atau `HABIS`. | Status mengikuti stok aktual dan batas minimum produk. | Baseline |
 | FR-POS-008 | Admin | Admin dapat mengatur batas minimum stok. | Status `MENIPIS` berubah sesuai nilai terbaru. | Baseline |
-| FR-POS-009 | Sistem | Perubahan stok disimpan sebagai ledger/riwayat. | Setiap perubahan memiliki jumlah sebelum/sesudah, sumber `FULL_SYNC`, `PRODUCT_SYNC`, `SALE`, `CANCEL_RETURN`, atau `CORRECTION`, referensi eksternal, dan waktu. | Baseline |
+| FR-POS-009 | Sistem | Perubahan stok disimpan sebagai ledger/riwayat. | Setiap perubahan memiliki jumlah sebelum/sesudah, sumber `FULL_SYNC`, `PRODUCT_SYNC`, `WEB_SALE`, `WEB_RETURN`, atau `CORRECTION`, referensi order/retur, dan waktu. | Baseline |
 | FR-POS-010 | Sistem | Kegagalan sementara POS dapat di-retry. | Retry tidak membuat duplikasi dan berhenti setelah batas percobaan. | Proposed |
-| FR-POS-011 | Sistem | Checkout memvalidasi stok efektif dari snapshot terakhir ditambah perubahan sales order/retur setelah sinkronisasi. | Order tidak diteruskan jika stok efektif tidak memenuhi kebutuhan; pengecekan per produk dapat dijalankan ketika kebijakan rekonsiliasi memerlukannya. | Baseline |
-| FR-POS-012 | Sistem | Penyesuaian stok pembatalan dapat ditelusuri. | Respons `CancelSalesOrder`, referensi retur POS, perubahan stok, dan order web terkait tersimpan. | Baseline |
+| FR-POS-011 | Sistem | Checkout memvalidasi stok efektif dari snapshot POS terakhir dan perubahan penjualan/retur website yang belum tercakup snapshot tersebut. | Order tidak diteruskan jika stok efektif tidak memenuhi kebutuhan; full sync tidak menghitung delta dua kali atau menghapus delta lokal yang belum tercakup, dan pengecekan per produk dapat dijalankan ketika rekonsiliasi memerlukannya. | Baseline; stock cutoff contract open |
+| FR-POS-012 | Sistem | Penyesuaian stok pembatalan dapat ditelusuri. | Retur website, perubahan stok efektif, status laporan retur POS, dan order terkait tersimpan. | Baseline |
 | FR-POS-013 | Data Seeder | Sistem dapat memuat produk, tiga jenis harga, dan stok representatif ketika API POS belum tersedia. | Setiap produk memiliki harga eceran, partai, dan grosir; dataset juga mencakup minimum grosir serta status stok tersedia/menipis/habis. | Baseline |
 | FR-POS-014 | Sistem | Seeder mengikuti kontrak data internal yang juga digunakan adapter POS. | SKU/external ID stabil, field wajib tervalidasi, dan perubahan ke API tidak memerlukan perubahan domain transaksi. | Baseline |
 | FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi; nilai source utama diperbarui dan pelengkap lokal untuk field yang tidak tersedia tetap dipertahankan. | Baseline |
 | FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; setelah alur website berjalan, akses POS dikoordinasikan dengan Kak Rio; production selalu menolak eksekusi data contoh. | Baseline |
-| FR-POS-017 | Sistem | Setiap order web dikirim melalui `CreateSalesOrder`. | Setelah sukses, POS sales order ID, invoice ID/number, response reference, dan waktu tersimpan; stok efektif berkurang sesuai hasil POS. | Baseline; contract partially open |
-| FR-POS-018 | Sistem | Pembatalan web dikirim melalui `CancelSalesOrder`. | Setelah sukses, referensi retur tersimpan dan stok efektif bertambah; request berulang tidak membuat retur ganda. | Baseline; idempotency contract open |
-| FR-POS-019 | Worker | Sistem merekonsiliasi sales order, invoice, dan retur dengan `GetAllSalesOrder` serta `GetSalesOrderDetail`. | Selisih status/reference dicatat dan tidak menimpa transaksi lokal tanpa audit; arah data final mengikuti [OPN-005](BRD.md#opn-005). | Baseline; direction partially open |
-| FR-POS-020 | Sistem | Timeout atau respons ambigu pada operasi write-back tidak di-retry secara buta. | Sistem mencari external reference/status terlebih dahulu atau menandai `RECONCILIATION_REQUIRED`; kebijakan final mengikuti kontrak idempotency POS. | Baseline; contract open |
+| FR-POS-017 | Worker | Setiap order website yang berhasil dibuat menghasilkan laporan penjualan POS. | Operasi memakai external reference unik, membawa snapshot transaksi yang diperlukan POS, dan menyimpan status acknowledgement tanpa menunda atau menggandakan order/invoice website. | Baseline; contract partially open |
+| FR-POS-018 | Worker | Setiap retur website menghasilkan laporan retur POS. | Laporan ditahan sampai laporan penjualan asal berhasil atau direkonsiliasi; retry tidak membuat retur ganda dan acknowledgement tersimpan. | Baseline; idempotency contract open |
+| FR-POS-019 | Worker | Sistem merekonsiliasi status laporan penjualan dan retur terhadap POS. | Selisih status/reference dicatat dan tidak menimpa transaksi atau invoice website tanpa audit; kontrak lookup/acknowledgement mengikuti [OPN-005](BRD.md#opn-005). | Baseline; contract partially open |
+| FR-POS-020 | Sistem | Timeout atau respons ambigu pada operasi pelaporan tidak di-retry secara buta. | Sistem mencari external reference/status terlebih dahulu atau menandai `RECONCILIATION_REQUIRED`; kebijakan final mengikuti kontrak idempotency POS. | Baseline; contract open |
 
 ## 7. Modul Keranjang dan Checkout
 
@@ -250,13 +252,13 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-ORD-001 | Sistem | Sistem membuat nomor order web unik dan menyimpan referensi invoice POS. | Constraint unik mencegah duplikasi nomor order, POS sales order ID, dan invoice ID/number; kebutuhan invoice lokal mengikuti [OPN-008](BRD.md#opn-008). | Baseline; invoice mapping partially open |
+| FR-ORD-001 | Sistem | Sistem membuat nomor order dan invoice website yang unik. | Constraint unik mencegah duplikasi nomor order/invoice; format dan aturan penomoran invoice mengikuti [OPN-008](BRD.md#opn-008). | Baseline; ownership resolved, number format open |
 | FR-ORD-002 | Sistem | Order menyimpan snapshot item, identitas toko, dan biaya yang telah disetujui untuk kebutuhan invoice. | Snapshot mencakup nama/alamat/kontak/NPWP toko; jumlah, nama, SKU, harga satuan, dan total harga setiap item; ongkir; total pembelian keseluruhan; serta nilai rupiah PPh 22 jika berlaku. Dasar pengenaan PPh 22 mengikuti [OPN-006](BRD.md#opn-006). | Baseline; source mapping partially open |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
-| FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi tidak valid ditolak dan dicatat; status pemenuhan dan nomor resi mengikuti [OPN-020](BRD.md#opn-020). | Baseline; lifecycle partially open |
-| FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta tindakan manual ditolak; pembatalan yang valid memanggil `CancelSalesOrder`. | Baseline |
-| FR-ORD-007 | Sistem | Pembatalan merekonsiliasi retur dan stok POS. | Referensi retur, penyesuaian stok efektif, status order, dan audit log tercatat konsisten. | Baseline |
+| FR-ORD-005 | Admin | Admin dapat memperbarui status operasional order. | Transisi valid setelah pembayaran adalah `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; transisi tidak valid ditolak dan dicatat. | Baseline |
+| FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta tindakan manual ditolak; pembatalan yang valid membuat retur website secara idempotent. | Baseline |
+| FR-ORD-007 | Sistem | Pembatalan menyimpan retur, mengembalikan stok efektif, dan menjadwalkan laporan retur POS. | Retur, penyesuaian stok, status pelaporan POS, status order, dan audit log tercatat konsisten. | Baseline |
 | FR-ORD-008 | Sistem | Order yang sudah dibatalkan tidak dapat diproses lebih lanjut. | Transisi dari `CANCELLED` ditolak. | Proposed |
 
 ### 9.1 Status Transaksi Draft
@@ -269,24 +271,23 @@ stateDiagram-v2
     PAYMENT_SUBMITTED --> PAYMENT_REJECTED: Admin menolak
     PAYMENT_REJECTED --> PAYMENT_SUBMITTED: Upload ulang
     PAYMENT_VERIFIED --> PROCESSING
-    PROCESSING --> READY_FOR_DELIVERY
-    READY_FOR_DELIVERY --> SHIPPED
+    PROCESSING --> PACKED
+    PACKED --> SHIPPED
     SHIPPED --> COMPLETED
     WAITING_PAYMENT --> CANCELLED: Admin, hari yang sama
     WAITING_PAYMENT --> CANCELLED: Sistem, hari berikutnya
     PAYMENT_SUBMITTED --> CANCELLED: Admin, hari yang sama
-    PAYMENT_VERIFIED --> PROCESSING
 ```
 
 Pembatalan standar hanya oleh admin pada hari yang sama dengan tanggal
-transaksi. Lifecycle pemenuhan dan kebutuhan nomor resi masih memerlukan
-keputusan bisnis ([OPN-020](BRD.md#opn-020)); pengembalian dana berada di luar
-scope pembatalan standar.
+transaksi. Setelah pembayaran diverifikasi, order diproses, dikemas, dikirim,
+lalu diselesaikan. Pengembalian dana berada di luar scope pembatalan standar.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice miliknya sesuai format dan channel yang disetujui. | Invoice menampilkan identitas toko, rincian item, total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku sesuai [OPN-022](BRD.md#opn-022); keputusan PDF dan channel tetap terbuka. | Baseline; format/channel partially open |
-| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1; `CancelSalesOrder` dipanggil jika order POS sudah ada, dan referensi retur/audit tersimpan tanpa duplikasi. | Baseline |
+| FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice website miliknya sesuai format dan channel yang disetujui. | Invoice menampilkan identitas toko, rincian item, total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku sesuai [OPN-022](BRD.md#opn-022); keputusan PDF dan channel tetap terbuka. | Baseline; ownership resolved, format/channel partially open |
+| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1; retur website, stok efektif, laporan retur POS, dan audit tersimpan tanpa duplikasi. | Baseline |
+| FR-ORD-011 | Pelanggan Aktif | Pelanggan dapat melihat status fulfillment dan nomor resi pada detail order. | Status tampil konsisten dengan lifecycle; setelah order `SHIPPED`, nomor resi ditampilkan ketika tersedia. | Baseline |
 
 ## 10. Modul Pembayaran Manual
 
@@ -320,15 +321,15 @@ scope pembatalan standar.
 | FR-AUD-003 | Sistem | Log menyimpan request/correlation ID. | Error aplikasi dapat dihubungkan dengan integration log. | Proposed |
 | FR-AUD-004 | Sistem | Data rahasia tidak ditulis mentah ke log. | Password, token, dan credential termask/redacted. | Proposed |
 
-## 13. Candidate: Notifikasi
+## 13. Modul Notifikasi Admin
 
-Bagian ini mencegah asumsi bahwa queue `notifications` berarti channel atau
-event bisnis tertentu sudah disetujui.
+Order baru adalah event minimum yang sudah disetujui. Detail integrasi
+WhatsApp tetap dibatasi oleh [OPN-023](BRD.md#opn-023).
 
-| ID | Aktor | Candidate Requirement | Status |
-|---|---|---|---|
-| FR-NTF-001 | Sistem | Sistem dapat mengirim notifikasi untuk event yang disetujui, misalnya approval akun, invoice, pembayaran, dan status order. | [Open question: OPN-023](BRD.md#opn-023) |
-| FR-NTF-002 | Admin | Admin dapat melihat kegagalan notifikasi operasional yang memerlukan tindak lanjut. | [Open question: OPN-023](BRD.md#opn-023) |
+| ID | Aktor | Requirement | Acceptance Criteria | Status |
+|---|---|---|---|---|
+| FR-NTF-001 | Sistem | Sistem membuat notifikasi website untuk admin ketika order baru berhasil dibuat. | Admin melihat indikator merah dan jumlah notifikasi belum dibaca; notifikasi menaut ke detail order. Perilaku baca/hapus final mengikuti [OPN-023](BRD.md#opn-023). | Baseline; read behavior partially open |
+| FR-NTF-002 | Sistem | Sistem mengirim notifikasi WhatsApp kepada admin ketika order baru berhasil dibuat. | Pengiriman dicatat dan di-retry sesuai kontrak provider tanpa menggandakan pesan; bunyi berasal dari aplikasi/perangkat WhatsApp. Provider, penerima, template, dan fallback mengikuti [OPN-023](BRD.md#opn-023). | Baseline; integration contract open |
 
 ## 14. Candidate: Reseller
 
@@ -347,8 +348,8 @@ disetujui.
 | Kondisi | Perilaku yang Diharapkan |
 |---|---|
 | POS read timeout | Sync ditandai gagal/parsial, di-retry terbatas, dan tidak menghapus data lama. |
-| `CreateSalesOrder` timeout/ambigu | Order tidak dianggap terkonfirmasi dua kali; sistem mencari external reference atau menandai rekonsiliasi sebelum retry. |
-| `CancelSalesOrder` timeout/ambigu | Status cancel/retur direkonsiliasi sebelum retry agar stok tidak dikembalikan dua kali. |
+| Laporan penjualan POS timeout/ambigu | Order dan invoice website tetap sah; sistem mencari external reference atau menandai rekonsiliasi sebelum retry. |
+| Laporan retur POS timeout/ambigu | Retur dan stok efektif website tetap sah; status laporan direkonsiliasi sebelum retry agar POS tidak menerima retur dua kali. |
 | Payload POS tidak valid | Record terkait ditolak, error dicatat, proses lain dapat dilanjutkan sesuai kebijakan. |
 | Payload POS memuat konfigurasi PPh 22 | Field tersebut tidak menimpa konfigurasi website; perbedaan dicatat sebagai contract mismatch untuk ditinjau. |
 | Seeder dijalankan ulang | Data inti di-upsert secara idempotent dan enrichment lokal dipertahankan. |
@@ -368,14 +369,14 @@ disetujui.
 | BR-006 | FR-PRC-001, FR-PRC-002, FR-PRC-005 - FR-PRC-007 |
 | BR-007 - BR-008 | FR-PRC-003 - FR-PRC-004, FR-CART-006, FR-ORD-002 |
 | BR-009 - BR-014 | FR-POS-001 - FR-POS-020 |
-| BR-014 - BR-017, BR-030 | FR-CART-001 - FR-CART-007, FR-ORD-001 - FR-ORD-010 |
+| BR-014 - BR-017, BR-030 | FR-CART-001 - FR-CART-007, FR-ORD-001 - FR-ORD-011 |
 | BR-018 - BR-020 | FR-PAY-001 - FR-PAY-007 |
 | BR-021 - BR-022 | FR-ORD-006 - FR-ORD-008, FR-POS-012 |
 | BR-023 - BR-025 | FR-SHP-001 - FR-SHP-007 |
+| BR-031 | FR-NTF-001 - FR-NTF-002 |
 | BR-026 | FR-RPT-001 - FR-RPT-006 |
 | BR-027 - BR-028 | FR-AUD-001 - FR-AUD-004 |
 | CND-001 - CND-002 | FR-RSL-001 - FR-RSL-004 |
-| CND-005 | FR-NTF-001 - FR-NTF-002 |
 
 ## 17. Acceptance Gate
 
@@ -384,11 +385,11 @@ FRD dapat dibaseline setelah:
 - seluruh item `TBD` kritis mendapat keputusan;
 - seluruh item `ON_HOLD` dikeluarkan tertulis dari MVP atau dikembalikan menjadi
   requirement aktif dengan acceptance criteria;
-- operasi baca dan write-back POS dapat diuji atau adapter data contoh lulus
+- operasi baca dan pelaporan POS dapat diuji atau adapter data contoh lulus
   acceptance test; setelah alur website berjalan akses dikoordinasikan dengan
-  Kak Rio, dan sebelum production contract test `CreateSalesOrder`,
-  `CancelSalesOrder`, lookup sales order, master data, dan inventory wajib
-  tersedia serta lulus;
+  Kak Rio, dan sebelum production contract test laporan penjualan, laporan
+  retur, acknowledgement/lookup, ordering laporan, master data, dan inventory
+  wajib tersedia serta lulus;
 - kredensial test dan live Biteship dipisahkan, API Maps/Rates dapat diuji dari
   backend, dan akun production siap digunakan;
 - status/transisi order disetujui;
@@ -399,14 +400,14 @@ FRD dapat dibaseline setelah:
   [OPN-006](BRD.md#opn-006);
 - event pengurangan/reservasi stok disetujui melalui
   [OPN-004](BRD.md#opn-004);
-- lifecycle order dan bukti fulfillment disetujui melalui
+- lifecycle order dan tampilan nomor resi mengikuti keputusan resolved pada
   [OPN-020](BRD.md#opn-020); pembatalan standar tetap oleh admin pada hari
   yang sama;
 - data origin, berat produk, penggunaan dimensi, daftar kurir, serta mapping
   area ID/koordinat Biteship tersedia melalui [OPN-021](BRD.md#opn-021);
-- sumber identitas toko, format/penyampaian invoice, dan kebutuhan notifikasi
-  diputuskan atau eksplisit dikeluarkan dari MVP melalui
+- sumber identitas toko dan format/penyampaian invoice diputuskan melalui
   [OPN-022](BRD.md#opn-022) dan
+  kontrak notifikasi WhatsApp diselesaikan melalui
   [OPN-023](BRD.md#opn-023);
 - hak akses katalog dan harga sebelum approval disetujui;
 - setiap item P0 memenuhi Definition of Ready;

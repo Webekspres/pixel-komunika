@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.2 - Biteship Maps/Rates Model |
-| Tanggal | Selasa, 28 Juli 2026 |
+| Versi | 0.3 - Web-owned Transaction and Notification Model |
+| Tanggal | Rabu, 29 Juli 2026 |
 | Status | Internal - siap menjadi dasar migration MVP |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Detail field | [Data Dictionary](DATA_DICTIONARY.md) |
@@ -15,16 +15,16 @@
 ERD ini sudah cukup untuk implementasi MVP. Bagian berikut masih
 `Provisional` dan tidak boleh diartikan sebagai keputusan bisnis final:
 
-- formula dasar pengenaan dan agregasi PPh 22
+- formula dasar pengenaan PPh 22
   ([OPN-006](../requirements/BRD.md#opn-006));
 - cakupan item yang memperoleh harga partai serta prioritas partai terhadap
   grosir ([OPN-013](../requirements/BRD.md#opn-013));
 - nama field, payload, autentikasi, error, dan idempotency API POS
   ([OPN-005](../requirements/BRD.md#opn-005));
-- lifecycle fulfillment dan kebutuhan nomor resi
-  ([OPN-020](../requirements/BRD.md#opn-020));
 - sumber identitas toko, format PDF, dan channel invoice
   ([OPN-022](../requirements/BRD.md#opn-022));
+- provider, penerima, template, retry/fallback WhatsApp, dan perilaku baca
+  notifikasi website ([OPN-023](../requirements/BRD.md#opn-023));
 - origin, berat/dimensi, area, tarif, dan fallback pengiriman
   ([OPN-010](../requirements/BRD.md#opn-010),
   [OPN-016](../requirements/BRD.md#opn-016), dan
@@ -143,7 +143,7 @@ erDiagram
         BIGINT id PK
         BIGINT product_id FK
         BIGINT sync_run_id FK
-        BIGINT pos_return_id FK
+        BIGINT sales_return_id FK
         VARCHAR source_type
         INT quantity_before
         INT quantity_after
@@ -189,7 +189,6 @@ erDiagram
         BIGINT source_address_id FK
         VARCHAR order_number UK
         VARCHAR idempotency_key UK
-        VARCHAR pos_sales_order_id UK
         VARCHAR status
         DECIMAL grand_total
     }
@@ -219,7 +218,6 @@ erDiagram
         BIGINT id PK
         BIGINT order_id FK,UK
         BIGINT store_profile_id FK
-        VARCHAR pos_invoice_id UK
         VARCHAR invoice_number UK
         VARCHAR store_name_snapshot
         VARCHAR store_npwp_snapshot
@@ -269,6 +267,7 @@ erDiagram
         VARCHAR rate_request_hash
         DATETIME quoted_at
         VARCHAR status
+        VARCHAR tracking_number
     }
 
     POS_INTEGRATION_OPERATIONS {
@@ -281,13 +280,23 @@ erDiagram
         VARCHAR correlation_id
     }
 
-    POS_RETURNS {
+    SALES_RETURNS {
         BIGINT id PK
         BIGINT order_id FK,UK
-        VARCHAR pos_return_id UK
-        VARCHAR pos_sales_order_id
+        VARCHAR return_number UK
+        VARCHAR pos_ack_reference
         VARCHAR reason
+        VARCHAR reporting_status
+    }
+
+    NOTIFICATIONS {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT order_id FK
+        VARCHAR channel
+        VARCHAR type
         VARCHAR status
+        DATETIME read_at
     }
 
     SYNC_RUNS {
@@ -323,6 +332,7 @@ erDiagram
     USERS ||--o{ CATEGORY_TAX_RULES : updates
     USERS o|--o{ PAYMENTS : verifies
     USERS o|--o{ AUDIT_LOGS : performs
+    USERS ||--o{ NOTIFICATIONS : receives
 
     CATEGORIES ||--o{ PRODUCTS : classifies
     BRANDS o|--o{ PRODUCTS : brands
@@ -348,13 +358,14 @@ erDiagram
     PAYMENTS ||--o{ PAYMENT_PROOFS : evidenced_by
     ORDERS ||--o| SHIPMENTS : shipped_by
     STORE_COURIER_RATES o|--o{ SHIPMENTS : quoted_from
+    ORDERS ||--o{ NOTIFICATIONS : announces
 
     ORDERS o|--o{ POS_INTEGRATION_OPERATIONS : synchronized_by
-    ORDERS ||--o| POS_RETURNS : cancelled_as
+    ORDERS ||--o| SALES_RETURNS : cancelled_as
     SYNC_RUNS o|--o{ POS_INTEGRATION_OPERATIONS : groups
     SYNC_RUNS ||--o{ SYNC_ERRORS : records
     SYNC_RUNS o|--o{ INVENTORY_LEDGER : produces
-    POS_RETURNS o|--o{ INVENTORY_LEDGER : restores
+    SALES_RETURNS o|--o{ INVENTORY_LEDGER : restores
 ```
 
 ## 3. Aturan Relasi Utama
@@ -366,12 +377,12 @@ erDiagram
    enrichment lokal.
 4. Satu keranjang aktif memiliki maksimal satu baris per produk.
 5. Satu order memiliki minimal satu item dan maksimal satu invoice, payment
-   aktif, shipment, serta retur POS.
+   aktif, shipment, serta retur website.
 6. `order_items`, `order_charge_components`, `invoices`, dan `shipments`
    menyimpan snapshot transaksi; foreign key ke master hanya untuk
    traceability.
 7. `external_reference` operasi POS, `order_number`, `idempotency_key`, SKU,
-   invoice reference, dan return reference harus unik ketika nilainya tersedia.
+   `invoice_number`, dan `return_number` harus unik.
 8. Audit log menggunakan relasi polymorphic logis melalui
    `auditable_type + auditable_id`; database tidak membuat foreign key dinamis
    untuk pasangan tersebut.
@@ -388,6 +399,15 @@ erDiagram
   bukan hasil perhitungan ulang dari komponen respons.
 - Harga partai dihitung dari kuantitas per SKU pada cart/order; kuantitas
   antar-SKU tidak dijumlahkan.
+- `order_charge_components` menyimpan snapshot klasifikasi, dasar, tarif, dan
+  metadata agregasi; `orders.pph22_amount` menyimpan satu hasil gabungan.
+  Jumlah baris serta urutan formula tetap provisional sampai OPN-006 selesai.
+- Website membuat order, invoice, serta retur. Tabel operasi POS hanya melacak
+  pelaporan penjualan/retur dan acknowledgement, bukan ownership transaksi.
+- Laporan retur baru boleh dikirim setelah laporan penjualan order asal
+  berhasil atau sudah direkonsiliasi.
+- Tabel `notifications` dipakai untuk indikator website dan jejak pengiriman
+  WhatsApp order baru; tidak dibuat tabel delivery tambahan.
 - Data laporan dibaca dari tabel transaksi dan snapshot. Tabel agregasi khusus
   ditambahkan hanya jika pengukuran production membuktikan query terlalu berat.
 - Payload integrasi disimpan teredaksi dan terbatas untuk rekonsiliasi; token,

@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.3 - Standardized Flowchart Notation |
-| Tanggal | Selasa, 28 Juli 2026 |
+| Versi | 0.4 - Web-owned Transaction and Admin Notification Flows |
+| Tanggal | Rabu, 29 Juli 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Model data | [ERD](ERD.md) dan [Data Dictionary](DATA_DICTIONARY.md) |
@@ -20,7 +20,7 @@
   tautan Markdown tetap disediakan setelah diagram sebagai fallback.
 - Label `Provisional` menunjukkan cabang yang bergantung pada open question.
 - Validasi dan kalkulasi kritis selalu dilakukan server-side.
-- Flow notifikasi, reseller, refund, booking kurir Biteship, split shipment, dan
+- Flow reseller, refund, booking kurir Biteship, split shipment, dan
   penggabungan order tidak dimasukkan karena belum menjadi baseline MVP.
 
 ### 1.1 Notasi Flowchart
@@ -57,16 +57,17 @@ konektor juga dapat dinonaktifkan oleh renderer dengan security mode ketat.
 | [UF-06](#uf-06-rekalkulasi-harga-dan-pph-22) | Rekalkulasi harga dan PPh 22 | Sistem | Total cart server-side |
 | [UF-07](#uf-07-alamat-dan-pengiriman) | Alamat dan pengiriman | Pelanggan aktif, Biteship Maps/Rates | Snapshot ongkir terpilih |
 | [UF-08](#uf-08-validasi-checkout) | Validasi checkout | Pelanggan aktif, sistem | Draft order idempotent |
-| [UF-09](#uf-09-sales-order-pos-dan-invoice) | Sales order POS dan invoice | Sistem, POS | Order aktif dan invoice |
+| [UF-09](#uf-09-pembuatan-order-invoice-dan-pelaporan-pos) | Pembuatan order, invoice, dan pelaporan POS | Sistem, POS | Order/invoice aktif dan laporan penjualan tercatat |
 | [UF-10](#uf-10-pengajuan-pembayaran) | Pengajuan pembayaran | Pelanggan aktif | Bukti pembayaran submitted |
 | [UF-11](#uf-11-verifikasi-pembayaran) | Verifikasi pembayaran | Admin | Pembayaran verified/rejected |
 | [UF-12](#uf-12-fulfillment-dan-penyelesaian) | Fulfillment dan penyelesaian | Admin | Order completed |
-| [UF-13](#uf-13-pembatalan-dan-retur-pos) | Pembatalan dan retur POS | Admin, scheduler, POS | Order cancelled dan stok kembali |
+| [UF-13](#uf-13-pembatalan-dan-pelaporan-retur) | Pembatalan dan pelaporan retur | Admin, scheduler, POS | Order cancelled, stok kembali, dan retur dilaporkan |
 | [UF-14](#uf-14-sinkronisasi-master-dan-harga-pos) | Sinkronisasi master dan harga | Worker, POS/seeder | Master produk terkini |
 | [UF-15](#uf-15-sinkronisasi-dan-stok-efektif) | Sinkronisasi dan stok efektif | Worker, POS | Snapshot dan ledger stok |
 | [UF-16](#uf-16-enrichment-dan-visibilitas-produk) | Enrichment dan visibilitas | Admin | Presentasi produk terkini |
 | [UF-17](#uf-17-konfigurasi-operasional) | Konfigurasi operasional | Admin | Aturan bisnis aktif |
 | [UF-18](#uf-18-laporan-dan-audit) | Laporan dan audit | Admin | Laporan snapshot dan audit trail |
+| [UF-19](#uf-19-notifikasi-order-baru-admin) | Notifikasi order baru admin | Sistem, admin | Indikator website dan pesan WhatsApp |
 
 ## 3. Customer-facing Flows
 
@@ -216,9 +217,10 @@ flowchart TD
     J --> K["Kelompokkan nilai per klasifikasi PPh 22"]
     K --> L{"Ambang klasifikasi terlampaui?"}
     L -->|Tidak| M["PPh 22 = 0"]
-    L -->|Ya| N["Hitung PPh 22 dengan basis provisional OPN-006"]
+    L -->|Ya| N["Gabungkan perhitungan klasifikasi terpicu<br/>dengan formula provisional OPN-006"]
+    N --> N1["Hasilkan satu total PPh 22 transaksi"]
     M --> O[/"Tampilkan subtotal, PPh 22 terpisah, dan total"/]
-    N --> O
+    N1 --> O
     O --> P{"Aksi pelanggan?"}
     P -->|Ubah cart| C_UF05
     P -->|Lanjut| C_UF07((UF-07))
@@ -229,7 +231,8 @@ flowchart TD
 
 Kuantitas SKU berbeda tidak pernah dijumlahkan untuk memenuhi syarat lima unit.
 Cakupan item yang memperoleh harga partai dan prioritas terhadap grosir tetap
-[OPN-013](../requirements/BRD.md#opn-013). Dasar PPh 22 tetap
+[OPN-013](../requirements/BRD.md#opn-013). Multi-klasifikasi menghasilkan satu
+total gabungan; dasar pengenaan dan urutan agregasi tetap
 [OPN-006](../requirements/BRD.md#opn-006).
 
 Lanjutan: [UF-07 Alamat dan Pengiriman](#uf-07-alamat-dan-pengiriman).
@@ -293,50 +296,57 @@ flowchart TD
     G -->|Ya| H["Validasi alamat dan pilihan pengiriman"]
     H --> I{"Valid?"}
     I -->|Tidak| C_UF07((UF-07))
-    I -->|Ya| J[["Database transaction:<br/>buat DRAFT, item, charge, shipment snapshot"]]
-    J --> K["Buat external reference POS unik"]
+    I -->|Ya| J[["Database transaction:<br/>buat DRAFT request, item, charge, shipment snapshot"]]
+    J --> K["Buat idempotency key transaksi"]
     K --> C_UF09
 
     click C_UF04 "#uf-04-login-dan-routing-akses"
     click C_UF06 "#uf-06-rekalkulasi-harga-dan-pph-22"
     click C_UF07 "#uf-07-alamat-dan-pengiriman"
-    click C_UF09 "#uf-09-sales-order-pos-dan-invoice"
+    click C_UF09 "#uf-09-pembuatan-order-invoice-dan-pelaporan-pos"
 ```
 
-Lanjutan: [UF-09 Sales Order POS](#uf-09-sales-order-pos-dan-invoice).
+Lanjutan: [UF-09 Pembuatan Order dan Invoice](#uf-09-pembuatan-order-invoice-dan-pelaporan-pos).
 
-### UF-09 Sales Order POS dan Invoice
+### UF-09 Pembuatan Order, Invoice, dan Pelaporan POS
 
 ```mermaid
 flowchart TD
-    A(["Draft order dan external reference tersedia"]) --> B[["Kirim CreateSalesOrder ke POS"]]
-    B --> C{"Hasil?"}
-    C -->|Sukses| D[("POS sales order dan invoice reference tersimpan")]
-    D --> E[("Stok efektif dan inventory ledger diperbarui")]
-    E --> F[("Invoice snapshot tersimpan")]
-    F --> G["Set order WAITING_PAYMENT dan expires_at D+1"]
-    G --> C_UF10((UF-10))
-    C -->|Timeout atau ambigu| H["Set operation RECONCILIATION_REQUIRED"]
-    H --> I[["Lookup POS dengan external reference"]]
-    I --> J{"Transaksi ditemukan?"}
-    J -->|Ya| D
-    J -->|Tidak| K{"Retry rekonsiliasi masih tersedia?"}
-    K -->|Ya| I
-    K -->|Tidak| K1["Tandai untuk review operasional<br/>tanpa membuat external reference baru"]
-    K1 --> K2(["Selesai: perlu review operasional"])
-    C -->|Gagal definitif| L["Set operation FAILED; order tetap internal DRAFT"]
-    L --> M[/"Tampilkan checkout belum berhasil"/]
-    M --> C_UF08((UF-08))
+    A(["Draft request checkout valid"]) --> B[["Database transaction:<br/>buat order, item, invoice website,<br/>kurangi stok efektif, catat ledger WEB_SALE"]]
+    B --> C{"Commit berhasil?"}
+    C -->|Tidak| D[/"Tampilkan checkout gagal tanpa order parsial"/]
+    D --> C_UF08((UF-08))
+    C -->|Ya| E[("Order WAITING_PAYMENT, invoice,<br/>dan expires_at D+1 tersimpan")]
+    E --> F[("Operasi WEB_SALE_REPORT PENDING<br/>dengan external reference unik")]
+    F --> C_UF10((UF-10))
+    F --> C_UF19((UF-19))
+    F --> G[["Worker mengirim laporan penjualan ke POS"]]
+    G --> H{"Hasil?"}
+    H -->|Sukses| I[("Acknowledgement dan status SUCCEEDED tersimpan")]
+    I --> J(["Selesai: POS menerima laporan penjualan"])
+    H -->|Timeout atau ambigu| K["Set RECONCILIATION_REQUIRED"]
+    K --> L[["Lookup status dengan external reference"]]
+    L --> M{"Laporan ditemukan?"}
+    M -->|Ya| I
+    M -->|Tidak| N{"Retry rekonsiliasi masih tersedia?"}
+    N -->|Ya| L
+    N -->|Tidak| O["Tandai untuk review operasional;<br/>order dan invoice website tetap sah"]
+    O --> P(["Selesai: perlu review POS"])
+    H -->|Gagal definitif| Q["Set operation FAILED;<br/>order dan invoice website tetap sah"]
+    Q --> P
 
     click C_UF08 "#uf-08-validasi-checkout"
     click C_UF10 "#uf-10-pengajuan-pembayaran"
+    click C_UF19 "#uf-19-notifikasi-order-baru-admin"
 ```
 
-Kontrak operasi, payload, autentikasi, error, dan idempotency final mengikuti
-[OPN-005](../requirements/BRD.md#opn-005). Invoice hanya aktif setelah respons
-sukses atau hasil rekonsiliasi membuktikan transaksi POS sudah terbentuk.
+Website adalah source of truth order dan invoice. Gangguan POS tidak menggagalkan
+commit website; kontrak operasi, payload, acknowledgement/lookup, autentikasi,
+error, dan idempotency final mengikuti
+[OPN-005](../requirements/BRD.md#opn-005).
 
-Lanjutan: [UF-10 Pengajuan Pembayaran](#uf-10-pengajuan-pembayaran).
+Lanjutan: [UF-10 Pengajuan Pembayaran](#uf-10-pengajuan-pembayaran) dan
+[UF-19 Notifikasi Admin](#uf-19-notifikasi-order-baru-admin).
 
 ### UF-10 Pengajuan Pembayaran
 
@@ -359,11 +369,11 @@ flowchart TD
     K --> C_UF11((UF-11))
 
     click C_UF11 "#uf-11-verifikasi-pembayaran"
-    click C_UF13 "#uf-13-pembatalan-dan-retur-pos"
+    click C_UF13 "#uf-13-pembatalan-dan-pelaporan-retur"
 ```
 
 Lanjutan: [UF-11 Verifikasi Pembayaran](#uf-11-verifikasi-pembayaran) atau
-[UF-13 Pembatalan](#uf-13-pembatalan-dan-retur-pos).
+[UF-13 Pembatalan](#uf-13-pembatalan-dan-pelaporan-retur).
 
 ### UF-11 Verifikasi Pembayaran
 
@@ -393,27 +403,28 @@ Lanjutan: pelanggan mengunggah ulang melalui
 ```mermaid
 flowchart TD
     A(["Order PROCESSING"]) --> B["Admin menyiapkan pesanan"]
-    B --> C["Set READY_FOR_DELIVERY"]
+    B --> C["Set PACKED"]
     C --> D{"Transisi valid?"}
     D -->|Tidak| E[/"Tampilkan transisi ditolak dan catat audit"/]
     E --> B
     D -->|Ya| F["Serahkan ke metode pengiriman terpilih"]
-    F --> G[/"Admin mengisi tracking bila diwajibkan<br/>Provisional OPN-020"/]
+    F --> G[/"Admin mengisi nomor resi ketika tersedia"/]
     G --> H["Set SHIPPED dan shipped_at"]
-    H --> I[/"Admin mengonfirmasi penyelesaian"/]
+    H --> H1[/"Tampilkan status SHIPPED dan nomor resi kepada pelanggan"/]
+    H1 --> I[/"Admin mengonfirmasi penyelesaian"/]
     I --> J["Set COMPLETED dan delivered_at"]
     J --> C_UF18((UF-18))
 
     click C_UF18 "#uf-18-laporan-dan-audit"
 ```
 
-Lifecycle fulfillment dan nomor resi tetap
-[OPN-020](../requirements/BRD.md#opn-020). Booking/pickup Biteship tidak
-dilakukan website.
+Lifecycle fulfillment adalah `PROCESSING` -> `PACKED` -> `SHIPPED` ->
+`COMPLETED`. Nomor resi ditampilkan ketika tersedia. Booking/pickup Biteship
+tidak dilakukan website.
 
 Lanjutan: [UF-18 Laporan](#uf-18-laporan-dan-audit).
 
-### UF-13 Pembatalan dan Retur POS
+### UF-13 Pembatalan dan Pelaporan Retur
 
 ```mermaid
 flowchart TD
@@ -428,25 +439,29 @@ flowchart TD
     B -->|Scheduler D+1| G{"Status WAITING_PAYMENT dan order_date lebih lama?"}
     G -->|Tidak| H(["Selesai: tidak ada tindakan"])
     G -->|Ya| F
-    F --> I{"POS sales order sudah ada?"}
-    I -->|Tidak| J["Batalkan draft lokal"]
-    I -->|Ya| K[["Kirim CancelSalesOrder ke POS"]]
-    K --> L{"Hasil?"}
-    L -->|Sukses| M[("POS return reference tersimpan")]
-    M --> N[("Stok efektif dan ledger CANCEL_RETURN diperbarui")]
-    N --> O[("Order CANCELLED dan audit tersimpan")]
-    J --> O
-    L -->|Timeout atau ambigu| P["Set RECONCILIATION_REQUIRED"]
-    P --> Q[["Lookup retur/status POS sebelum retry"]]
-    Q --> R{"Retur ditemukan?"}
-    R -->|Ya| M
-    R -->|Tidak| R1{"Retry rekonsiliasi masih tersedia?"}
-    R1 -->|Ya| Q
-    R1 -->|Tidak| R2["Tandai untuk review operasional"]
-    R2 --> T2(["Selesai: perlu review operasional"])
-    L -->|Gagal definitif| S[/"Tampilkan kegagalan operasional;<br/>jangan set CANCELLED atau tambah stok"/]
-    S --> T2
-    O --> C_UF18((UF-18))
+    F --> I[["Database transaction:<br/>buat retur website, tambah stok efektif,<br/>catat ledger WEB_RETURN dan set CANCELLED"]]
+    I --> J[("Operasi WEB_RETURN_REPORT PENDING tersimpan")]
+    J --> K{"Laporan penjualan asal SUCCEEDED<br/>atau sudah direkonsiliasi?"}
+    K -->|Tidak| L["Tahan laporan retur"]
+    L --> M[["Rekonsiliasi laporan penjualan asal"]]
+    M --> M1{"Laporan penjualan berhasil ditemukan?"}
+    M1 -->|Ya| K
+    M1 -->|Tidak| M2["Pertahankan retur PENDING;<br/>tandai untuk review POS"]
+    M2 --> T2
+    K -->|Ya| N[["Worker mengirim laporan retur ke POS"]]
+    N --> O{"Hasil?"}
+    O -->|Sukses| P[("Acknowledgement retur dan status SUCCEEDED tersimpan")]
+    P --> C_UF18((UF-18))
+    O -->|Timeout atau ambigu| Q["Set RECONCILIATION_REQUIRED"]
+    Q --> R[["Lookup status retur dengan external reference"]]
+    R --> S{"Retur ditemukan?"}
+    S -->|Ya| P
+    S -->|Tidak| S1{"Retry rekonsiliasi masih tersedia?"}
+    S1 -->|Ya| R
+    S1 -->|Tidak| S2["Tandai untuk review operasional;<br/>retur dan stok website tetap sah"]
+    S2 --> T2(["Selesai: perlu review POS"])
+    O -->|Gagal definitif| U["Set operation FAILED;<br/>retur dan stok website tetap sah"]
+    U --> T2
 
     click C_UF18 "#uf-18-laporan-dan-audit"
 ```
@@ -500,8 +515,8 @@ flowchart TD
     A(["Trigger perubahan stok"]) --> B{"Sumber?"}
     B -->|Full sync harian| C[["Panggil seluruh inventory POS"]]
     B -->|Pencocokan terarah| D[["Panggil stock by product POS"]]
-    B -->|CreateSalesOrder sukses| E[["Gunakan perubahan SALE dari UF-09"]]
-    B -->|CancelSalesOrder sukses| F[["Gunakan perubahan CANCEL_RETURN dari UF-13"]]
+    B -->|Commit penjualan web| E[["Gunakan perubahan WEB_SALE dari UF-09"]]
+    B -->|Commit retur web| F[["Gunakan perubahan WEB_RETURN dari UF-13"]]
     C --> G["Validasi payload dan external ID"]
     D --> G
     E --> H["Lock snapshot produk"]
@@ -510,7 +525,7 @@ flowchart TD
     I -->|Tidak| J[("Sync error tersimpan;<br/>snapshot lama dipertahankan")]
     J --> J1(["Selesai: stok tidak diperbarui"])
     I -->|Ya| H
-    H --> K["Hitung quantity before, change, dan after"]
+    H --> K["Hitung stok efektif dari snapshot POS<br/>dan delta web yang belum tercakup"]
     K --> L[("Inventory snapshot diperbarui secara atomik")]
     L --> M[("Inventory ledger dan source reference tersimpan")]
     M --> N["Hitung TERSEDIA, MENIPIS, atau HABIS"]
@@ -557,7 +572,7 @@ Lanjutan: perubahan tampil pada
 flowchart TD
     A(["Admin membuka konfigurasi"]) --> B{"Jenis konfigurasi?"}
     B -->|PPh 22| C[/"Pilih klasifikasi, ambang, tarif termasuk 0 persen"/]
-    C --> D[/"Isi basis perhitungan<br/>Provisional OPN-006"/]
+    C --> D[/"Isi dasar pengenaan<br/>Provisional OPN-006"/]
     B -->|Stok minimum| E[/"Isi low-stock threshold per produk"/]
     B -->|Kurir toko| F[/"Isi area, tarif, ETA, dan status aktif"/]
     B -->|Identitas toko| G[/"Isi nama, alamat, kontak, dan NPWP"/]
@@ -612,6 +627,34 @@ flowchart TD
 Format ekspor CSV/XLSX tetap mengikuti keputusan final. Query berat dijalankan
 melalui queue dan tidak boleh memblokir transaksi.
 
+### UF-19 Notifikasi Order Baru Admin
+
+```mermaid
+flowchart TD
+    A(["Order baru berhasil di-commit pada UF-09"]) --> B[("Notifikasi DATABASE NEW_ORDER tersimpan")]
+    B --> C[/"Tampilkan indikator merah dan jumlah belum dibaca pada website admin"/]
+    B --> D[("Notifikasi WHATSAPP NEW_ORDER berstatus PENDING")]
+    D --> E{"Provider, penerima, dan template tersedia?"}
+    E -->|Tidak| F["Pertahankan status PENDING/FAILED;<br/>indikator website tetap aktif"]
+    F --> G(["Selesai: menunggu OPN-023"])
+    E -->|Ya| H[["Worker mengirim pesan WhatsApp"]]
+    H --> I{"Pengiriman berhasil?"}
+    I -->|Ya| J[("Status SENT dan external message ID tersimpan")]
+    J --> K[/"WhatsApp/perangkat penerima menghasilkan bunyi sesuai pengaturan perangkat"/]
+    K --> L(["Selesai"])
+    I -->|Tidak sementara| M{"Retry masih tersedia?"}
+    M -->|Ya| H
+    M -->|Tidak| N[("Status FAILED dan failed job tercatat")]
+    N --> G
+    C --> O[/"Admin membuka notifikasi dan detail order"/]
+    O --> P[("read_at diperbarui sesuai aturan OPN-023")]
+    P --> L
+```
+
+Website tidak membuat audio WhatsApp sendiri. Provider, penerima, template,
+retry/fallback, serta perilaku read/clear mengikuti
+[OPN-023](../requirements/BRD.md#opn-023).
+
 ## 5. Traceability
 
 | User Flow | Requirement Utama |
@@ -629,16 +672,17 @@ melalui queue dan tidak boleh memblokir transaksi.
 | UF-16 | FR-CAT-002 - FR-CAT-006 |
 | UF-17 | FR-PRC-003 - FR-PRC-004; FR-POS-008; FR-SHP-001; FR-PAY-001; FR-ORD-002 |
 | UF-18 | FR-RPT-001 - FR-RPT-006; FR-AUD-001 - FR-AUD-004 |
+| UF-19 | FR-NTF-001 - FR-NTF-002; BR-031 |
 
 ## 6. Open Decisions yang Membatasi Flow
 
 | Referensi | Dampak pada Flow |
 |---|---|
-| [OPN-005](../requirements/BRD.md#opn-005) | Nama operasi, payload, autentikasi, error, dan idempotency UF-09, UF-13, UF-14, UF-15. |
-| [OPN-006](../requirements/BRD.md#opn-006) | Basis dan agregasi PPh 22 pada UF-06 dan UF-17. |
+| [OPN-005](../requirements/BRD.md#opn-005) | Nama operasi laporan, payload, acknowledgement/lookup, autentikasi, error, idempotency, dan cutoff snapshot stok pada UF-09, UF-13, UF-14, UF-15. |
+| [OPN-006](../requirements/BRD.md#opn-006) | Dasar pengenaan dan urutan agregasi PPh 22 pada UF-06 dan UF-17; kewajiban satu hasil gabungan sudah resolved. |
 | [OPN-010](../requirements/BRD.md#opn-010) | Area, tarif, dan ETA kurir toko pada UF-07/UF-17. |
 | [OPN-013](../requirements/BRD.md#opn-013) | Cakupan harga partai dan prioritas terhadap grosir pada UF-06. |
 | [OPN-016](../requirements/BRD.md#opn-016) | Perilaku fallback ketika quote Biteship gagal pada UF-07. |
-| [OPN-020](../requirements/BRD.md#opn-020) | Lifecycle fulfillment dan tracking pada UF-12. |
 | [OPN-021](../requirements/BRD.md#opn-021) | Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya provider pada UF-07. |
-| [OPN-022](../requirements/BRD.md#opn-022) | Sumber identitas toko, nomor/ownership, PDF, dan channel invoice pada UF-09. |
+| [OPN-022](../requirements/BRD.md#opn-022) | Sumber identitas toko, format nomor, PDF, dan channel invoice pada UF-09. |
+| [OPN-023](../requirements/BRD.md#opn-023) | Provider, penerima, template, retry/fallback WhatsApp, dan perilaku read/clear indikator website pada UF-19. |

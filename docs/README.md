@@ -24,7 +24,7 @@ klien.
 2. [Data Dictionary](design/DATA_DICTIONARY.md) - definisi field, tipe data,
    constraint, index, snapshot, dan penanda provisional.
 3. [User Flows](design/USER_FLOWS.md) - flow MVP granular dalam Mermaid dengan
-   konektor lintas-flow `UF-01` sampai `UF-18`.
+   konektor lintas-flow `UF-01` sampai `UF-19`.
 
 ## Delivery Method
 

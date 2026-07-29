@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.10 - Fulfillment Transition Clarification |
+| Versi | 0.11 - Cancellation Source Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
@@ -45,9 +45,9 @@ serta diproses admin.
 | MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh digunakan sampai alur website berjalan, lalu akses POS dikoordinasikan dengan Kak Rio. |
 | MVP-007 | Stok efektif dan rekonsiliasi | BR-011 - BR-014; FR-POS-007 - FR-POS-012, FR-POS-017 - FR-POS-020 | Stok efektif berkurang ketika penjualan website dicatat, bertambah ketika retur website dicatat, lalu laporan penjualan/retur direkonsiliasi ke POS tanpa perubahan ganda. |
 | MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat subtotal, PPh 22, ongkir, serta total yang dihitung server-side; PPh 22 tampil sebagai komponen terpisah. |
-| MVP-009 | Order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-009 - FR-ORD-011 | Website membuat order dan invoice; invoice menampilkan identitas toko, jumlah/nama/SKU/harga satuan/total harga item, total pembelian keseluruhan, serta nilai rupiah PPh 22 jika berlaku. Pesanan belum dibayar otomatis dibatalkan pada hari berikutnya; pelanggan dapat melihat status dan nomor resi. Melihat resi tidak menyelesaikan order; trigger fulfillment mengikuti OPN-020. |
+| MVP-009 | Order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-009 - FR-ORD-011 | Website membuat order dan invoice; invoice menampilkan identitas toko, jumlah/nama/SKU/harga satuan/total harga item, total pembelian keseluruhan, serta nilai rupiah PPh 22 jika berlaku. Pesanan belum dibayar otomatis dibatalkan pada hari berikutnya; pelanggan dapat melihat status, nomor resi, serta sumber/alasan/waktu pembatalan jika berlaku. Melihat resi tidak menyelesaikan order; trigger fulfillment mengikuti OPN-020. |
 | MVP-010 | Pembayaran transfer manual | BR-018 - BR-020; FR-PAY-001 - FR-PAY-007 | Pelanggan mengunggah bukti secara privat; admin menerima/menolak; status dan audit tercatat. |
-| MVP-011 | Pembatalan, retur, dan rekonsiliasi stok | BR-021 - BR-022; FR-ORD-006 - FR-ORD-008; FR-POS-012, FR-POS-018 | Pembatalan yang valid membuat retur website, mengembalikan stok efektif, dan melaporkan retur ke POS setelah laporan penjualan asal diterima tanpa membuat retur ganda. |
+| MVP-011 | Pembatalan, retur, dan rekonsiliasi stok | BR-021 - BR-022; FR-ORD-006 - FR-ORD-008; FR-POS-012, FR-POS-018 | Pembatalan yang valid memakai satu status `CANCELLED`, menyimpan sumber `ADMIN`/`SYSTEM`, pelaku admin jika ada, alasan, dan waktu; kemudian membuat retur website, mengembalikan stok efektif, serta melaporkan retur ke POS setelah laporan penjualan asal diterima tanpa membuat retur ganda. |
 | MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025; FR-SHP-001 - FR-SHP-007 | Backend memakai Biteship Maps untuk area dan Rates untuk pilihan layanan/ongkir, menyimpan snapshot pilihan ke transaksi, dan tidak menghasilkan ongkir Rp0 saat gagal. Booking/pickup, label, tracking, dan webhook Biteship tidak termasuk MVP. |
 | MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi, omzet, dan PPh 22 berdasarkan periode serta area; PPh 22 tampil terpisah dan transaksi batal dikecualikan. |
 | MVP-014 | Audit dan penanganan gangguan | BR-027 - BR-028; FR-POS-020; FR-AUD-001, FR-AUD-004; FRD Bagian 15 | Pelaporan penjualan/retur ke POS dan gangguan sinkronisasi tercatat; percobaan ulang tidak membuat laporan atau perubahan stok ganda. |
@@ -100,6 +100,9 @@ MVP dapat dinyatakan selesai apabila:
 - trigger `PACKED`, `SHIPPED`, dan `COMPLETED`, pihak yang mengonfirmasi
   penerimaan, serta penanganan barang belum diterima telah diputuskan melalui
   OPN-020 dan lulus UAT;
+- pembatalan admin dan sistem menghasilkan status `CANCELLED` yang sama, tetapi
+  keterangan sumber, alasan, waktu, dan pelaku admin jika ada tersimpan serta
+  tampil dengan benar pada detail order;
 - invoice menampilkan seluruh field wajib dan mempertahankan snapshot
   historisnya;
 - koneksi POS production yang dikoordinasikan dengan Kak Rio tersedia dan

@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.14 - Fulfillment Transition Clarification |
+| Versi | 0.15 - Cancellation Source Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -96,7 +96,10 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
   template/provider/penerima/fallback WhatsApp masih menunggu OPN-023;
 - development memakai data contoh sampai akses POS dibuka setelah alur website
   berjalan; koordinasi akses dilakukan dengan Kak Rio sebagai PIC POS;
-- pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya.
+- pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya;
+- pembatalan admin dan pembatalan otomatis tetap memakai status `CANCELLED`,
+  dengan metadata sumber `ADMIN`/`SYSTEM`, alasan, waktu, dan admin pelaksana
+  jika ada.
 
 Nilai harga, jenis harga, aturan PPh 22 yang terpakai, dasar perhitungan, tarif,
 dan hasilnya harus disimpan sebagai snapshot transaksi.
@@ -505,7 +508,7 @@ Contoh error:
 | inventory_snapshots | Nilai stok terbaru per produk. |
 | inventory_ledger | Riwayat perubahan stok. |
 | carts / cart_items | Keranjang aktif. |
-| orders | Header transaksi dan status. |
+| orders | Header transaksi, status, sumber/alasan/waktu pembatalan, dan admin pembatal jika ada. |
 | order_items | Snapshot nama produk, SKU, kuantitas, harga satuan, dan total harga item. |
 | order_charge_components | Snapshot komponen biaya aktif, dasar perhitungan, tarif/nilai, dan total. |
 | invoices | Nomor invoice website, snapshot nama/alamat/kontak/NPWP toko, total pembelian keseluruhan, dan nilai rupiah PPh 22 kondisional. |
@@ -547,6 +550,7 @@ erDiagram
     USER ||--|| CUSTOMER_PROFILE : has
     USER ||--o{ ADDRESS : owns
     USER ||--o{ ORDER : places
+    USER o|--o{ ORDER : cancels
     PRODUCT }o--|| CATEGORY : classified_as
     CATEGORY ||--o{ CATEGORY_TAX_RULE : governed_by
     PRODUCT }o--|| BRAND : branded_as
@@ -582,8 +586,9 @@ Operasi berikut harus atomik:
 - pembuatan order, item, invoice website, pengurangan stok efektif, serta
   pencatatan operasi laporan penjualan;
 - verifikasi pembayaran dan perubahan status;
-- pembuatan retur website, pengembalian stok efektif, serta pencatatan operasi
-  laporan retur.
+- perubahan order menjadi `CANCELLED` beserta sumber, alasan, waktu, admin
+  pembatal jika ada, pembuatan retur website, pengembalian stok efektif, serta
+  pencatatan operasi laporan retur.
 
 Ketentuan:
 
@@ -603,8 +608,9 @@ pelaporan minimum:
 3. worker mengirim laporan penjualan berdasarkan external reference unik;
 4. jika timeout atau hasil ambigu, tandai `RECONCILIATION_REQUIRED` dan cari
    status berdasarkan external reference sebelum retry;
-5. pembatalan membuat retur, menambah stok efektif, dan membuat operasi laporan
-   retur `PENDING` secara atomik;
+5. pembatalan menyimpan status `CANCELLED`, sumber `ADMIN`/`SYSTEM`, alasan,
+   waktu, admin pembatal jika ada, membuat retur, menambah stok efektif, dan
+   membuat operasi laporan retur `PENDING` secara atomik;
 6. worker hanya mengirim laporan retur setelah laporan penjualan asal
    `SUCCEEDED` atau sudah direkonsiliasi.
 
@@ -763,7 +769,7 @@ Audit log minimum:
 - verifikasi dan perubahan status akun;
 - perubahan harga dan kebijakan pembelian yang telah disetujui;
 - verifikasi/penolakan pembayaran;
-- perubahan status dan pembatalan order;
+- perubahan status dan pembatalan order, termasuk sumber serta aktor pembatal;
 - sinkronisasi manual;
 - perubahan konfigurasi kurir.
 

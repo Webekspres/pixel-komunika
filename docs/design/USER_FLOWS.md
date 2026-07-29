@@ -4,7 +4,7 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.5 - Fulfillment Transition Clarification |
+| Versi | 0.6 - Cancellation Source Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -446,12 +446,16 @@ flowchart TD
     C -->|Ya| E{"Status WAITING_PAYMENT atau PAYMENT_SUBMITTED?"}
     E -->|Tidak| D2[/"Tolak: status order tidak dapat dibatalkan admin"/]
     D2 --> T
-    E -->|Ya| F["Mulai proses cancel idempotent"]
+    E -->|Ya| F1["Tetapkan sumber ADMIN,<br/>admin pelaksana, dan alasan"]
     B -->|Scheduler D+1| G{"Status WAITING_PAYMENT dan order_date lebih lama?"}
     G -->|Tidak| H(["Selesai: tidak ada tindakan"])
-    G -->|Ya| F
-    F --> I[["Database transaction:<br/>buat retur website, tambah stok efektif,<br/>catat ledger WEB_RETURN dan set CANCELLED"]]
+    G -->|Ya| F2["Tetapkan sumber SYSTEM dan alasan<br/>batas pembayaran berakhir"]
+    F1 --> F["Mulai proses cancel idempotent"]
+    F2 --> F
+    F --> I[["Database transaction:<br/>set CANCELLED beserta sumber, alasan, waktu,<br/>buat retur, tambah stok efektif,<br/>dan catat ledger WEB_RETURN"]]
     I --> J[("Operasi WEB_RETURN_REPORT PENDING tersimpan")]
+    I --> J1[/"Tampilkan Dibatalkan oleh Admin<br/>atau Dibatalkan otomatis oleh Sistem"/]
+    J1 --> J2(["Cabang tampilan selesai"])
     J --> K{"Laporan penjualan asal SUCCEEDED<br/>atau sudah direkonsiliasi?"}
     K -->|Tidak| L["Tahan laporan retur"]
     L --> M[["Rekonsiliasi laporan penjualan asal"]]
@@ -480,8 +484,10 @@ flowchart TD
 Auto-cancel baseline hanya menargetkan `WAITING_PAYMENT` dari hari kalender
 sebelumnya dan selalu dijalankan otomatis oleh scheduler. Penolakan pada cabang
 admin hanya menolak permintaan pembatalan operasional yang melewati tanggal
-transaksi atau tidak memenuhi status. Refund setelah pembayaran terverifikasi
-berada di luar flow ini.
+transaksi atau tidak memenuhi status. Kedua cabang memakai status `CANCELLED`;
+perbedaannya disimpan pada `cancellation_source`, `cancelled_by_user_id`,
+`cancellation_reason`, dan `cancelled_at`, lalu ditampilkan sebagai keterangan
+order. Refund setelah pembayaran terverifikasi berada di luar flow ini.
 
 Lanjutan: [UF-18 Laporan](#uf-18-laporan-dan-audit).
 

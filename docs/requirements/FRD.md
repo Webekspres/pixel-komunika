@@ -4,7 +4,7 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.11 - Fulfillment Transition Clarification |
+| Versi | 0.12 - Cancellation Source Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
@@ -257,8 +257,8 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin / Sistem | Status operasional order mengikuti urutan `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`. | `PROCESSING` dimulai setelah pembayaran diterima. Urutan tidak dapat dilewati; transisi tidak valid ditolak dan dicatat. Kondisi packing selesai, penyerahan ke kurir, kewajiban nomor resi, serta konfirmasi penerimaan mengikuti [OPN-020](BRD.md#opn-020). | Baseline sequence; transition triggers partially open |
-| FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta tindakan manual ditolak; pembatalan yang valid membuat retur website secara idempotent. | Baseline |
-| FR-ORD-007 | Sistem | Pembatalan menyimpan retur, mengembalikan stok efektif, dan menjadwalkan laporan retur POS. | Retur, penyesuaian stok, status pelaporan POS, status order, dan audit log tercatat konsisten. | Baseline |
+| FR-ORD-006 | Admin | Admin dapat membatalkan order pada hari yang sama. | Setelah pergantian tanggal Asia/Jakarta tindakan manual ditolak; pembatalan yang valid menyimpan status `CANCELLED`, sumber `ADMIN`, admin pelaksana, alasan, waktu, dan retur website secara idempotent. | Baseline |
+| FR-ORD-007 | Sistem | Pembatalan menyimpan sumber pembatalan dan retur, mengembalikan stok efektif, serta menjadwalkan laporan retur POS. | Status tetap `CANCELLED`; `cancellation_source` hanya `ADMIN` atau `SYSTEM`. Retur, penyesuaian stok, status pelaporan POS, alasan, waktu, pelaku admin jika ada, dan audit log tercatat konsisten. | Baseline |
 | FR-ORD-008 | Sistem | Order yang sudah dibatalkan tidak dapat diproses lebih lanjut. | Transisi dari `CANCELLED` ditolak. | Proposed |
 
 ### 9.1 Status Transaksi Draft
@@ -274,23 +274,26 @@ stateDiagram-v2
     PROCESSING --> PACKED: Packing selesai; konfirmasi OPN-020
     PACKED --> SHIPPED: Diserahkan ke kurir; konfirmasi OPN-020
     SHIPPED --> COMPLETED: Barang diterima; mekanisme OPN-020
-    WAITING_PAYMENT --> CANCELLED: Admin, hari yang sama
-    WAITING_PAYMENT --> CANCELLED: Sistem, hari berikutnya
-    PAYMENT_SUBMITTED --> CANCELLED: Admin, hari yang sama
+    WAITING_PAYMENT --> CANCELLED: source ADMIN; hari yang sama
+    WAITING_PAYMENT --> CANCELLED: source SYSTEM; hari berikutnya
+    PAYMENT_SUBMITTED --> CANCELLED: source ADMIN; hari yang sama
 ```
 
-Pembatalan standar hanya oleh admin pada hari yang sama dengan tanggal
-transaksi. Setelah pembayaran diverifikasi, order diproses, dikemas, dikirim,
-lalu diselesaikan. Urutan tersebut telah disetujui, tetapi trigger operasional
-setiap transisi dan metode konfirmasi barang diterima masih mengikuti
+Pembatalan manual hanya dapat dilakukan admin pada hari yang sama dengan tanggal
+transaksi; pembatalan kedaluwarsa dilakukan sistem pada hari berikutnya.
+Keduanya memakai status `CANCELLED`, sedangkan sumber, alasan, waktu, dan admin
+pelaksana jika ada disimpan sebagai metadata. Setelah pembayaran diverifikasi,
+order diproses, dikemas, dikirim, lalu diselesaikan. Urutan tersebut telah
+disetujui, tetapi trigger operasional setiap transisi dan metode konfirmasi
+barang diterima masih mengikuti
 [OPN-020](BRD.md#opn-020). Melihat nomor resi tidak mengubah order menjadi
 `COMPLETED`. Pengembalian dana berada di luar scope pembatalan standar.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-009 | Pelanggan Aktif | Pelanggan dapat mengakses invoice website miliknya sesuai format dan channel yang disetujui. | Invoice menampilkan identitas toko, rincian item, total pembelian keseluruhan, dan nilai rupiah PPh 22 jika berlaku sesuai [OPN-022](BRD.md#opn-022); keputusan PDF dan channel tetap terbuka. | Baseline; ownership resolved, format/channel partially open |
-| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1; retur website, stok efektif, laporan retur POS, dan audit tersimpan tanpa duplikasi. | Baseline |
-| FR-ORD-011 | Pelanggan Aktif | Pelanggan dapat melihat status fulfillment dan nomor resi pada detail order. | Status tampil konsisten dengan lifecycle; setelah order `SHIPPED`, nomor resi ditampilkan ketika tersedia. Membuka detail atau melihat resi tidak memicu `COMPLETED`. | Baseline |
+| FR-ORD-010 | Sistem | Pesanan yang tetap `WAITING_PAYMENT` pada hari kalender berikutnya otomatis dibatalkan. | Pesanan dibuat pada tanggal D tidak lagi aktif pada D+1; sumber `SYSTEM`, alasan kedaluwarsa, waktu, retur website, stok efektif, laporan retur POS, dan audit tersimpan tanpa duplikasi. | Baseline |
+| FR-ORD-011 | Pelanggan Aktif | Pelanggan dapat melihat status fulfillment, nomor resi, dan keterangan pembatalan pada detail order. | Status tampil konsisten dengan lifecycle; setelah order `SHIPPED`, nomor resi ditampilkan ketika tersedia. Order `CANCELLED` menampilkan `Dibatalkan oleh Admin` atau `Dibatalkan otomatis oleh Sistem`, alasan, dan waktu. Membuka detail atau melihat resi tidak memicu `COMPLETED`. | Baseline |
 
 ## 10. Modul Pembayaran Manual
 

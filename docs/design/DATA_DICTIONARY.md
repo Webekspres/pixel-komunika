@@ -4,7 +4,7 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.4 - Fulfillment Transition Clarification                                                                                     |
+| Versi    | 0.5 - Cancellation Source Clarification                                                                                       |
 | Tanggal  | Rabu, 29 Juli 2026                                                                                                              |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
@@ -318,30 +318,41 @@ Sumber/mapping final profil toko masih
 
 ### 5.3 `orders`
 
-| Kolom               | Tipe            | Null  | Key/Default | Deskripsi                                          |
-| ------------------- | --------------- | :---: | ----------- | -------------------------------------------------- |
-| id                  | BIGINT UNSIGNED | Tidak | PK          | Identifier order.                                  |
-| user_id             | BIGINT UNSIGNED | Tidak | FK, IDX     | Pelanggan pemilik order.                           |
-| source_address_id   | BIGINT UNSIGNED |   Ya  | FK          | Alamat sumber sebelum snapshot shipment.           |
-| order_number        | VARCHAR(64)     | Tidak | UK          | Nomor order web.                                   |
-| idempotency_key     | VARCHAR(191)    | Tidak | UK          | Pencegah checkout ganda.                           |
-| status              | VARCHAR(32)     | Tidak | IDX         | Status lifecycle pada FRD 9.1.                     |
-| order_date_local    | DATE            | Tidak | IDX         | Tanggal bisnis Asia/Jakarta untuk auto-cancel D+1. |
-| subtotal_amount     | DECIMAL(19,2)   | Tidak | —           | Total seluruh `order_items.line_total`.            |
-| pph22_amount        | DECIMAL(19,2)   | Tidak | `0`         | Total PPh 22 snapshot.                             |
-| shipping_amount     | DECIMAL(19,2)   | Tidak | `0`         | Ongkir snapshot.                                   |
-| grand_total         | DECIMAL(19,2)   | Tidak | —           | Total final server-side.                           |
-| expires_at          | DATETIME(6)     | Tidak | IDX         | Batas aktif order belum dibayar.                   |
-| cancelled_at        | DATETIME(6)     |   Ya  | —           | Waktu pembatalan.                                  |
-| cancellation_reason | TEXT            |   Ya  | —           | Alasan pembatalan.                                 |
-| created_at          | DATETIME(6)     | Tidak | IDX         | Waktu order dibuat.                                |
-| updated_at          | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                   |
+| Kolom                 | Tipe            | Null  | Key/Default | Deskripsi                                                         |
+| --------------------- | --------------- | :---: | ----------- | ----------------------------------------------------------------- |
+| id                    | BIGINT UNSIGNED | Tidak | PK          | Identifier order.                                                 |
+| user_id               | BIGINT UNSIGNED | Tidak | FK, IDX     | Pelanggan pemilik order.                                          |
+| source_address_id     | BIGINT UNSIGNED |   Ya  | FK          | Alamat sumber sebelum snapshot shipment.                          |
+| order_number          | VARCHAR(64)     | Tidak | UK          | Nomor order web.                                                  |
+| idempotency_key       | VARCHAR(191)    | Tidak | UK          | Pencegah checkout ganda.                                          |
+| status                | VARCHAR(32)     | Tidak | IDX         | Status lifecycle pada FRD 9.1.                                    |
+| order_date_local      | DATE            | Tidak | IDX         | Tanggal bisnis Asia/Jakarta untuk auto-cancel D+1.                |
+| subtotal_amount       | DECIMAL(19,2)   | Tidak | —           | Total seluruh `order_items.line_total`.                           |
+| pph22_amount          | DECIMAL(19,2)   | Tidak | `0`         | Total PPh 22 snapshot.                                            |
+| shipping_amount       | DECIMAL(19,2)   | Tidak | `0`         | Ongkir snapshot.                                                  |
+| grand_total           | DECIMAL(19,2)   | Tidak | —           | Total final server-side.                                          |
+| expires_at            | DATETIME(6)     | Tidak | IDX         | Batas aktif order belum dibayar.                                  |
+| cancellation_source   | VARCHAR(16)     |   Ya  | IDX         | `ADMIN` atau `SYSTEM`; null jika order tidak dibatalkan.          |
+| cancelled_by_user_id  | BIGINT UNSIGNED |   Ya  | FK, IDX     | Admin pembatal; wajib untuk `ADMIN`, null untuk `SYSTEM`.          |
+| cancellation_reason   | TEXT            |   Ya  | —           | Alasan pembatalan; wajib ketika status `CANCELLED`.                |
+| cancelled_at          | DATETIME(6)     |   Ya  | —           | Waktu pembatalan; wajib ketika status `CANCELLED`.                 |
+| created_at            | DATETIME(6)     | Tidak | IDX         | Waktu order dibuat.                                               |
+| updated_at            | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                                  |
 
 Status internal checkout: `DRAFT`. Status customer-facing:
 `WAITING_PAYMENT`, `PAYMENT_SUBMITTED`, `PAYMENT_REJECTED`,
 `PAYMENT_VERIFIED`, `PROCESSING`, `PACKED`, `SHIPPED`, `COMPLETED`, dan
 `CANCELLED`. `RECONCILIATION_REQUIRED` hanya menjadi status operasi integrasi,
 bukan status order pelanggan.
+
+Invariant pembatalan:
+
+- status `CANCELLED` mewajibkan `cancellation_source`, `cancellation_reason`,
+  dan `cancelled_at`;
+- sumber `ADMIN` mewajibkan `cancelled_by_user_id`;
+- sumber `SYSTEM` mewajibkan `cancelled_by_user_id` bernilai null; dan
+- label pelanggan diturunkan dari sumber menjadi `Dibatalkan oleh Admin` atau
+  `Dibatalkan otomatis oleh Sistem`, bukan status lifecycle baru.
 
 ### 5.4 `order_items`
 
@@ -621,7 +632,7 @@ isi file bukti pembayaran tidak boleh masuk `old_values` atau `new_values`.
 | Identity   | UK `users.email`, UK `users.phone`, UK `customer_profiles.user_id`.                                                               |
 | Product    | UK `products.pos_product_id`, UK `products.sku`, UK gabungan `product_prices(product_id, price_type)`.                            |
 | Cart       | UK parsial/logis satu `carts` aktif per user; UK `cart_items(cart_id, product_id)`.                                               |
-| Order      | UK `orders.order_number`, UK `orders.idempotency_key`.                                                                          |
+| Order      | UK `orders.order_number`, UK `orders.idempotency_key`; index `(status, cancellation_source, cancelled_at)`.                    |
 | Snapshot   | Index `order_items.sku_snapshot`, `shipments.district_snapshot`, dan tanggal/status order untuk laporan.                          |
 | Invoice    | UK `invoices.order_id`, UK `invoices.invoice_number`.                                                                            |
 | POS        | UK `pos_integration_operations.external_reference`; index `(order_id, operation, status)`.                                         |

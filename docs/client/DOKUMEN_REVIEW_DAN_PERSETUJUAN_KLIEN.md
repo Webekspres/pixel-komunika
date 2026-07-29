@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.4 |
+| Versi | 1.5 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -143,7 +143,7 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 | Pemrosesan pesanan | Setelah pembayaran diterima, urutan status pesanan adalah Diproses, Dikemas, Dikirim, dan Selesai. Syarat perpindahan status dan cara mengonfirmasi barang diterima harus diputuskan pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima). |
 | Nomor resi | Nomor resi ditampilkan kepada pelanggan ketika sudah tersedia. |
 | Pengiriman | Website mendukung kurir toko dan pilihan layanan serta perkiraan ongkir dari Biteship. |
-| Pembatalan dan retur | Admin dapat membatalkan pesanan secara manual hanya pada tanggal transaksi. Pesanan yang belum dibayar dibatalkan otomatis pada hari berikutnya. Pembatalan mengembalikan stok website dan dilaporkan ke POS sebagai retur. |
+| Pembatalan dan retur | Admin dapat membatalkan pesanan secara manual hanya pada tanggal transaksi. Pesanan yang belum dibayar dibatalkan otomatis oleh sistem pada hari berikutnya. Keduanya memakai status `Dibatalkan`, disertai keterangan apakah pembatalan dilakukan oleh admin atau sistem. Pembatalan mengembalikan stok website dan dilaporkan ke POS sebagai retur. |
 | Notifikasi admin | Order baru menampilkan tanda notifikasi merah pada website admin dan mengirim pemberitahuan WhatsApp. |
 | Laporan | Admin dapat melihat laporan transaksi, omzet, dan PPh 22 berdasarkan periode dan wilayah. |
 | Keamanan dan pencatatan | Hak akses pengguna dibatasi sesuai perannya. Tindakan penting admin dan gangguan pertukaran data dicatat agar dapat diperiksa kembali. |
@@ -167,8 +167,11 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 10. Website membuat transaksi dan invoice.
 11. POS menerima laporan penjualan untuk mencatat penjualan dan mengurangi
     stok, serta laporan retur untuk mencatat retur dan menambah stok.
-12. Pesanan yang belum dibayar otomatis dibatalkan pada hari berikutnya.
+12. Pesanan yang belum dibayar otomatis dibatalkan oleh sistem pada hari
+    berikutnya.
 13. Pembatalan manual oleh admin hanya dapat dilakukan pada tanggal transaksi.
+    Website membedakan sumber pembatalan `Admin` dan `Sistem` sebagai keterangan,
+    tanpa membuat dua status pembatalan yang berbeda.
 14. Setelah pembayaran diterima, urutan statusnya adalah Diproses, Dikemas,
     Dikirim, lalu Selesai; nomor resi ditampilkan ketika tersedia. Pemicu setiap
     perubahan status belum termasuk dalam keputusan ini.
@@ -253,19 +256,29 @@ Melihat nomor resi **tidak** otomatis mengubah status pesanan menjadi
 dikonfirmasi dengan cara yang disetujui klien. Pilihan cara konfirmasi dibahas
 pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima).
 
-### 5.4 Pembatalan Otomatis
+### 5.4 Pembatalan oleh Admin atau Sistem
 
 ```mermaid
 flowchart TD
-    A(["Pesanan menunggu<br/>pembayaran"]) --> B{"Tanggal transaksi<br/>sudah berlalu?"}
-    B -->|Belum| C[/"Tetap menunggu<br/>pembayaran"/]
-    C --> B
-    B -->|Ya| D[["Batalkan pesanan<br/>secara otomatis"]]
-    D --> E["Kembalikan stok<br/>website"]
-    E --> F[["Laporkan retur<br/>ke POS"]]
-    F --> G[("Status:<br/>Dibatalkan")]
-    G --> H(["Selesai"])
+    A(["Pesanan aktif"]) --> B{"Sumber<br/>pembatalan?"}
+    B -->|Admin| C{"Masih pada tanggal<br/>transaksi dan status<br/>boleh dibatalkan?"}
+    C -->|Tidak| D[/"Tolak pembatalan<br/>dan tampilkan alasannya"/]
+    D --> E(["Selesai: pesanan<br/>tidak dibatalkan"])
+    C -->|Ya| F["Simpan sumber Admin,<br/>admin pelaksana, dan alasan"]
+    B -->|Sistem| G{"Pesanan masih menunggu<br/>pembayaran pada hari berikutnya?"}
+    G -->|Tidak| H(["Selesai: tidak ada<br/>tindakan sistem"])
+    G -->|Ya| I["Simpan sumber Sistem dan alasan:<br/>batas pembayaran berakhir"]
+    F --> J[["Batalkan pesanan dan<br/>kembalikan stok website"]]
+    I --> J
+    J --> K[["Laporkan retur<br/>ke POS"]]
+    K --> L[("Status Dibatalkan,<br/>sumber, alasan, dan waktu tersimpan")]
+    L --> M[/"Tampilkan Dibatalkan oleh Admin<br/>atau Dibatalkan otomatis oleh Sistem"/]
+    M --> N(["Selesai"])
 ```
+
+`Dibatalkan` tetap menjadi satu status pesanan. Rincian pesanan menampilkan
+sumber, alasan, dan waktu pembatalan. Untuk pembatalan admin, sistem juga
+mencatat admin yang melakukan tindakan tersebut.
 
 ### 5.5 Hubungan Website dengan POS
 
@@ -516,7 +529,8 @@ Versi pertama dapat diterima apabila:
 - PPh 22 dihitung sesuai keputusan final dan ditampilkan secara terpisah;
 - invoice menampilkan seluruh informasi wajib;
 - pelanggan dapat mengirim bukti pembayaran dan admin dapat memeriksanya;
-- pesanan yang tidak dibayar otomatis dibatalkan pada hari berikutnya;
+- pesanan yang tidak dibayar otomatis dibatalkan pada hari berikutnya dan
+  rincian pesanan menunjukkan bahwa pembatalan dilakukan oleh sistem;
 - pesanan yang dibayar dapat diproses sampai selesai sesuai pemicu status yang
   disetujui pada
   [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima),

@@ -4,7 +4,7 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.3 - Web-owned Transaction and Notification Model |
+| Versi | 0.4 - Cancellation Source Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Internal - siap menjadi dasar migration MVP |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -187,9 +187,13 @@ erDiagram
         BIGINT id PK
         BIGINT user_id FK
         BIGINT source_address_id FK
+        BIGINT cancelled_by_user_id FK
         VARCHAR order_number UK
         VARCHAR idempotency_key UK
         VARCHAR status
+        VARCHAR cancellation_source
+        TEXT cancellation_reason
+        DATETIME cancelled_at
         DECIMAL grand_total
     }
 
@@ -329,6 +333,7 @@ erDiagram
     USERS ||--o{ ADDRESSES : owns
     USERS ||--o{ CARTS : owns
     USERS ||--o{ ORDERS : places
+    USERS o|--o{ ORDERS : cancels
     USERS ||--o{ CATEGORY_TAX_RULES : updates
     USERS o|--o{ PAYMENTS : verifies
     USERS o|--o{ AUDIT_LOGS : performs

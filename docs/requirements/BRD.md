@@ -7,7 +7,7 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.13 - Fulfillment Transition Clarification |
+| Versi | 0.14 - Cancellation Source Clarification |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
@@ -55,6 +55,7 @@ Status requirement:
 | CR-012 | Selasa, 28 Juli 2026, 20.03-20.04 WIB | Klarifikasi klien Sylvi | PPh 22 dari lebih dari satu klasifikasi digabungkan. Transaksi dan invoice web dibuat oleh website; POS menerima laporan penjualan untuk mencatat transaksi dan mengurangi stok, serta laporan retur untuk mencatat retur dan menambah stok. Setelah pembayaran diverifikasi, alur berlanjut ke diproses, dikemas, dikirim, dan selesai; nomor resi ditampilkan. Admin menerima notifikasi order baru melalui indikator merah di website dan WhatsApp dengan bunyi; template WhatsApp belum tersedia. | CR-006 superseded untuk ownership transaksi/invoice dan arah pelaporan. OPN-004, OPN-005, OPN-006, OPN-008, OPN-020, OPN-022, dan OPN-023 diperbarui; requirement, model data, dan user flow diselaraskan. | Approved business flow; API/notification contract partial |
 | CR-013 | Rabu, 29 Juli 2026 | Review dokumentasi internal | Pertanyaan yang telah selesai ditandai strikethrough tanpa menghapus ID dan bukti keputusan. Diagram proses bisnis memakai notasi flowchart yang konsisten; diagram konteks tetap diperlakukan sebagai context diagram. | Keterbacaan dan audit trail diperbaiki tanpa mengubah scope atau aturan bisnis. | Documentation-only |
 | CR-014 | Rabu, 29 Juli 2026 | Review alur fulfillment | Urutan `PROCESSING` → `PACKED` → `SHIPPED` → `COMPLETED` telah disetujui, tetapi pemicu setiap transisi dan cara memastikan barang diterima belum pernah ditetapkan. Melihat nomor resi tidak dapat dianggap sebagai bukti penerimaan. | OPN-020 dibuka kembali sebagai keputusan parsial; Q-025 ditambahkan dan alur client-facing serta user flow diperinci tanpa memilih mekanisme konfirmasi secara sepihak. | Clarification required |
+| CR-015 | Rabu, 29 Juli 2026 | Klarifikasi sumber pembatalan | Pembatalan manual oleh admin dan pembatalan kedaluwarsa oleh sistem harus dapat dibedakan tanpa memecah lifecycle menjadi dua status batal. | Status tetap `CANCELLED`; sumber `ADMIN`/`SYSTEM`, pelaku admin jika ada, alasan, dan waktu pembatalan disimpan serta ditampilkan pada rincian order. | Baseline clarification |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -266,7 +267,7 @@ flowchart LR
 | BR-018 | Pembayaran dilakukan melalui transfer bank dan diverifikasi admin. | Baseline |
 | BR-019 | Pelanggan harus dapat mengunggah bukti pembayaran ([lihat OPN-009](#opn-009)). | Baseline; batas file dan retensi open |
 | BR-020 | Admin harus dapat menerima atau menolak bukti pembayaran. | Baseline |
-| BR-021 | Admin dapat membatalkan transaksi hanya pada tanggal kalender yang sama dengan transaksi; website mencatat retur dan mengembalikan stok efektif secara atomik. | Baseline |
+| BR-021 | Admin dapat membatalkan transaksi hanya pada tanggal kalender yang sama dengan transaksi; website menyimpan sumber `ADMIN`, admin pelaksana, alasan, dan waktu pembatalan, lalu mencatat retur dan mengembalikan stok efektif secara atomik. | Baseline |
 | BR-022 | Setiap retur website harus dilaporkan ke POS untuk mencatat retur dan menambah stok POS. Laporan retur tidak boleh diterapkan di POS sebelum laporan penjualan asal berhasil diterima atau direkonsiliasi, dan retry tidak boleh membuat retur ganda. | Baseline; API contract partially open |
 | BR-023 | Sistem harus mendukung kurir toko beserta biaya berdasarkan wilayah ([lihat OPN-010](#opn-010)). | Baseline; area, tarif, dan SLA open |
 | BR-024 | Biteship digunakan sebagai provider eksternal untuk standardisasi area melalui Maps API dan pilihan layanan/estimasi ongkir melalui Rates API; Biteship bukan sumber order, stok, invoice, atau pembayaran website ([lihat OPN-021](#opn-021)). | Baseline; data operasional dan kurir open |
@@ -275,7 +276,7 @@ flowchart LR
 | BR-027 | Sistem harus mempertahankan jejak audit untuk tindakan administratif kritis. | [Proposed; lihat OPN-015](#opn-015) |
 | BR-028 | Kegagalan POS atau Biteship harus dapat ditelusuri dan tidak boleh diam-diam menghasilkan data transaksi salah. | [Proposed; lihat OPN-015](#opn-015) |
 | BR-029 | Sistem harus dapat ditingkatkan kapasitasnya tanpa mengubah domain bisnis utama. | [Proposed; lihat OPN-015](#opn-015) |
-| BR-030 | Pesanan yang belum dibayar hanya berlaku pada hari pembuatannya dan otomatis dibatalkan pada hari kalender berikutnya dalam zona waktu `Asia/Jakarta`; pembatalan otomatis membuat retur website dan menjadwalkan laporan retur POS secara idempotent. | Baseline |
+| BR-030 | Pesanan yang belum dibayar hanya berlaku pada hari pembuatannya dan otomatis dibatalkan pada hari kalender berikutnya dalam zona waktu `Asia/Jakarta`; website menyimpan sumber `SYSTEM`, alasan kedaluwarsa, dan waktu pembatalan, lalu membuat retur website serta menjadwalkan laporan retur POS secara idempotent. | Baseline |
 | BR-031 | Ketika order baru berhasil dibuat, sistem harus memberi tahu admin melalui indikator notifikasi merah di website dan pesan WhatsApp. Bunyi mengikuti notifikasi aplikasi/perangkat WhatsApp; provider, penerima, template, dan fallback mengikuti [OPN-023](#opn-023). | Baseline; channel behavior partially open |
 
 ## 10. Business Rules
@@ -308,6 +309,7 @@ flowchart LR
 | RULE-024 | Operasi pelaporan POS wajib memiliki external reference/idempotency mechanism yang disepakati sebelum integration acceptance. |
 | RULE-025 | Status setelah pembayaran diterima adalah `PROCESSING`, `PACKED`, `SHIPPED`, lalu `COMPLETED`; nomor resi ditampilkan kepada pelanggan ketika tersedia. Melihat nomor resi tidak memicu `COMPLETED`; pemicu transisi operasional dan konfirmasi penerimaan mengikuti [OPN-020](#opn-020). |
 | RULE-026 | Notifikasi WhatsApp menggunakan perilaku bunyi aplikasi/perangkat WhatsApp; website tidak membuat audio notifikasi WhatsApp sendiri. |
+| RULE-027 | Pembatalan admin dan pembatalan otomatis memakai satu status `CANCELLED`. Perbedaannya disimpan sebagai `cancellation_source` bernilai `ADMIN` atau `SYSTEM`, dilengkapi alasan, waktu, dan `cancelled_by_user_id` untuk sumber `ADMIN`; rincian order menampilkan keterangan sumber pembatalan. |
 
 ## 11. Proses Bisnis Utama
 
@@ -371,7 +373,7 @@ flowchart TD
     I --> O[/"Tampilkan instruksi transfer dan invoice"/]
     O --> P{"Bukti diajukan<br/>pada tanggal transaksi?"}
     P -->|Tidak| Q[["Scheduler membatalkan order<br/>pada hari berikutnya"]]
-    Q --> R[("Order CANCELLED dan<br/>laporan retur PENDING tersimpan")]
+    Q --> R[("Order CANCELLED, sumber SYSTEM,<br/>alasan kedaluwarsa, dan<br/>laporan retur PENDING tersimpan")]
     R --> S(["Selesai: pesanan dibatalkan otomatis"])
     P -->|Ya| T[/"Pelanggan mengunggah bukti pembayaran"/]
     T --> U[/"Admin memeriksa bukti pembayaran"/]

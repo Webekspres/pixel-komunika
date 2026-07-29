@@ -5,13 +5,37 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.3 |
+| Versi | 1.4 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
 | Pengembang | PT Webekspres Teknologi Indonesia |
 | Target pengerjaan | 45 hari kerja |
 | Status | Menunggu pemeriksaan dan persetujuan klien |
+
+## Pemberitahuan Penting: Kedudukan Dokumen
+
+> **Dokumen ini merupakan pelengkap dari proposal penawaran dan kesepakatan
+> komersial yang telah dibuat sebelumnya. Dokumen ini tidak menggantikan,
+> mengubah, membatalkan, atau mengambil alih kedudukan proposal penawaran
+> maupun kesepakatan komersial tersebut.**
+
+Dokumen ini hanya digunakan untuk memberitahukan dan mengonfirmasi:
+
+- fitur, aturan, dan alur yang akan dikerjakan oleh pengembang;
+- batas pekerjaan yang termasuk dan tidak termasuk dalam versi pertama; serta
+- kondisi yang digunakan untuk menilai apakah versi pertama telah selesai
+  sesuai ruang lingkup fungsional.
+
+Persetujuan klien terhadap dokumen ini hanya berarti persetujuan atas pemahaman
+ruang lingkup fungsional versi pertama. Persetujuan tersebut **bukan**
+kesepakatan komersial baru dan tidak mengubah harga, termin pembayaran, jangka
+waktu, atau ketentuan komersial lain yang telah disepakati sebelumnya.
+
+Apabila terdapat perbedaan antara dokumen ini dengan proposal penawaran atau
+kesepakatan komersial sebelumnya, proposal penawaran dan kesepakatan komersial
+tersebut tetap berlaku, kecuali perubahan telah dinyatakan secara tertulis dan
+disetujui oleh Pixel Komunika dan PT Webekspres Teknologi Indonesia.
 
 ## 1. Tujuan Dokumen
 
@@ -31,21 +55,23 @@ Klien diharapkan:
 3. memberi koreksi jika ada alur yang tidak sesuai; dan
 4. menyetujui ruang lingkup versi pertama sebagai dasar pengerjaan.
 
-Dokumen ini tidak menggantikan proposal penawaran atau kesepakatan komersial
-yang telah dibuat.
+Kedudukan dan batas fungsi dokumen dijelaskan pada
+[Pemberitahuan Penting](#pemberitahuan-penting-kedudukan-dokumen).
 
 ### TL;DR
 
 Untuk pemeriksaan paling cepat:
 
-1. periksa [fitur yang termasuk dalam versi pertama](#3-fitur-yang-termasuk-dalam-versi-pertama);
-2. sampaikan persetujuan, revisi, penolakan, atau pilihan lain dengan mengikuti
+1. pahami terlebih dahulu
+   [kedudukan dan batas fungsi dokumen](#pemberitahuan-penting-kedudukan-dokumen);
+2. periksa [fitur yang termasuk dalam versi pertama](#3-fitur-yang-termasuk-dalam-versi-pertama);
+3. sampaikan persetujuan, revisi, penolakan, atau pilihan lain dengan mengikuti
    [cara memberikan tanggapan melalui grup WhatsApp](#11-cara-memberikan-tanggapan-melalui-grup-whatsapp);
-3. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien),
+4. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien),
    termasuk [cara memastikan barang telah diterima](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima);
-4. periksa [kriteria penerimaan versi pertama](#9-kriteria-penerimaan-versi-pertama);
+5. periksa [kriteria penerimaan versi pertama](#9-kriteria-penerimaan-versi-pertama);
    dan
-5. berikan [persetujuan akhir](#11-persetujuan) melalui grup WhatsApp proyek.
+6. berikan [persetujuan akhir](#11-persetujuan) melalui grup WhatsApp proyek.
 
 ### 1.1 Cara Memberikan Tanggapan melalui Grup WhatsApp
 
@@ -534,7 +560,9 @@ Dengan memberikan persetujuan, para pihak menyatakan bahwa:
    lanjutan;
 3. ruang lingkup versi pertama dapat digunakan sebagai dasar pengerjaan dan
    pengujian; dan
-4. perubahan berikutnya akan mengikuti proses persetujuan bersama.
+4. perubahan berikutnya akan mengikuti proses persetujuan bersama; serta
+5. persetujuan dokumen ini tidak menggantikan atau mengubah proposal penawaran
+   maupun kesepakatan komersial sebelumnya.
 
 | Peran | Nama | Tanggal | Status/Persetujuan |
 |---|---|---|---|

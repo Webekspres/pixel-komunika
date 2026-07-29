@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.8 |
+| Versi | 1.9 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -213,6 +213,8 @@ flowchart TD
 
 ### 5.2 Pemesanan dan Pembayaran
 
+#### 5.2.1 Memilih Produk dan Pengiriman
+
 ```mermaid
 flowchart TD
     A(["Mulai"]) --> B[/"Pilih produk<br/>dan jumlah"/]
@@ -222,15 +224,30 @@ flowchart TD
     E --> B
     D -->|Ya| F[/"Pilih alamat<br/>dan pengiriman"/]
     F --> G["Hitung total<br/>pembayaran"]
-    G --> H[["Buat pesanan<br/>dan invoice"]]
-    H --> I[/"Tampilkan invoice<br/>dan petunjuk transfer"/]
-    I --> J[/"Unggah bukti<br/>pembayaran"/]
-    J --> K[/"Admin memeriksa<br/>bukti pembayaran"/]
-    K --> L{"Pembayaran<br/>diterima?"}
-    L -->|Tidak| M[/"Minta pelanggan<br/>mengunggah ulang bukti"/]
-    M --> J
-    L -->|Ya| N[("Pesanan siap<br/>diproses")]
-    N --> O(["Lanjut ke alur<br/>pengiriman"])
+    G --> H(["Lanjut ke<br/>Bagian 5.2.2"])
+```
+
+#### 5.2.2 Membuat Pesanan dan Mengirim Bukti Pembayaran
+
+```mermaid
+flowchart TD
+    A(["Dari Bagian 5.2.1:<br/>Total pembayaran tersedia"]) --> B[["Buat pesanan<br/>dan invoice"]]
+    B --> C[/"Tampilkan invoice<br/>dan petunjuk transfer"/]
+    C --> D[/"Pelanggan mengunggah<br/>bukti pembayaran"/]
+    D --> E(["Lanjut ke<br/>Bagian 5.2.3"])
+```
+
+#### 5.2.3 Memverifikasi Pembayaran
+
+```mermaid
+flowchart TD
+    A(["Dari Bagian 5.2.2:<br/>Bukti pembayaran tersedia"]) --> B[/"Admin memeriksa<br/>bukti pembayaran"/]
+    B --> C{"Pembayaran<br/>diterima?"}
+    C -->|Tidak| D[/"Minta pelanggan<br/>mengunggah ulang bukti"/]
+    D --> E[/"Pelanggan mengunggah<br/>bukti pembayaran baru"/]
+    E --> B
+    C -->|Ya| F[("Pesanan siap<br/>diproses")]
+    F --> G(["Lanjut ke<br/>Bagian 5.3.1"])
 ```
 
 ### 5.3 Pemrosesan dan Pengiriman

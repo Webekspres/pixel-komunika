@@ -5,7 +5,7 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.7 |
+| Versi | 1.8 |
 | Tanggal | Rabu, 29 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
@@ -238,6 +238,8 @@ flowchart TD
 Diagram berikut merupakan usulan alur yang masih memerlukan konfirmasi klien
 pada Bagian 8.11.
 
+#### 5.3.1 Menyiapkan dan Mengemas Pesanan
+
 ```mermaid
 flowchart TD
     A(["Pembayaran<br/>diterima"]) --> B[("Status:<br/>Diproses")]
@@ -246,20 +248,35 @@ flowchart TD
     D -->|Belum| C
     D -->|Ya| E["Admin mengubah<br/>status ke Dikemas"]
     E --> F[("Status:<br/>Dikemas")]
-    F --> G["Siapkan penyerahan ke<br/>kurir yang dipilih"]
-    G --> H{"Barang sudah<br/>diserahkan ke kurir?"}
-    H -->|Belum| G
-    H -->|Ya| I{"Nomor resi<br/>tersedia?"}
-    I -->|Ya| J[/"Admin memasukkan<br/>nomor resi"/]
-    I -->|Tidak| K["Admin mengubah<br/>status ke Dikirim"]
-    J --> K
-    K --> L[("Status:<br/>Dikirim")]
-    L --> M[/"Tampilkan status dan<br/>nomor resi jika tersedia"/]
-    M --> N{"Penerimaan barang<br/>sudah dikonfirmasi?"}
-    N -->|Belum| O(["Status tetap Dikirim;<br/>menunggu konfirmasi"])
-    N -->|Ya| P["Ubah status<br/>menjadi Selesai"]
-    P --> Q[("Status:<br/>Selesai")]
-    Q --> R(["Pesanan selesai"])
+    F --> G(["Lanjut ke<br/>Bagian 5.3.2"])
+```
+
+#### 5.3.2 Menyerahkan Pesanan kepada Kurir
+
+```mermaid
+flowchart TD
+    A(["Dari Bagian 5.3.1:<br/>Status Dikemas"]) --> B["Siapkan penyerahan ke<br/>kurir yang dipilih"]
+    B --> C{"Barang sudah<br/>diserahkan ke kurir?"}
+    C -->|Belum| B
+    C -->|Ya| D{"Nomor resi<br/>tersedia?"}
+    D -->|Ya| E[/"Admin memasukkan<br/>nomor resi"/]
+    D -->|Tidak| F["Admin mengubah<br/>status ke Dikirim"]
+    E --> F
+    F --> G[("Status:<br/>Dikirim")]
+    G --> H[/"Tampilkan status dan<br/>nomor resi jika tersedia"/]
+    H --> I(["Lanjut ke<br/>Bagian 5.3.3"])
+```
+
+#### 5.3.3 Mengonfirmasi Penerimaan dan Menyelesaikan Pesanan
+
+```mermaid
+flowchart TD
+    A(["Dari Bagian 5.3.2:<br/>Status Dikirim"]) --> B{"Penerimaan barang<br/>sudah dikonfirmasi?"}
+    B -->|Belum| C[("Status tetap Dikirim;<br/>menunggu konfirmasi")]
+    C --> D(["Alur berhenti sementara"])
+    B -->|Ya| E["Ubah status<br/>menjadi Selesai"]
+    E --> F[("Status:<br/>Selesai")]
+    F --> G(["Pesanan selesai"])
 ```
 
 Melihat nomor resi **tidak** otomatis mengubah status pesanan menjadi

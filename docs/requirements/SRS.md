@@ -148,6 +148,9 @@ Alasan:
 
 ### 3.3 Component Diagram
 
+Diagram ini adalah **component/dependency diagram**, bukan urutan proses.
+Panah menunjukkan dependensi komunikasi antarkomponen.
+
 ```mermaid
 flowchart TB
     Browser[Browser Mobile/Desktop]
@@ -219,6 +222,9 @@ Baseline awal:
 - CDN/WAF di depan aplikasi.
 
 Ukuran tersebut merupakan titik awal dan wajib divalidasi dengan load test.
+
+Diagram berikut adalah **deployment topology**. Panah menunjukkan jalur request
+atau komunikasi infrastruktur, bukan status proses bisnis.
 
 ```mermaid
 flowchart LR
@@ -869,21 +875,25 @@ sebagai sumber stok production.
 | FR-AUD | Logging, Audit, Observability |
 | FR-NTF | Queue, Data Model, Resilience |
 
-## 20. Technical Decisions Open
+## 20. Technical Decisions and Open Items
+
+Teks `~~dicoret~~` menandakan keputusan yang sudah final dan dipertahankan
+untuk audit trail. Baris dengan kontrak atau detail yang masih terbuka tidak
+dicoret meskipun sebagian keputusan bisnisnya sudah selesai.
 
 | ID | Decision | Referensi BRD | Status |
 |---|---|---|---|
-| TD-001 | Shared hosting milik klien sebagai production baseline. | OPN-001 | Resolved |
+| TD-001 | ~~Shared hosting milik klien sebagai production baseline.~~ | OPN-001 | Resolved |
 | TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
 | TD-003 | Working operation POS tersedia; Kak Rio menjadi PIC dan akses dibuka setelah alur website berbasis data contoh berjalan. URL/method/payload/auth/error/idempotency belum final; data contoh hanya dipakai di non-production. | OPN-005, OPN-019 | PIC/access trigger resolved; connection contract open |
 | TD-004 | Website membuat transaksi/invoice dan memperbarui stok efektif; POS menerima laporan penjualan/retur untuk pencatatan transaksi serta perubahan stok POS. | OPN-004, OPN-005 | Business flow resolved; technical contract open |
-| TD-005 | Master tiga jenis harga, kategori, merek, nama produk, dan SKU. | OPN-003, OPN-013 | Resolved - POS |
+| TD-005 | ~~Master tiga jenis harga, kategori, merek, nama produk, dan SKU.~~ | OPN-003, OPN-013 | Resolved - POS |
 | TD-006 | Full master/inventory sync sekali sehari; stock-by-product berkala bila diperlukan. | OPN-005 | Resolved working cadence; SLA/trigger final open |
 | TD-007 | Object storage provider dan kebijakan retensi. | OPN-009 | Open |
 | TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
 | TD-010 | Dasar pengenaan PPh 22 dan expiry order belum dibayar. Konfigurasi klasifikasi, ambang, dan tarif ditetapkan melalui website; multi-klasifikasi menghasilkan satu total gabungan. | OPN-006, OPN-007 | Hasil gabungan and expiry resolved; dasar/urutan agregasi partially open |
-| TD-011 | Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; nomor resi ditampilkan. | OPN-020 | Resolved |
+| TD-011 | ~~Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; nomor resi ditampilkan.~~ | OPN-020 | Resolved |
 | TD-012 | Biteship berperan sebagai external location/rate provider melalui Maps dan Rates; endpoint serta field teknis dasar sudah teridentifikasi. Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya masih perlu keputusan operasional. | OPN-021 | Technical contract resolved; operations open |
 | TD-013 | Field wajib invoice ditetapkan; event order baru dan channel website/WhatsApp disetujui. Sumber identitas toko, format/penyampaian invoice, serta kontrak WhatsApp belum final. | OPN-022, OPN-023 | Business behavior resolved; data/provider contract open |
 | TD-014 | Website menerbitkan invoice transaksi web; format/awalan nomor invoice masih perlu ditetapkan. | OPN-008, OPN-022 | Ownership resolved; number/delivery format open |

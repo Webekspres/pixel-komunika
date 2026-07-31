@@ -60,9 +60,11 @@ sesuai proposal awal. PPh 22, batas maksimal penjualan, dan surcharge terkait
 tetap berada dalam MVP; detail formula masih menunggu klarifikasi pada
 [BRD Bagian 15.1](requirements/BRD.md#151-klarifikasi-klien-28-juli-2026).
 
-Production menggunakan shared hosting milik klien. Data production produk dan
-stok wajib berasal dari POS; data contoh hanya digunakan untuk development,
-staging, demo, dan UAT.
+Production menggunakan shared hosting milik klien. Klien akan memberikan akses
+yang diperlukan kepada developer Webekspres untuk setup dan deployment;
+kredensial aktual serta kemampuan teknis hosting diverifikasi saat technical
+handoff. Data production produk dan stok wajib berasal dari POS; data contoh
+hanya digunakan untuk development, staging, demo, dan UAT.
 
 ## Source Documents
 

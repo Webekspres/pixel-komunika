@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.15 - Cancellation Source Clarification |
-| Tanggal | Rabu, 29 Juli 2026 |
+| Versi | 0.16 - Client Shared Hosting Confirmation |
+| Tanggal | Jumat, 31 Juli 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Kebutuhan bisnis | `BRD.md` |
@@ -26,7 +26,8 @@ ketentuan operasional aplikasi.
 - Blade/Livewire digunakan untuk UI; tidak dibangun SPA terpisah.
 - Node.js hanya digunakan pada tahap build aset, bukan runtime production.
 - Database relasional menjadi source of truth transaksi.
-- Redis tidak menyimpan data transaksi utama.
+- Cache/queue tidak menyimpan data transaksi utama; Redis hanya digunakan jika
+  production kelak dipindahkan ke profil VPS.
 - Integrasi eksternal dijalankan melalui backend dan queue.
 - Seeder menggunakan kontrak import internal yang sama dengan adapter POS agar
   perpindahan sumber data tidak mengubah domain transaksi.
@@ -164,19 +165,19 @@ flowchart TB
     Worker[Laravel Queue Worker]
     Scheduler[Laravel Scheduler]
     DB[(MySQL/InnoDB)]
-    Redis[(Redis)]
+    Queue[(Database/File Queue)]
     Storage[(S3-compatible Storage)]
     POS[POS API]
     Biteship[Biteship API<br/>Maps + Rates]
 
     Browser --> CDN --> App
     App --> DB
-    App --> Redis
+    App --> Queue
     App --> Storage
     App --> Biteship
-    App --> Redis
     Scheduler --> App
-    Redis --> Worker
+    Scheduler --> Worker
+    Queue --> Worker
     Worker --> DB
     Worker --> POS
     Worker --> Storage
@@ -186,20 +187,20 @@ flowchart TB
 
 | Area | Pilihan | Keterangan |
 |---|---|---|
-| Language | PHP 8.4 | Runtime utama |
+| Language | PHP versi kompatibel yang tersedia pada hosting; target PHP 8.4 | Runtime utama; diverifikasi sebelum dependency dikunci |
 | Framework | Laravel 13 | Modular monolith |
 | View | Blade | SSR untuk storefront dan halaman umum |
 | Reactive UI | Livewire | Form, cart, checkout, filter, dan admin |
 | Client interaction | Alpine.js | Modal, dropdown, preview, dan interaksi ringan |
 | Styling | Tailwind CSS | Dibangun menjadi aset statis |
 | Asset bundler | Vite | Build-time; bukan production backbone |
-| Database | MySQL 8.4 / InnoDB | Transaksi ACID dan row-level locking |
-| Cache/Queue | Redis | Profil VPS |
-| Queue monitor | Supervisor | Menjaga worker tetap hidup |
-| Web server | Nginx + PHP-FPM | Profil VPS |
+| Database | MySQL/MariaDB versi hosting dengan InnoDB | Transaksi ACID dan row-level locking |
+| Cache/Queue | Database/file | Baseline shared hosting; Redis hanya opsi upgrade VPS |
+| Queue execution | Cron dan bounded worker | Proses berhenti setelah antrean kosong; Supervisor hanya opsi upgrade VPS |
+| Web server | Dikelola penyedia shared hosting | Nginx + PHP-FPM hanya contoh profil upgrade VPS |
 | File storage | S3-compatible object storage | Media dan bukti pembayaran |
 | Testing | PHPUnit atau Pest | Unit, feature, integration |
-| CI/CD | GitHub Actions | Lint, test, build, dan deployment |
+| CI/CD | GitHub Actions | Lint, test, build, lalu deployment artifact ke shared hosting |
 | Edge | Cloudflare atau ekuivalen | CDN, WAF, dan rate limiting |
 
 ### 4.1 Dependency Policy
@@ -244,7 +245,7 @@ flowchart LR
 
 ### 5.2 Profil B - Shared Hosting (Production Baseline)
 
-Jika shared hosting dipilih:
+Pada production baseline shared hosting:
 
 - runtime hanya PHP + MySQL/MariaDB;
 - aset frontend dibangun di CI/developer lalu di-deploy sebagai file statis;
@@ -263,6 +264,13 @@ kebutuhan persistent worker atau resource lebih besar ke opsi upgrade VPS.
 Status final: **shared hosting milik klien**. Aplikasi memakai runtime PHP dan
 database yang disediakan hosting; VPS hanya menjadi opsi upgrade jika batas
 resource shared hosting tidak lagi mencukupi.
+
+Klien akan memberikan akses yang diperlukan kepada developer Webekspres untuk
+setup dan deployment. Kredensial diserahkan melalui jalur aman dan tidak
+disimpan di repository. Saat technical handoff, Webekspres memverifikasi akses
+minimum ke deployment file/artifact, konfigurasi environment, database, cron,
+log, serta backup/restore. Akses SSH/terminal tidak diasumsikan tersedia dan
+hanya digunakan jika didukung oleh paket hosting.
 
 ## 6. Scalability Strategy
 
@@ -822,11 +830,18 @@ Pipeline minimal:
 
 ### 17.3 Deployment
 
+- gunakan artifact yang telah dibangun dan diuji di CI/developer; production
+  tidak menjalankan Node.js/NPM sebagai runtime atau backbone;
+- akses hosting menggunakan akun dengan hak minimum yang memadai dan
+  kredensial tidak disimpan di repository;
 - maintenance mode hanya jika diperlukan;
-- backup/migration plan sebelum perubahan skema berisiko;
+- backup database dan migration plan disiapkan sebelum perubahan skema
+  berisiko;
 - migration bersifat backward-compatible sejauh praktis;
-- cache konfigurasi/route/view dibangun;
-- worker di-restart graceful;
+- migration, cache konfigurasi/route/view, dan setup cron dijalankan melalui
+  mekanisme panel atau terminal yang tersedia pada hosting;
+- queue dijalankan periodik sebagai bounded worker yang berhenti setelah
+  antrean kosong; restart persistent worker hanya berlaku pada opsi VPS;
 - smoke test dijalankan;
 - rollback procedure tersedia.
 
@@ -891,7 +906,7 @@ dicoret meskipun sebagian keputusan bisnisnya sudah selesai.
 
 | ID | Decision | Referensi BRD | Status |
 |---|---|---|---|
-| TD-001 | ~~Shared hosting milik klien sebagai production baseline.~~ | OPN-001 | Resolved |
+| TD-001 | ~~Shared hosting milik klien menjadi production baseline dan klien akan memberikan akses setup/deployment kepada developer Webekspres.~~ Detail kredensial serta kemampuan panel, database, cron, log, backup, dan SSH/terminal diverifikasi saat technical handoff. | OPN-001, PRE-006 | Hosting/access commitment resolved; technical handoff pending |
 | TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
 | TD-003 | Working operation POS tersedia; Kak Rio menjadi PIC dan akses dibuka setelah alur website berbasis data contoh berjalan. URL/method/payload/auth/error/idempotency belum final; data contoh hanya dipakai di non-production. | OPN-005, OPN-019 | PIC/access trigger resolved; connection contract open |
 | TD-004 | Website membuat transaksi/invoice dan memperbarui stok efektif; POS menerima laporan penjualan/retur untuk pencatatan transaksi serta perubahan stok POS. | OPN-004, OPN-005 | Business flow resolved; technical contract open |

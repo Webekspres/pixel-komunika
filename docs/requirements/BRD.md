@@ -7,8 +7,8 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.14 - Cancellation Source Clarification |
-| Tanggal | Rabu, 29 Juli 2026 |
+| Versi | 0.15 - Client Shared Hosting Confirmation |
+| Tanggal | Jumat, 31 Juli 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
 | MVP delivery | `MVP.md` |
@@ -56,6 +56,7 @@ Status requirement:
 | CR-013 | Rabu, 29 Juli 2026 | Review dokumentasi internal | Pertanyaan yang telah selesai ditandai strikethrough tanpa menghapus ID dan bukti keputusan. Diagram proses bisnis memakai notasi flowchart yang konsisten; diagram konteks tetap diperlakukan sebagai context diagram. | Keterbacaan dan audit trail diperbaiki tanpa mengubah scope atau aturan bisnis. | Documentation-only |
 | CR-014 | Rabu, 29 Juli 2026 | Review alur fulfillment | Urutan `PROCESSING` → `PACKED` → `SHIPPED` → `COMPLETED` telah disetujui, tetapi pemicu setiap transisi dan cara memastikan barang diterima belum pernah ditetapkan. Melihat nomor resi tidak dapat dianggap sebagai bukti penerimaan. | OPN-020 dibuka kembali sebagai keputusan parsial; Q-025 ditambahkan dan alur client-facing serta user flow diperinci tanpa memilih mekanisme konfirmasi secara sepihak. | Clarification required |
 | CR-015 | Rabu, 29 Juli 2026 | Klarifikasi sumber pembatalan | Pembatalan manual oleh admin dan pembatalan kedaluwarsa oleh sistem harus dapat dibedakan tanpa memecah lifecycle menjadi dua status batal. | Status tetap `CANCELLED`; sumber `ADMIN`/`SYSTEM`, pelaku admin jika ada, alasan, dan waktu pembatalan disimpan serta ditampilkan pada rincian order. | Baseline clarification |
+| CR-016 | Jumat, 31 Juli 2026 | Konfirmasi resmi klien melalui System Analyst | Production menggunakan shared hosting milik klien dan developer Webekspres akan diberikan akses yang diperlukan untuk setup serta deployment. | OPN-001 diperkuat sebagai keputusan final. Komitmen penyediaan akses pada PRE-006 selesai; kredensial aktual, domain/DNS, akun layanan, kemampuan runtime, cron, log, dan backup tetap diverifikasi saat technical handoff. | Resolved - hosting ownership and access commitment |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -448,8 +449,9 @@ Nilai target final harus disetujui pada technical kickoff
   Format/penyampaian invoice dan kontrak notifikasi WhatsApp diselesaikan
   sebelum integration acceptance ([lihat OPN-022](#opn-022) dan
   [OPN-023](#opn-023)).
-- Infrastruktur production menggunakan shared hosting milik klien
-  ([lihat OPN-001](#opn-001)).
+- Infrastruktur production menggunakan shared hosting milik klien. Klien akan
+  memberikan akses yang diperlukan kepada developer Webekspres untuk setup dan
+  deployment ([lihat OPN-001](#opn-001)).
 - Perubahan scope setelah baseline mengikuti change control pada
   [Bagian 2.3](#23-change-control).
 
@@ -481,7 +483,15 @@ Item `Partially resolved` tidak dicoret karena masih memiliki keputusan terbuka.
 
 ### OPN-001
 
-~~Production menggunakan shared hosting milik klien. Batasan runtime dan operasional shared hosting menjadi baseline desain.~~
+~~Production menggunakan shared hosting milik klien. Klien akan memberikan
+akses yang diperlukan kepada developer Webekspres untuk setup dan deployment.
+Batasan runtime dan operasional shared hosting menjadi baseline desain.~~
+
+**Keputusan:** Kepemilikan hosting dan komitmen pemberian akses dikonfirmasi
+resmi pada 31 Juli 2026. Kredensial aktual, domain/DNS, akun layanan, versi
+runtime/database, dukungan cron, akses log, dan mekanisme backup diverifikasi
+pada technical handoff; verifikasi tersebut tidak membuka kembali keputusan
+jenis hosting.
 
 **Pemilik:** Klien / Webekspres · **Target:** 28 Juli 2026 · **Status:** Resolved
 
@@ -770,7 +780,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Blocker operasional - OPN-010, OPN-016, OPN-021; kontrak Maps/Rates sudah teridentifikasi |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - ownership/field invoice dan event/channel notifikasi selesai; sumber identitas, format/channel invoice, serta provider/penerima/template/fallback WhatsApp tetap OPN-022/OPN-023 |
-| PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Parsial - shared hosting resolved pada OPN-001; domain/DNS, akun layanan, dan akses environment masih perlu disediakan |
+| PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Parsial - shared hosting milik klien dan komitmen pemberian akses developer resolved pada OPN-001/CR-016; kredensial aktual, domain/DNS, akun layanan, kemampuan runtime, cron, log, backup, dan jadwal handoff masih perlu disediakan atau diverifikasi |
 | PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |
 
 ## 16. Persetujuan

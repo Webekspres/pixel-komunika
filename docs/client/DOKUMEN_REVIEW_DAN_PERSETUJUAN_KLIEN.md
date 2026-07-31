@@ -5,8 +5,8 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.9 |
-| Tanggal | Rabu, 29 Juli 2026 |
+| Versi | 1.10 |
+| Tanggal | Jumat, 31 Juli 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
 | Pengembang | PT Webekspres Teknologi Indonesia |
@@ -161,7 +161,10 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 
 ## 4. Keputusan yang Sudah Disepakati
 
-1. Website produksi menggunakan shared hosting milik klien.
+1. Website produksi menggunakan shared hosting milik klien. Klien akan
+   memberikan akses yang diperlukan kepada developer Webekspres untuk
+   menyiapkan dan memasang website. Detail akses akan diserahkan secara aman
+   sebelum proses pemasangan.
 2. Produk, SKU, kategori, merek, harga, dan stok bersumber dari POS.
 3. Website dapat melengkapi gambar, video, deskripsi, dan informasi lain yang
    belum tersedia di POS.

@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.11 - Cancellation Source Clarification |
-| Tanggal | Rabu, 29 Juli 2026 |
+| Versi | 0.12 - Client Shared Hosting Confirmation |
+| Tanggal | Jumat, 31 Juli 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
 | System Analyst | Sultan - Webekspres |
@@ -52,7 +52,7 @@ serta diproses admin.
 | MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi, omzet, dan PPh 22 berdasarkan periode serta area; PPh 22 tampil terpisah dan transaksi batal dikecualikan. |
 | MVP-014 | Audit dan penanganan gangguan | BR-027 - BR-028; FR-POS-020; FR-AUD-001, FR-AUD-004; FRD Bagian 15 | Pelaporan penjualan/retur ke POS dan gangguan sinkronisasi tercatat; percobaan ulang tidak membuat laporan atau perubahan stok ganda. |
 | MVP-015 | Security dan authorization | SRS Bagian 12.3 | CSRF, validation, policy, rate limit, secure session, private upload, dan secret management lulus test relevan. |
-| MVP-016 | Release readiness | SRS Bagian 15 - 18 | Staging, CI, backup, rollback, logging, smoke test, UAT, training, dan sign-off go-live tersedia. |
+| MVP-016 | Release readiness | SRS Bagian 15 - 18 | Shared hosting milik klien menjadi target production; akses deployment developer, domain/DNS, runtime/database, cron, log, backup/rollback, staging, CI, smoke test, UAT, training, dan sign-off go-live tersedia serta terverifikasi sebelum rilis. |
 | MVP-017 | Ambang klasifikasi dan PPh 22 | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Admin mengelola klasifikasi, ambang nilai belanja, dan tarif melalui website; transaksi di atas ambang tetap berjalan. Multi-klasifikasi menghasilkan satu total PPh 22 yang disimpan dan ditampilkan sesuai formula final OPN-006. |
 | MVP-018 | Notifikasi order baru kepada admin | BR-031; FR-NTF-001 - FR-NTF-002 | Order baru menampilkan indikator merah di website admin dan menjadwalkan pesan WhatsApp. Gangguan WhatsApp tidak menggagalkan order; provider, penerima, template, dan fallback harus selesai sebelum acceptance integrasi WhatsApp. |
 

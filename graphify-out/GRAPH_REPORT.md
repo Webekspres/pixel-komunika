@@ -1,16 +1,16 @@
 # Graph Report - pixel-komunika  (2026-08-04)
 
 ## Corpus Check
-- 47 files · ~46,196 words
+- 47 files · ~46,434 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 451 nodes · 450 edges · 45 communities (40 shown, 5 thin omitted)
+- 453 nodes · 451 edges · 47 communities (42 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d9aba983`
+- Built from commit: `d585a663`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -39,6 +39,8 @@
 - Domains/README.md
 - Controller.php
 - ponytail.md
+- 5. Order, Invoice, dan Payment
+- Pixel Komunika
 
 ## God Nodes (most connected - your core abstractions)
 1. `15. Keputusan Terbuka` - 28 edges
@@ -59,11 +61,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (45 total, 5 thin omitted)
+## Communities (47 total, 5 thin omitted)
 
 ### Community 0 - "Data Dictionary"
-Cohesion: 0.05
-Nodes (44): 10. Constraint dan Index Minimum, 11. Delete dan Retention, 1. Konvensi, 2.1 `roles`, 2.2 `users`, 2.3 `customer_profiles`, 2.4 `addresses`, 2. Identity dan Customer (+36 more)
+Cohesion: 0.06
+Nodes (35): 10. Constraint dan Index Minimum, 11. Delete dan Retention, 1. Konvensi, 2.1 `roles`, 2.2 `users`, 2.3 `customer_profiles`, 2.4 `addresses`, 2. Identity dan Customer (+27 more)
 
 ### Community 1 - "Software Requirements Specification (SRS)"
 Cohesion: 0.05
@@ -98,8 +100,8 @@ Cohesion: 0.08
 Nodes (26): 10. Business Rules, 11.1 Registrasi dan Persetujuan, 11.2 Transaksi dan Pembayaran, 11.3 Sinkronisasi POS, 11. Proses Bisnis Utama, 12. Ukuran Keberhasilan, 13. Asumsi dan Dependensi, 14. Risiko Bisnis (+18 more)
 
 ### Community 9 - "docs/README.md"
-Cohesion: 0.22
-Nodes (10): 1. Batasan Model, 2. ERD Working Baseline, 3. Aturan Relasi Utama, 4. Keputusan Minimal untuk Implementasi, Entity Relationship Diagram (ERD), Pixel Komunika E-Commerce, Docs, Local setup (+2 more)
+Cohesion: 0.36
+Nodes (6): 1. Batasan Model, 2. ERD Working Baseline, 3. Aturan Relasi Utama, 4. Keputusan Minimal untuk Implementasi, Entity Relationship Diagram (ERD), Pixel Komunika E-Commerce
 
 ### Community 10 - "User.php"
 Cohesion: 0.16
@@ -137,8 +139,16 @@ Nodes (7): Client Deliverable, Current Change Notice, Delivery Method, Design Do
 Cohesion: 0.40
 Nodes (3): Illuminate\Foundation\Testing\TestCase, ExampleTest, TestCase
 
+### Community 45 - "5. Order, Invoice, dan Payment"
+Cohesion: 0.22
+Nodes (9): 5.1 `store_profiles`, 5.2 `bank_accounts`, 5.3 `orders`, 5.4 `order_items`, 5.5 `order_charge_components`, 5.6 `invoices`, 5.7 `payments`, 5.8 `payment_proofs` (+1 more)
+
+### Community 46 - "Pixel Komunika"
+Cohesion: 0.29
+Nodes (6): Branch, Catatan, Development setup, Dokumentasi, Pixel Komunika, Stack
+
 ## Knowledge Gaps
-- **297 isolated node(s):** `Controller`, `$schema`, `name`, `type`, `description` (+292 more)
+- **299 isolated node(s):** `Controller`, `$schema`, `name`, `type`, `description` (+294 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -146,15 +156,15 @@ Nodes (3): Illuminate\Foundation\Testing\TestCase, ExampleTest, TestCase
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Business Requirements Document (BRD)` connect `Business Requirements Document (BRD)` to `docs/README.md`, `15. Keputusan Terbuka`?**
-  _High betweenness centrality (0.128) - this node is a cross-community bridge._
+  _High betweenness centrality (0.124) - this node is a cross-community bridge._
 - **Why does `Software Requirements Specification (SRS)` connect `Software Requirements Specification (SRS)` to `7.3 Biteship API`, `docs/README.md`?**
-  _High betweenness centrality (0.126) - this node is a cross-community bridge._
-- **Why does `Data Dictionary` connect `Data Dictionary` to `docs/README.md`?**
-  _High betweenness centrality (0.108) - this node is a cross-community bridge._
+  _High betweenness centrality (0.123) - this node is a cross-community bridge._
+- **Why does `Data Dictionary` connect `Data Dictionary` to `docs/README.md`, `5. Order, Invoice, dan Payment`?**
+  _High betweenness centrality (0.105) - this node is a cross-community bridge._
 - **What connects `Controller`, `$schema`, `name` to the rest of the system?**
-  _297 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _299 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Data Dictionary` be split into smaller, more focused modules?**
-  _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Software Requirements Specification (SRS)` be split into smaller, more focused modules?**
   _Cohesion score 0.046511627906976744 - nodes in this community are weakly interconnected._
 - **Should `composer.json` be split into smaller, more focused modules?**

@@ -609,15 +609,15 @@
       "norm_label": "composer\\\\config::disableprocesstimeout"
     },
     {
-      "label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fb7185,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"php artisan pail --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,logs,vite --kill-others",
+      "label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,vite --kill-others",
       "file_type": "concept",
       "source_file": "composer.json",
       "source_location": "L46",
       "_origin": "ast",
-      "id": "ref_npx_concurrently_c_93c5fd_c4b5fd_fb7185_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_php_artisan_pail_timeout_0_npm_run_dev_names_server_queue_logs_vite_kill_others",
+      "id": "ref_npx_concurrently_c_93c5fd_c4b5fd_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_npm_run_dev_names_server_queue_vite_kill_others",
       "community": 7,
       "community_name": "scripts",
-      "norm_label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fb7185,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"php artisan pail --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,logs,vite --kill-others"
+      "norm_label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,vite --kill-others"
     },
     {
       "label": "test",
@@ -1742,21 +1742,21 @@
       "norm_label": "`dev` \u2014 manual"
     },
     {
-      "label": "`staging` \u2014 semi-otomatis",
+      "label": "`staging` \u2014 manual",
       "file_type": "document",
       "source_file": "AGENTS.md",
       "source_location": "L84",
       "_origin": "ast",
-      "id": "agents_staging_semi_otomatis",
+      "id": "agents_staging_manual",
       "community": 12,
       "community_name": "Kebijakan Branch dan Push",
-      "norm_label": "`staging` \u2014 semi-otomatis"
+      "norm_label": "`staging` \u2014 manual"
     },
     {
       "label": "`main` \u2014 manual dan production-ready",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L93",
+      "source_location": "L92",
       "_origin": "ast",
       "id": "agents_main_manual_dan_production_ready",
       "community": 12,
@@ -1767,7 +1767,7 @@
       "label": "Pengaman Git",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L102",
+      "source_location": "L104",
       "_origin": "ast",
       "id": "agents_pengaman_git",
       "community": 12,
@@ -1781,8 +1781,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "readme",
-      "community": 9,
-      "community_name": "docs/README.md",
+      "community": 46,
+      "community_name": "Pixel Komunika",
       "norm_label": "readme.md"
     },
     {
@@ -1792,42 +1792,64 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "readme_pixel_komunika",
-      "community": 9,
-      "community_name": "docs/README.md",
+      "community": 46,
+      "community_name": "Pixel Komunika",
       "norm_label": "pixel komunika"
     },
     {
       "label": "Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L5",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "readme_stack",
-      "community": 9,
-      "community_name": "docs/README.md",
+      "community": 46,
+      "community_name": "Pixel Komunika",
       "norm_label": "stack"
     },
     {
-      "label": "Docs",
+      "label": "Branch",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L21",
       "_origin": "ast",
-      "id": "readme_docs",
-      "community": 9,
-      "community_name": "docs/README.md",
-      "norm_label": "docs"
+      "id": "readme_branch",
+      "community": 46,
+      "community_name": "Pixel Komunika",
+      "norm_label": "branch"
     },
     {
-      "label": "Local setup",
+      "label": "Development setup",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L15",
+      "source_location": "L31",
       "_origin": "ast",
-      "id": "readme_local_setup",
-      "community": 9,
-      "community_name": "docs/README.md",
-      "norm_label": "local setup"
+      "id": "readme_development_setup",
+      "community": 46,
+      "community_name": "Pixel Komunika",
+      "norm_label": "development setup"
+    },
+    {
+      "label": "Dokumentasi",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "readme_dokumentasi",
+      "community": 46,
+      "community_name": "Pixel Komunika",
+      "norm_label": "dokumentasi"
+    },
+    {
+      "label": "Catatan",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "readme_catatan",
+      "community": 46,
+      "community_name": "Pixel Komunika",
+      "norm_label": "catatan"
     },
     {
       "label": "Domains/README.md",
@@ -2617,8 +2639,8 @@
       "source_location": "L286",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_order_invoice_dan_payment",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5. order, invoice, dan payment"
     },
     {
@@ -2628,8 +2650,8 @@
       "source_location": "L288",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_1_store_profiles",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.1 `store_profiles`"
     },
     {
@@ -2639,8 +2661,8 @@
       "source_location": "L306",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_2_bank_accounts",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.2 `bank_accounts`"
     },
     {
@@ -2650,8 +2672,8 @@
       "source_location": "L319",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_3_orders",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.3 `orders`"
     },
     {
@@ -2661,8 +2683,8 @@
       "source_location": "L357",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_4_order_items",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.4 `order_items`"
     },
     {
@@ -2672,8 +2694,8 @@
       "source_location": "L376",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_5_order_charge_components",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.5 `order_charge_components`"
     },
     {
@@ -2683,8 +2705,8 @@
       "source_location": "L397",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_6_invoices",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.6 `invoices`"
     },
     {
@@ -2694,8 +2716,8 @@
       "source_location": "L421",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_7_payments",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.7 `payments`"
     },
     {
@@ -2705,8 +2727,8 @@
       "source_location": "L438",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_5_8_payment_proofs",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "5. Order, Invoice, dan Payment",
       "norm_label": "5.8 `payment_proofs`"
     },
     {
@@ -5787,7 +5809,7 @@
       "context": "import",
       "_origin": "ast",
       "source": "composer_scripts_dev",
-      "target": "ref_npx_concurrently_c_93c5fd_c4b5fd_fb7185_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_php_artisan_pail_timeout_0_npm_run_dev_names_server_queue_logs_vite_kill_others",
+      "target": "ref_npx_concurrently_c_93c5fd_c4b5fd_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_npm_run_dev_names_server_queue_vite_kill_others",
       "confidence_score": 1.0
     },
     {
@@ -6640,7 +6662,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
-      "source_location": "L93",
+      "source_location": "L92",
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
@@ -6651,7 +6673,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
-      "source_location": "L102",
+      "source_location": "L104",
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
@@ -6666,18 +6688,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
-      "target": "agents_staging_semi_otomatis",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L13",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "readme",
-      "target": "docs_readme",
+      "target": "agents_staging_manual",
       "confidence_score": 1.0
     },
     {
@@ -6695,29 +6706,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_pixel_komunika",
-      "target": "readme_docs",
+      "target": "readme_branch",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L15",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_pixel_komunika",
-      "target": "readme_local_setup",
+      "target": "readme_catatan",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L5",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_pixel_komunika",
+      "target": "readme_development_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_pixel_komunika",
+      "target": "readme_dokumentasi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_pixel_komunika",
@@ -9960,5 +9993,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d9aba983616aadd4200cb9712e01b15f69fd609f"
+  "built_at_commit": "d585a663a05909bb01a856824bf852150441682e"
 }

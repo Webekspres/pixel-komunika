@@ -1,7 +1,7 @@
 # Graph Report - pixel-komunika  (2026-08-04)
 
 ## Corpus Check
-- 47 files · ~46,195 words
+- 47 files · ~46,196 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4efad436`
+- Built from commit: `d9aba983`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -111,7 +111,7 @@ Nodes (17): concurrently, laravel-vite-plugin, devDependencies, concurrently, la
 
 ### Community 12 - "Kebijakan Branch dan Push"
 Cohesion: 0.15
-Nodes (12): 1. Rust Token Killer (RTK), 2. Graphify, 3. Ponytail Ultra, Always-Active Tooling, Bootstrap Wajib, `dev` — otomatis, Kebijakan Branch dan Push, `main` — manual dan production-ready (+4 more)
+Nodes (12): 1. Rust Token Killer (RTK), 2. Graphify, 3. Ponytail Ultra, Always-Active Tooling, Bootstrap Wajib, `dev` — manual, Kebijakan Branch dan Push, `main` — manual dan production-ready (+4 more)
 
 ### Community 13 - "5. Alur Utama"
 Cohesion: 0.17

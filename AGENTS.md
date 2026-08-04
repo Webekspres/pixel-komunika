@@ -95,8 +95,11 @@ promosi.
   untuk tindakan tersebut.
 - Dilarang melakukan auto-push, auto-merge, atau menganggap kata "selesai",
   "stabil", maupun "final" sebagai izin implisit untuk menyentuh `main`.
-- Sebelum promosi, pastikan seluruh scope final, acceptance criteria terpenuhi,
-  validasi production lulus, dan perubahan siap dirilis.
+- Sampai rilis production pertama, `main` boleh berisi landing `README.md`
+  saja; aplikasi penuh tetap di `dev`/`staging`. Mengganti isi `main` ke
+  artifact production tetap memerlukan prompt eksplisit.
+- Sebelum promosi production, pastikan seluruh scope final, acceptance
+  criteria terpenuhi, validasi production lulus, dan perubahan siap dirilis.
 
 ### Pengaman Git
 

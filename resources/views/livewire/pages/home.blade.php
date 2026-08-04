@@ -38,15 +38,29 @@
                     <span class="sr-only">Keranjang (segera)</span>
                 </button>
 
-                <a href="#masuk" class="hidden text-sm font-medium text-brand-black/80 transition hover:text-brand-red sm:inline">
-                    Masuk
-                </a>
-                <a
-                    href="#daftar"
-                    class="rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-soft"
-                >
-                    Daftar
-                </a>
+                @auth
+                    <a href="{{ route('account.dashboard') }}" class="hidden text-sm font-medium text-brand-black/80 transition hover:text-brand-red sm:inline">
+                        Akun
+                    </a>
+                    @if (auth()->user()->isActiveCustomer())
+                        <a
+                            href="{{ route('checkout.index') }}"
+                            class="rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-soft"
+                        >
+                            Checkout
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="hidden text-sm font-medium text-brand-black/80 transition hover:text-brand-red sm:inline">
+                        Masuk
+                    </a>
+                    <a
+                        href="{{ route('register') }}"
+                        class="rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-soft"
+                    >
+                        Daftar
+                    </a>
+                @endauth
             </div>
         </div>
     </header>
@@ -72,18 +86,35 @@
                     Power bank, charger, audio, kartu data, voucher internet, dan pulsa — harga partai &amp; grosir setelah akun disetujui.
                 </p>
                 <div class="mt-8 flex flex-wrap items-center gap-3">
-                    <a
-                        href="#daftar"
-                        class="inline-flex rounded-full bg-brand-black px-6 py-3 text-sm font-semibold text-brand-white transition hover:bg-brand-black/90"
-                    >
-                        Daftar sekarang
-                    </a>
-                    <a
-                        href="#masuk"
-                        class="inline-flex rounded-full border-2 border-brand-black/20 bg-brand-white/50 px-6 py-3 text-sm font-semibold text-brand-black transition hover:border-brand-red hover:text-brand-red"
-                    >
-                        Masuk
-                    </a>
+                    @auth
+                        <a
+                            href="{{ route('account.dashboard') }}"
+                            class="inline-flex rounded-full bg-brand-black px-6 py-3 text-sm font-semibold text-brand-white transition hover:bg-brand-black/90"
+                        >
+                            Buka akun
+                        </a>
+                        @if (auth()->user()->isActiveCustomer())
+                            <a
+                                href="{{ route('orders.index') }}"
+                                class="inline-flex rounded-full border-2 border-brand-black/20 bg-brand-white/50 px-6 py-3 text-sm font-semibold text-brand-black transition hover:border-brand-red hover:text-brand-red"
+                            >
+                                Lihat order
+                            </a>
+                        @endif
+                    @else
+                        <a
+                            href="{{ route('register') }}"
+                            class="inline-flex rounded-full bg-brand-black px-6 py-3 text-sm font-semibold text-brand-white transition hover:bg-brand-black/90"
+                        >
+                            Daftar sekarang
+                        </a>
+                        <a
+                            href="{{ route('login') }}"
+                            class="inline-flex rounded-full border-2 border-brand-black/20 bg-brand-white/50 px-6 py-3 text-sm font-semibold text-brand-black transition hover:border-brand-red hover:text-brand-red"
+                        >
+                            Masuk
+                        </a>
+                    @endauth
                 </div>
             </div>
 
@@ -114,7 +145,7 @@
 
             <div class="mt-10 grid gap-5 lg:grid-cols-3 lg:grid-rows-2">
                 <a
-                    href="#daftar"
+                    href="{{ auth()->check() ? route('account.dashboard') : route('register') }}"
                     class="group relative overflow-hidden rounded-2xl bg-brand-yellow lg:col-span-2 lg:row-span-2"
                 >
                     <img
@@ -134,7 +165,7 @@
                     </div>
                 </a>
 
-                <a href="#daftar" class="group relative overflow-hidden rounded-2xl bg-gray-100">
+                <a href="{{ auth()->check() ? route('account.dashboard') : route('register') }}" class="group relative overflow-hidden rounded-2xl bg-gray-100">
                     <img
                         src="{{ asset('assets/placeholders/voucher.webp') }}"
                         alt=""
@@ -152,7 +183,7 @@
                     </div>
                 </a>
 
-                <a href="#daftar" class="group relative overflow-hidden rounded-2xl bg-brand-black">
+                <a href="{{ auth()->check() ? route('account.dashboard') : route('register') }}" class="group relative overflow-hidden rounded-2xl bg-brand-black">
                     <img
                         src="{{ asset('assets/placeholders/pulsa.webp') }}"
                         alt=""
@@ -192,7 +223,7 @@
                     ['img' => 'product-4.webp', 'badge' => 'Tersedia', 'badgeClass' => 'bg-brand-yellow text-brand-black', 'title' => 'Mouse wireless', 'icon' => 'package'],
                 ] as $item)
                     <article class="overflow-hidden rounded-2xl border border-brand-black/10 bg-brand-white transition hover:-translate-y-0.5 hover:border-brand-yellow/60">
-                        <div class="relative aspect-[4/3] bg-gray-100">
+                        <div class="relative aspect-4/3 bg-gray-100">
                             <img
                                 src="{{ asset('assets/placeholders/'.$item['img']) }}"
                                 alt=""
@@ -212,10 +243,15 @@
                             </div>
                             <h3 class="font-semibold text-brand-black">{{ $item['title'] }}</h3>
                             <p class="mt-1 text-xs text-brand-black/55">Harga partai</p>
-                            <p class="mt-1 select-none text-lg font-bold text-brand-black blur-sm" aria-hidden="true">
-                                Rp 999.000
-                            </p>
-                            <p class="sr-only">Harga tersembunyi sampai akun disetujui</p>
+                            @if (auth()->user()?->canViewPrices())
+                                <p class="mt-1 text-lg font-bold text-brand-black">
+                                    Rp 999.000
+                                </p>
+                            @else
+                                <p class="mt-1 text-sm font-semibold text-brand-black/55">
+                                    Login aktif untuk melihat harga
+                                </p>
+                            @endif
                         </div>
                     </article>
                 @endforeach
@@ -270,22 +306,32 @@
         <div class="mx-auto max-w-6xl px-6 text-center lg:px-8">
             <h2 class="text-2xl font-bold text-brand-black sm:text-3xl">Siap bergabung?</h2>
             <p class="mx-auto mt-3 max-w-xl text-brand-black/70">
-                Registrasi dan login akan aktif setelah modul autentikasi siap. Tombol di bawah menandai alur berikutnya.
+                Guest dan akun pending tetap bisa melihat katalog. Harga, checkout, dan riwayat order hanya terbuka setelah akun disetujui admin.
             </p>
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <span
-                    id="masuk"
-                    class="inline-flex cursor-default rounded-full border-2 border-brand-black/15 px-6 py-3 text-sm font-semibold text-brand-black/50"
-                    title="Segera hadir"
-                >
-                    Masuk (segera)
-                </span>
-                <span
-                    class="inline-flex cursor-default rounded-full bg-brand-yellow/70 px-6 py-3 text-sm font-semibold text-brand-black/60"
-                    title="Segera hadir"
-                >
-                    Daftar (segera)
-                </span>
+                @auth
+                    <a
+                        id="masuk"
+                        href="{{ route('account.dashboard') }}"
+                        class="inline-flex rounded-full border-2 border-brand-black/15 px-6 py-3 text-sm font-semibold text-brand-black"
+                    >
+                        Buka akun
+                    </a>
+                @else
+                    <a
+                        id="masuk"
+                        href="{{ route('login') }}"
+                        class="inline-flex rounded-full border-2 border-brand-black/15 px-6 py-3 text-sm font-semibold text-brand-black"
+                    >
+                        Masuk
+                    </a>
+                    <a
+                        href="{{ route('register') }}"
+                        class="inline-flex rounded-full bg-brand-yellow/80 px-6 py-3 text-sm font-semibold text-brand-black"
+                    >
+                        Daftar
+                    </a>
+                @endauth
             </div>
         </div>
     </section>
@@ -320,8 +366,12 @@
             <div>
                 <h3 class="mb-3 text-sm font-semibold tracking-wide uppercase">Akun</h3>
                 <ul class="space-y-2 text-sm text-brand-white/70">
-                    <li><a href="#daftar" class="transition hover:text-brand-yellow">Daftar</a></li>
-                    <li><a href="#masuk" class="transition hover:text-brand-yellow">Masuk</a></li>
+                    @auth
+                        <li><a href="{{ route('account.dashboard') }}" class="transition hover:text-brand-yellow">Akun</a></li>
+                    @else
+                        <li><a href="{{ route('register') }}" class="transition hover:text-brand-yellow">Daftar</a></li>
+                        <li><a href="{{ route('login') }}" class="transition hover:text-brand-yellow">Masuk</a></li>
+                    @endauth
                 </ul>
             </div>
         </div>

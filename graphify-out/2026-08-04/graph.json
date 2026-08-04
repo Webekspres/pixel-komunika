@@ -1731,15 +1731,15 @@
       "norm_label": "kebijakan branch dan push"
     },
     {
-      "label": "`dev` \u2014 manual",
+      "label": "`dev` \u2014 otomatis",
       "file_type": "document",
       "source_file": "AGENTS.md",
       "source_location": "L75",
       "_origin": "ast",
-      "id": "agents_dev_manual",
+      "id": "agents_dev_otomatis",
       "community": 12,
       "community_name": "Kebijakan Branch dan Push",
-      "norm_label": "`dev` \u2014 manual"
+      "norm_label": "`dev` \u2014 otomatis"
     },
     {
       "label": "`staging` \u2014 semi-otomatis",
@@ -6633,7 +6633,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
-      "target": "agents_dev_manual",
+      "target": "agents_dev_otomatis",
       "confidence_score": 1.0
     },
     {
@@ -9960,5 +9960,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d9aba983616aadd4200cb9712e01b15f69fd609f"
+  "built_at_commit": "4efad436ead832951458f6c442452276f875e908"
 }

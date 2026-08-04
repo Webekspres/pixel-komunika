@@ -72,22 +72,21 @@ Jika capability belum tersedia:
 Gunakan alur promosi `dev` -> `staging` -> `main`. Jangan melewati tingkat
 promosi.
 
-### `dev` — otomatis
+### `dev` — manual
 
-- Setelah setiap iterasi selesai dan validasi relevan lulus, commit perubahan
-  iterasi tersebut lalu push otomatis ke branch `dev` tanpa menunggu prompt.
-- Commit hanya file yang termasuk scope iterasi. Jangan memasukkan perubahan
-  milik pengguna atau pekerjaan lain yang tidak terkait.
+- Jangan commit atau push ke `dev` secara otomatis.
+- Commit dan/atau push ke `dev` hanya jika pengguna meminta secara eksplisit.
+- Saat diminta: commit hanya file yang termasuk scope iterasi; jangan
+  memasukkan perubahan milik pengguna atau pekerjaan lain yang tidak terkait.
 - Jika validasi gagal, terjadi konflik, atau akses remote tidak tersedia,
   jangan push; laporkan blocker dan pertahankan perubahan lokal.
 
-### `staging` — semi-otomatis
+### `staging` — manual
 
-- Push ke `staging` hanya ketika satu fitur sudah stabil: scope fitur selesai,
-  acceptance criteria terpenuhi, dan pemeriksaan relevan lulus.
-- Promosi dapat dipicu agent secara mandiri ketika seluruh syarat stabil
-  terbukti, atau menunggu instruksi pengguna jika kesiapan fitur masih
-  mengandung keputusan bisnis maupun risiko yang belum jelas.
+- Jangan commit atau push ke `staging` secara otomatis maupun semi-otomatis.
+- Push/promosi ke `staging` hanya jika pengguna meminta secara eksplisit.
+- Saat diminta: pastikan satu fitur sudah stabil (scope selesai, acceptance
+  criteria terpenuhi, pemeriksaan relevan lulus) sebelum mempromosikan.
 - Jangan mempromosikan pekerjaan parsial atau eksperimen dari `dev`.
 
 ### `main` — manual dan production-ready

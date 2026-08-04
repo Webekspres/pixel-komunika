@@ -1,35 +1,43 @@
 <x-layouts.app :title="'Masuk - Pixel Komunika'">
-    <section class="mx-auto max-w-xl px-4 py-12 sm:px-6 lg:px-8">
-        <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-            <h1 class="text-3xl font-bold">Masuk</h1>
-            <p class="mt-2 text-sm text-brand-black/70">
-                Gunakan email dan password yang terdaftar.
-            </p>
+    <x-layout.auth-shell
+        title="Masuk ke akun Anda"
+        description="Gunakan email dan password terdaftar untuk membuka akses area internal Pixel Komunika."
+    >
+        <form method="POST" action="{{ route('login.store') }}" class="space-y-5">
+            @csrf
 
-            <form method="POST" action="{{ route('login.store') }}" class="mt-8 space-y-5">
-                @csrf
+            <flux:input
+                id="email"
+                name="email"
+                type="email"
+                label="Email"
+                value="{{ old('email') }}"
+                placeholder="nama@usaha.com"
+                required
+            />
 
-                <div>
-                    <label for="email" class="mb-2 block text-sm font-semibold">Email</label>
-                    <input id="email" name="email" type="email" value="{{ old('email') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                    @error('email') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                </div>
+            <flux:input
+                id="password"
+                name="password"
+                type="password"
+                label="Password"
+                viewable
+                required
+            />
 
-                <div>
-                    <label for="password" class="mb-2 block text-sm font-semibold">Password</label>
-                    <input id="password" name="password" type="password" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                    @error('password') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                </div>
+            <flux:field variant="inline">
+                <flux:checkbox name="remember" value="1" label="Ingat saya" />
+            </flux:field>
 
-                <label class="flex items-center gap-2 text-sm text-brand-black/70">
-                    <input type="checkbox" name="remember" value="1" class="rounded border-brand-black/20">
-                    <span>Ingat saya</span>
-                </label>
-
-                <button type="submit" class="rounded-full bg-brand-yellow px-5 py-3 font-semibold text-brand-black">
+            <div class="space-y-3">
+                <flux:button type="submit" variant="primary" color="amber" class="w-full">
                     Masuk
-                </button>
-            </form>
-        </div>
-    </section>
+                </flux:button>
+
+                <flux:button href="{{ route('register') }}" variant="ghost" class="w-full">
+                    Belum punya akun? Daftar
+                </flux:button>
+            </div>
+        </form>
+    </x-layout.auth-shell>
 </x-layouts.app>

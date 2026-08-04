@@ -1,91 +1,115 @@
 <x-layouts.app :title="'Customer Management - Pixel Komunika'">
-    <section class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="flex items-end justify-between gap-4">
-            <div>
-                <p class="text-sm font-semibold uppercase tracking-wide text-brand-red">Admin</p>
-                <h1 class="mt-2 text-3xl font-bold">Customer management</h1>
-            </div>
+    <x-layout.admin-page
+        title="Customer management"
+        description="Review pendaftaran pelanggan, cek status verifikasi, dan jalankan approval dari satu pola list internal."
+    >
+        <div class="grid gap-4 md:grid-cols-3">
+            <x-ui.stat-card label="Total di halaman ini" :value="(string) $customers->count()" />
+            <x-ui.stat-card label="Filter status" :value="$selectedStatus ?: 'Semua'" />
+            <x-ui.stat-card label="Keyword" :value="$search !== '' ? $search : '-'" description="Cari nama, email, phone, atau nama usaha." />
+        </div>
 
-            <form method="GET" class="flex flex-wrap items-center gap-2">
-                <input
+        <x-ui.filter-bar>
+            <form method="GET" class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px_auto] lg:items-end">
+                <flux:input
                     type="search"
                     name="q"
+                    label="Cari customer"
                     value="{{ $search }}"
-                    placeholder="Cari nama, email, phone, usaha"
-                    class="rounded-full border border-brand-black/10 bg-brand-white px-4 py-2 text-sm"
-                >
-                <label for="status" class="text-sm font-medium">Status</label>
-                <select id="status" name="status" class="rounded-full border border-brand-black/10 bg-brand-white px-4 py-2 text-sm">
-                    <option value="">Semua</option>
+                    placeholder="Nama, email, phone, usaha"
+                    icon="magnifying-glass"
+                />
+
+                <flux:select name="status" label="Status">
+                    <flux:select.option value="" label="Semua" {{ $selectedStatus === '' ? 'selected' : '' }} />
                     @foreach ($statuses as $status)
-                        <option value="{{ $status }}" @selected($selectedStatus === $status)>{{ $status }}</option>
+                        <flux:select.option value="{{ $status }}" label="{{ $status }}" {{ $selectedStatus === $status ? 'selected' : '' }} />
                     @endforeach
-                </select>
-                <button type="submit" class="rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black">
-                    Filter
-                </button>
-            </form>
-        </div>
+                </flux:select>
 
-        <div class="mt-8 grid gap-4">
-            @forelse ($customers as $customer)
-                <article class="rounded-3xl border border-brand-black/10 bg-brand-white p-5 shadow-sm">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                        <div>
-                            <h2 class="text-xl font-semibold">{{ $customer->user->name }}</h2>
-                            <p class="mt-1 text-sm text-brand-black/70">
-                                {{ $customer->business_name ?: 'Usaha belum diisi' }} • {{ $customer->user->email }} • {{ $customer->user->phone }}
-                            </p>
-                            <p class="mt-3 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-brand-black">
-                                {{ $customer->verification_status }}
-                            </p>
-                            @if ($customer->rejection_reason)
-                                <p class="mt-3 text-sm text-brand-black/70">{{ $customer->rejection_reason }}</p>
-                            @endif
-                            <p class="mt-3">
-                                <a href="{{ route('admin.customers.show', $customer) }}" class="text-sm font-semibold text-brand-red">
-                                    Lihat detail
-                                </a>
-                            </p>
-                        </div>
-
-                        <form method="POST" action="{{ route('admin.customers.update', $customer) }}" class="grid gap-3 lg:w-80">
-                            @csrf
-                            @method('PATCH')
-
-                            <textarea
-                                name="reason"
-                                rows="3"
-                                class="rounded-2xl border border-brand-black/10 px-4 py-3 text-sm"
-                                placeholder="Alasan penolakan / penangguhan"
-                            ></textarea>
-
-                            <div class="flex flex-wrap gap-2">
-                                <button type="submit" name="action" value="approve" class="rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black">
-                                    Setujui
-                                </button>
-                                <button type="submit" name="action" value="reactivate" class="rounded-full bg-brand-black px-4 py-2 text-sm font-semibold text-brand-white">
-                                    Aktifkan
-                                </button>
-                                <button type="submit" name="action" value="reject" class="rounded-full border border-brand-red px-4 py-2 text-sm font-semibold text-brand-red">
-                                    Tolak
-                                </button>
-                                <button type="submit" name="action" value="suspend" class="rounded-full border border-brand-black/15 px-4 py-2 text-sm font-semibold text-brand-black">
-                                    Tangguhkan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </article>
-            @empty
-                <div class="rounded-3xl border border-dashed border-brand-black/15 bg-brand-white p-8 text-center text-brand-black/60">
-                    Belum ada customer sesuai filter.
+                <div class="flex gap-2">
+                    <flux:button type="submit" variant="primary" color="amber">Filter</flux:button>
+                    @if ($search !== '' || $selectedStatus !== '')
+                        <flux:button href="{{ route('admin.customers.index') }}" variant="ghost">Reset</flux:button>
+                    @endif
                 </div>
-            @endforelse
-        </div>
+            </form>
+        </x-ui.filter-bar>
 
-        <div class="mt-8">
-            {{ $customers->links() }}
-        </div>
-    </section>
+        @if ($customers->isEmpty())
+            <x-ui.empty-state
+                title="Belum ada customer sesuai filter"
+                description="Ubah keyword atau status untuk melihat data yang lain."
+                icon="users"
+            />
+        @else
+            <x-ui.section-card title="Daftar customer" description="Pola list ini bisa dipakai ulang untuk modul products, orders, payments, dan reports.">
+                <flux:table :paginate="$customers" container:class="overflow-x-auto">
+                    <flux:table.columns>
+                        <flux:table.column>Customer</flux:table.column>
+                        <flux:table.column>Status</flux:table.column>
+                        <flux:table.column>Catatan</flux:table.column>
+                        <flux:table.column align="end">Aksi</flux:table.column>
+                    </flux:table.columns>
+
+                    <flux:table.rows>
+                        @foreach ($customers as $customer)
+                            <flux:table.row :key="$customer->id">
+                                <flux:table.cell>
+                                    <div class="min-w-64">
+                                        <flux:heading>{{ $customer->user->name }}</flux:heading>
+                                        <flux:text class="mt-1">{{ $customer->business_name ?: 'Usaha belum diisi' }}</flux:text>
+                                        <flux:text class="mt-1">{{ $customer->user->email }} • {{ $customer->user->phone }}</flux:text>
+                                    </div>
+                                </flux:table.cell>
+
+                                <flux:table.cell class="py-0">
+                                    <x-ui.status-badge :status="$customer->verification_status" />
+                                </flux:table.cell>
+
+                                <flux:table.cell>
+                                    <flux:text>
+                                        {{ $customer->rejection_reason ?: 'Belum ada catatan review.' }}
+                                    </flux:text>
+                                </flux:table.cell>
+
+                                <flux:table.cell align="end">
+                                    <div class="min-w-80 space-y-3">
+                                        <form method="POST" action="{{ route('admin.customers.update', $customer) }}" class="space-y-3">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <flux:textarea
+                                                name="reason"
+                                                rows="2"
+                                                placeholder="Alasan penolakan / penangguhan"
+                                            ></flux:textarea>
+
+                                            <div class="flex flex-wrap justify-end gap-2">
+                                                <flux:button href="{{ route('admin.customers.show', $customer) }}" variant="ghost" size="sm">
+                                                    Detail
+                                                </flux:button>
+                                                <flux:button type="submit" name="action" value="approve" variant="primary" color="amber" size="sm">
+                                                    Setujui
+                                                </flux:button>
+                                                <flux:button type="submit" name="action" value="reactivate" variant="filled" size="sm">
+                                                    Aktifkan
+                                                </flux:button>
+                                                <flux:button type="submit" name="action" value="reject" variant="danger" size="sm">
+                                                    Tolak
+                                                </flux:button>
+                                                <flux:button type="submit" name="action" value="suspend" variant="subtle" size="sm">
+                                                    Tangguhkan
+                                                </flux:button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </flux:table.cell>
+                            </flux:table.row>
+                        @endforeach
+                    </flux:table.rows>
+                </flux:table>
+            </x-ui.section-card>
+        @endif
+    </x-layout.admin-page>
 </x-layouts.app>

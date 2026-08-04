@@ -33,6 +33,9 @@ klien.
    constraint, index, snapshot, dan penanda provisional.
 3. [User Flows](design/USER_FLOWS.md) - flow MVP granular dalam Mermaid dengan
    konektor lintas-flow `UF-01` sampai `UF-19`.
+4. [Frontend UI Architecture](design/FRONTEND_UI_ARCHITECTURE.md) - arsitektur
+   layer UI, adopsi Flux, strategi komponen, folder structure, design system,
+   animasi, performa, dan aturan development frontend.
 
 ## Delivery Method
 

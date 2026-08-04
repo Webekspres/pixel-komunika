@@ -1,57 +1,99 @@
 <x-layouts.app :title="'Detail Customer - Pixel Komunika'">
-    <section class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <p class="text-sm font-semibold uppercase tracking-wide text-brand-red">Admin</p>
-                <h1 class="mt-2 text-3xl font-bold">Detail pendaftar</h1>
-            </div>
-            <a href="{{ route('admin.customers.index') }}" class="rounded-full border border-brand-black/10 px-4 py-2 text-sm font-semibold text-brand-black">
+    <x-layout.admin-page
+        title="Detail pendaftar"
+        description="Pola detail ini menjadi baseline untuk future admin module dengan meta card, status, dan related records."
+    >
+        <x-slot name="actions">
+            <flux:button href="{{ route('admin.customers.index') }}" variant="ghost" size="sm" icon="arrow-left">
                 Kembali
-            </a>
+            </flux:button>
+        </x-slot>
+
+        <div class="grid gap-6 md:grid-cols-3">
+            <x-ui.stat-card label="Status" :value="$customer->verification_status" />
+            <x-ui.stat-card label="Alamat" :value="(string) $customer->user->addresses->count()" />
+            <x-ui.stat-card label="Reviewer" :value="$customer->reviewer?->name ?: '-'" />
         </div>
 
-        <div class="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-                <h2 class="text-2xl font-bold">{{ $customer->user->name }}</h2>
-                <div class="mt-4 space-y-2 text-sm text-brand-black/70">
-                    <p>Email: {{ $customer->user->email }}</p>
-                    <p>Phone: {{ $customer->user->phone }}</p>
-                    <p>Nama usaha: {{ $customer->business_name ?: 'Belum diisi' }}</p>
-                    <p>Status: {{ $customer->verification_status }}</p>
-                    <p>Direview oleh: {{ $customer->reviewer?->name ?: '-' }}</p>
-                    <p>Waktu review: {{ $customer->reviewed_at?->format('Y-m-d H:i') ?: '-' }}</p>
-                </div>
-
-                @if ($customer->rejection_reason)
-                    <div class="mt-5 rounded-2xl bg-gray-50 p-4 text-sm text-brand-black/70">
-                        {{ $customer->rejection_reason }}
+        <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+            <x-ui.section-card :title="$customer->user->name" description="Ringkasan identitas customer untuk proses review admin.">
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <x-ui.status-badge :status="$customer->verification_status" />
+                        @if ($customer->reviewed_at)
+                            <flux:text size="sm">Direview pada {{ $customer->reviewed_at->format('Y-m-d H:i') }}</flux:text>
+                        @endif
                     </div>
-                @endif
-            </div>
 
-            <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-                <h2 class="text-2xl font-bold">Alamat pelanggan</h2>
-                <div class="mt-5 grid gap-4">
+                    <dl class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-zinc-500">Email</dt>
+                            <dd class="mt-1 text-sm">{{ $customer->user->email }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-zinc-500">Phone</dt>
+                            <dd class="mt-1 text-sm">{{ $customer->user->phone }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-zinc-500">Nama usaha</dt>
+                            <dd class="mt-1 text-sm">{{ $customer->business_name ?: 'Belum diisi' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-zinc-500">Direview oleh</dt>
+                            <dd class="mt-1 text-sm">{{ $customer->reviewer?->name ?: '-' }}</dd>
+                        </div>
+                    </dl>
+
+                    <form method="POST" action="{{ route('admin.customers.update', $customer) }}" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+
+                        <flux:textarea
+                            name="reason"
+                            label="Catatan admin"
+                            rows="3"
+                            placeholder="Alasan penolakan / penangguhan"
+                        >{{ $customer->rejection_reason }}</flux:textarea>
+
+                        <div class="flex flex-wrap gap-2">
+                            <flux:button type="submit" name="action" value="approve" variant="primary" color="amber">
+                                Setujui
+                            </flux:button>
+                            <flux:button type="submit" name="action" value="reactivate" variant="filled">
+                                Aktifkan
+                            </flux:button>
+                            <flux:button type="submit" name="action" value="reject" variant="danger">
+                                Tolak
+                            </flux:button>
+                            <flux:button type="submit" name="action" value="suspend" variant="subtle">
+                                Tangguhkan
+                            </flux:button>
+                        </div>
+                    </form>
+                </div>
+            </x-ui.section-card>
+
+            <x-ui.section-card title="Alamat pelanggan" description="Related record pattern untuk entity admin yang punya child data.">
+                <div class="grid gap-4">
                     @forelse ($customer->user->addresses as $address)
-                        <article class="rounded-2xl border border-brand-black/10 bg-gray-50 p-4">
+                        <flux:card class="space-y-3 bg-zinc-50">
                             <div class="flex items-center gap-2">
-                                <h3 class="font-semibold">{{ $address->label ?: 'Alamat pelanggan' }}</h3>
+                                <flux:heading>{{ $address->label ?: 'Alamat pelanggan' }}</flux:heading>
                                 @if ($address->is_default)
-                                    <span class="rounded-full bg-brand-yellow px-2 py-1 text-xs font-semibold text-brand-black">Default</span>
+                                    <flux:badge color="amber" rounded size="sm">Default</flux:badge>
                                 @endif
                             </div>
-                            <p class="mt-2 text-sm text-brand-black/70">{{ $address->recipient_name }} • {{ $address->recipient_phone }}</p>
-                            <p class="mt-1 text-sm text-brand-black/70">
+
+                            <flux:text>{{ $address->recipient_name }} • {{ $address->recipient_phone }}</flux:text>
+                            <flux:text>
                                 {{ $address->address_line }}, {{ $address->district_name }}, {{ $address->city_name }}, {{ $address->province_name }} {{ $address->postal_code }}
-                            </p>
-                        </article>
+                            </flux:text>
+                        </flux:card>
                     @empty
-                        <div class="rounded-2xl border border-dashed border-brand-black/15 bg-gray-50 p-6 text-center text-brand-black/60">
-                            Belum ada alamat.
-                        </div>
+                        <x-ui.empty-state title="Belum ada alamat" description="Customer ini belum menyimpan alamat pengiriman." icon="map-pin" />
                     @endforelse
                 </div>
-            </div>
+            </x-ui.section-card>
         </div>
-    </section>
+    </x-layout.admin-page>
 </x-layouts.app>

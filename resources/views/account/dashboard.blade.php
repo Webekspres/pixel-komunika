@@ -1,177 +1,217 @@
 <x-layouts.app :title="'Akun - Pixel Komunika'">
-    <section class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-            <p class="text-sm font-semibold uppercase tracking-wide text-brand-red">
-                Akun
-            </p>
-            <h1 class="mt-2 text-3xl font-bold">{{ $user->name }}</h1>
-            <p class="mt-2 text-brand-black/70">{{ $user->email }} • {{ $user->phone ?? 'No phone' }}</p>
+    @php($status = $user->customerStatus())
 
-            @php($status = $user->customerStatus())
+    <x-layout.app-page>
+        <x-ui.page-header
+            eyebrow="Akun"
+            :title="$user->name"
+            :description="$user->email.' • '.($user->phone ?? 'No phone')"
+        />
 
-            <div class="mt-8 rounded-2xl bg-gray-50 p-5">
-                @if ($user->isAdmin())
-                    <h2 class="text-xl font-semibold">Akses admin aktif</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        Gunakan halaman customer management untuk approval dan perubahan status akun pelanggan.
-                    </p>
-                @elseif ($status === \App\Models\CustomerProfile::ACTIVE)
-                    <h2 class="text-xl font-semibold">Akun aktif</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        Anda dapat melihat harga, membuka checkout, dan mengakses riwayat order.
-                    </p>
-                @elseif ($status === \App\Models\CustomerProfile::REJECTED)
-                    <h2 class="text-xl font-semibold">Pendaftaran ditolak</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        {{ $user->customerProfile?->rejection_reason ?: 'Silakan hubungi admin untuk informasi lebih lanjut.' }}
-                    </p>
-                @elseif ($status === \App\Models\CustomerProfile::SUSPENDED)
-                    <h2 class="text-xl font-semibold">Akun ditangguhkan</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        {{ $user->customerProfile?->rejection_reason ?: 'Akses checkout dan harga ditutup sementara.' }}
-                    </p>
-                @else
-                    <h2 class="text-xl font-semibold">Menunggu verifikasi</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        Anda tetap dapat melihat katalog publik, tetapi harga, checkout, dan riwayat order belum tersedia.
-                    </p>
-                @endif
-            </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <x-ui.stat-card label="Role" :value="$user->isAdmin() ? 'Admin' : 'Customer'" />
+            <x-ui.stat-card label="Status" :value="$user->isAdmin() ? 'ADMIN_ACCESS' : ($status ?: 'PENDING_VERIFICATION')" />
+            <x-ui.stat-card label="Alamat" :value="(string) $user->addresses->count()" description="Default address dipakai lebih dulu saat checkout." />
         </div>
 
-        @if (! $user->isAdmin())
-            <div class="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-                <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-                    <h2 class="text-2xl font-bold">Profil pelanggan</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        Data ini dipakai untuk identitas akun dan persiapan checkout.
-                    </p>
+        <x-ui.section-card>
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                    <flux:heading size="lg">
+                        @if ($user->isAdmin())
+                            Akses admin aktif
+                        @elseif ($status === \App\Models\CustomerProfile::ACTIVE)
+                            Akun aktif
+                        @elseif ($status === \App\Models\CustomerProfile::REJECTED)
+                            Pendaftaran ditolak
+                        @elseif ($status === \App\Models\CustomerProfile::SUSPENDED)
+                            Akun ditangguhkan
+                        @else
+                            Menunggu verifikasi
+                        @endif
+                    </flux:heading>
 
-                    <form method="POST" action="{{ route('account.update') }}" class="mt-6 space-y-5">
+                    <flux:text class="mt-2">
+                        @if ($user->isAdmin())
+                            Gunakan halaman customer management untuk approval dan perubahan status akun pelanggan.
+                        @elseif ($status === \App\Models\CustomerProfile::ACTIVE)
+                            Anda dapat melihat harga, membuka checkout, dan mengakses riwayat order.
+                        @elseif ($status === \App\Models\CustomerProfile::REJECTED)
+                            {{ $user->customerProfile?->rejection_reason ?: 'Silakan hubungi admin untuk informasi lebih lanjut.' }}
+                        @elseif ($status === \App\Models\CustomerProfile::SUSPENDED)
+                            {{ $user->customerProfile?->rejection_reason ?: 'Akses checkout dan harga ditutup sementara.' }}
+                        @else
+                            Anda tetap dapat melihat katalog publik, tetapi harga, checkout, dan riwayat order belum tersedia.
+                        @endif
+                    </flux:text>
+                </div>
+
+                @if (! $user->isAdmin())
+                    <x-ui.status-badge :status="$status ?: \App\Models\CustomerProfile::PENDING" />
+                @endif
+            </div>
+        </x-ui.section-card>
+
+        @if (! $user->isAdmin())
+            <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                <x-ui.section-card
+                    title="Profil pelanggan"
+                    description="Data ini dipakai untuk identitas akun dan persiapan checkout."
+                >
+                    <form method="POST" action="{{ route('account.update') }}" class="space-y-5">
                         @csrf
                         @method('PATCH')
 
-                        <div>
-                            <label for="name" class="mb-2 block text-sm font-semibold">Nama</label>
-                            <input id="name" name="name" value="{{ old('name', $user->name) }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                            @error('name') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                        </div>
+                        <flux:input
+                            id="name"
+                            name="name"
+                            label="Nama"
+                            value="{{ old('name', $user->name) }}"
+                            required
+                        />
 
-                        <div>
-                            <label for="phone" class="mb-2 block text-sm font-semibold">Nomor telepon</label>
-                            <input id="phone" name="phone" value="{{ old('phone', $user->phone) }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                            @error('phone') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                        </div>
+                        <flux:input
+                            id="phone"
+                            name="phone"
+                            label="Nomor telepon"
+                            value="{{ old('phone', $user->phone) }}"
+                            required
+                        />
 
-                        <div>
-                            <label for="business_name" class="mb-2 block text-sm font-semibold">Nama usaha</label>
-                            <input id="business_name" name="business_name" value="{{ old('business_name', $user->customerProfile?->business_name) }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3">
-                            @error('business_name') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                        </div>
+                        <flux:input
+                            id="business_name"
+                            name="business_name"
+                            label="Nama usaha"
+                            value="{{ old('business_name', $user->customerProfile?->business_name) }}"
+                        />
 
-                        <button type="submit" class="rounded-full bg-brand-yellow px-5 py-3 font-semibold text-brand-black">
+                        <flux:button type="submit" variant="primary" color="amber">
                             Simpan profil
-                        </button>
+                        </flux:button>
                     </form>
-                </div>
+                </x-ui.section-card>
 
-                <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-                    <h2 class="text-2xl font-bold">Tambah alamat</h2>
-                    <p class="mt-2 text-sm text-brand-black/70">
-                        Alamat default akan dipakai lebih dulu saat checkout.
-                    </p>
-
-                    <form method="POST" action="{{ route('account.addresses.store') }}" class="mt-6 space-y-4">
+                <x-ui.section-card
+                    title="Tambah alamat"
+                    description="Alamat default akan dipakai lebih dulu saat checkout."
+                >
+                    <form method="POST" action="{{ route('account.addresses.store') }}" class="space-y-4">
                         @csrf
 
-                        <input name="label" value="{{ old('label') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Label alamat, mis. Toko Utama">
-                        <input name="recipient_name" value="{{ old('recipient_name', $user->name) }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Nama penerima" required>
-                        <input name="recipient_phone" value="{{ old('recipient_phone', $user->phone) }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Nomor penerima" required>
-                        <textarea name="address_line" rows="3" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Alamat lengkap" required>{{ old('address_line') }}</textarea>
-                        <input name="province_name" value="{{ old('province_name') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Provinsi" required>
-                        <input name="city_name" value="{{ old('city_name') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Kota / Kabupaten" required>
-                        <input name="district_name" value="{{ old('district_name') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Kecamatan" required>
-                        <input name="postal_code" value="{{ old('postal_code') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Kode pos">
+                        <flux:input
+                            name="label"
+                            label="Label alamat"
+                            value="{{ old('label') }}"
+                            placeholder="Mis. Toko Utama"
+                        />
 
-                        <label class="flex items-center gap-2 text-sm text-brand-black/70">
-                            <input type="checkbox" name="is_default" value="1" class="rounded border-brand-black/20">
-                            <span>Jadikan alamat default</span>
-                        </label>
+                        <flux:input
+                            name="recipient_name"
+                            label="Nama penerima"
+                            value="{{ old('recipient_name', $user->name) }}"
+                            required
+                        />
 
-                        <button type="submit" class="rounded-full bg-brand-black px-5 py-3 font-semibold text-brand-white">
+                        <flux:input
+                            name="recipient_phone"
+                            label="Nomor penerima"
+                            value="{{ old('recipient_phone', $user->phone) }}"
+                            required
+                        />
+
+                        <flux:textarea
+                            name="address_line"
+                            label="Alamat lengkap"
+                            rows="3"
+                            placeholder="Jalan, nomor, patokan, dan detail lain"
+                            required
+                        >{{ old('address_line') }}</flux:textarea>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <flux:input name="province_name" label="Provinsi" value="{{ old('province_name') }}" required />
+                            <flux:input name="city_name" label="Kota / Kabupaten" value="{{ old('city_name') }}" required />
+                            <flux:input name="district_name" label="Kecamatan" value="{{ old('district_name') }}" required />
+                            <flux:input name="postal_code" label="Kode pos" value="{{ old('postal_code') }}" />
+                        </div>
+
+                        <flux:field variant="inline">
+                            <flux:checkbox name="is_default" value="1" label="Jadikan alamat default" />
+                        </flux:field>
+
+                        <flux:button type="submit" variant="filled">
                             Simpan alamat
-                        </button>
+                        </flux:button>
                     </form>
-                </div>
+                </x-ui.section-card>
             </div>
 
-            <div class="mt-8 rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-                <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold">Address book</h2>
-                        <p class="mt-2 text-sm text-brand-black/70">
-                            Hanya pemilik akun yang bisa mengubah alamatnya sendiri.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="mt-6 grid gap-4">
+            <x-ui.section-card
+                title="Address book"
+                description="Hanya pemilik akun yang bisa mengubah alamatnya sendiri."
+            >
+                <div class="grid gap-4">
                     @forelse ($user->addresses as $address)
-                        <article class="rounded-2xl border border-brand-black/10 bg-gray-50 p-5">
-                            <div class="flex flex-wrap items-start justify-between gap-3">
+                        <flux:card class="space-y-5 bg-zinc-50">
+                            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                                 <div>
-                                    <div class="flex items-center gap-2">
-                                        <h3 class="text-lg font-semibold">{{ $address->label ?: 'Alamat pelanggan' }}</h3>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <flux:heading size="lg">{{ $address->label ?: 'Alamat pelanggan' }}</flux:heading>
                                         @if ($address->is_default)
-                                            <span class="rounded-full bg-brand-yellow px-2.5 py-1 text-xs font-semibold text-brand-black">Default</span>
+                                            <flux:badge color="amber" rounded size="sm">Default</flux:badge>
                                         @endif
                                     </div>
-                                    <p class="mt-2 text-sm text-brand-black/70">
-                                        {{ $address->recipient_name }} • {{ $address->recipient_phone }}
-                                    </p>
-                                    <p class="mt-1 text-sm text-brand-black/70">
+
+                                    <flux:text class="mt-2">{{ $address->recipient_name }} • {{ $address->recipient_phone }}</flux:text>
+                                    <flux:text class="mt-1">
                                         {{ $address->address_line }}, {{ $address->district_name }}, {{ $address->city_name }}, {{ $address->province_name }} {{ $address->postal_code }}
-                                    </p>
+                                    </flux:text>
                                 </div>
 
                                 <form method="POST" action="{{ route('account.addresses.destroy', $address) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="rounded-full border border-brand-red px-4 py-2 text-sm font-semibold text-brand-red">
+                                    <flux:button type="submit" variant="danger" size="sm">
                                         Hapus
-                                    </button>
+                                    </flux:button>
                                 </form>
                             </div>
 
-                            <form method="POST" action="{{ route('account.addresses.update', $address) }}" class="mt-5 grid gap-3 md:grid-cols-2">
+                            <form method="POST" action="{{ route('account.addresses.update', $address) }}" class="grid gap-4 md:grid-cols-2">
                                 @csrf
                                 @method('PATCH')
-                                <input name="label" value="{{ $address->label }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Label">
-                                <input name="recipient_name" value="{{ $address->recipient_name }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Nama penerima" required>
-                                <input name="recipient_phone" value="{{ $address->recipient_phone }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Nomor penerima" required>
-                                <input name="province_name" value="{{ $address->province_name }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Provinsi" required>
-                                <input name="city_name" value="{{ $address->city_name }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Kota / Kabupaten" required>
-                                <input name="district_name" value="{{ $address->district_name }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Kecamatan" required>
-                                <input name="postal_code" value="{{ $address->postal_code }}" class="rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Kode pos">
-                                <textarea name="address_line" rows="3" class="md:col-span-2 rounded-2xl border border-brand-black/10 px-4 py-3" placeholder="Alamat lengkap" required>{{ $address->address_line }}</textarea>
-                                <label class="flex items-center gap-2 text-sm text-brand-black/70">
-                                    <input type="checkbox" name="is_default" value="1" class="rounded border-brand-black/20" @checked($address->is_default)>
-                                    <span>Jadikan default</span>
-                                </label>
-                                <div>
-                                    <button type="submit" class="rounded-full bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black">
+
+                                <flux:input name="label" label="Label" value="{{ $address->label }}" />
+                                <flux:input name="recipient_name" label="Nama penerima" value="{{ $address->recipient_name }}" required />
+                                <flux:input name="recipient_phone" label="Nomor penerima" value="{{ $address->recipient_phone }}" required />
+                                <flux:input name="province_name" label="Provinsi" value="{{ $address->province_name }}" required />
+                                <flux:input name="city_name" label="Kota / Kabupaten" value="{{ $address->city_name }}" required />
+                                <flux:input name="district_name" label="Kecamatan" value="{{ $address->district_name }}" required />
+                                <flux:input name="postal_code" label="Kode pos" value="{{ $address->postal_code }}" />
+
+                                <div class="md:col-span-2">
+                                    <flux:textarea name="address_line" label="Alamat lengkap" rows="3" required>{{ $address->address_line }}</flux:textarea>
+                                </div>
+
+                                <flux:field variant="inline">
+                                    <flux:checkbox name="is_default" value="1" label="Jadikan default" :checked="$address->is_default" />
+                                </flux:field>
+
+                                <div class="md:col-span-2">
+                                    <flux:button type="submit" variant="primary" color="amber">
                                         Update alamat
-                                    </button>
+                                    </flux:button>
                                 </div>
                             </form>
-                        </article>
+                        </flux:card>
                     @empty
-                        <div class="rounded-2xl border border-dashed border-brand-black/15 bg-gray-50 p-8 text-center text-brand-black/60">
-                            Belum ada alamat pelanggan.
-                        </div>
+                        <x-ui.empty-state
+                            title="Belum ada alamat pelanggan"
+                            description="Tambahkan minimal satu alamat untuk mempersiapkan checkout."
+                            icon="map-pin"
+                        />
                     @endforelse
                 </div>
-            </div>
+            </x-ui.section-card>
         @endif
-    </section>
+    </x-layout.app-page>
 </x-layouts.app>

@@ -1,57 +1,79 @@
 <x-layouts.app :title="'Daftar - Pixel Komunika'">
-    <section class="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
-        <div class="rounded-3xl border border-brand-black/10 bg-brand-white p-6 shadow-sm sm:p-8">
-            <h1 class="text-3xl font-bold">Daftar pelanggan</h1>
-            <p class="mt-2 text-sm text-brand-black/70">
-                Akun baru akan berstatus pending sampai direview admin.
-            </p>
+    <x-layout.auth-shell
+        title="Daftar pelanggan"
+        description="Akun baru akan masuk status pending verification sampai direview admin."
+        eyebrow="Pendaftaran customer"
+    >
+        <form method="POST" action="{{ route('register.store') }}" class="space-y-5">
+            @csrf
 
-            <form method="POST" action="{{ route('register.store') }}" class="mt-8 space-y-5">
-                @csrf
+            <flux:input
+                id="name"
+                name="name"
+                label="Nama"
+                value="{{ old('name') }}"
+                placeholder="Nama lengkap"
+                required
+            />
 
-                <div>
-                    <label for="name" class="mb-2 block text-sm font-semibold">Nama</label>
-                    <input id="name" name="name" value="{{ old('name') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                    @error('name') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                </div>
+            <flux:input
+                id="business_name"
+                name="business_name"
+                label="Nama usaha"
+                value="{{ old('business_name') }}"
+                placeholder="Opsional"
+            />
 
-                <div>
-                    <label for="business_name" class="mb-2 block text-sm font-semibold">Nama usaha</label>
-                    <input id="business_name" name="business_name" value="{{ old('business_name') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3">
-                    @error('business_name') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                </div>
+            <div class="grid gap-5 sm:grid-cols-2">
+                <flux:input
+                    id="phone"
+                    name="phone"
+                    label="Nomor telepon"
+                    value="{{ old('phone') }}"
+                    placeholder="08xxxxxxxxxx"
+                    required
+                />
 
-                <div class="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label for="phone" class="mb-2 block text-sm font-semibold">Nomor telepon</label>
-                        <input id="phone" name="phone" value="{{ old('phone') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                        @error('phone') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                    </div>
+                <flux:input
+                    id="email"
+                    name="email"
+                    type="email"
+                    label="Email"
+                    value="{{ old('email') }}"
+                    placeholder="nama@usaha.com"
+                    required
+                />
+            </div>
 
-                    <div>
-                        <label for="email" class="mb-2 block text-sm font-semibold">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                        @error('email') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                    </div>
-                </div>
+            <div class="grid gap-5 sm:grid-cols-2">
+                <flux:input
+                    id="password"
+                    name="password"
+                    type="password"
+                    label="Password"
+                    viewable
+                    required
+                />
 
-                <div class="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label for="password" class="mb-2 block text-sm font-semibold">Password</label>
-                        <input id="password" name="password" type="password" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                        @error('password') <p class="mt-1 text-sm text-brand-red">{{ $message }}</p> @enderror
-                    </div>
+                <flux:input
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    type="password"
+                    label="Konfirmasi password"
+                    viewable
+                    required
+                />
+            </div>
 
-                    <div>
-                        <label for="password_confirmation" class="mb-2 block text-sm font-semibold">Konfirmasi password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" class="w-full rounded-2xl border border-brand-black/10 px-4 py-3" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="rounded-full bg-brand-yellow px-5 py-3 font-semibold text-brand-black">
+            <div class="space-y-3">
+                <flux:button type="submit" variant="primary" color="amber" class="w-full">
                     Kirim pendaftaran
-                </button>
-            </form>
-        </div>
-    </section>
+                </flux:button>
+
+                <flux:button href="{{ route('login') }}" variant="ghost" class="w-full">
+                    Sudah punya akun? Masuk
+                </flux:button>
+            </div>
+        </form>
+    </x-layout.auth-shell>
 </x-layouts.app>

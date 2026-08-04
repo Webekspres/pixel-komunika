@@ -36,6 +36,7 @@ Laravel 13, Blade, Livewire 4, Alpine.js, Tailwind CSS 4, Vite, `wire:navigate` 
 | Item | Catatan |
 | --- | --- |
 | Lucide Icons | Nav, kategori, keunggulan, placeholder cart/user |
+| Flux UI | Hanya untuk app/internal UI (auth, account, admin), bukan fondasi storefront publik |
 | Sticky header | CSS `position: sticky` |
 | Toast (flash + Alpine/Livewire) | Auth, cart, approval — tanpa lib toast berat |
 | Drawer cart | Saat fitur cart |
@@ -51,6 +52,9 @@ Splide (carousel), Fancybox (galeri), GSAP (hero/scroll yang CSS tidak cukup), S
 ### D — Skip
 
 Lenis, critical-CSS toolchain terpisah, optimistic UI luas pada harga/stok, page-transition library, scroll progress indicator.
+
+Catatan arsitektur jangka panjang frontend: lihat
+[`docs/design/FRONTEND_UI_ARCHITECTURE.md`](docs/design/FRONTEND_UI_ARCHITECTURE.md).
 
 ## Color tokens
 

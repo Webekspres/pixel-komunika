@@ -190,9 +190,9 @@ flowchart TB
 | Language | PHP versi kompatibel yang tersedia pada hosting; target PHP 8.4 | Runtime utama; diverifikasi sebelum dependency dikunci |
 | Framework | Laravel 13 | Modular monolith |
 | View | Blade | SSR untuk storefront dan halaman umum |
-| Reactive UI | Livewire | Form, cart, checkout, filter, dan admin |
+| Reactive UI | Livewire 4.x | Form, cart, checkout, filter, dan admin |
 | Client interaction | Alpine.js | Modal, dropdown, preview, dan interaksi ringan |
-| Styling | Tailwind CSS | Dibangun menjadi aset statis |
+| Styling | Tailwind CSS 4.x | Dibangun menjadi aset statis |
 | Asset bundler | Vite | Build-time; bukan production backbone |
 | Database | MySQL/MariaDB versi hosting dengan InnoDB | Transaksi ACID dan row-level locking |
 | Cache/Queue | Database/file | Baseline shared hosting; Redis hanya opsi upgrade VPS |
@@ -211,6 +211,10 @@ flowchart TB
 - Hindari abstraction layer untuk satu implementasi kecuali diperlukan pada
   trust boundary atau integrasi eksternal.
 - Versi dependency dikunci melalui `composer.lock` dan lockfile frontend.
+
+### 4.2 Frontend toolkit (MVP)
+
+Kurasi ikon, pola UX storefront, dan library opsional (carousel, lightbox, animasi, analytics) dicatat di [`DESIGN.md`](../../DESIGN.md) bagian **Frontend toolkit**. Package opsional tidak menjadi requirement wajib sampai fitur terkait diimplementasikan; ikuti §4.1 Dependency Policy.
 
 ## 5. Deployment Profile
 

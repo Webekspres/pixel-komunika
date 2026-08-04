@@ -59,7 +59,7 @@ Health check: `GET /health`
 
 ## Dokumentasi
 
-- Brand UI (color tokens & font): [DESIGN.md](DESIGN.md)
+- Brand UI (produk, color tokens & font): [DESIGN.md](DESIGN.md)
 - Requirement, design sistem, dan deliverable klien di branch `dev`:
   - Di lokal setelah `git checkout dev`: buka `docs/README.md`
   - Di GitHub:

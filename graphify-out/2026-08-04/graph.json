@@ -26,6 +26,39 @@
       "norm_label": "controller"
     },
     {
+      "label": "Landing.php",
+      "file_type": "code",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_livewire_pages_landing",
+      "community": 41,
+      "community_name": "Landing.php",
+      "norm_label": "landing.php"
+    },
+    {
+      "label": "Landing",
+      "file_type": "code",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "app_livewire_pages_landing_landing",
+      "community": 41,
+      "community_name": "Landing.php",
+      "norm_label": "landing"
+    },
+    {
+      "label": ".render()",
+      "file_type": "code",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "app_livewire_pages_landing_landing_render",
+      "community": 41,
+      "community_name": "Landing.php",
+      "norm_label": ".render()"
+    },
+    {
       "label": "User.php",
       "file_type": "code",
       "source_file": "app/Models/User.php",
@@ -307,8 +340,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "composer_require_dev",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "require-dev"
     },
     {
@@ -318,8 +351,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "composer_require_dev_fakerphp_faker",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "fakerphp/faker"
     },
     {
@@ -329,8 +362,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "composer_require_dev_laravel_pail",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "laravel/pail"
     },
     {
@@ -340,8 +373,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "composer_require_dev_laravel_pao",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "laravel/pao"
     },
     {
@@ -351,8 +384,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "composer_require_dev_laravel_pint",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "laravel/pint"
     },
     {
@@ -362,8 +395,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "composer_require_dev_mockery_mockery",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "mockery/mockery"
     },
     {
@@ -373,8 +406,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "composer_require_dev_nunomaduro_collision",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "nunomaduro/collision"
     },
     {
@@ -384,8 +417,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "composer_require_dev_pestphp_pest",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "pestphp/pest"
     },
     {
@@ -395,8 +428,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "composer_require_dev_pestphp_pest_plugin_laravel",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "pestphp/pest-plugin-laravel"
     },
     {
@@ -406,8 +439,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "composer_require_dev_phpunit_phpunit",
-      "community": 2,
-      "community_name": "composer.json",
+      "community": 40,
+      "community_name": "require-dev",
       "norm_label": "phpunit/phpunit"
     },
     {
@@ -609,15 +642,15 @@
       "norm_label": "composer\\\\config::disableprocesstimeout"
     },
     {
-      "label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fb7185,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"php artisan pail --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,logs,vite --kill-others",
+      "label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,vite --kill-others",
       "file_type": "concept",
       "source_file": "composer.json",
       "source_location": "L46",
       "_origin": "ast",
-      "id": "ref_npx_concurrently_c_93c5fd_c4b5fd_fb7185_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_php_artisan_pail_timeout_0_npm_run_dev_names_server_queue_logs_vite_kill_others",
+      "id": "ref_npx_concurrently_c_93c5fd_c4b5fd_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_npm_run_dev_names_server_queue_vite_kill_others",
       "community": 7,
       "community_name": "scripts",
-      "norm_label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fb7185,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"php artisan pail --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,logs,vite --kill-others"
+      "norm_label": "npx concurrently -c \\\"#93c5fd,#c4b5fd,#fdba74\\\" \\\"php artisan serve\\\" \\\"php artisan queue:listen --tries=1 --timeout=0\\\" \\\"npm run dev\\\" --names=server,queue,vite --kill-others"
     },
     {
       "label": "test",
@@ -1456,15 +1489,26 @@
       "norm_label": "app.js"
     },
     {
-      "label": "welcome.blade.php",
+      "label": "guest.blade.php",
       "file_type": "code",
-      "source_file": "resources/views/welcome.blade.php",
+      "source_file": "resources/views/layouts/guest.blade.php",
       "source_location": null,
       "_origin": "ast",
-      "id": "resources_views_welcome_blade",
-      "community": 40,
-      "community_name": "welcome.blade.php",
-      "norm_label": "welcome.blade.php"
+      "id": "resources_views_layouts_guest_blade",
+      "community": 47,
+      "community_name": "guest.blade.php",
+      "norm_label": "guest.blade.php"
+    },
+    {
+      "label": "landing.blade.php",
+      "file_type": "code",
+      "source_file": "resources/views/livewire/pages/landing.blade.php",
+      "source_location": null,
+      "_origin": "ast",
+      "id": "resources_views_livewire_pages_landing_blade",
+      "community": 48,
+      "community_name": "landing.blade.php",
+      "norm_label": "landing.blade.php"
     },
     {
       "label": "console.php",
@@ -1485,7 +1529,7 @@
       "_origin": "ast",
       "id": "routes_web",
       "community": 41,
-      "community_name": "web.php",
+      "community_name": "Landing.php",
       "norm_label": "web.php"
     },
     {
@@ -1531,6 +1575,17 @@
       "community": 42,
       "community_name": "HealthTest.php",
       "norm_label": "healthtest.php"
+    },
+    {
+      "label": "LandingTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/LandingTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_landingtest",
+      "community": 49,
+      "community_name": "LandingTest.php",
+      "norm_label": "landingtest.php"
     },
     {
       "label": "Pest.php",
@@ -1639,7 +1694,7 @@
       "_origin": "ast",
       "id": "agents",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "agents.md"
     },
     {
@@ -1650,7 +1705,7 @@
       "_origin": "ast",
       "id": "agents_repository_agent_instructions",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "repository agent instructions"
     },
     {
@@ -1661,7 +1716,7 @@
       "_origin": "ast",
       "id": "agents_always_active_tooling",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "always-active tooling"
     },
     {
@@ -1672,7 +1727,7 @@
       "_origin": "ast",
       "id": "agents_1_rust_token_killer_rtk",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "1. rust token killer (rtk)"
     },
     {
@@ -1683,7 +1738,7 @@
       "_origin": "ast",
       "id": "agents_2_graphify",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "2. graphify"
     },
     {
@@ -1694,7 +1749,7 @@
       "_origin": "ast",
       "id": "agents_3_ponytail_ultra",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "3. ponytail ultra"
     },
     {
@@ -1705,7 +1760,7 @@
       "_origin": "ast",
       "id": "agents_bootstrap_wajib",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "bootstrap wajib"
     },
     {
@@ -1716,7 +1771,7 @@
       "_origin": "ast",
       "id": "agents_urutan_kerja",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "urutan kerja"
     },
     {
@@ -1727,7 +1782,7 @@
       "_origin": "ast",
       "id": "agents_kebijakan_branch_dan_push",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "kebijakan branch dan push"
     },
     {
@@ -1738,41 +1793,195 @@
       "_origin": "ast",
       "id": "agents_dev_manual",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "`dev` \u2014 manual"
     },
     {
-      "label": "`staging` \u2014 semi-otomatis",
+      "label": "`staging` \u2014 manual",
       "file_type": "document",
       "source_file": "AGENTS.md",
       "source_location": "L84",
       "_origin": "ast",
-      "id": "agents_staging_semi_otomatis",
+      "id": "agents_staging_manual",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
-      "norm_label": "`staging` \u2014 semi-otomatis"
+      "community_name": "Repository Agent Instructions",
+      "norm_label": "`staging` \u2014 manual"
     },
     {
       "label": "`main` \u2014 manual dan production-ready",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L93",
+      "source_location": "L92",
       "_origin": "ast",
       "id": "agents_main_manual_dan_production_ready",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "`main` \u2014 manual dan production-ready"
     },
     {
       "label": "Pengaman Git",
       "file_type": "document",
       "source_file": "AGENTS.md",
-      "source_location": "L102",
+      "source_location": "L104",
       "_origin": "ast",
       "id": "agents_pengaman_git",
       "community": 12,
-      "community_name": "Kebijakan Branch dan Push",
+      "community_name": "Repository Agent Instructions",
       "norm_label": "pengaman git"
+    },
+    {
+      "label": "Format Commit",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L111",
+      "_origin": "ast",
+      "id": "agents_format_commit",
+      "community": 12,
+      "community_name": "Repository Agent Instructions",
+      "norm_label": "format commit"
+    },
+    {
+      "label": "Type yang dipakai",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L126",
+      "_origin": "ast",
+      "id": "agents_type_yang_dipakai",
+      "community": 12,
+      "community_name": "Repository Agent Instructions",
+      "norm_label": "type yang dipakai"
+    },
+    {
+      "label": "Aturan penulisan",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L143",
+      "_origin": "ast",
+      "id": "agents_aturan_penulisan",
+      "community": 12,
+      "community_name": "Repository Agent Instructions",
+      "norm_label": "aturan penulisan"
+    },
+    {
+      "label": "Contoh singkat",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L159",
+      "_origin": "ast",
+      "id": "agents_contoh_singkat",
+      "community": 12,
+      "community_name": "Repository Agent Instructions",
+      "norm_label": "contoh singkat"
+    },
+    {
+      "label": "DESIGN.md",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "design",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "design.md"
+    },
+    {
+      "label": "DESIGN.md \u2014 Color Tokens & Font",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "design_design_md_color_tokens_font",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "design.md \u2014 color tokens & font"
+    },
+    {
+      "label": "Product context",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "design_product_context",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "product context"
+    },
+    {
+      "label": "UI direction",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "design_ui_direction",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "ui direction"
+    },
+    {
+      "label": "Color tokens",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "design_color_tokens",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "color tokens"
+    },
+    {
+      "label": "Neutrals (UI)",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "design_neutrals_ui",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "neutrals (ui)"
+    },
+    {
+      "label": "Semantic",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "design_semantic",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "semantic"
+    },
+    {
+      "label": "Font",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L56",
+      "_origin": "ast",
+      "id": "design_font",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "font"
+    },
+    {
+      "label": "Tailwind `@theme`",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "design_tailwind_theme",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "tailwind `@theme`"
+    },
+    {
+      "label": "Open",
+      "file_type": "document",
+      "source_file": "DESIGN.md",
+      "source_location": "L84",
+      "_origin": "ast",
+      "id": "design_open",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "open"
     },
     {
       "label": "README.md",
@@ -1781,8 +1990,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "readme",
-      "community": 9,
-      "community_name": "docs/README.md",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
       "norm_label": "readme.md"
     },
     {
@@ -1792,42 +2001,64 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "readme_pixel_komunika",
-      "community": 9,
-      "community_name": "docs/README.md",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
       "norm_label": "pixel komunika"
     },
     {
       "label": "Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L5",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "readme_stack",
-      "community": 9,
-      "community_name": "docs/README.md",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
       "norm_label": "stack"
     },
     {
-      "label": "Docs",
+      "label": "Branch",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L21",
       "_origin": "ast",
-      "id": "readme_docs",
-      "community": 9,
-      "community_name": "docs/README.md",
-      "norm_label": "docs"
+      "id": "readme_branch",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "branch"
     },
     {
-      "label": "Local setup",
+      "label": "Development setup",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L15",
+      "source_location": "L31",
       "_origin": "ast",
-      "id": "readme_local_setup",
-      "community": 9,
-      "community_name": "docs/README.md",
-      "norm_label": "local setup"
+      "id": "readme_development_setup",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "development setup"
+    },
+    {
+      "label": "Dokumentasi",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "readme_dokumentasi",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "dokumentasi"
+    },
+    {
+      "label": "Catatan",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "readme_catatan",
+      "community": 46,
+      "community_name": "DESIGN.md \u2014 Color Tokens & Font",
+      "norm_label": "catatan"
     },
     {
       "label": "Domains/README.md",
@@ -2474,8 +2705,8 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_product_pricing_dan_inventory",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3. product, pricing, dan inventory"
     },
     {
@@ -2485,8 +2716,8 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_1_categories",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.1 `categories`"
     },
     {
@@ -2496,8 +2727,8 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_2_brands",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.2 `brands`"
     },
     {
@@ -2507,8 +2738,8 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_3_products",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.3 `products`"
     },
     {
@@ -2518,8 +2749,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_4_product_enrichments",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.4 `product_enrichments`"
     },
     {
@@ -2529,8 +2760,8 @@
       "source_location": "L166",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_5_product_media",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.5 `product_media`"
     },
     {
@@ -2540,8 +2771,8 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_6_product_prices",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.6 `product_prices`"
     },
     {
@@ -2551,8 +2782,8 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_7_category_tax_rules",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.7 `category_tax_rules`"
     },
     {
@@ -2562,8 +2793,8 @@
       "source_location": "L218",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_8_inventory_snapshots",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.8 `inventory_snapshots`"
     },
     {
@@ -2573,8 +2804,8 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "docs_design_data_dictionary_3_9_inventory_ledger",
-      "community": 0,
-      "community_name": "Data Dictionary",
+      "community": 45,
+      "community_name": "3. Product, Pricing, dan Inventory",
       "norm_label": "3.9 `inventory_ledger`"
     },
     {
@@ -4866,6 +5097,17 @@
       "norm_label": "21. referensi teknis"
     },
     {
+      "label": "Livewire\\Component",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "livewire_component",
+      "community": 41,
+      "community_name": "Landing.php",
+      "norm_label": "livewire\\component"
+    },
+    {
       "label": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
       "file_type": "code",
       "source_file": "",
@@ -4975,6 +5217,63 @@
       "_origin": "ast",
       "source": "app_http_controllers_controller",
       "target": "app_http_controllers_controller_controller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_livewire_pages_landing",
+      "target": "app_livewire_pages_landing_landing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_livewire_pages_landing",
+      "target": "livewire_component",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/web.php",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "routes_web",
+      "target": "app_livewire_pages_landing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_livewire_pages_landing_landing",
+      "target": "app_livewire_pages_landing_landing_render",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Livewire/Pages/Landing.php",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_livewire_pages_landing_landing",
+      "target": "livewire_component",
       "confidence_score": 1.0
     },
     {
@@ -5787,7 +6086,7 @@
       "context": "import",
       "_origin": "ast",
       "source": "composer_scripts_dev",
-      "target": "ref_npx_concurrently_c_93c5fd_c4b5fd_fb7185_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_php_artisan_pail_timeout_0_npm_run_dev_names_server_queue_logs_vite_kill_others",
+      "target": "ref_npx_concurrently_c_93c5fd_c4b5fd_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_npm_run_dev_names_server_queue_vite_kill_others",
       "confidence_score": 1.0
     },
     {
@@ -6574,6 +6873,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
+      "source_location": "L111",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents_repository_agent_instructions",
+      "target": "agents_format_commit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
       "source_location": "L70",
       "weight": 1.0,
       "_origin": "ast",
@@ -6640,7 +6950,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
-      "source_location": "L93",
+      "source_location": "L92",
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
@@ -6651,7 +6961,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "AGENTS.md",
-      "source_location": "L102",
+      "source_location": "L104",
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
@@ -6666,18 +6976,150 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "agents_kebijakan_branch_dan_push",
-      "target": "agents_staging_semi_otomatis",
+      "target": "agents_staging_manual",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L143",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents_format_commit",
+      "target": "agents_aturan_penulisan",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L159",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents_format_commit",
+      "target": "agents_contoh_singkat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L126",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "agents_format_commit",
+      "target": "agents_type_yang_dipakai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design",
+      "target": "design_design_md_color_tokens_font",
       "confidence_score": 1.0
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L13",
+      "source_location": "L62",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme",
-      "target": "docs_readme",
+      "target": "design",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_design_md_color_tokens_font",
+      "target": "design_color_tokens",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_design_md_color_tokens_font",
+      "target": "design_font",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_design_md_color_tokens_font",
+      "target": "design_open",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_design_md_color_tokens_font",
+      "target": "design_product_context",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_design_md_color_tokens_font",
+      "target": "design_tailwind_theme",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_design_md_color_tokens_font",
+      "target": "design_ui_direction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_color_tokens",
+      "target": "design_neutrals_ui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DESIGN.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "design_color_tokens",
+      "target": "design_semantic",
       "confidence_score": 1.0
     },
     {
@@ -6695,29 +7137,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_pixel_komunika",
-      "target": "readme_docs",
+      "target": "readme_branch",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L15",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_pixel_komunika",
-      "target": "readme_local_setup",
+      "target": "readme_catatan",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L5",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_pixel_komunika",
+      "target": "readme_development_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_pixel_komunika",
+      "target": "readme_dokumentasi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "readme_pixel_komunika",
@@ -9960,5 +10424,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d9aba983616aadd4200cb9712e01b15f69fd609f"
+  "built_at_commit": "2ee67d4c6edd05d0678342772aa83d3c42faf01d"
 }

@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1785827784.411406,
-    "ast_hash": "0cdafb1ed5ed16e0ad8d871d33e3eafc",
+    "mtime": 1785832819.1294105,
+    "ast_hash": "692d9e2167fcbd102ac2d1033130ca64",
     "semantic_hash": ""
   },
   "public/index.php": {
@@ -120,13 +120,8 @@
     "semantic_hash": ""
   },
   "resources/js/app.js": {
-    "mtime": 1785827784.4164028,
-    "ast_hash": "b519d08ef66fd54910edbedba6181ec2",
-    "semantic_hash": ""
-  },
-  "resources/views/welcome.blade.php": {
-    "mtime": 1785827784.417404,
-    "ast_hash": "1a03818ea91deb4f3989c6c994e5867c",
+    "mtime": 1785832936.1218934,
+    "ast_hash": "b9d9ed7cd357064470779796040cbd72",
     "semantic_hash": ""
   },
   "routes/console.php": {
@@ -135,8 +130,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1785827784.4194014,
-    "ast_hash": "fd1ef7d2a9bbdd473e350326a47e3ffc",
+    "mtime": 1785832919.3234227,
+    "ast_hash": "86a5d6c12b723dbc510ceea6cb4b96a7",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -165,8 +160,8 @@
     "semantic_hash": ""
   },
   "vite.config.js": {
-    "mtime": 1785827784.4282663,
-    "ast_hash": "8ef22d264079dab94f6d36526b0cb1bc",
+    "mtime": 1785830450.256446,
+    "ast_hash": "7cdd34228b66daeef98c8585df9b2409",
     "semantic_hash": ""
   },
   ".cursor/rules/ponytail.md": {
@@ -175,13 +170,13 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1785827784.360401,
-    "ast_hash": "0179913b87a3fd4fe828806f396d9a60",
+    "mtime": 1785828623.033132,
+    "ast_hash": "612b7b025fbbc623be88060aab9be220",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785827768.5962179,
-    "ast_hash": "cb767e35f24fa049fe97ac7180d0fe74",
+    "mtime": 1785830441.7005172,
+    "ast_hash": "4477560a7852c1fe16cde0f0cdbbef57",
     "semantic_hash": ""
   },
   "app/Domains/README.md": {
@@ -230,13 +225,88 @@
     "semantic_hash": ""
   },
   "docs/requirements/SRS.md": {
-    "mtime": 1785827784.3984065,
-    "ast_hash": "81a2da81dc4ef3c7aabd80a697437e78",
+    "mtime": 1785832798.4380338,
+    "ast_hash": "caf3a2bfa092ce8b4260215b6fabff76",
     "semantic_hash": ""
   },
   "public/robots.txt": {
     "mtime": 1785827784.4144022,
     "ast_hash": "b6216d61c03e6ce0c9aea6ca7808f7ca",
+    "semantic_hash": ""
+  },
+  "resources/views/layouts/guest.blade.php": {
+    "mtime": 1785830530.1420648,
+    "ast_hash": "06e334fef906fe5e4b06c561fd1e8bbe",
+    "semantic_hash": ""
+  },
+  "DESIGN.md": {
+    "mtime": 1785832766.2107058,
+    "ast_hash": "79de0a01c072896fec6f10a2fd8ce901",
+    "semantic_hash": ""
+  },
+  "public/assets/brand-logo.png": {
+    "mtime": 1785828974.0169032,
+    "ast_hash": "dfe470542e0644dd211c232066d7aab9",
+    "semantic_hash": ""
+  },
+  "public/assets/mascot/Maskot-base.webp": {
+    "mtime": 1785828655.8044744,
+    "ast_hash": "8f4476be27a7e7cfbeb19e30bff0dd2f",
+    "semantic_hash": ""
+  },
+  "app/Livewire/Pages/Home.php": {
+    "mtime": 1785832913.563271,
+    "ast_hash": "2dd1082b3e289f2d26e033451c4a2cea",
+    "semantic_hash": ""
+  },
+  "resources/views/components/icon.blade.php": {
+    "mtime": 1785832863.1378667,
+    "ast_hash": "922c478b61d7c08ca238a29d936f3c07",
+    "semantic_hash": ""
+  },
+  "resources/views/livewire/pages/home.blade.php": {
+    "mtime": 1785832936.963805,
+    "ast_hash": "4aad13daa5bda5004e10ba35d7514693",
+    "semantic_hash": ""
+  },
+  "tests/Feature/HomeTest.php": {
+    "mtime": 1785832933.4771795,
+    "ast_hash": "b607930058a9e0a59427ce85c0dd3223",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/accessories.webp": {
+    "mtime": 1785832838.3985054,
+    "ast_hash": "8a91cdd47ce68c7afc9241a7ae9753d7",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/product-1.webp": {
+    "mtime": 1785832838.6205034,
+    "ast_hash": "f012997f46401565583b2757663f1130",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/product-2.webp": {
+    "mtime": 1785832838.7715042,
+    "ast_hash": "0f6f473309721a851a2eb1930d2057f8",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/product-3.webp": {
+    "mtime": 1785832838.915503,
+    "ast_hash": "9e08f924131984b3fe4edb1dc7ef83be",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/product-4.webp": {
+    "mtime": 1785832839.1614828,
+    "ast_hash": "408a9c9ae9cc9910e3f89a5b482397e9",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/pulsa.webp": {
+    "mtime": 1785832839.2874897,
+    "ast_hash": "68c4471c4c5d4a5ec154558c3f515a1e",
+    "semantic_hash": ""
+  },
+  "public/assets/placeholders/voucher.webp": {
+    "mtime": 1785832839.4534888,
+    "ast_hash": "186725b71da8352a3fabd5a0aca51380",
     "semantic_hash": ""
   }
 }

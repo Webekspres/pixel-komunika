@@ -1,9 +1,54 @@
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/livewire/src/Features/SupportPagination/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-yellow: #f8b818;
+    --color-brand-yellow-soft: #f8d820;
+    --color-brand-black: #181818;
+    --color-brand-white: #ffffff;
+    --color-brand-red: #f81818;
+
+    --color-success: #15803d;
+    --color-warning: #f8b818;
+    --color-danger: #f81818;
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float-y {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.75rem);
+    }
+}
+
+@utility animate-fade-up {
+    animation: fade-up 0.7s ease-out both;
+}
+
+@utility animate-float {
+    animation: float-y 5s ease-in-out infinite;
+}
+
+@utility skeleton {
+    @apply animate-pulse rounded-md bg-gray-100;
 }

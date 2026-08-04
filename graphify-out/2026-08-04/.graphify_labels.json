@@ -11,7 +11,7 @@
   "9": "docs/README.md",
   "10": "User.php",
   "11": "devDependencies",
-  "12": "Kebijakan Branch dan Push",
+  "12": "Repository Agent Instructions",
   "13": "5. Alur Utama",
   "14": "config",
   "15": "Minimum Viable Product (MVP) Baseline",
@@ -39,9 +39,14 @@
   "37": "session.php",
   "38": "index.php",
   "39": "app.js",
-  "40": "welcome.blade.php",
-  "41": "web.php",
+  "40": "require-dev",
+  "41": "Landing.php",
   "42": "HealthTest.php",
   "43": "Pest.php",
-  "44": "vite.config.js"
+  "44": "vite.config.js",
+  "45": "3. Product, Pricing, dan Inventory",
+  "46": "DESIGN.md — Color Tokens & Font",
+  "47": "guest.blade.php",
+  "48": "landing.blade.php",
+  "49": "LandingTest.php"
 }

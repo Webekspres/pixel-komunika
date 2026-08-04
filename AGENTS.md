@@ -107,3 +107,63 @@ promosi.
 - Periksa branch aktif, diff, dan status validasi sebelum setiap commit/push.
 - Jika branch tujuan belum tersedia, buat branch hanya dari baseline yang sudah
   disepakati; jika baseline tidak jelas, hentikan promosi dan minta arahan.
+
+## Format Commit
+
+Setiap commit memakai Conventional Commits:
+
+```text
+<type>(<scope opsional>): <ringkasan singkat>
+```
+
+Contoh:
+
+```text
+feat(cart): hitung PPh 22 sebagai komponen terpisah
+fix(auth): tolak checkout untuk pelanggan pending
+```
+
+### Type yang dipakai
+
+| Type | Dipakai untuk |
+| --- | --- |
+| `feat` | Fitur baru yang menambah kemampuan produk |
+| `fix` | Perbaikan bug |
+| `refactor` | Ubah struktur kode tanpa mengubah perilaku |
+| `remove` | Hapus fitur, modul, file, atau dependency yang tidak dipakai |
+| `docs` | Dokumentasi saja (README, BRD/FRD/SRS, komentar panduan) |
+| `test` | Tambah atau perbaiki test |
+| `chore` | Kerja rutin yang tidak mengubah logika produk (tooling, ignore, lockfile) |
+| `style` | Format/lint whitespace tanpa ubah perilaku |
+| `perf` | Peningkatan performa |
+| `build` | Build system, Composer/NPM dependency yang memengaruhi build |
+| `ci` | Pipeline CI/CD |
+| `revert` | Membatalkan commit sebelumnya |
+
+### Aturan penulisan
+
+1. `type` wajib; `scope` opsional (satu kata: `auth`, `cart`, `order`, `pos`,
+   `shipping`, `admin`, `docs`, `agents`, dll.).
+2. Ringkasan dalam bahasa Inggris atau Indonesia yang konsisten dalam satu
+   commit; imperatif/deskriptif singkat; huruf kecil setelah colon; tanpa titik
+   di akhir; maksimal sekitar 72 karakter.
+3. Fokus pada **mengapa / dampak**, bukan daftar file.
+4. Satu commit = satu tujuan. Jangan campur `feat` dan `fix` tanpa alasan.
+5. Breaking change: tambahkan `!` setelah type/scope
+   (`feat(api)!: ubah kontrak laporan POS`) dan/atau footer
+   `BREAKING CHANGE: ...`.
+6. Body opsional untuk konteks; footer opsional untuk issue
+   (`Refs: #12`, `Closes: #34`).
+7. Jangan commit secret (`.env`, kredensial, key production).
+
+### Contoh singkat
+
+```text
+feat(catalog): tampilkan harga hanya untuk pelanggan aktif
+fix(payment): tolak upload bukti selain gambar/pdf
+refactor(order): ekstrak status transition ke domain service
+remove(admin): hapus endpoint sinkronisasi manual sementara
+docs(agents): standarisasi format commit conventional
+chore(dev): hilangkan pail dari composer run di Windows
+test(health): pastikan /health mengecek koneksi database
+```

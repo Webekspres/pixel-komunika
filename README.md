@@ -59,11 +59,11 @@ Health check: `GET /health`
 
 ## Dokumentasi
 
-Requirement, design, dan deliverable klien ada di branch `dev`:
-
-- Di lokal setelah `git checkout dev`: buka `docs/README.md`
-- Di GitHub:
-  [docs pada branch dev](https://github.com/Webekspres/pixel-komunika/tree/dev/docs)
+- Brand UI (color tokens & font): [DESIGN.md](DESIGN.md)
+- Requirement, design sistem, dan deliverable klien di branch `dev`:
+  - Di lokal setelah `git checkout dev`: buka `docs/README.md`
+  - Di GitHub:
+    [docs pada branch dev](https://github.com/Webekspres/pixel-komunika/tree/dev/docs)
 
 ## Catatan
 

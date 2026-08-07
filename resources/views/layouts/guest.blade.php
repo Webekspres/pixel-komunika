@@ -9,5 +9,9 @@
     </head>
     <body class="min-h-screen bg-brand-white font-sans text-brand-black antialiased">
         {{ $slot }}
+
+        @livewire('storefront.cart-drawer')
+        @livewireScripts
+        @fluxScripts
     </body>
 </html>

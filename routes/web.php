@@ -14,7 +14,12 @@ use App\Livewire\Storefront\Checkout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
+use App\Livewire\Storefront\ProductIndex;
+use App\Livewire\Storefront\ProductShow;
+
 Route::get('/', Home::class)->name('home');
+Route::get('/produk', ProductIndex::class)->name('products.index');
+Route::get('/produk/{product}', ProductShow::class)->name('products.show');
 Route::get('/cart', CartIndex::class)->name('cart.index');
 
 Route::middleware('guest')->group(function () {

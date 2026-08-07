@@ -49,5 +49,9 @@
         <main>
             {{ $slot }}
         </main>
+
+        @livewire('storefront.cart-drawer')
+        @livewireScripts
+        @fluxScripts
     </body>
 </html>

@@ -2,15 +2,62 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Services\CartService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Pixel Komunika')]
+#[Title('Pixel Komunika - E-Commerce Aksesoris & Konektivitas')]
 class Home extends Component
 {
-    public function render()
+    public string $selectedCategory = 'all';
+    public string $search = '';
+
+    public function addToCart(int $productId, CartService $cartService)
     {
-        return view('livewire.pages.home')
-            ->layout('layouts.guest');
+        $user = Auth::user();
+        $sessionId = session()->getId();
+        $cart = $cartService->getOrCreateCart($user, $sessionId);
+
+        try {
+            $cartService->addItem($cart, $productId, 1);
+            $this->dispatch('cart-updated');
+            $this->dispatch('open-cart-drawer');
+        } catch (\InvalidArgumentException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+    }
+
+    public function render(CartService $cartService)
+    {
+        $user = Auth::user();
+        $sessionId = session()->getId();
+        $cart = $cartService->getOrCreateCart($user, $sessionId);
+        $cartSummary = $cartService->getCartSummary($cart);
+
+        $categories = Category::all();
+
+        $query = Product::with(['category', 'enrichment', 'latestPrice', 'inventorySnapshot']);
+
+        if ($this->selectedCategory !== 'all') {
+            $query->where('category_id', $this->selectedCategory);
+        }
+
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', "%{$this->search}%")
+                  ->orWhere('sku', 'like', "%{$this->search}%");
+            });
+        }
+
+        $products = $query->take(12)->get();
+
+        return view('livewire.pages.home', [
+            'categories' => $categories,
+            'products' => $products,
+            'cartCount' => $cartSummary['total_items'],
+        ])->layout('layouts.guest');
     }
 }

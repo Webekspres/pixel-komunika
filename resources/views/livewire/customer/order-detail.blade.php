@@ -63,7 +63,7 @@
             </x-ui.section-card>
         </div>
 
-        <!-- Invoice Snapshot -->
+        <!-- Invoice & Payment Proof Side -->
         <div class="space-y-4">
             <x-ui.section-card title="Invoice Snapshot">
                 @if ($order->invoice)
@@ -102,6 +102,68 @@
                     <p class="text-sm text-zinc-500">Invoice belum diterbitkan.</p>
                 @endif
             </x-ui.section-card>
+
+            <!-- Payment Upload / Proof Section -->
+            @if ($order->status === 'unpaid' || $order->status === 'payment_pending')
+                <x-ui.section-card title="Upload Bukti Pembayaran">
+                    @if (session()->has('success'))
+                        <div class="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-medium mb-3">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session()->has('error'))
+                        <div class="p-3 bg-red-50 text-red-800 text-xs rounded-xl font-medium mb-3">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    <form wire:submit.prevent="uploadPaymentProof" class="space-y-4">
+                        <flux:input label="Nama Bank Transfer" wire:model="bank_name" placeholder="contoh: BCA / Mandiri / BNI" required />
+                        <flux:input label="Nama Pemilik Rekening" wire:model="account_name" placeholder="Nama pengirim" required />
+                        <flux:input label="Jumlah Transfer (Rp)" wire:model="amount" type="number" required />
+                        <div>
+                            <flux:label>File Bukti Pembayaran (Gambar / PDF max 5MB)</flux:label>
+                            <input type="file" wire:model="proof_file" class="mt-1 block w-full text-xs text-zinc-600 border border-zinc-300 rounded-lg p-2" required />
+                            @error('proof_file') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        <flux:button type="submit" variant="primary" color="amber" class="w-full">
+                            Kirim Bukti Pembayaran
+                        </flux:button>
+                    </form>
+
+                    <div class="pt-4 border-t border-zinc-200">
+                        <flux:button wire:click="cancelOrder" wire:confirm="Yakin ingin membatalkan pesanan ini?" variant="ghost" class="w-full text-red-600">
+                            Batalkan Pesanan Ini
+                        </flux:button>
+                    </div>
+                </x-ui.section-card>
+            @endif
+
+            @if ($order->paymentProofs->isNotEmpty())
+                <x-ui.section-card title="Riwayat Upload Bukti">
+                    <div class="space-y-3">
+                        @foreach ($order->paymentProofs as $proof)
+                            <div class="p-3 rounded-xl bg-zinc-50 border border-zinc-200 text-xs space-y-1">
+                                <div class="flex justify-between font-bold text-zinc-900">
+                                    <span>{{ $proof->bank_name }} - {{ $proof->account_name }}</span>
+                                    <span class="uppercase {{ $proof->status === 'approved' ? 'text-emerald-700' : ($proof->status === 'rejected' ? 'text-red-600' : 'text-amber-700') }}">
+                                        {{ $proof->status }}
+                                    </span>
+                                </div>
+                                <p class="text-zinc-600">Total: Rp {{ number_format($proof->amount, 0, ',', '.') }}</p>
+                                <p class="text-zinc-400 text-[10px]">{{ $proof->created_at->format('d M Y, H:i WIB') }}</p>
+                                @if ($proof->status === 'rejected' && $proof->rejection_reason)
+                                    <div class="p-2 bg-red-50 text-red-800 rounded mt-1">
+                                        Catatan Penolakan: {{ $proof->rejection_reason }}
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </x-ui.section-card>
+            @endif
         </div>
     </div>
 </x-layout.app-page>

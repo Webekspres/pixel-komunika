@@ -60,4 +60,19 @@ class Order extends Model
     {
         return $this->hasOne(Invoice::class);
     }
+
+    public function paymentProofs(): HasMany
+    {
+        return $this->hasMany(PaymentProof::class);
+    }
+
+    public function latestPaymentProof(): HasOne
+    {
+        return $this->hasOne(PaymentProof::class)->latestOfMany();
+    }
+
+    public function returns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
 }

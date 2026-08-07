@@ -68,12 +68,21 @@
                                 <td class="px-4 py-3">
                                     <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold
                                         {{ $order->status === 'unpaid' ? 'bg-amber-100 text-amber-800' : '' }}
+                                        {{ $order->status === 'payment_pending' ? 'bg-purple-100 text-purple-800' : '' }}
                                         {{ $order->status === 'paid' ? 'bg-emerald-100 text-emerald-800' : '' }}
                                         {{ $order->status === 'shipped' ? 'bg-blue-100 text-blue-800' : '' }}
                                         {{ $order->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}
                                     ">
                                         {{ strtoupper($order->status) }}
                                     </span>
+
+                                    @if ($order->latestPaymentProof)
+                                        <div class="mt-1">
+                                            <span class="text-[10px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                                                Bukti: {{ $order->latestPaymentProof->bank_name }} ({{ strtoupper($order->latestPaymentProof->status) }})
+                                            </span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     <div class="flex items-center justify-end gap-2">
@@ -81,7 +90,14 @@
                                             Detail
                                         </a>
 
-                                        @if ($order->status === 'unpaid')
+                                        @if ($order->latestPaymentProof && $order->latestPaymentProof->status === 'pending')
+                                            <button
+                                                wire:click="approvePayment({{ $order->latestPaymentProof->id }})"
+                                                class="px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-lg hover:bg-emerald-700"
+                                            >
+                                                Verifikasi Bayar
+                                            </button>
+                                        @elseif ($order->status === 'unpaid')
                                             <button
                                                 wire:click="updateOrderStatus({{ $order->id }}, 'paid')"
                                                 class="px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-lg hover:bg-emerald-700"
@@ -94,6 +110,16 @@
                                                 class="px-3 py-1.5 bg-blue-600 text-white font-bold text-xs rounded-lg hover:bg-blue-700"
                                             >
                                                 Kirim
+                                            </button>
+                                        @endif
+
+                                        @if (!in_array($order->status, ['cancelled', 'completed', 'returned']))
+                                            <button
+                                                wire:click="cancelOrder({{ $order->id }})"
+                                                wire:confirm="Yakin membatalkan order ini?"
+                                                class="px-2 py-1.5 bg-red-100 text-red-700 font-semibold text-xs rounded-lg hover:bg-red-200"
+                                            >
+                                                Batal
                                             </button>
                                         @endif
                                     </div>

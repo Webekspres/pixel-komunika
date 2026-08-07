@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Daftar - Pixel Komunika'">
+<x-layouts.auth title="Daftar - Pixel Komunika">
     <x-layout.auth-shell
         title="Daftar pelanggan"
         description="Akun baru akan masuk status pending verification sampai direview admin."
@@ -7,6 +7,12 @@
         <form method="POST" action="{{ route('register.store') }}" class="space-y-5">
             @csrf
 
+            @if ($errors->any())
+                <div class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
             <flux:input
                 id="name"
                 name="name"
@@ -14,6 +20,7 @@
                 value="{{ old('name') }}"
                 placeholder="Nama lengkap"
                 required
+                autofocus
             />
 
             <flux:input
@@ -65,15 +72,15 @@
                 />
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-3 pt-1">
                 <flux:button type="submit" variant="primary" color="amber" class="w-full">
                     Kirim pendaftaran
                 </flux:button>
 
-                <flux:button href="{{ route('login') }}" variant="ghost" class="w-full">
+                <flux:button href="{{ route('login') }}" variant="ghost" class="w-full text-zinc-500">
                     Sudah punya akun? Masuk
                 </flux:button>
             </div>
         </form>
     </x-layout.auth-shell>
-</x-layouts.app>
+</x-layouts.auth>

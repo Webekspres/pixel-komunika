@@ -10,15 +10,18 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete()->index();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->foreign('user_id', 'fk_carts_user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->string('session_id', 191)->nullable()->index();
             $table->timestamps();
         });
 
         Schema::create('cart_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cart_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('cart_id');
+            $table->foreign('cart_id', 'fk_cart_items_cart_id')->references('id')->on('carts')->cascadeOnDelete();
+            $table->foreignId('product_id');
+            $table->foreign('product_id', 'fk_cart_items_product_id')->references('id')->on('products')->cascadeOnDelete();
             $table->unsignedInteger('quantity')->default(1);
             $table->timestamps();
 
@@ -28,8 +31,10 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number', 64)->unique();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->index();
-            $table->foreignId('address_id')->nullable()->constrained('addresses')->nullOnDelete();
+            $table->foreignId('user_id')->index();
+            $table->foreign('user_id', 'fk_orders_user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreignId('address_id')->nullable();
+            $table->foreign('address_id', 'fk_orders_address_id')->references('id')->on('addresses')->nullOnDelete();
             $table->string('status', 32)->default('unpaid')->index();
             $table->string('recipient_name', 150);
             $table->string('recipient_phone', 32);
@@ -50,8 +55,10 @@ return new class extends Migration
 
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained();
+            $table->foreignId('order_id');
+            $table->foreign('order_id', 'fk_order_items_order_id')->references('id')->on('orders')->cascadeOnDelete();
+            $table->foreignId('product_id');
+            $table->foreign('product_id', 'fk_order_items_product_id')->references('id')->on('products');
             $table->string('product_name', 255);
             $table->string('sku', 191);
             $table->decimal('unit_price', 19, 2);
@@ -64,8 +71,10 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_number', 64)->unique();
-            $table->foreignId('order_id')->unique()->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')->unique();
+            $table->foreign('order_id', 'fk_invoices_order_id')->references('id')->on('orders')->cascadeOnDelete();
+            $table->foreignId('user_id');
+            $table->foreign('user_id', 'fk_invoices_user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->decimal('subtotal', 19, 2);
             $table->decimal('tax_pph22', 19, 2)->default(0);
             $table->decimal('shipping_cost', 19, 2)->default(0);

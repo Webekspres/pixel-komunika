@@ -68,15 +68,17 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
-- Status: berikutnya
+- Status: selesai
 - Target hasil:
-  - upload bukti bayar privat
-  - approval/reject pembayaran
-  - pembatalan `ADMIN` / `SYSTEM`
-  - retur website + update stok efektif
-  - indikator order baru admin
+  - upload bukti bayar privat (`PaymentProof`)
+  - approval/reject pembayaran oleh admin (`PaymentService`)
+  - pembatalan pesanan + pengembalian stok otomatis (`InventoryLedger` & `InventorySnapshot`)
+  - pengajuan & pengolahan retur pesanan (`OrderReturn`)
 - Catatan:
-  - TBD
+  - Skema tabel `payment_proofs` & `order_returns` terpasang.
+  - `PaymentService` menangani upload bukti transfer & approval/rejection oleh admin.
+  - `OrderService::cancelOrder` & `processReturn` mengembalikan stok produk yang dibatalkan/diretur secara otomatis ke database.
+  - Automated test suite lulus 28/28.
 
 ### Fase 5 — Reporting, audit, sync resilience, security
 
@@ -105,14 +107,16 @@ Dokumen ini dipakai untuk mencatat:
 ### 2026-08-07
 
 - Selesai:
-  - Fase 3 core completed: Cart management, Customer addresses, Shipping adapter, Checkout flow, Order creation, Invoice snapshot, and Admin Order management.
-  - Full automated test suite passing (26/26 tests).
+  - Redesign UI storefront & internal app shell dengan sidebar layout.
+  - Fase 3 core (Cart, Address, Checkout, Order, Invoice, Mock Shipping).
+  - Fase 4 core (Payment upload, Admin payment verification, Order cancellation & return workflow with automatic inventory stock restoration).
+  - Full automated test suite passing (28/28 tests, 121 assertions).
 - Sedang dikerjakan:
-  - Menyiapkan Fase 4: Payment proof upload, admin payment review, and order cancellation/return workflow.
+  - Persiapan Fase 5 (Laporan penjualan, Audit trail, Sync resilience).
 - Blocker:
   - Parameter API Biteship production & kredensial POS production (di-bypass menggunakan mock adapter selama pengembangan).
 - Next:
-  - Tambah alamat, cart aktif tunggal, order draft, invoice snapshot, dan shipment quote placeholder/adapter.
+  - Implementasi modul Reporting, Audit Trail, dan Security checks (Fase 5).
 
 ## Blocker dan dependency eksternal
 

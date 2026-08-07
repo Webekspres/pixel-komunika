@@ -146,4 +146,132 @@ class OrderService
             return $order;
         });
     }
+
+    /**
+     * Cancel order and restore product stock.
+     */
+    public function cancelOrder(Order $order, string $reason, string $cancelledBy = 'SYSTEM'): void
+    {
+        if (in_array($order->status, ['cancelled', 'completed', 'returned'])) {
+            throw new InvalidArgumentException("Order #{$order->order_number} tidak dapat dibatalkan.");
+        }
+
+        DB::transaction(function () use ($order, $reason, $cancelledBy) {
+            $order->update(['status' => 'cancelled']);
+
+            if ($order->invoice) {
+                $order->invoice->update(['status' => 'cancelled']);
+            }
+
+            // Restore stock for all order items
+            foreach ($order->items as $item) {
+                $snapshot = InventorySnapshot::where('product_id', $item->product_id)->lockForUpdate()->first();
+                if ($snapshot) {
+                    $qtyBefore = $snapshot->quantity_available;
+                    $qtyAfter = $qtyBefore + $item->quantity;
+
+                    $status = InventorySnapshot::AVAILABLE;
+                    if ($qtyAfter <= $snapshot->low_stock_threshold) {
+                        $status = InventorySnapshot::LOW;
+                    }
+
+                    $snapshot->update([
+                        'quantity_available' => $qtyAfter,
+                        'stock_status' => $status,
+                    ]);
+
+                    InventoryLedger::create([
+                        'product_id' => $item->product_id,
+                        'source' => 'ORDER_CANCELLED',
+                        'quantity_before' => $qtyBefore,
+                        'quantity_after' => $qtyAfter,
+                        'quantity_delta' => $item->quantity,
+                        'external_reference' => $order->order_number,
+                        'occurred_at' => now(),
+                        'meta' => [
+                            'order_id' => $order->id,
+                            'reason' => $reason,
+                            'cancelled_by' => $cancelledBy,
+                        ],
+                    ]);
+                }
+            }
+        });
+    }
+
+    /**
+     * Request an order return from customer.
+     */
+    public function requestReturn(Order $order, User $user, string $reason): \App\Models\OrderReturn
+    {
+        if ($order->status !== 'completed' && $order->status !== 'shipped') {
+            throw new InvalidArgumentException("Retur hanya dapat diajukan untuk order yang sudah dikirim atau selesai.");
+        }
+
+        return \App\Models\OrderReturn::create([
+            'order_id' => $order->id,
+            'user_id' => $user->id,
+            'reason' => $reason,
+            'status' => 'requested',
+        ]);
+    }
+
+    /**
+     * Admin processes a return request (approve/reject).
+     */
+    public function processReturn(\App\Models\OrderReturn $return, string $action, ?float $refundAmount, User $admin, ?string $adminNotes = null): void
+    {
+        DB::transaction(function () use ($return, $action, $refundAmount, $admin, $adminNotes) {
+            if ($action === 'approve') {
+                $return->update([
+                    'status' => 'approved',
+                    'refund_amount' => $refundAmount ?? $return->order->grand_total,
+                    'admin_notes' => $adminNotes,
+                    'processed_by' => $admin->id,
+                    'processed_at' => now(),
+                ]);
+
+                $return->order->update(['status' => 'returned']);
+
+                if ($return->order->invoice) {
+                    $return->order->invoice->update(['status' => 'refunded']);
+                }
+
+                // Restore stock
+                foreach ($return->order->items as $item) {
+                    $snapshot = InventorySnapshot::where('product_id', $item->product_id)->lockForUpdate()->first();
+                    if ($snapshot) {
+                        $qtyBefore = $snapshot->quantity_available;
+                        $qtyAfter = $qtyBefore + $item->quantity;
+
+                        $snapshot->update([
+                            'quantity_available' => $qtyAfter,
+                            'stock_status' => InventorySnapshot::AVAILABLE,
+                        ]);
+
+                        InventoryLedger::create([
+                            'product_id' => $item->product_id,
+                            'source' => 'ORDER_RETURNED',
+                            'quantity_before' => $qtyBefore,
+                            'quantity_after' => $qtyAfter,
+                            'quantity_delta' => $item->quantity,
+                            'external_reference' => $return->order->order_number,
+                            'occurred_at' => now(),
+                            'meta' => [
+                                'return_id' => $return->id,
+                                'admin_id' => $admin->id,
+                            ],
+                        ]);
+                    }
+                }
+            } else {
+                $return->update([
+                    'status' => 'rejected',
+                    'admin_notes' => $adminNotes,
+                    'processed_by' => $admin->id,
+                    'processed_at' => now(),
+                ]);
+            }
+        });
+    }
 }

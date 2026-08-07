@@ -5,11 +5,17 @@ use App\Http\Controllers\Account\AddressController;
 use App\Http\Controllers\Admin\CustomerReviewController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Livewire\Admin\AdminOrders;
+use App\Livewire\Customer\CustomerOrders;
+use App\Livewire\Customer\OrderDetail;
 use App\Livewire\Pages\Home;
+use App\Livewire\Storefront\CartIndex;
+use App\Livewire\Storefront\Checkout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
+Route::get('/cart', CartIndex::class)->name('cart.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', [RegisteredUserController::class, 'create'])->name('register');
@@ -25,17 +31,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/akun/addresses', [AddressController::class, 'store'])->name('account.addresses.store');
     Route::patch('/akun/addresses/{address}', [AddressController::class, 'update'])->name('account.addresses.update');
     Route::delete('/akun/addresses/{address}', [AddressController::class, 'destroy'])->name('account.addresses.destroy');
+    Route::get('/orders/{order}', OrderDetail::class)->name('orders.show');
 });
 
 Route::middleware(['auth', 'active.customer'])->group(function () {
-    Route::view('/checkout', 'checkout.index')->name('checkout.index');
-    Route::view('/orders', 'orders.index')->name('orders.index');
+    Route::get('/checkout', Checkout::class)->name('checkout.index');
+    Route::get('/orders', CustomerOrders::class)->name('orders.index');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/customers', [CustomerReviewController::class, 'index'])->name('customers.index');
     Route::get('/customers/{customerProfile}', [CustomerReviewController::class, 'show'])->name('customers.show');
     Route::patch('/customers/{customerProfile}', [CustomerReviewController::class, 'update'])->name('customers.update');
+    Route::get('/orders', AdminOrders::class)->name('orders.index');
 });
 
 Route::get('/health', function () {

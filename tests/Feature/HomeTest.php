@@ -6,12 +6,12 @@ it('shows the branded home page', function () {
         ->assertSee('Pixel Komunika')
         ->assertSee('Aksesoris')
         ->assertSee('konektivitas')
-        ->assertSee('Ikhtisar kategori')
+        ->assertSee('Tiga jalur utama')
         ->assertSee('Aksesoris elektronik')
         ->assertSee('Kartu')
         ->assertSee('voucher')
         ->assertSee('Pulsa')
         ->assertSee('Permintaan tinggi')
-        ->assertSee('Kenapa berbelanja di sini')
+        ->assertSee('Dirancang untuk reseller')
         ->assertSee('Akun terverifikasi');
 });

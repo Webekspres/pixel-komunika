@@ -11,8 +11,8 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-04
-- Fase aktif: transisi dari Fase 2 ke Fase 3
+- Tanggal update terakhir: 2026-08-07
+- Fase aktif: transisi dari Fase 3 ke Fase 4
 - Status umum: on track
 - PIC update: AI agent
 
@@ -20,7 +20,7 @@ Dokumen ini dipakai untuk mencatat:
 
 - `Fase 1` Identity & access
 - `Fase 2` Catalog, pricing, stock, dan data contoh POS
-- `Fase 3` Cart, checkout, shipping quote, order, invoice
+- `Fase 3` Cart, checkout, shipping quote, order, invoice (Selesai dengan Mock Adapter)
 - `Fase 4` Payment, cancellation/return, admin workflow
 - `Fase 5` Reporting, audit, sync resilience, security
 - `Fase 6` Release readiness, UAT, dan go-live
@@ -54,18 +54,21 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: berikutnya
+- Status: selesai
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
-  - ongkir Biteship Maps/Rates
+  - ongkir Biteship (dikembangkan menggunakan adapter `MockBiteshipShippingService`)
   - order + invoice + expiry unpaid
 - Catatan:
-  - TBD
+  - Skema tabel `carts`, `cart_items`, `orders`, `order_items`, `invoices` sudah terpasang.
+  - `CartService` mengelola manipulasi item & kalkulasi PPh 22/partai price.
+  - `OrderService` membuat order, snapshot invoice, serta mengurangi stok pada `inventory_snapshot` dan `inventory_ledger`.
+  - Fitur UI Livewire `CartIndex`, `Checkout`, `CustomerOrders`, `OrderDetail`, dan `AdminOrders` sudah lengkap & teruji.
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
-- Status: belum mulai
+- Status: berikutnya
 - Target hasil:
   - upload bukti bayar privat
   - approval/reject pembayaran
@@ -99,15 +102,15 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Log progres
 
-### YYYY-MM-DD
+### 2026-08-07
 
 - Selesai:
-  - Fase 1 auth foundation: role, profile customer, login/register/logout, approval admin, access guard.
-  - Fase 2 foundation: schema catalog/pricing/inventory, importer data contoh, kalkulasi harga dan PPh 22 dasar.
+  - Fase 3 core completed: Cart management, Customer addresses, Shipping adapter, Checkout flow, Order creation, Invoice snapshot, and Admin Order management.
+  - Full automated test suite passing (26/26 tests).
 - Sedang dikerjakan:
-  - Menyiapkan Fase 3 cart, checkout, shipping quote, order, dan invoice.
+  - Menyiapkan Fase 4: Payment proof upload, admin payment review, and order cancellation/return workflow.
 - Blocker:
-  - Detail parameter Biteship production belum final.
+  - Parameter API Biteship production & kredensial POS production (di-bypass menggunakan mock adapter selama pengembangan).
 - Next:
   - Tambah alamat, cart aktif tunggal, order draft, invoice snapshot, dan shipment quote placeholder/adapter.
 

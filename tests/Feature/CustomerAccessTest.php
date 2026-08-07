@@ -61,7 +61,7 @@ it('allows active customers to access checkout and order history', function () {
     $this->actingAs($customer)
         ->get(route('orders.index'))
         ->assertOk()
-        ->assertSee('Riwayat order');
+        ->assertSee('Riwayat Pesanan');
 });
 
 it('lets a customer update profile and manage default addresses', function () {

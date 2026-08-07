@@ -10,24 +10,37 @@
 @source '../views/**/*.blade.php';
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     --color-brand-yellow: #f8b818;
     --color-brand-yellow-soft: #f8d820;
+    --color-brand-yellow-muted: #fef3c7;
     --color-brand-black: #181818;
     --color-brand-white: #ffffff;
     --color-brand-red: #f81818;
 
+    --color-surface-1: #ffffff;
+    --color-surface-2: #fafafa;
+    --color-surface-3: #f5f5f5;
+
     --color-success: #15803d;
     --color-warning: #f8b818;
     --color-danger: #f81818;
+
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-card-hover: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 8px -2px rgb(0 0 0 / 0.08);
+    --shadow-product: 0 2px 8px -2px rgb(0 0 0 / 0.1), 0 4px 16px -4px rgb(0 0 0 / 0.08);
 }
+
+/* ============================================
+   KEYFRAMES
+   ============================================ */
 
 @keyframes fade-up {
     from {
         opacity: 0;
-        transform: translateY(1rem);
+        transform: translateY(1.25rem);
     }
     to {
         opacity: 1;
@@ -35,24 +48,147 @@
     }
 }
 
-@keyframes float-y {
-    0%,
-    100% {
-        transform: translateY(0);
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-1rem);
     }
-    50% {
-        transform: translateY(-0.75rem);
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-0.85rem); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-badge {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
 @utility animate-fade-up {
-    animation: fade-up 0.7s ease-out both;
+    animation: fade-up 0.65s ease-out both;
+}
+
+@utility animate-fade-in {
+    animation: fade-in 0.5s ease-out both;
+}
+
+@utility animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out both;
+}
+
+@utility animate-scale-in {
+    animation: scale-in 0.4s ease-out both;
 }
 
 @utility animate-float {
-    animation: float-y 5s ease-in-out infinite;
+    animation: float-y 5.5s ease-in-out infinite;
 }
 
 @utility skeleton {
     @apply animate-pulse rounded-md bg-gray-100;
+}
+
+/* Delay utilities for staggered animations */
+@utility delay-75 { animation-delay: 75ms; }
+@utility delay-150 { animation-delay: 150ms; }
+@utility delay-200 { animation-delay: 200ms; }
+@utility delay-300 { animation-delay: 300ms; }
+@utility delay-500 { animation-delay: 500ms; }
+
+/* ============================================
+   STOREFRONT DESIGN SYSTEM
+   ============================================ */
+
+/* Product Card */
+@utility product-card {
+    @apply relative overflow-hidden rounded-2xl border border-brand-black/8 bg-white transition-all duration-300;
+    box-shadow: var(--shadow-card);
+}
+
+@utility product-card-hover {
+    @apply hover:-translate-y-1;
+    &:hover { box-shadow: var(--shadow-card-hover); }
+}
+
+/* Premium section rhythm */
+@utility section-yellow {
+    @apply bg-brand-yellow;
+}
+
+@utility section-white {
+    @apply bg-white;
+}
+
+@utility section-gray {
+    @apply bg-surface-2;
+}
+
+@utility section-yellow-muted {
+    @apply bg-brand-yellow-muted;
+}
+
+@utility section-black {
+    @apply bg-brand-black text-brand-white;
+}
+
+/* Container sizes */
+@utility container-2xl {
+    @apply mx-auto w-full max-w-screen-2xl px-5 sm:px-8 lg:px-12;
+}
+
+@utility container-lg {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8 lg:px-10;
+}
+
+/* ============================================
+   INTERNAL APP SIDEBAR LAYOUT
+   ============================================ */
+
+:root {
+    --sidebar-width: 240px;
+    --topbar-height: 56px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Sidebar transition */
+.sidebar-nav-item {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150;
+    @apply text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900;
+}
+
+.sidebar-nav-item.active {
+    @apply bg-amber-50 text-amber-700;
 }

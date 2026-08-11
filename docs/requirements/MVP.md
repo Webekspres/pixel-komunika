@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.12 - Client Shared Hosting Confirmation |
-| Tanggal | Jumat, 31 Juli 2026 |
+| Versi | 0.13 - Klarifikasi Klien 7-11 Agustus 2026 |
+| Tanggal | Selasa, 11 Agustus 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
 | System Analyst | Sultan - Webekspres |
@@ -39,22 +39,24 @@ serta diproses admin.
 |---|---|---|---|
 | MVP-001 | Registrasi dan autentikasi | BR-002; FR-AUTH-001 - FR-AUTH-004 | Pengguna dapat registrasi, login, dan logout dengan validasi serta session yang aman. |
 | MVP-002 | Approval dan status pelanggan | BR-003 - BR-004; FR-AUTH-006 - FR-AUTH-009 | Admin dapat menyetujui, menolak, menangguhkan, dan mengaktifkan pelanggan dengan status yang benar. |
-| MVP-003 | Hak akses guest, pending, aktif, dan admin | FR-AUTH-002; FR-CAT-007; FR-PRC-007; FR-ORD-003 | Guest/pending dapat melihat katalog tanpa harga; hanya pelanggan aktif dapat checkout dan melihat riwayat sendiri. |
-| MVP-004 | Katalog dan pelengkap produk | BR-005; FR-CAT-001 - FR-CAT-007 | Seluruh data yang tersedia di POS disinkronkan sebagai sumber utama; website dapat melengkapi gambar, deskripsi, atau field lain yang belum tersedia di POS. |
-| MVP-005 | Harga eceran, partai, dan grosir | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-007 | Setiap produk memiliki tiga jenis harga dari POS; harga eceran disiapkan tetapi tidak ditampilkan pada storefront. Harga partai eligible jika sedikitnya satu produk/SKU dalam struk berjumlah minimal lima unit dan kuantitas antar-SKU tidak dijumlahkan. Harga grosir mengikuti minimum per produk; cakupan penerapan harga partai dan prioritas terhadap grosir mengikuti OPN-013. |
+| MVP-003 | Hak akses guest, pending, reseller aktif, dan admin | FR-AUTH-002; FR-CAT-007; FR-PRC-007; FR-ORD-003 | Guest/pending melihat katalog tanpa harga; reseller aktif yang disetujui admin dapat melihat harga, checkout, dan riwayat sendiri. |
+| MVP-004 | Katalog dan pelengkap produk | BR-005; FR-CAT-001 - FR-CAT-007 | SKU/master berasal dari POS; admin dapat mengubah nama tampilan serta melengkapi gambar, video, deskripsi, dan presentasi produk tanpa ditimpa sinkronisasi. |
+| MVP-005 | Harga eceran, partai, dan grosir | BR-006; FR-PRC-001 - FR-PRC-002, FR-PRC-005 - FR-PRC-008 | Minimum global partai dapat diubah admin (awal lima unit). Jika satu SKU mencapainya, harga partai berlaku untuk seluruh order dan menang terhadap grosir. |
 | MVP-006 | Integrasi master data dan inventory POS | BR-009 - BR-013; FR-POS-001 - FR-POS-016 | Master data dan seluruh stok disinkronkan sekali sehari; stok produk tertentu dapat dicocokkan berkala; data contoh digunakan sampai alur website berjalan, lalu akses POS dikoordinasikan dengan Kak Rio. |
 | MVP-007 | Stok efektif dan rekonsiliasi | BR-011 - BR-014; FR-POS-007 - FR-POS-012, FR-POS-017 - FR-POS-020 | Stok efektif berkurang ketika penjualan website dicatat, bertambah ketika retur website dicatat, lalu laporan penjualan/retur direkonsiliasi ke POS tanpa perubahan ganda. |
 | MVP-008 | Keranjang dan checkout | BR-014 - BR-015; FR-CART-001 - FR-CART-006 | Pelanggan aktif dapat mengelola cart, alamat, pengiriman, dan melihat subtotal, PPh 22, ongkir, serta total yang dihitung server-side; PPh 22 tampil sebagai komponen terpisah. |
-| MVP-009 | Order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-009 - FR-ORD-011 | Website membuat order dan invoice; invoice menampilkan identitas toko, jumlah/nama/SKU/harga satuan/total harga item, total pembelian keseluruhan, serta nilai rupiah PPh 22 jika berlaku. Pesanan belum dibayar otomatis dibatalkan pada hari berikutnya; pelanggan dapat melihat status, nomor resi, serta sumber/alasan/waktu pembatalan jika berlaku. Melihat resi tidak menyelesaikan order; trigger fulfillment mengikuti OPN-020. |
+| MVP-009 | Order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030, BR-034; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-009 - FR-ORD-013 | Invoice tampil di website, dapat diunduh PDF, dan dikirim melalui WhatsApp/email; identitas toko di atas serta perusahaan/NPWP/akun reseller di bawah. Resi wajib hanya bila tersedia; tautan WhatsApp atau scheduler lima hari kerja menyelesaikan order, sedangkan `TERKENDALA` menahan scheduler. |
 | MVP-010 | Pembayaran transfer manual | BR-018 - BR-020; FR-PAY-001 - FR-PAY-007 | Pelanggan mengunggah bukti secara privat; admin menerima/menolak; status dan audit tercatat. |
 | MVP-011 | Pembatalan, retur, dan rekonsiliasi stok | BR-021 - BR-022; FR-ORD-006 - FR-ORD-008; FR-POS-012, FR-POS-018 | Pembatalan yang valid memakai satu status `CANCELLED`, menyimpan sumber `ADMIN`/`SYSTEM`, pelaku admin jika ada, alasan, dan waktu; kemudian membuat retur website, mengembalikan stok efektif, serta melaporkan retur ke POS setelah laporan penjualan asal diterima tanpa membuat retur ganda. |
-| MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025; FR-SHP-001 - FR-SHP-007 | Backend memakai Biteship Maps untuk area dan Rates untuk pilihan layanan/ongkir, menyimpan snapshot pilihan ke transaksi, dan tidak menghasilkan ongkir Rp0 saat gagal. Booking/pickup, label, tracking, dan webhook Biteship tidak termasuk MVP. |
-| MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi, omzet, dan PPh 22 berdasarkan periode serta area; PPh 22 tampil terpisah dan transaksi batal dikecualikan. |
+| MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025, BR-033; FR-SHP-001 - FR-SHP-008 | Kurir toko melayani seluruh kecamatan Kota/Kabupaten Bandung dengan SLA hari kerja. Biteship memakai origin toko, berat produk, dimensi produk besar, dan Grab/Gojek same-day; kegagalan meminta pelanggan menghubungi admin. Order beralamat sama dapat digrup untuk pengiriman. |
+| MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi, omzet, dan PPh 22 berdasarkan periode/area; omzet mulai saat `SHIPPED` dan tidak dihitung ganda saat `COMPLETED`. |
 | MVP-014 | Audit dan penanganan gangguan | BR-027 - BR-028; FR-POS-020; FR-AUD-001, FR-AUD-004; FRD Bagian 15 | Pelaporan penjualan/retur ke POS dan gangguan sinkronisasi tercatat; percobaan ulang tidak membuat laporan atau perubahan stok ganda. |
 | MVP-015 | Security dan authorization | SRS Bagian 12.3 | CSRF, validation, policy, rate limit, secure session, private upload, dan secret management lulus test relevan. |
 | MVP-016 | Release readiness | SRS Bagian 15 - 18 | Shared hosting milik klien menjadi target production; akses deployment developer, domain/DNS, runtime/database, cron, log, backup/rollback, staging, CI, smoke test, UAT, training, dan sign-off go-live tersedia serta terverifikasi sebelum rilis. |
-| MVP-017 | Ambang klasifikasi dan PPh 22 | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Admin mengelola klasifikasi, ambang nilai belanja, dan tarif melalui website; transaksi di atas ambang tetap berjalan. Multi-klasifikasi menghasilkan satu total PPh 22 yang disimpan dan ditampilkan sesuai formula final OPN-006. |
-| MVP-018 | Notifikasi order baru kepada admin | BR-031; FR-NTF-001 - FR-NTF-002 | Order baru menampilkan indikator merah di website admin dan menjadwalkan pesan WhatsApp. Gangguan WhatsApp tidak menggagalkan order; provider, penerima, template, dan fallback harus selesai sebelum acceptance integrasi WhatsApp. |
+| MVP-017 | Ambang klasifikasi dan PPh 22 | BR-007 - BR-008; FR-PRC-003 - FR-PRC-004 | Seluruh subtotal klasifikasi terpicu digabung; `PPh 22 = (dasar / 1,11) × tarif`. Tarif multi-klasifikasi dan pembulatan wajib ditetapkan sebelum UAT. |
+| MVP-018 | Notifikasi order baru kepada admin | BR-031; FR-NTF-001 - FR-NTF-002 | Indikator merah dianggap dibaca saat admin membuka daftar proses; WhatsApp dikirim ke `081546407702` dengan isi minimum `Cek Order masuk`. |
+| MVP-019 | Reseller dan channel pemesanan | BR-032; FR-RSL-001 - FR-RSL-004 | Akun yang disetujui admin menjadi reseller aktif, memperoleh nomor akun, dapat melihat harga, serta memesan lewat website atau WhatsApp. Pencatatan order WhatsApp harus diputuskan sebelum UAT. |
+| MVP-020 | Retensi bukti pembayaran | BR-019; FR-PAY-002, FR-PAY-006 | Bukti pembayaran privat dipertahankan selama lima tahun dan hanya dapat diakses pihak berwenang. |
 
 ## 4. Data Contoh Saat Koneksi POS Belum Tersedia
 
@@ -81,8 +83,6 @@ Jika koneksi POS belum tersedia:
 
 | Kategori | Item | Status |
 |---|---|---|
-| Candidate | Segmentasi/reseller dan pemesanan WhatsApp | Menunggu CND-001/CND-002 |
-| Candidate | Penggabungan beberapa transaksi menjadi satu pengiriman | Menunggu CND-003 |
 | P1 | Reset password | Dikerjakan jika kapasitas tersedia |
 | P1 | Pencarian/filter katalog lanjutan | Dikerjakan jika kapasitas tersedia |
 | P1 | Sinkronisasi manual dan monitoring lanjutan | Dikerjakan setelah alur sinkronisasi minimum aman |
@@ -97,19 +97,21 @@ MVP dapat dinyatakan selesai apabila:
 - seluruh acceptance criteria P0 memiliki test case dan lulus di staging;
 - alur end-to-end registrasi sampai order selesai dan nomor resi tampil lulus
   UAT;
-- trigger `PACKED`, `SHIPPED`, dan `COMPLETED`, pihak yang mengonfirmasi
-  penerimaan, serta penanganan barang belum diterima telah diputuskan melalui
-  OPN-020 dan lulus UAT;
+- resi kondisional, tautan konfirmasi WhatsApp, auto-complete lima hari kerja,
+  penanda `TERKENDALA`, dan pencegahan poin ganda lulus UAT; provider, kalender,
+  dan nilai/masa berlaku/penggunaan poin telah diputuskan melalui OPN-020;
 - pembatalan admin dan sistem menghasilkan status `CANCELLED` yang sama, tetapi
   keterangan sumber, alasan, waktu, dan pelaku admin jika ada tersimpan serta
   tampil dengan benar pada detail order;
-- invoice menampilkan seluruh field wajib dan mempertahankan snapshot
-  historisnya;
+- invoice menampilkan layout identitas, nomor akun reseller, preview website,
+  PDF, dan pilihan channel serta mempertahankan snapshot historisnya;
 - koneksi POS production yang dikoordinasikan dengan Kak Rio tersedia dan
   contract test operasi master data, inventory, laporan penjualan/retur,
   acknowledgement/idempotency, ordering laporan, serta rekonsiliasi lulus;
-- indikator order baru website lulus UAT; notifikasi WhatsApp lulus acceptance
-  setelah provider, penerima, template, dan fallback disetujui;
+- indikator order baru website dan read behavior lulus UAT; notifikasi WhatsApp
+  lulus setelah provider, template, credential, dan fallback disetujui;
+- alur reseller, pemesanan WhatsApp, dan pengiriman gabungan lulus setelah
+  pencatatan transaksi, ongkir, resi, invoice, dan status diputuskan;
 - tidak ada defect kritis atau tinggi yang belum diterima sebagai risiko;
 - backup, rollback, monitoring, security check, training, dan smoke test siap;
 - Sylvi memberikan UAT dan go-live sign-off pada hari kerja;

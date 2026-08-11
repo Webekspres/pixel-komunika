@@ -58,10 +58,12 @@ Governance utama berada pada:
 
 ## Current Change Notice
 
-Pada Selasa, 28 Juli 2026, klien mengarahkan agar pengembangan dilanjutkan
-sesuai proposal awal. PPh 22, batas maksimal penjualan, dan surcharge terkait
-tetap berada dalam MVP; detail formula masih menunggu klarifikasi pada
-[BRD Bagian 15.1](requirements/BRD.md#151-klarifikasi-klien-28-juli-2026).
+Jawaban tertulis klien pada 7-11 Agustus 2026 menetapkan formula PPh 22,
+penerapan harga partai, invoice website/PDF/WhatsApp/email, omzet saat dikirim,
+wilayah/SLA kurir toko, fallback Biteship, retensi bukti pembayaran, notifikasi
+admin, reseller versi pertama, pengiriman gabungan untuk alamat sama, serta
+konfirmasi penerimaan dan auto-complete lima hari kerja. Rincian dan sisa
+keputusan berada pada [BRD Bagian 15](requirements/BRD.md#15-keputusan-terbuka).
 
 Production menggunakan shared hosting milik klien. Klien akan memberikan akses
 yang diperlukan kepada developer Webekspres untuk setup dan deployment;

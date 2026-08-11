@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.6 - Cancellation Source Clarification |
-| Tanggal | Rabu, 29 Juli 2026 |
+| Versi | 0.7 - Klarifikasi Klien 7-11 Agustus 2026 |
+| Tanggal | Selasa, 11 Agustus 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Model data | [ERD](ERD.md) dan [Data Dictionary](DATA_DICTIONARY.md) |
@@ -20,8 +20,9 @@
   tautan Markdown tetap disediakan setelah diagram sebagai fallback.
 - Label `Provisional` menunjukkan cabang yang bergantung pada open question.
 - Validasi dan kalkulasi kritis selalu dilakukan server-side.
-- Flow reseller, refund, booking kurir Biteship, split shipment, dan
-  penggabungan order tidak dimasukkan karena belum menjadi baseline MVP.
+- Refund, booking kurir Biteship, dan split shipment tidak dimasukkan karena
+  belum menjadi baseline MVP. Reseller memakai flow pelanggan aktif; detail
+  pencatatan order WhatsApp dan ongkir/status pengiriman gabungan tetap open.
 
 ### 1.1 Notasi Flowchart
 
@@ -79,7 +80,7 @@ flowchart TD
     B --> C{"Status sesi?"}
     C -->|Guest| D[/"Tampilkan produk aktif tanpa harga"/]
     C -->|Pending, rejected, suspended| D
-    C -->|Pelanggan aktif| E[/"Tampilkan produk aktif dengan harga yang berlaku"/]
+    C -->|Reseller aktif| E[/"Tampilkan produk aktif dengan harga yang berlaku"/]
     C -->|Admin| F[/"Tampilkan katalog dan data harga hasil sinkronisasi"/]
     D --> G{"Aksi?"}
     G -->|Lihat produk| C_UF05((UF-05))
@@ -185,8 +186,11 @@ flowchart TD
     B -->|Ya| D{"Pelanggan ACTIVE?"}
     D -->|Tidak| E[/"Tampilkan detail tanpa harga dan tombol cart"/]
     E --> C_UF01
-    D -->|Ya| F[/"Tampilkan harga berlaku dan status stok"/]
-    F --> G[/"Pelanggan menentukan kuantitas"/]
+    D -->|Ya| F[/"Tampilkan nama website,<br/>harga berlaku, dan status stok"/]
+    F --> F1{"Channel pemesanan?"}
+    F1 -->|Website| G[/"Pelanggan menentukan kuantitas"/]
+    F1 -->|WhatsApp| F2[["Buka WhatsApp dengan<br/>konteks produk/SKU"]]
+    F2 --> F3(["Lanjut sesuai keputusan<br/>pencatatan OPN-002"])
     G --> H{"Kuantitas valid terhadap stok efektif?"}
     H -->|Tidak| I[/"Tampilkan stok tidak mencukupi"/]
     I --> G
@@ -207,17 +211,17 @@ flowchart TD
     B --> C{"Semua item masih valid?"}
     C -->|Tidak| D[/"Tampilkan item bermasalah dan minta koreksi"/]
     D --> C_UF05((UF-05))
-    C -->|Ya| E{"Ada satu SKU dengan quantity minimal 5?"}
+    C -->|Ya| E{"Ada satu SKU mencapai<br/>minimum partai aktif?"}
     E -->|Ya| F["Cart eligible harga PARTAI"]
     E -->|Tidak| G["Cart tidak eligible harga PARTAI"]
     F --> H["Evaluasi minimum GROSIR per produk"]
     G --> H
-    H --> I["Pilih harga memakai rule baseline<br/>Provisional OPN-013"]
+    H --> I["Jika eligible, pakai PARTAI untuk semua item;<br/>PARTAI menang terhadap GROSIR"]
     I --> J["Hitung subtotal server-side"]
     J --> K["Kelompokkan nilai per klasifikasi PPh 22"]
     K --> L{"Ambang klasifikasi terlampaui?"}
     L -->|Tidak| M["PPh 22 = 0"]
-    L -->|Ya| N["Gabungkan perhitungan klasifikasi terpicu<br/>dengan formula provisional OPN-006"]
+    L -->|Ya| N["Gabungkan seluruh subtotal terpicu,<br/>bagi 1,11, lalu kali tarif PPh 22"]
     N --> N1["Hasilkan satu total PPh 22 transaksi"]
     M --> O[/"Tampilkan subtotal, PPh 22 terpisah, dan total"/]
     N1 --> O
@@ -229,11 +233,9 @@ flowchart TD
     click C_UF07 "#uf-07-alamat-dan-pengiriman"
 ```
 
-Kuantitas SKU berbeda tidak pernah dijumlahkan untuk memenuhi syarat lima unit.
-Cakupan item yang memperoleh harga partai dan prioritas terhadap grosir tetap
-[OPN-013](../requirements/BRD.md#opn-013). Multi-klasifikasi menghasilkan satu
-total gabungan; dasar pengenaan dan urutan agregasi tetap
-[OPN-006](../requirements/BRD.md#opn-006).
+Kuantitas SKU berbeda tidak dijumlahkan. Minimum global dimulai dari lima dan
+dapat diubah admin. Multi-klasifikasi menghasilkan satu total gabungan; tarif
+berbeda dan pembulatan tetap [OPN-006](../requirements/BRD.md#opn-006).
 
 Lanjutan: [UF-07 Alamat dan Pengiriman](#uf-07-alamat-dan-pengiriman).
 
@@ -251,18 +253,16 @@ flowchart TD
     E -->|Kurir toko| F{"Tarif aktif tersedia untuk area?"}
     F -->|Tidak| G[/"Tampilkan kurir toko tidak tersedia"/]
     G --> E
-    F -->|Ya| H[/"Pilih tarif dan ETA kurir toko"/]
-    E -->|Biteship| I["Validasi area origin/destination, daftar kurir,<br/>nama, nilai, kuantitas, dan berat setiap item"]
+    F -->|Ya| H[/"Pilih tarif; ETA H+1 hari kerja<br/>atau H+2 bila kurir tidak tersedia"/]
+    E -->|Biteship| I["Validasi origin toko, destination, kurir,<br/>nama, nilai, kuantitas, dan berat tiap item"]
     I --> J{"Data quote lengkap?"}
     J -->|Tidak| K[/"Tampilkan data quote yang belum lengkap"/]
     K --> E
     J -->|Ya| L[["Backend memanggil Biteship Rates;<br/>kirim dimensi bila tersedia"]]
     L --> M{"Respons dan rate valid?"}
     M -->|Ya| N[/"Pilih kurir/layanan, durasi,<br/>mata uang, dan harga final"/]
-    M -->|Tidak| O{"Fallback sudah disetujui?"}
-    O -->|Tidak| P[/"Tampilkan checkout tertunda;<br/>ongkir tidak boleh Rp0"/]
+    M -->|Tidak| P[/"Tampilkan checkout tertunda;<br/>minta pelanggan hubungi admin"/]
     P --> E
-    O -->|Ya| H
     H --> Q[("Pilihan pengiriman sementara tersimpan")]
     N --> R[("Snapshot provider, kurir, layanan,<br/>area ID, price, hash request, dan waktu quote")]
     R --> Q
@@ -271,9 +271,9 @@ flowchart TD
     click C_UF08 "#uf-08-validasi-checkout"
 ```
 
-Data operasional dan fallback mengikuti
+Tarif kurir toko, definisi produk besar, fallback berat/dimensi, kode layanan,
+dan akun provider mengikuti
 [OPN-010](../requirements/BRD.md#opn-010),
-[OPN-016](../requirements/BRD.md#opn-016), dan
 [OPN-021](../requirements/BRD.md#opn-021).
 Biteship di flow ini adalah external Maps/Rates provider; flow tidak membuat
 order, pickup, label, atau tracking di Biteship.
@@ -410,16 +410,20 @@ flowchart TD
     E --> F["Siapkan penyerahan ke metode pengiriman terpilih"]
     F --> G{"Barang sudah diserahkan?"}
     G -->|Belum| F
-    G -->|Ya| H{"Nomor resi tersedia?"}
-    H -->|Ya| I[/"Admin mengisi nomor resi"/]
+    G -->|Ya| H{"Metode memiliki resi?"}
+    H -->|Ya| I[/"Admin wajib mengisi nomor resi"/]
     H -->|Tidak| J["Admin set SHIPPED dan shipped_at"]
     I --> J
     J --> K[("Order SHIPPED tersimpan")]
     K --> L[/"Tampilkan status dan nomor resi jika tersedia"/]
-    L --> M{"Penerimaan dikonfirmasi<br/>sesuai OPN-020?"}
-    M -->|Belum| N[("Order tetap SHIPPED")]
-    N --> O(["Selesai sementara:<br/>menunggu konfirmasi"])
-    M -->|Ya| P["Set COMPLETED dan delivered_at"]
+    L --> M[["Kirim tautan konfirmasi<br/>penerimaan via WhatsApp"]]
+    M --> N{"Pelanggan konfirmasi?"}
+    N -->|Ya| P["Set COMPLETED, delivered_at,<br/>dan event poin idempotent"]
+    N -->|Belum| N1{"TERKENDALA?"}
+    N1 -->|Ya| N2[("Tetap SHIPPED;<br/>scheduler ditahan")]
+    N1 -->|Tidak| N3{"Sudah 5 hari kerja?"}
+    N3 -->|Belum| N
+    N3 -->|Ya| P
     P --> Q[("Order COMPLETED tersimpan")]
     Q --> C_UF18((UF-18))
 
@@ -427,11 +431,10 @@ flowchart TD
 ```
 
 Lifecycle fulfillment adalah `PROCESSING` -> `PACKED` -> `SHIPPED` ->
-`COMPLETED`. Urutannya telah disetujui, tetapi kondisi packing selesai,
-kewajiban nomor resi, pihak yang mengonfirmasi penerimaan, trigger
-`COMPLETED`, dan penanganan barang belum diterima masih provisional melalui
-[OPN-020](../requirements/BRD.md#opn-020). Melihat nomor resi tidak memicu
-`COMPLETED`. Booking/pickup Biteship tidak dilakukan website.
+`COMPLETED`. Resi diwajibkan hanya untuk metode yang memilikinya. Konfirmasi
+WhatsApp atau scheduler lima hari kerja menyelesaikan order; `TERKENDALA`
+menahan scheduler. Provider, kalender, dan aturan poin mengikuti
+[OPN-020](../requirements/BRD.md#opn-020).
 
 Lanjutan: [UF-18 Laporan](#uf-18-laporan-dan-audit).
 
@@ -589,12 +592,14 @@ Lanjutan: perubahan tampil pada
 flowchart TD
     A(["Admin membuka konfigurasi"]) --> B{"Jenis konfigurasi?"}
     B -->|PPh 22| C[/"Pilih klasifikasi, ambang, tarif termasuk 0 persen"/]
-    C --> D[/"Isi dasar pengenaan<br/>Provisional OPN-006"/]
+    C --> D["Gunakan dasar gabungan / 1,11;<br/>tarif/pembulatan OPN-006"]
+    B -->|Minimum partai| D1[/"Isi bilangan bulat positif;<br/>default 5"/]
     B -->|Stok minimum| E[/"Isi low-stock threshold per produk"/]
     B -->|Kurir toko| F[/"Isi area, tarif, ETA, dan status aktif"/]
     B -->|Identitas toko| G[/"Isi nama, alamat, kontak, dan NPWP"/]
     B -->|Rekening transfer| H[/"Isi bank, rekening, pemilik, dan instruksi"/]
     D --> I{"Validasi lulus?"}
+    D1 --> I
     E --> I
     F --> I
     G --> I
@@ -628,7 +633,7 @@ flowchart TD
     A1 -->|Audit trail| L[/"Filter actor, action, entity, request ID, dan periode"/]
     B --> C[/"Opsional: filter status, pelanggan, area, metode kirim"/]
     C --> D["Query order dan shipment snapshot"]
-    D --> E["Keluarkan order CANCELLED dari omzet"]
+    D --> E["Hitung omzet mulai status SHIPPED;<br/>jangan hitung COMPLETED dua kali"]
     E --> F[/"Tampilkan jumlah transaksi, omzet, dan PPh 22 terpisah"/]
     F --> G{"Ekspor diminta?"}
     G -->|Tidak| H[/"Tampilkan hasil terpaginated"/]
@@ -663,13 +668,13 @@ flowchart TD
     M -->|Ya| H
     M -->|Tidak| N[("Status FAILED dan failed job tercatat")]
     N --> G
-    C --> O[/"Admin membuka notifikasi dan detail order"/]
-    O --> P[("read_at diperbarui sesuai aturan OPN-023")]
+    C --> O[/"Admin membuka daftar pesanan<br/>yang akan diproses"/]
+    O --> P[("read_at notifikasi order baru diperbarui")]
     P --> L
 ```
 
-Website tidak membuat audio WhatsApp sendiri. Provider, penerima, template,
-retry/fallback, serta perilaku read/clear mengikuti
+Pesan order baru dikirim ke `081546407702` dengan isi minimum `Cek Order masuk`.
+Provider, credential, dan retry/fallback mengikuti
 [OPN-023](../requirements/BRD.md#opn-023).
 
 ## 5. Traceability
@@ -696,10 +701,10 @@ retry/fallback, serta perilaku read/clear mengikuti
 | Referensi | Dampak pada Flow |
 |---|---|
 | [OPN-005](../requirements/BRD.md#opn-005) | Nama operasi laporan, payload, acknowledgement/lookup, autentikasi, error, idempotency, dan cutoff snapshot stok pada UF-09, UF-13, UF-14, UF-15. |
-| [OPN-006](../requirements/BRD.md#opn-006) | Dasar pengenaan dan urutan agregasi PPh 22 pada UF-06 dan UF-17; kewajiban satu hasil gabungan sudah resolved. |
-| [OPN-010](../requirements/BRD.md#opn-010) | Area, tarif, dan ETA kurir toko pada UF-07/UF-17. |
-| [OPN-013](../requirements/BRD.md#opn-013) | Cakupan harga partai dan prioritas terhadap grosir pada UF-06. |
-| [OPN-016](../requirements/BRD.md#opn-016) | Perilaku fallback ketika quote Biteship gagal pada UF-07. |
-| [OPN-021](../requirements/BRD.md#opn-021) | Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya provider pada UF-07. |
-| [OPN-022](../requirements/BRD.md#opn-022) | Sumber identitas toko, format nomor, PDF, dan channel invoice pada UF-09. |
-| [OPN-023](../requirements/BRD.md#opn-023) | Provider, penerima, template, retry/fallback WhatsApp, dan perilaku read/clear indikator website pada UF-19. |
+| [OPN-002](../requirements/BRD.md#opn-002) | Cara order WhatsApp dicatat pada stok, invoice, dan laporan POS dari UF-05. |
+| [OPN-006](../requirements/BRD.md#opn-006) | Tarif multi-klasifikasi dan pembulatan PPh 22 pada UF-06/UF-17. |
+| [OPN-010](../requirements/BRD.md#opn-010) | Tarif per kecamatan kurir toko pada UF-07/UF-17. |
+| [OPN-014](../requirements/BRD.md#opn-014) | Pembebanan ongkir dan propagasi resi/status order gabungan. |
+| [OPN-021](../requirements/BRD.md#opn-021) | Definisi produk besar, fallback berat/dimensi, kode layanan, akun production, dan biaya provider pada UF-07. |
+| [OPN-022](../requirements/BRD.md#opn-022) | Nama legal perusahaan, format NPWP/akun reseller, nomor invoice, dan kontrak channel pada UF-09. |
+| [OPN-023](../requirements/BRD.md#opn-023) | Provider, credential, serta retry/fallback WhatsApp pada UF-19. |

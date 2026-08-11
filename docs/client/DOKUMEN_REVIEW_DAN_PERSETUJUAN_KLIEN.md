@@ -5,8 +5,8 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.11 |
-| Tanggal | Jumat, 31 Juli 2026 |
+| Versi | 1.12 |
+| Tanggal | Selasa, 11 Agustus 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
 | Pengembang | PT Webekspres Teknologi Indonesia |
@@ -115,7 +115,7 @@ kerja.
 
 ## 2. Ringkasan Website
 
-Website akan digunakan sebagai kanal penjualan untuk pelanggan yang telah
+Website akan digunakan sebagai kanal penjualan untuk reseller yang telah
 terdaftar dan disetujui oleh admin Pixel Komunika.
 
 Pengunjung dan pelanggan yang belum disetujui tetap dapat melihat katalog,
@@ -124,33 +124,37 @@ disetujui, pelanggan dapat melihat harga yang berlaku, membuat pesanan,
 memilih pengiriman, menerima invoice, mengirim bukti pembayaran, dan memantau
 status pesanannya.
 
-Website membuat transaksi dan invoice. Sistem POS menyediakan data produk,
-harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
+Website membuat transaksi dan invoice. Sistem POS menyediakan SKU, data dasar
+produk, harga, dan stok, kemudian menerima laporan penjualan atau retur dari
+website. Nama tampilan produk dapat diperbarui mandiri melalui website.
 
 ## 3. Fitur yang Termasuk dalam Versi Pertama
 
 | Area | Hasil yang Akan Tersedia |
 |---|---|
-| Pendaftaran pelanggan | Pelanggan dapat mendaftar, masuk, dan keluar dari akun. |
+| Pendaftaran reseller | Reseller dapat mendaftar, masuk, dan keluar dari akun. |
 | Persetujuan akun | Admin dapat menyetujui, menolak, menangguhkan, atau mengaktifkan kembali akun pelanggan. |
 | Hak akses | Pengunjung dan pelanggan yang belum disetujui dapat melihat katalog tanpa harga. Hanya pelanggan aktif yang dapat melihat harga, melakukan pembelian, dan melihat riwayat transaksinya sendiri. |
-| Katalog produk | Website menampilkan produk, kategori, merek, SKU, deskripsi, gambar, dan media produk. |
-| Sumber data produk | Nama produk, SKU, kategori, merek, harga, dan stok mengikuti data yang tersedia di POS. Informasi tambahan yang belum tersedia di POS dapat dilengkapi melalui website. |
+| Katalog produk | Website menampilkan produk, kategori, merek, SKU, deskripsi, gambar, dan video produk. |
+| Sumber data produk | SKU, data dasar produk, kategori, merek, harga, dan stok mengikuti POS. Nama tampilan produk serta informasi presentasi lain dapat diperbarui mandiri melalui website. |
 | Tiga jenis harga | Setiap produk memiliki harga eceran, partai, dan grosir. Harga eceran disiapkan tetapi belum ditampilkan kepada pelanggan pada versi pertama. |
-| Harga partai | Transaksi memenuhi syarat harga partai jika sedikitnya satu jenis produk dibeli minimal lima unit. Jumlah dari produk yang berbeda tidak digabungkan. |
+| Harga partai | Minimum awal adalah lima unit dari satu jenis produk dan dapat diubah admin. Jika terpenuhi, harga partai berlaku untuk seluruh produk dalam pesanan. Jika satu produk juga memenuhi harga grosir, harga partai digunakan. |
 | Harga grosir | Batas minimum dan harga grosir dapat berbeda untuk setiap produk dan mengikuti data dari POS. |
-| PPh 22 | Admin dapat memilih klasifikasi produk yang terkena PPh 22 serta mengatur batas nilai belanja dan persentasenya melalui website. Jika beberapa klasifikasi terkena PPh 22, hasilnya ditampilkan sebagai satu total PPh 22. |
+| PPh 22 | Jika subtotal klasifikasi melewati batas, seluruh subtotal klasifikasi tersebut masuk perhitungan. Nilai semua klasifikasi terpicu digabung, dibagi `1,11`, lalu dikalikan persentase PPh 22. |
 | Stok | Website memperbarui stok ketika terjadi penjualan atau retur, kemudian mencocokkannya dengan data POS secara berkala. |
 | Keranjang dan penyelesaian pembelian | Pelanggan dapat memilih produk, jumlah barang, alamat, dan layanan pengiriman serta melihat rincian total sebelum membuat pesanan. |
-| Pesanan dan invoice | Website membuat pesanan dan invoice serta menyimpan rincian harga pada saat transaksi terjadi. |
+| Pesanan dan invoice | Website membuat pesanan dan invoice. Invoice dapat dilihat di website, diunduh sebagai PDF, dan dikirim melalui WhatsApp atau email sesuai pilihan. |
 | Pembayaran | Pembayaran dilakukan melalui transfer bank. Pelanggan mengunggah bukti pembayaran dan admin menerima atau menolaknya. |
 | Masa berlaku pesanan | Pesanan yang belum dibayar hanya berlaku pada tanggal pembuatannya dan otomatis dibatalkan pada hari berikutnya. |
-| Pemrosesan pesanan | Setelah pembayaran diterima, urutan status pesanan adalah Diproses, Dikemas, Dikirim, dan Selesai. Syarat perpindahan status dan cara mengonfirmasi barang diterima harus diputuskan pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima). |
-| Nomor resi | Nomor resi ditampilkan kepada pelanggan ketika sudah tersedia. |
-| Pengiriman | Website mendukung kurir toko dan pilihan layanan serta perkiraan ongkir dari Biteship. |
+| Pemrosesan pesanan | Setelah pembayaran diterima, statusnya Diproses, Dikemas, Dikirim, lalu Selesai. Pelanggan dapat mengonfirmasi penerimaan melalui tautan WhatsApp. Sistem menyelesaikan otomatis setelah lima hari kerja sejak dikirim jika tidak ada kendala. |
+| Nomor resi | Resi wajib diisi sebelum Dikirim hanya untuk metode yang memiliki resi; kurir toko tidak memerlukan resi. |
+| Pengiriman | Kurir toko melayani seluruh kecamatan Kota/Kabupaten Bandung dengan target H+1 hari kerja atau H+2 bila kurir tidak tersedia. Biteship menyediakan pilihan termasuk Grab/Gojek same-day. |
+| Penggabungan pengiriman | Beberapa pesanan dapat digabung jika alamat tujuannya sama; nomor pesanan dan invoice tetap terpisah. |
 | Pembatalan dan retur | Admin dapat membatalkan pesanan secara manual hanya pada tanggal transaksi. Pesanan yang belum dibayar dibatalkan otomatis oleh sistem pada hari berikutnya. Keduanya memakai status `Dibatalkan`, disertai keterangan apakah pembatalan dilakukan oleh admin atau sistem. Pembatalan mengembalikan stok website dan dilaporkan ke POS sebagai retur. |
-| Notifikasi admin | Order baru menampilkan tanda notifikasi merah pada website admin dan mengirim pemberitahuan WhatsApp. |
-| Laporan | Admin dapat melihat laporan transaksi, omzet, dan PPh 22 berdasarkan periode dan wilayah. |
+| Notifikasi admin | Order baru menampilkan tanda merah dan mengirim pesan `Cek Order masuk` ke `081546407702`. Tanda dibaca saat admin membuka daftar pesanan yang akan diproses. |
+| Laporan | Admin dapat melihat laporan transaksi, omzet, dan PPh 22 berdasarkan periode/wilayah. Pesanan mulai dihitung sebagai omzet saat dikirim. |
+| Retensi bukti pembayaran | Bukti pembayaran disimpan selama lima tahun. |
+| Reseller | Akun yang disetujui admin menjadi reseller aktif, dapat melihat harga, dan dapat memesan lewat website atau WhatsApp. |
 | Keamanan dan pencatatan | Hak akses pengguna dibatasi sesuai perannya. Tindakan penting admin dan gangguan pertukaran data dicatat agar dapat diperiksa kembali. |
 
 ## 4. Keputusan yang Sudah Disepakati
@@ -159,19 +163,20 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
    memberikan akses yang diperlukan kepada developer Webekspres untuk
    menyiapkan dan memasang website. Detail akses akan diserahkan secara aman
    sebelum proses pemasangan.
-2. Produk, SKU, kategori, merek, harga, dan stok bersumber dari POS.
-3. Website dapat melengkapi gambar, video, deskripsi, dan informasi lain yang
-   belum tersedia di POS.
+2. SKU, data dasar produk, kategori, merek, harga, dan stok bersumber dari POS.
+3. Website dapat mengubah nama tampilan produk dan melengkapi gambar, video,
+   deskripsi, serta informasi presentasi lain.
 4. Setiap produk memiliki harga eceran, partai, dan grosir.
 5. Harga eceran disiapkan tetapi belum ditampilkan pada versi pertama.
-6. Syarat harga partai terpenuhi jika minimal satu jenis produk dibeli sebanyak
-   lima unit.
+6. Minimum harga partai bernilai awal lima unit dari satu jenis produk dan dapat
+   diubah admin. Jika terpenuhi, harga partai berlaku untuk seluruh pesanan dan
+   diprioritaskan terhadap harga grosir.
 7. Aturan PPh 22 diatur melalui website dan dapat dinonaktifkan dengan
    persentase `0%`.
 8. PPh 22 ditampilkan terpisah pada keranjang, halaman konfirmasi pembelian,
    invoice, dan laporan.
-9. Jika lebih dari satu klasifikasi terkena PPh 22, hasilnya digabungkan menjadi
-   satu nilai PPh 22.
+9. Seluruh subtotal klasifikasi yang melewati ambang digabung, dibagi `1,11`,
+   lalu dikalikan persentase PPh 22 menjadi satu nilai.
 10. Website membuat transaksi dan invoice.
 11. POS menerima laporan penjualan untuk mencatat penjualan dan mengurangi
     stok, serta laporan retur untuk mencatat retur dan menambah stok.
@@ -180,12 +185,21 @@ harga, dan stok, kemudian menerima laporan penjualan atau retur dari website.
 13. Pembatalan manual oleh admin hanya dapat dilakukan pada tanggal transaksi.
     Website membedakan sumber pembatalan `Admin` dan `Sistem` sebagai keterangan,
     tanpa membuat dua status pembatalan yang berbeda.
-14. Setelah pembayaran diterima, urutan statusnya adalah Diproses, Dikemas,
-    Dikirim, lalu Selesai; nomor resi ditampilkan ketika tersedia. Pemicu setiap
-    perubahan status belum termasuk dalam keputusan ini.
-15. Admin menerima pemberitahuan order baru melalui website dan WhatsApp.
+14. Setelah pembayaran diterima, urutan statusnya Diproses, Dikemas, Dikirim,
+    lalu Selesai. Resi wajib hanya untuk pengiriman yang memilikinya. Pelanggan
+    mengonfirmasi melalui tautan WhatsApp; sistem menyelesaikan otomatis setelah
+    lima hari kerja jika tidak ada penanda Terkendala.
+15. Admin menerima indikator website dan pesan `Cek Order masuk` melalui
+    WhatsApp `081546407702` untuk order baru.
 16. Akses POS akan dibuka setelah alur website dengan data contoh sudah
     berjalan. Koordinasi akses dilakukan dengan Kak Rio.
+17. Invoice tampil di website, dapat diunduh sebagai PDF, dan dapat dikirim
+    melalui WhatsApp atau email sesuai pilihan pelanggan.
+18. Reseller aktif dapat melihat harga dan memesan melalui website atau
+    WhatsApp.
+19. Pesanan dengan alamat tujuan sama dapat digabung menjadi satu pengiriman.
+20. Pesanan mulai dihitung sebagai omzet ketika berstatus Dikirim.
+21. Bukti pembayaran disimpan selama lima tahun.
 
 ## 5. Alur Utama
 
@@ -249,8 +263,7 @@ flowchart TD
 
 ### 5.3 Pemrosesan dan Pengiriman
 
-Diagram berikut merupakan usulan alur yang masih memerlukan konfirmasi klien
-pada Bagian 8.11.
+Diagram berikut menerapkan keputusan klien pada Bagian 8.11.
 
 #### 5.3.1 Menyiapkan dan Mengemas Pesanan
 
@@ -272,8 +285,8 @@ flowchart TD
     A(["Dari Bagian 5.3.1:<br/>Status Dikemas"]) --> B["Siapkan penyerahan ke<br/>kurir yang dipilih"]
     B --> C{"Barang sudah<br/>diserahkan ke kurir?"}
     C -->|Belum| B
-    C -->|Ya| D{"Nomor resi<br/>tersedia?"}
-    D -->|Ya| E[/"Admin memasukkan<br/>nomor resi"/]
+    C -->|Ya| D{"Metode pengiriman<br/>memiliki resi?"}
+    D -->|Ya| E[/"Admin wajib memasukkan<br/>nomor resi"/]
     D -->|Tidak| F["Admin mengubah<br/>status ke Dikirim"]
     E --> F
     F --> G[("Status:<br/>Dikirim")]
@@ -285,18 +298,24 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A(["Dari Bagian 5.3.2:<br/>Status Dikirim"]) --> B{"Penerimaan barang<br/>sudah dikonfirmasi?"}
-    B -->|Belum| C[("Status tetap Dikirim;<br/>menunggu konfirmasi")]
-    C --> D(["Alur berhenti sementara"])
-    B -->|Ya| E["Ubah status<br/>menjadi Selesai"]
-    E --> F[("Status:<br/>Selesai")]
-    F --> G(["Pesanan selesai"])
+    A(["Dari Bagian 5.3.2:<br/>Status Dikirim"]) --> B[["Kirim tautan konfirmasi<br/>melalui WhatsApp"]]
+    B --> C{"Pelanggan klik<br/>konfirmasi?"}
+    C -->|Ya| D["Ubah status menjadi Selesai<br/>dan catat poin"]
+    C -->|Belum| E{"Ada laporan<br/>kendala?"}
+    E -->|Ya| F[("Status tetap Dikirim;<br/>penanda Terkendala aktif")]
+    F --> G["Admin menangani<br/>dan menutup kendala"]
+    G --> H{"Sudah 5 hari kerja<br/>sejak dikirim?"}
+    E -->|Tidak| H
+    H -->|Belum| C
+    H -->|Ya| I["Sistem mengubah<br/>status menjadi Selesai"]
+    D --> J[("Status:<br/>Selesai")]
+    I --> J
+    J --> K(["Pesanan selesai"])
 ```
 
-Melihat nomor resi **tidak** otomatis mengubah status pesanan menjadi
-`Selesai`. Pesanan tetap berstatus `Dikirim` sampai penerimaan barang telah
-dikonfirmasi dengan cara yang disetujui klien. Pilihan cara konfirmasi dibahas
-pada [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima).
+Melihat nomor resi **tidak** otomatis mengubah status menjadi `Selesai`.
+Konfirmasi pelanggan atau auto-complete setelah lima hari kerja menyelesaikan
+pesanan. Penanda `Terkendala` menahan auto-complete sampai admin menutup kendala.
 
 ### 5.4 Pembatalan oleh Admin atau Sistem
 
@@ -339,17 +358,30 @@ Invoice pelanggan dibuat oleh website, bukan oleh POS.
 
 Invoice sekurang-kurangnya menampilkan:
 
-- nama toko;
-- alamat toko;
-- nomor kontak toko;
-- NPWP toko;
+- pada bagian atas: nama toko, alamat toko, dan nomor kontak toko;
 - jumlah setiap barang;
 - nama barang;
 - SKU;
 - harga satuan;
 - total harga setiap barang;
 - total pembelian keseluruhan; dan
-- nilai rupiah PPh 22 apabila transaksi terkena PPh 22.
+- nilai rupiah PPh 22 apabila transaksi terkena PPh 22;
+- pada bagian bawah: nama legal perusahaan, NPWP perusahaan, dan nomor akun
+  reseller terdaftar.
+
+Nilai awal yang sudah diberikan klien:
+
+| Data | Nilai |
+|---|---|
+| Nama toko | Pixel Komunika |
+| Alamat | Jl. Sawahkurung IV No. 18B, Bandung |
+| Nomor kontak/WhatsApp | 081546407702 |
+| NPWP perusahaan | 0821.4146.0442.4000 |
+| Nama legal perusahaan | Belum diberikan |
+
+Identitas ini dapat diubah admin melalui pengaturan website. Invoice dapat
+dilihat di website, diunduh sebagai PDF, serta dikirim melalui WhatsApp atau
+email sesuai pilihan pelanggan.
 
 Data pada invoice disimpan sesuai kondisi pada saat transaksi sehingga
 perubahan data produk atau identitas toko setelahnya tidak mengubah invoice
@@ -360,19 +392,17 @@ lama.
 Fitur berikut belum menjadi komitmen versi pertama sampai ada keputusan
 tertulis:
 
-1. segmentasi khusus reseller;
-2. pemesanan reseller melalui WhatsApp;
-3. penggabungan beberapa pesanan menjadi satu pengiriman;
-4. pembuatan order kurir, permintaan penjemputan, pencetakan label, dan
+1. aturan penggunaan poin selain pencatatan poin dari konfirmasi penerimaan;
+2. pembuatan order kurir, permintaan penjemputan, pencetakan label, dan
    pelacakan otomatis melalui Biteship;
-5. pembayaran otomatis melalui virtual account, kartu, atau dompet digital;
-6. pengembalian dana otomatis di luar proses pembatalan dan pengembalian stok;
-7. reset kata sandi mandiri;
-8. pencarian dan penyaringan katalog lanjutan;
-9. ekspor laporan ke CSV atau Excel; dan
-10. fitur tambahan di luar ruang lingkup yang disepakati dalam dokumen ini.
+3. pembayaran otomatis melalui virtual account, kartu, atau dompet digital;
+4. pengembalian dana otomatis di luar proses pembatalan dan pengembalian stok;
+5. reset kata sandi mandiri;
+6. pencarian dan penyaringan katalog lanjutan;
+7. ekspor laporan ke CSV atau Excel; dan
+8. fitur tambahan di luar ruang lingkup yang disepakati dalam dokumen ini.
 
-## 8. Keputusan yang Masih Diperlukan dari Klien
+## 8. Rekap Jawaban dan Keputusan yang Masih Diperlukan
 
 Jawaban dapat diberikan bertahap. Klien dapat memberi tanda pada pilihan yang
 sesuai atau menuliskan jawaban sendiri.
@@ -382,95 +412,81 @@ sesuai atau menuliskan jawaban sendiri.
 Rumus yang dipilih sebaiknya telah dikonfirmasi oleh pihak keuangan atau
 perpajakan Pixel Komunika. Website akan menerapkan rumus yang disetujui klien.
 
-Ketika nilai belanja pada klasifikasi tertentu melewati batas yang ditetapkan,
-PPh 22 dihitung dari:
+Keputusan klien:
 
-- [ ] seluruh nilai belanja pada klasifikasi tersebut;
-- [ ] hanya bagian nilai belanja yang melebihi batas;
-- [ ] cara lain: _______________________________________________.
+- [x] gunakan seluruh nilai belanja pada klasifikasi yang melewati batas;
+- [x] gabungkan nilai semua klasifikasi yang terpicu;
+- [x] hitung dengan rumus `(nilai gabungan / 1,11) × persentase PPh 22`.
 
-Jika lebih dari satu klasifikasi terkena PPh 22, cara menghitungnya:
-
-- [ ] hitung setiap klasifikasi terlebih dahulu, lalu jumlahkan hasilnya;
-- [ ] gabungkan nilai belanjanya terlebih dahulu, lalu hitung PPh 22;
-- [ ] cara lain: _______________________________________________.
+Masih perlu dipastikan: jika klasifikasi yang terpicu memiliki persentase
+berbeda, persentase mana yang dipakai, dan bagaimana pembulatan rupiahnya?
 
 ### 8.2 Harga Partai dan Grosir
 
-Jika satu jenis produk dibeli minimal lima unit dan syarat harga partai
-terpenuhi, harga partai berlaku untuk:
+Keputusan klien:
 
-- [ ] hanya produk yang jumlahnya minimal lima unit;
-- [ ] seluruh produk dalam pesanan;
-- [ ] aturan lain: _____________________________________________.
-
-Jika satu produk memenuhi syarat harga partai sekaligus harga grosir:
-
-- [ ] harga grosir digunakan;
-- [ ] harga partai digunakan;
-- [ ] harga termurah digunakan;
-- [ ] aturan lain: _____________________________________________.
+- [x] minimum awal lima unit harus berasal dari satu jenis produk;
+- [x] minimum tersebut dapat diubah admin melalui website;
+- [x] setelah syarat terpenuhi, harga partai berlaku untuk seluruh produk dalam
+  pesanan; dan
+- [x] jika satu produk memenuhi partai dan grosir, harga partai digunakan.
 
 ### 8.3 Nomor dan Penyampaian Invoice
 
-1. Format atau awalan nomor invoice yang diinginkan:
+1. Format atau awalan nomor invoice masih diperlukan:
    ______________________________________________________________.
-2. Invoice perlu tersedia sebagai:
-   - [ ] tampilan di website;
-   - [ ] file PDF;
-   - [ ] keduanya.
-3. Invoice perlu disampaikan melalui:
-   - [ ] website;
-   - [ ] WhatsApp;
-   - [ ] email;
-   - [ ] media lain: ___________________________________________.
-4. Identitas toko pada invoice diambil dari:
-   - [ ] pengaturan di website;
-   - [ ] data POS;
-   - [ ] sumber lain: __________________________________________.
-5. Mohon melengkapi identitas yang akan ditampilkan:
+2. Ketersediaan invoice:
+   - [x] tampilan di website;
+   - [x] file PDF.
+3. Penyampaian invoice sesuai pilihan pelanggan:
+   - [x] website;
+   - [x] WhatsApp;
+   - [x] email.
+4. Identitas invoice:
+   - [x] diambil dari pengaturan website dan dapat diubah admin.
+5. Identitas yang telah diberikan:
 
    | Data | Nilai |
    |---|---|
-   | Nama toko |  |
-   | Alamat |  |
-   | Nomor kontak |  |
-   | NPWP |  |
+   | Nama toko | Pixel Komunika |
+   | Alamat | Jl. Sawahkurung IV No. 18B, Bandung |
+   | Nomor kontak | 081546407702 |
+   | NPWP perusahaan | 0821.4146.0442.4000 |
+   | Nama legal perusahaan | Belum diberikan |
+
+6. Masih perlu dipastikan: nama legal perusahaan, format NPWP final, dan format
+   nomor akun reseller yang dicetak di bagian bawah invoice.
 
 ### 8.4 Perhitungan Omzet
 
 Transaksi mulai dihitung sebagai omzet ketika:
 
-- [ ] pembayaran telah diterima;
-- [ ] pesanan telah dikirim;
-- [ ] pesanan telah selesai;
-- [ ] kondisi lain: ____________________________________________.
+- [x] pesanan telah dikirim.
 
 ### 8.5 Kurir Toko
 
-Mohon melengkapi:
-
-1. area yang dilayani: __________________________________________;
-2. tarif per area: ______________________________________________;
-3. perkiraan waktu pengiriman: __________________________________.
+1. Area: seluruh kecamatan di Kota Bandung dan Kabupaten Bandung.
+2. Tarif per area: masih dalam evaluasi.
+3. Perkiraan: H+1 hari kerja; dapat menjadi H+2 jika kurir tidak tersedia.
+   Minggu dan tanggal merah tidak dihitung.
 
 ### 8.6 Pengiriman melalui Biteship
 
 Mohon melengkapi:
 
-1. alamat asal pengiriman: ______________________________________;
-2. sumber berat produk: _________________________________________;
+1. alamat asal: Jl. Sawahkurung IV No. 18B, Bandung;
+2. sumber berat: berat masing-masing produk;
 3. apakah ukuran panjang, lebar, dan tinggi paket digunakan?
-   - [ ] Ya
+   - [x] Ya, untuk produk berkapasitas besar
    - [ ] Tidak
 4. kurir atau layanan yang ingin ditampilkan:
-   ______________________________________________________________;
+   Grab dan Gojek untuk layanan same-day;
 5. pihak yang menyediakan dan menanggung akun Biteship:
    ______________________________________________________________.
 
 Jika pengecekan ongkir Biteship sedang tidak dapat digunakan, pelanggan:
 
-- [ ] diminta menghubungi admin;
+- [x] diminta menghubungi admin;
 - [ ] menggunakan tarif manual yang ditentukan admin;
 - [ ] diminta mencoba kembali;
 - [ ] menggunakan cara lain: ___________________________________.
@@ -481,18 +497,15 @@ Berapa lama bukti pembayaran perlu disimpan?
 
 - [ ] 1 tahun;
 - [ ] 2 tahun;
-- [ ] 5 tahun;
+- [x] 5 tahun;
 - [ ] mengikuti kebijakan lain: _________________________________.
 
 ### 8.8 Notifikasi Order Baru
 
-1. Nomor WhatsApp penerima notifikasi:
-   ______________________________________________________________.
-2. Contoh isi pesan yang diinginkan:
-   ______________________________________________________________
-   ______________________________________________________________.
+1. Nomor WhatsApp penerima: `081546407702`.
+2. Isi minimum: `Cek Order masuk`.
 3. Tanda notifikasi merah pada website dianggap sudah dibaca ketika:
-   - [ ] admin membuka daftar pesanan;
+   - [x] admin membuka daftar pesanan yang akan diproses;
    - [ ] admin membuka detail pesanan;
    - [ ] admin menandainya secara manual;
    - [ ] cara lain: _____________________________________________.
@@ -502,13 +515,13 @@ Berapa lama bukti pembayaran perlu disimpan?
 Apakah reseller termasuk dalam versi pertama?
 
 - [ ] Tidak, disiapkan untuk tahap berikutnya.
-- [ ] Ya, pemesanan dilakukan melalui website.
-- [ ] Ya, pemesanan dilakukan melalui WhatsApp.
+- [x] Ya, pemesanan dilakukan melalui website.
+- [x] Ya, pemesanan dilakukan melalui WhatsApp.
 - [ ] Aturan lain: _____________________________________________.
 
 Jika reseller termasuk, apakah reseller dapat melihat harga?
 
-- [ ] Ya
+- [x] Ya, untuk reseller terdaftar yang disetujui admin
 - [ ] Tidak
 
 ### 8.10 Penggabungan Pesanan
@@ -516,10 +529,11 @@ Jika reseller termasuk, apakah reseller dapat melihat harga?
 Apakah beberapa pesanan boleh digabungkan menjadi satu pengiriman?
 
 - [ ] Tidak.
-- [ ] Ya, dengan ketentuan: ____________________________________.
+- [x] Ya, hanya jika alamat tujuan pengiriman sama.
 
-Jika diperbolehkan, mohon jelaskan pengaruhnya terhadap ongkir dan invoice:
-__________________________________________________________________.
+Nomor order dan invoice tetap terpisah. Masih perlu dipastikan: cara membagi
+ongkir serta apakah satu resi dan perubahan status diterapkan sekaligus ke
+seluruh order dalam grup.
 
 ### 8.11 Perubahan Status Pengiriman dan Konfirmasi Barang Diterima
 
@@ -534,30 +548,34 @@ Usulan alur perubahan status:
 
 Apakah usulan tersebut disetujui?
 
-- [ ] Ya.
+- [x] Ya.
 - [ ] Perlu revisi: ____________________________________________.
 
 Apakah nomor resi wajib diisi sebelum status menjadi `Dikirim`?
 
 - [ ] Ya, untuk seluruh metode pengiriman.
-- [ ] Ya, hanya untuk pengiriman yang memang memiliki nomor resi.
+- [x] Ya, hanya untuk pengiriman yang memang memiliki nomor resi.
 - [ ] Tidak.
 - [ ] Aturan lain: _____________________________________________.
 
 Siapa atau proses apa yang mengonfirmasi bahwa barang telah diterima?
 
-- [ ] pelanggan menekan tombol **Pesanan Diterima** pada website;
+- [x] pelanggan membuka tautan WhatsApp dan menekan konfirmasi penerimaan;
 - [ ] admin mengubah status setelah memperoleh konfirmasi pelanggan atau kurir;
 - [ ] sistem otomatis menyelesaikan pesanan setelah ______ hari sejak dikirim;
-- [ ] pelanggan atau admin dapat mengonfirmasi, kemudian sistem otomatis
-      menyelesaikan setelah ______ hari jika belum ada tindakan;
+- [x] sistem otomatis menyelesaikan setelah lima hari kerja sejak dikirim jika
+      tidak ada kendala;
 - [ ] cara lain: _______________________________________________.
 
 Jika barang belum diterima atau pelanggan melaporkan kendala:
 
-- [ ] status tetap `Dikirim` sampai admin menyelesaikan kendala;
-- [ ] gunakan status tambahan: _________________________________;
+- [x] status tetap `Dikirim` sampai admin menyelesaikan kendala;
+- [x] gunakan penanda tambahan: `Terkendala`;
 - [ ] penanganan lain: _________________________________________.
+
+Konfirmasi pelanggan memberikan poin. Masih perlu dipastikan: jumlah poin,
+masa berlaku, kegunaan poin, provider/template tautan WhatsApp, kalender hari
+kerja untuk auto-complete, dan apakah admin boleh menyelesaikan order manual.
 
 ## 9. Kriteria Penerimaan Versi Pertama
 
@@ -568,23 +586,31 @@ Versi pertama dapat diterima apabila:
   bertransaksi;
 - pelanggan aktif dapat memilih barang, memperoleh harga yang benar, memilih
   pengiriman, dan membuat pesanan;
-- PPh 22 dihitung sesuai keputusan final dan ditampilkan secara terpisah;
-- invoice menampilkan seluruh informasi wajib;
+- harga partai berlaku untuk seluruh pesanan saat satu SKU mencapai minimum
+  yang dikonfigurasi, dan diprioritaskan terhadap grosir;
+- PPh 22 memakai dasar gabungan, pembagi `1,11`, dan tarif/pembulatan yang
+  disepakati serta ditampilkan terpisah;
+- invoice menampilkan seluruh informasi wajib, nomor akun reseller, dapat
+  dilihat di website, diunduh PDF, dan dikirim melalui channel pilihan;
 - pelanggan dapat mengirim bukti pembayaran dan admin dapat memeriksanya;
 - pesanan yang tidak dibayar otomatis dibatalkan pada hari berikutnya dan
   rincian pesanan menunjukkan bahwa pembatalan dilakukan oleh sistem;
-- pesanan yang dibayar dapat diproses sampai selesai sesuai pemicu status yang
-  disetujui pada
-  [Bagian 8.11](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima),
-  dan nomor resi dapat dilihat pelanggan;
+- pesanan yang dibayar dapat diproses sampai selesai melalui konfirmasi
+  pelanggan atau auto-complete lima hari kerja; `Terkendala` menahan
+  auto-complete dan resi diwajibkan hanya untuk metode yang memilikinya;
 - data produk, harga, dan stok dapat dipertukarkan dengan POS tanpa
   menggandakan transaksi;
 - penjualan dan retur dari website tercatat pada POS;
 - pilihan dan ongkir pengiriman berjalan sesuai keputusan final;
-- laporan transaksi, omzet, dan PPh 22 dapat dilihat admin;
+- order dengan alamat sama dapat digabung sesuai aturan ongkir/resi/status yang
+  disepakati;
+- laporan transaksi, omzet sejak status Dikirim, dan PPh 22 dapat dilihat admin;
 - notifikasi order baru tampil pada website admin;
 - notifikasi WhatsApp berjalan setelah nomor penerima dan isi pesan
   disepakati;
+- reseller aktif dapat melihat harga dan memakai channel pemesanan yang
+  disepakati;
+- bukti pembayaran tetap tersedia secara privat selama lima tahun;
 - data pelanggan dan bukti pembayaran tidak dapat diakses oleh pihak yang
   tidak berwenang; dan
 - tidak ada masalah kritis yang menghalangi penggunaan alur penjualan utama.

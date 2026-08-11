@@ -20,7 +20,9 @@
 /storage/*.key
 /storage/pail
 /vendor
+/graphify-out/.graphify_python
 /graphify-out/cache/
+/graphify-out/cost.json
 _ide_helper.php
 Homestead.json
 Homestead.yaml

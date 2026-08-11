@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.16 - Client Shared Hosting Confirmation |
-| Tanggal | Jumat, 31 Juli 2026 |
+| Versi | 0.17 - Klarifikasi Klien 7-11 Agustus 2026 |
+| Tanggal | Selasa, 11 Agustus 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Kebutuhan bisnis | `BRD.md` |
@@ -53,28 +53,27 @@ implementasi dilakukan iteratif per sprint.
 - Perubahan tetap harus menjaga backward compatibility, migration safety, test,
   observability, dan rollback.
 
-### 2.2 Change Notice dan Klarifikasi 27-28 Juli 2026
+### 2.2 Change Notice dan Klarifikasi 27 Juli-11 Agustus 2026
 
 Klarifikasi klien pada 28 Juli 2026 menetapkan:
 
 - setiap produk memiliki harga eceran, partai, dan grosir dari POS;
 - harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini;
-- harga partai eligible jika sedikitnya satu produk/SKU dalam struk berjumlah
-  minimal lima unit dan kuantitas antar-SKU tidak dijumlahkan; cakupan item yang
-  mendapat harga partai dan prioritas terhadap harga grosir masih menunggu
-  OPN-013;
+- harga partai eligible jika sedikitnya satu produk/SKU mencapai minimum global
+  website (awal lima unit); kuantitas antar-SKU tidak dijumlahkan; setelah
+  terpicu harga partai berlaku untuk seluruh order dan menang terhadap grosir;
 - istilah batas maksimal dikoreksi menjadi ambang nilai belanja per klasifikasi;
   melewati ambang tidak menolak checkout;
 - PPh 22 menggunakan tarif configurable, termasuk `0%`, dan dipicu ketika
-  ambang klasifikasi terlampaui; klasifikasi, ambang, dan tarif dikelola melalui
-  website, sedangkan dasar pengenaan menunggu OPN-006;
+  ambang klasifikasi terlampaui; seluruh subtotal klasifikasi terpicu digabung,
+  dibagi `1,11`, lalu dikalikan tarif; tarif multi-klasifikasi dan pembulatan
+  menunggu OPN-006;
 - PPh 22 ditampilkan sebagai komponen terpisah pada cart, checkout, invoice,
   dan laporan;
-- perhitungan PPh 22 dari lebih dari satu klasifikasi terpicu digabungkan
-  menjadi satu total transaksi; dasar pengenaan dan urutan agregasi tetap
-  menunggu OPN-006;
-- SKU, nama produk, kategori/klasifikasi, merek, harga, dan stok bersumber dari
-  POS;
+- perhitungan PPh 22 dari lebih dari satu klasifikasi digabungkan sebelum
+  formula dan menghasilkan satu total transaksi;
+- SKU, nama dasar produk, kategori/klasifikasi, merek, harga, dan stok bersumber
+  dari POS; nama tampilan produk dapat diubah mandiri melalui website;
 - master data dan inventory disinkronkan penuh sekali sehari; stok per produk
   dapat dicek berkala untuk rekonsiliasi;
 - website menjadi source of truth transaksi, invoice, dan lifecycle order;
@@ -87,14 +86,24 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
   transaksi website yang sah;
 - field POS menjadi sumber utama ketika tersedia, sedangkan website hanya
   melengkapi field yang belum tersedia;
-- invoice wajib memuat identitas toko, rincian item, total pembelian
-  keseluruhan, dan nilai rupiah PPh 22 jika berlaku;
+- invoice tampil di website dan dapat diunduh sebagai PDF; bagian atas memuat
+  identitas toko, bagian bawah nama legal perusahaan, NPWP, dan nomor akun
+  reseller; pelanggan dapat memilih penyampaian WhatsApp atau email;
 - setelah pembayaran diverifikasi, order berlanjut melalui `PROCESSING`,
-  `PACKED`, `SHIPPED`, dan `COMPLETED`; nomor resi ditampilkan ketika tersedia.
-  Urutan status telah disetujui, sedangkan trigger operasional dan konfirmasi
-  penerimaan mengikuti OPN-020;
-- order baru memicu indikator merah pada website admin dan pesan WhatsApp;
-  template/provider/penerima/fallback WhatsApp masih menunggu OPN-023;
+  `PACKED`, `SHIPPED`, dan `COMPLETED`; resi wajib hanya untuk metode yang
+  memilikinya; konfirmasi menggunakan tautan WhatsApp, auto-complete berjalan
+  lima hari kerja setelah dikirim, dan penanda `TERKENDALA` menahan scheduler;
+- order baru memicu indikator merah yang dibaca saat admin membuka daftar
+  pesanan dan pesan `Cek Order masuk` ke `081546407702`;
+- reseller versi pertama adalah akun terdaftar yang disetujui admin, dapat
+  melihat harga, dan memesan melalui website atau WhatsApp;
+- order dengan alamat tujuan identik dapat digabung ke satu pengiriman tanpa
+  menggabungkan nomor order/invoice; detail ongkir dan propagasi status terbuka;
+- omzet mulai diakui saat order berstatus `SHIPPED`;
+- bukti pembayaran disimpan lima tahun;
+- kurir toko mencakup seluruh kecamatan Kota/Kabupaten Bandung dengan target
+  H+1 hari kerja atau H+2 jika kurir tidak tersedia; Minggu/tanggal merah tidak
+  dihitung;
 - development memakai data contoh sampai akses POS dibuka setelah alur website
   berjalan; koordinasi akses dilakukan dengan Kak Rio sebagai PIC POS;
 - pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya;
@@ -390,14 +399,17 @@ menggantikan pengujian koneksi terhadap POS asli sebelum go-live.
 | External product ID | POS | Amendment |
 | SKU | POS | Baseline |
 | Nama dasar produk | POS | Baseline |
+| Nama tampilan produk | Website (override lokal) | Baseline amendment |
 | Stok aktual | POS | Baseline |
 | Produk/stok contoh sebelum POS tersedia | Data contoh | Baseline non-production |
 | Status ketersediaan | Dihitung website dari stok POS | Draft |
 | Harga eceran, partai, dan grosir | POS | Baseline |
 | Minimum kuantitas grosir | POS | Baseline |
+| Minimum global harga partai | Website; default 5 | Baseline |
 | Kategori/klasifikasi dan merek | POS | Baseline |
 | Konfigurasi klasifikasi, ambang, dan tarif PPh 22 | Website | Baseline |
 | Order, retur, lifecycle, dan invoice | Website | Baseline |
+| Identitas toko/perusahaan dan nomor akun reseller pada invoice | Website snapshot | Baseline |
 | Pencatatan penjualan/retur web dan stok POS | POS dari laporan website | Baseline downstream |
 | Gambar/video | POS ketika tersedia; fallback website | Baseline |
 | Deskripsi pemasaran | POS ketika tersedia; fallback website | Baseline |
@@ -439,8 +451,10 @@ Request minimum memuat:
 - panjang, lebar, dan tinggi hanya bila tersedia atau diperlukan layanan,
   karena dimensi dapat memengaruhi biaya.
 
-Nilai origin, sumber/default berat, penggunaan dimensi, daftar kurir, dan mode
-lokasi tidak boleh diasumsikan dalam kode; keputusan operasionalnya mengikuti
+Origin memakai Jl. Sawahkurung IV No. 18B, Bandung. Berat berasal dari masing-
+masing produk. Dimensi dikirim untuk produk berkapasitas besar. Grab dan Gojek
+same-day memerlukan lokasi yang didukung provider. Definisi kapasitas besar,
+fallback data, kode layanan final, dan akun production mengikuti
 [OPN-021](BRD.md#opn-021).
 
 #### 7.3.3 Kontrak Response dan Snapshot
@@ -469,8 +483,7 @@ kurir sampai fulfillment.
 - Gangguan jaringan dan respons 5xx dapat dicoba ulang secara terbatas dengan
   backoff; respons 4xx autentikasi/validasi tidak diulang tanpa koreksi.
 - Error dicatat dengan correlation ID dan payload teredaksi.
-- Kegagalan tidak menghasilkan ongkir nol; fallback mengikuti
-  [OPN-016](BRD.md#opn-016).
+- Kegagalan tidak menghasilkan ongkir nol; pelanggan diminta menghubungi admin.
 - Sandbox/test digunakan sebelum live, tetapi penggunaan Maps/Rates tetap perlu
   memperhatikan akun, aktivasi, dan biaya provider.
 
@@ -507,53 +520,53 @@ Contoh error:
 | Entity | Tujuan |
 |---|---|
 | users | Identitas dan kredensial pengguna. |
-| customer_profiles | Data bisnis pelanggan dan status verifikasi. |
+| customer_profiles | Data bisnis pelanggan, status verifikasi, dan nomor akun reseller. |
 | addresses | Alamat pelanggan dan snapshot sumber alamat. |
 | roles / permissions | Hak akses admin dan pelanggan. |
 | products | Data inti produk serta external identifier. |
-| product_enrichments | Deskripsi pemasaran, SEO, label, dan status tampil. |
+| product_enrichments | Override nama tampilan, deskripsi pemasaran, SEO, label, dan status tampil. |
 | product_media | Metadata gambar/video dan object key. |
 | categories | Klasifikasi produk. |
 | brands | Merek produk. |
-| product_prices | Tiga jenis harga dari POS, minimum kuantitas grosir per produk, dan metadata penerapannya; kelayakan partai dihitung pada struk dari kuantitas per SKU. |
+| product_prices | Tiga jenis harga dari POS dan minimum kuantitas grosir per produk; minimum global partai dikelola website. |
 | category_tax_rules | Klasifikasi terpilih, ambang nilai belanja, tarif PPh 22, status aktif, serta metadata pembuat/perubah konfigurasi website. |
 | inventory_snapshots | Nilai stok terbaru per produk. |
 | inventory_ledger | Riwayat perubahan stok. |
 | carts / cart_items | Keranjang aktif. |
-| orders | Header transaksi, status, sumber/alasan/waktu pembatalan, dan admin pembatal jika ada. |
+| orders | Header transaksi, status, penanda kendala, waktu kirim/selesai, sumber konfirmasi, serta metadata pembatalan. |
 | order_items | Snapshot nama produk, SKU, kuantitas, harga satuan, dan total harga item. |
 | order_charge_components | Snapshot komponen biaya aktif, dasar perhitungan, tarif/nilai, dan total. |
-| invoices | Nomor invoice website, snapshot nama/alamat/kontak/NPWP toko, total pembelian keseluruhan, dan nilai rupiah PPh 22 kondisional. |
+| invoices | Nomor invoice website, snapshot identitas toko/perusahaan dan nomor akun reseller, total pembelian, serta PPh 22 kondisional. |
 | pos_integration_operations | External reference, operasi, payload hash, status, attempt, correlation ID, dan hasil rekonsiliasi. |
 | sales_returns | Retur website, alasan pembatalan, perubahan stok efektif, dan status pelaporan ke POS. |
 | payments | Pengajuan dan verifikasi pembayaran. |
 | payment_proofs | Metadata file bukti pembayaran. |
-| shipments | Metode, layanan, area, ongkir, dan status. |
+| shipments | Metode, layanan, area, ongkir, status, resi kondisional, dan grup pengiriman opsional. |
 | notifications | Notifikasi admin berbasis database untuk order baru dan status baca. |
 | store_courier_rates | Tarif kurir toko per wilayah. |
 | sync_runs | Ringkasan eksekusi sinkronisasi. |
 | sync_errors | Detail item yang gagal. |
 | audit_logs | Jejak tindakan kritis. |
 
-Model data menyimpan konfigurasi PPh 22 yang dikelola melalui website secara
-terpisah dari snapshot biaya order. Perubahan konfigurasi klasifikasi, ambang,
-atau tarif tidak boleh mengubah invoice lama. Dasar pengenaan tetap menunggu
-[`OPN-006`](BRD.md#opn-006). Perubahan skema harus melalui migration, data
-dictionary, test, dan ADR.
+Model data menyimpan konfigurasi PPh 22 terpisah dari snapshot biaya order.
+Snapshot menyimpan dasar gabungan, pembagi `1,11`, tarif, hasil, dan metadata
+klasifikasi. Perubahan konfigurasi tidak mengubah invoice lama. Tarif berbeda
+antar-klasifikasi dan pembulatan mengikuti [`OPN-006`](BRD.md#opn-006).
 
 Kontrak tampilan invoice minimum:
 
-- identitas toko: nama, alamat, nomor kontak, dan NPWP;
+- bagian atas: nama toko, alamat, dan nomor kontak;
+- bagian bawah: nama legal perusahaan, NPWP, dan nomor akun reseller;
 - setiap item: jumlah, nama barang, SKU, harga satuan, dan total harga item;
 - ringkasan: total pembelian keseluruhan serta nilai rupiah PPh 22 jika
   transaksi terkena PPh 22;
 - seluruh nilai disimpan sebagai snapshot agar invoice historis tidak berubah
   ketika data toko, produk, atau harga diperbarui.
 
-Website adalah penerbit invoice resmi untuk transaksi web. Sumber/mapping
-identitas toko, format nomor, kebutuhan PDF, dan channel penyampaian tetap
-mengikuti [`OPN-008`](BRD.md#opn-008) serta
-[`OPN-022`](BRD.md#opn-022).
+Website adalah penerbit invoice resmi. Invoice dapat dilihat di website,
+diunduh sebagai PDF, serta dikirim melalui WhatsApp/email sesuai pilihan.
+Format nomor, identifier legal/reseller, dan kontrak provider mengikuti
+[`OPN-008`](BRD.md#opn-008) serta [`OPN-022`](BRD.md#opn-022).
 
 ### 9.2 Relasi Konseptual
 
@@ -647,9 +660,9 @@ Ketentuan job:
 
 Event minimum queue `notifications` adalah order baru. Notifikasi database
 website dibuat pada commit order; pesan WhatsApp dikirim asynchronous setelah
-commit. Bunyi berasal dari aplikasi/perangkat WhatsApp. Provider, penerima,
-template, aturan retry/fallback, dan perilaku read/clear mengikuti
-[OPN-023](BRD.md#opn-023).
+commit ke `081546407702` dengan isi minimum `Cek Order masuk`. Indikator website
+ditandai dibaca ketika admin membuka daftar pesanan yang akan diproses.
+Provider, credential, dan retry/fallback mengikuti [OPN-023](BRD.md#opn-023).
 
 Scheduler minimum:
 
@@ -658,6 +671,9 @@ Scheduler minimum:
 - rekonsiliasi laporan penjualan dan retur;
 - pembatalan idempotent untuk order `WAITING_PAYMENT` dari hari kalender
   sebelumnya;
+- auto-complete order `SHIPPED` setelah lima hari kerja tanpa penanda
+  `TERKENDALA`;
+- pengiriman tautan konfirmasi penerimaan WhatsApp;
 - retry/reconciliation;
 - pembersihan temporary upload;
 - pruning log sesuai retention;
@@ -914,16 +930,16 @@ dicoret meskipun sebagian keputusan bisnisnya sudah selesai.
 | TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
 | TD-003 | Working operation POS tersedia; Kak Rio menjadi PIC dan akses dibuka setelah alur website berbasis data contoh berjalan. URL/method/payload/auth/error/idempotency belum final; data contoh hanya dipakai di non-production. | OPN-005, OPN-019 | PIC/access trigger resolved; connection contract open |
 | TD-004 | Website membuat transaksi/invoice dan memperbarui stok efektif; POS menerima laporan penjualan/retur untuk pencatatan transaksi serta perubahan stok POS. | OPN-004, OPN-005 | Business flow resolved; technical contract open |
-| TD-005 | ~~Master tiga jenis harga, kategori, merek, nama produk, dan SKU.~~ | OPN-003, OPN-013 | Resolved - POS |
+| TD-005 | ~~Master tiga jenis harga, kategori, merek, nama dasar produk, dan SKU berasal dari POS; nama tampilan produk dapat dioverride melalui website.~~ | OPN-003, OPN-013 | Resolved |
 | TD-006 | Full master/inventory sync sekali sehari; stock-by-product berkala bila diperlukan. | OPN-005 | Resolved working cadence; SLA/trigger final open |
-| TD-007 | Object storage provider dan kebijakan retensi. | OPN-009 | Open |
+| TD-007 | Object storage provider open; bukti pembayaran disimpan lima tahun. | OPN-009 | Retention resolved; provider open |
 | TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
-| TD-010 | Dasar pengenaan PPh 22 dan expiry order belum dibayar. Konfigurasi klasifikasi, ambang, dan tarif ditetapkan melalui website; multi-klasifikasi menghasilkan satu total gabungan. | OPN-006, OPN-007 | Hasil gabungan and expiry resolved; dasar/urutan agregasi partially open |
-| TD-011 | Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; nomor resi ditampilkan ketika tersedia dan tidak memicu `COMPLETED`. Kondisi setiap transisi, pihak yang mengonfirmasi penerimaan, serta kebijakan penyelesaian otomatis mengikuti OPN-020. | OPN-020 | Sequence resolved; transition triggers open |
-| TD-012 | Biteship berperan sebagai external location/rate provider melalui Maps dan Rates; endpoint serta field teknis dasar sudah teridentifikasi. Origin, sumber/default berat, penggunaan dimensi, daftar kurir, mode area ID/koordinat, akun production, dan biaya masih perlu keputusan operasional. | OPN-021 | Technical contract resolved; operations open |
-| TD-013 | Field wajib invoice ditetapkan; event order baru dan channel website/WhatsApp disetujui. Sumber identitas toko, format/penyampaian invoice, serta kontrak WhatsApp belum final. | OPN-022, OPN-023 | Business behavior resolved; data/provider contract open |
-| TD-014 | Website menerbitkan invoice transaksi web; format/awalan nomor invoice masih perlu ditetapkan. | OPN-008, OPN-022 | Ownership resolved; number/delivery format open |
+| TD-010 | PPh 22 memakai seluruh subtotal klasifikasi terpicu yang digabung, dibagi `1,11`, lalu dikali tarif. | OPN-006, OPN-007 | Formula/expiry resolved; tariff/rounding partial |
+| TD-011 | Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; resi kondisional, konfirmasi WhatsApp, auto-complete lima hari kerja, dan penanda `TERKENDALA` ditetapkan. | OPN-020 | Lifecycle resolved; provider/calendar/points partial |
+| TD-012 | Biteship memakai Maps/Rates dengan origin Sawahkurung IV No. 18B, berat per produk, dimensi produk besar, dan Grab/Gojek same-day. | OPN-021 | Core operations resolved; fallback/account partial |
+| TD-013 | Layout invoice, preview/PDF, channel WhatsApp/email, penerima notifikasi admin, isi minimum, dan read behavior ditetapkan. Identifier legal/reseller dan kontrak provider belum final. | OPN-022, OPN-023 | Business behavior resolved; identifiers/provider partial |
+| TD-014 | Website menerbitkan invoice transaksi web; format/awalan nomor serta identifier legal/reseller masih perlu ditetapkan. | OPN-008, OPN-022 | Ownership/delivery resolved; identifiers open |
 
 ## 21. Referensi Teknis
 

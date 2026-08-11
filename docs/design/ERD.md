@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.4 - Cancellation Source Clarification |
-| Tanggal | Rabu, 29 Juli 2026 |
+| Versi | 0.5 - Klarifikasi Klien 7-11 Agustus 2026 |
+| Tanggal | Selasa, 11 Agustus 2026 |
 | Status | Internal - siap menjadi dasar migration MVP |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Detail field | [Data Dictionary](DATA_DICTIONARY.md) |
@@ -15,19 +15,16 @@
 ERD ini sudah cukup untuk implementasi MVP. Bagian berikut masih
 `Provisional` dan tidak boleh diartikan sebagai keputusan bisnis final:
 
-- formula dasar pengenaan PPh 22
+- tarif multi-klasifikasi dan pembulatan PPh 22
   ([OPN-006](../requirements/BRD.md#opn-006));
-- cakupan item yang memperoleh harga partai serta prioritas partai terhadap
-  grosir ([OPN-013](../requirements/BRD.md#opn-013));
 - nama field, payload, autentikasi, error, dan idempotency API POS
   ([OPN-005](../requirements/BRD.md#opn-005));
-- sumber identitas toko, format PDF, dan channel invoice
-  ([OPN-022](../requirements/BRD.md#opn-022));
-- provider, penerima, template, retry/fallback WhatsApp, dan perilaku baca
-  notifikasi website ([OPN-023](../requirements/BRD.md#opn-023));
-- origin, berat/dimensi, area, tarif, dan fallback pengiriman
-  ([OPN-010](../requirements/BRD.md#opn-010),
-  [OPN-016](../requirements/BRD.md#opn-016), dan
+- nama legal perusahaan, format NPWP/akun reseller, nomor invoice, dan provider
+  channel invoice ([OPN-022](../requirements/BRD.md#opn-022));
+- provider, credential, dan retry/fallback WhatsApp
+  ([OPN-023](../requirements/BRD.md#opn-023));
+- tarif kurir toko, fallback berat/dimensi, kode layanan, akun, dan biaya
+  provider ([OPN-010](../requirements/BRD.md#opn-010) dan
   [OPN-021](../requirements/BRD.md#opn-021)).
 
 Kolom snapshot dipertahankan agar transaksi dan invoice historis tidak berubah
@@ -56,6 +53,7 @@ erDiagram
         BIGINT id PK
         BIGINT user_id FK,UK
         VARCHAR business_name
+        VARCHAR reseller_account_number UK
         VARCHAR verification_status
         BIGINT reviewed_by FK
         DATETIME reviewed_at
@@ -100,6 +98,7 @@ erDiagram
         BIGINT id PK
         BIGINT product_id FK,UK
         VARCHAR slug UK
+        VARCHAR display_name
         TEXT description
         BOOLEAN is_visible
     }
@@ -127,6 +126,7 @@ erDiagram
         BIGINT updated_by FK
         DECIMAL threshold_amount
         DECIMAL rate_percent
+        VARCHAR calculation_basis
         BOOLEAN is_active
     }
 
@@ -169,7 +169,9 @@ erDiagram
         VARCHAR store_name
         TEXT address
         VARCHAR contact_number
-        VARCHAR npwp
+        VARCHAR company_name
+        VARCHAR company_npwp
+        INT partai_minimum_quantity
         VARCHAR origin_biteship_area_id
         VARCHAR origin_postal_code
         BOOLEAN is_active
@@ -194,6 +196,9 @@ erDiagram
         VARCHAR cancellation_source
         TEXT cancellation_reason
         DATETIME cancelled_at
+        VARCHAR completion_source
+        DATETIME receipt_confirmed_at
+        VARCHAR receipt_token_hash UK
         DECIMAL grand_total
     }
 
@@ -214,6 +219,7 @@ erDiagram
         BIGINT category_tax_rule_id FK
         VARCHAR component_code
         DECIMAL basis_amount
+        DECIMAL divisor
         DECIMAL rate_percent
         DECIMAL amount
     }
@@ -224,7 +230,9 @@ erDiagram
         BIGINT store_profile_id FK
         VARCHAR invoice_number UK
         VARCHAR store_name_snapshot
-        VARCHAR store_npwp_snapshot
+        VARCHAR company_name_snapshot
+        VARCHAR company_npwp_snapshot
+        VARCHAR reseller_account_number_snapshot
         DECIMAL grand_total
     }
 
@@ -272,6 +280,9 @@ erDiagram
         DATETIME quoted_at
         VARCHAR status
         VARCHAR tracking_number
+        VARCHAR shipment_group_code
+        VARCHAR issue_status
+        TEXT issue_reason
     }
 
     POS_INTEGRATION_OPERATIONS {
@@ -396,23 +407,29 @@ erDiagram
 
 - Hak akses MVP memakai `roles` dan Laravel Policy. Tabel permission granular
   belum dibuat karena role baseline hanya admin dan pelanggan.
-- Satu order hanya memiliki satu shipment. Split shipment dan penggabungan
-  beberapa order belum menjadi baseline.
+- Satu order hanya memiliki satu shipment. Beberapa shipment dari order berbeda
+  dapat berbagi `shipment_group_code` bila alamat tujuan identik; split
+  shipment tetap di luar baseline.
 - Biteship hanya menjadi provider Maps/Rates. Website menyimpan area ID dan
   snapshot rate terpilih; model tidak membuat entitas booking/order Biteship.
 - `shipments.shipping_amount` menyimpan field `price` final dari rate Biteship,
   bukan hasil perhitungan ulang dari komponen respons.
-- Harga partai dihitung dari kuantitas per SKU pada cart/order; kuantitas
-  antar-SKU tidak dijumlahkan.
-- `order_charge_components` menyimpan snapshot klasifikasi, dasar, tarif, dan
-  metadata agregasi; `orders.pph22_amount` menyimpan satu hasil gabungan.
-  Jumlah baris serta urutan formula tetap provisional sampai OPN-006 selesai.
+- Harga partai memakai minimum global website (awal lima) dari satu SKU;
+  kuantitas antar-SKU tidak dijumlahkan. Setelah terpicu, harga partai berlaku
+  untuk seluruh order dan menang terhadap grosir.
+- `order_charge_components` menyimpan satu snapshot agregat klasifikasi, dasar,
+  pembagi `1,11`, tarif, dan hasil PPh 22. Tarif multi-klasifikasi serta
+  pembulatan tetap provisional pada OPN-006.
 - Website membuat order, invoice, serta retur. Tabel operasi POS hanya melacak
   pelaporan penjualan/retur dan acknowledgement, bukan ownership transaksi.
 - Laporan retur baru boleh dikirim setelah laporan penjualan order asal
   berhasil atau sudah direkonsiliasi.
-- Tabel `notifications` dipakai untuk indikator website dan jejak pengiriman
-  WhatsApp order baru; tidak dibuat tabel delivery tambahan.
+- Tabel `notifications` dipakai untuk indikator admin, WhatsApp order baru, dan
+  tautan konfirmasi penerimaan; tidak dibuat tabel delivery tambahan.
+- Penanda `shipments.issue_status = TERKENDALA` menahan auto-complete lima hari
+  kerja tanpa menambah status lifecycle order baru.
+- Subsystem loyalty belum dimodelkan sampai nilai, masa berlaku, dan penggunaan
+  poin disepakati; event konfirmasi tetap direkam idempotent sebagai sumber poin.
 - Data laporan dibaca dari tabel transaksi dan snapshot. Tabel agregasi khusus
   ditambahkan hanya jika pengukuran production membuktikan query terlalu berat.
 - Payload integrasi disimpan teredaksi dan terbatas untuk rekonsiliasi; token,

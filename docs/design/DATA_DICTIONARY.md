@@ -4,8 +4,8 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.5 - Cancellation Source Clarification                                                                                       |
-| Tanggal  | Rabu, 29 Juli 2026                                                                                                              |
+| Versi    | 0.6 - Klarifikasi Klien 7-11 Agustus 2026                                                                                      |
+| Tanggal  | Selasa, 11 Agustus 2026                                                                                                         |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
 | Sumber   | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -65,6 +65,7 @@ baru dibuat hanya jika role operasional bertambah.
 | id                  | BIGINT UNSIGNED | Tidak | PK                          | Identifier profil.                                              |
 | user_id             | BIGINT UNSIGNED | Tidak | FK, UK                      | Satu profil per pelanggan.                                      |
 | business_name       | VARCHAR(191)    |   Ya  | —                           | Nama toko/usaha pelanggan.                                      |
+| reseller_account_number | VARCHAR(64) |   Ya  | UK                          | Nomor akun reseller setelah disetujui admin; format mengikuti OPN-022. |
 | verification_status | VARCHAR(32)     | Tidak | IDX, `PENDING_VERIFICATION` | `PENDING_VERIFICATION`, `ACTIVE`, `REJECTED`, atau `SUSPENDED`. |
 | rejection_reason    | TEXT            |   Ya  | —                           | Alasan penolakan/penangguhan yang dapat ditampilkan.            |
 | reviewed_by         | BIGINT UNSIGNED |   Ya  | FK                          | Admin pemberi keputusan terakhir.                               |
@@ -152,6 +153,7 @@ atau diperlukan layanan.
 | ----------------- | --------------- | :---: | ----------- | --------------------------- |
 | id                | BIGINT UNSIGNED | Tidak | PK          | Identifier enrichment.      |
 | product_id        | BIGINT UNSIGNED | Tidak | FK, UK      | Satu enrichment per produk. |
+| display_name      | VARCHAR(255)    |   Ya  | IDX         | Override nama tampilan website; null memakai nama dasar POS. |
 | slug              | VARCHAR(191)    | Tidak | UK          | URL produk.                 |
 | short_description | VARCHAR(500)    |   Ya  | —           | Ringkasan pemasaran lokal.  |
 | description       | TEXT            |   Ya  | —           | Deskripsi panjang lokal.    |
@@ -195,9 +197,9 @@ atau diperlukan layanan.
 | updated_at        | DATETIME(6)     | Tidak | —               | Waktu perubahan.                                                    |
 
 Constraint: unik `product_id + price_type`; nilai `amount >= 0`;
-`minimum_quantity` wajib untuk `GROSIR`. Cakupan penerapan `PARTAI` dan
-prioritas terhadap `GROSIR` masih
-[OPN-013](../requirements/BRD.md#opn-013).
+`minimum_quantity` wajib untuk `GROSIR`. Minimum global `PARTAI` disimpan pada
+`store_profiles.partai_minimum_quantity`; setelah terpicu, harga partai berlaku
+untuk seluruh order dan menang terhadap grosir.
 
 ### 3.7 `category_tax_rules`
 
@@ -207,7 +209,7 @@ prioritas terhadap `GROSIR` masih
 | category_id       | BIGINT UNSIGNED | Tidak | FK, IDX     | Klasifikasi terpilih.                                           |
 | threshold_amount  | DECIMAL(19,2)   | Tidak | —           | Ambang nilai belanja.                                           |
 | rate_percent      | DECIMAL(8,4)    | Tidak | `0`         | Tarif PPh 22; `0` menonaktifkan pungutan.                       |
-| calculation_basis | VARCHAR(32)     |   Ya  | Provisional | Dasar pengenaan final menunggu [OPN-006](../requirements/BRD.md#opn-006). |
+| calculation_basis | VARCHAR(48)     | Tidak | `TRIGGERED_SUBTOTAL_DIV_1_11` | Seluruh subtotal klasifikasi terpicu digabung lalu dibagi `1,11`. |
 | is_active         | BOOLEAN         | Tidak | `true`, IDX | Aturan aktif.                                                   |
 | effective_from    | DATETIME(6)     | Tidak | —           | Awal masa berlaku.                                              |
 | effective_until   | DATETIME(6)     |   Ya  | —           | Akhir masa berlaku.                                             |
@@ -290,18 +292,20 @@ kuantitas antar-SKU tidak dijumlahkan.
 | Kolom                   | Tipe            | Null  | Key/Default | Deskripsi                                      |
 | ----------------------- | --------------- | :---: | ----------- | ---------------------------------------------- |
 | id                      | BIGINT UNSIGNED | Tidak | PK          | Identifier profil toko.                        |
-| store_name              | VARCHAR(191)    | Tidak | —           | Nama pada invoice.                             |
-| address                 | TEXT            | Tidak | —           | Alamat pada invoice.                           |
-| contact_number          | VARCHAR(32)     | Tidak | —           | Nomor kontak pada invoice.                     |
-| npwp                    | VARCHAR(32)     | Tidak | —           | NPWP pada invoice.                             |
+| store_name              | VARCHAR(191)    | Tidak | —           | Nama toko pada bagian atas invoice; awal `Pixel Komunika`. |
+| address                 | TEXT            | Tidak | —           | Alamat toko; awal `Jl. Sawahkurung IV No. 18B, Bandung`. |
+| contact_number          | VARCHAR(32)     | Tidak | —           | Kontak toko; awal `081546407702`.              |
+| company_name            | VARCHAR(191)    |   Ya  | —           | Nama legal perusahaan pada bagian bawah invoice; masih TBD. |
+| company_npwp            | VARCHAR(32)     | Tidak | —           | NPWP perusahaan; awal `0821.4146.0442.4000`, format final perlu konfirmasi. |
+| partai_minimum_quantity | INT UNSIGNED    | Tidak | `5`         | Minimum global satu SKU untuk memicu harga partai. |
 | origin_biteship_area_id | VARCHAR(191)    |   Ya  | IDX         | Area ID origin untuk rate reguler.             |
 | origin_postal_code      | VARCHAR(16)     |   Ya  | —           | Kode pos origin sebagai data lokasi tambahan. |
 | is_active               | BOOLEAN         | Tidak | `true`, IDX | Profil aktif.                                  |
 | created_at              | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                               |
 | updated_at              | DATETIME(6)     | Tidak | —           | Waktu perubahan.                               |
 
-Sumber/mapping final profil toko masih
-[OPN-022](../requirements/BRD.md#opn-022).
+Identitas dikelola melalui website. Nama legal perusahaan, format NPWP, dan
+format nomor akun reseller mengikuti [OPN-022](../requirements/BRD.md#opn-022).
 
 ### 5.2 `bank_accounts`
 
@@ -336,6 +340,10 @@ Sumber/mapping final profil toko masih
 | cancelled_by_user_id  | BIGINT UNSIGNED |   Ya  | FK, IDX     | Admin pembatal; wajib untuk `ADMIN`, null untuk `SYSTEM`.          |
 | cancellation_reason   | TEXT            |   Ya  | —           | Alasan pembatalan; wajib ketika status `CANCELLED`.                |
 | cancelled_at          | DATETIME(6)     |   Ya  | —           | Waktu pembatalan; wajib ketika status `CANCELLED`.                 |
+| completion_source     | VARCHAR(24)     |   Ya  | IDX         | `CUSTOMER_WHATSAPP`, `SYSTEM_5_WORKDAYS`, atau `ADMIN`; null sebelum selesai. |
+| receipt_confirmed_at  | DATETIME(6)     |   Ya  | —           | Waktu konfirmasi penerimaan pelanggan.                            |
+| receipt_token_hash    | VARCHAR(255)    |   Ya  | UK          | Hash token sekali pakai pada tautan konfirmasi WhatsApp.          |
+| receipt_token_expires_at | DATETIME(6)  |   Ya  | IDX         | Masa berlaku token konfirmasi.                                    |
 | created_at            | DATETIME(6)     | Tidak | IDX         | Waktu order dibuat.                                               |
 | updated_at            | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                                  |
 
@@ -343,7 +351,8 @@ Status internal checkout: `DRAFT`. Status customer-facing:
 `WAITING_PAYMENT`, `PAYMENT_SUBMITTED`, `PAYMENT_REJECTED`,
 `PAYMENT_VERIFIED`, `PROCESSING`, `PACKED`, `SHIPPED`, `COMPLETED`, dan
 `CANCELLED`. `RECONCILIATION_REQUIRED` hanya menjadi status operasi integrasi,
-bukan status order pelanggan.
+bukan status order pelanggan. `TERKENDALA` disimpan sebagai penanda pada
+shipment, bukan status lifecycle baru.
 
 Invariant pembatalan:
 
@@ -382,16 +391,17 @@ Constraint: satu SKU muncul maksimal sekali dalam satu order.
 | category_tax_rule_id | BIGINT UNSIGNED |   Ya  | FK, IDX     | Aturan sumber jika masih tersedia.                           |
 | component_code       | VARCHAR(32)     | Tidak | IDX         | Minimal `PPH22`; komponen lain hanya melalui change control. |
 | label_snapshot       | VARCHAR(100)    | Tidak | —           | Label invoice/laporan.                                       |
-| basis_amount         | DECIMAL(19,2)   | Tidak | —           | Dasar perhitungan snapshot; provisional OPN-006.             |
+| basis_amount         | DECIMAL(19,2)   | Tidak | —           | Jumlah seluruh subtotal klasifikasi yang melewati ambang.    |
+| divisor              | DECIMAL(8,4)    | Tidak | `1.1100`    | Pembagi formula PPh 22.                                      |
 | rate_percent         | DECIMAL(8,4)    | Tidak | —           | Tarif snapshot.                                              |
 | amount               | DECIMAL(19,2)   | Tidak | —           | Nilai rupiah komponen.                                       |
 | config_snapshot      | JSON            | Tidak | —           | Klasifikasi, ambang, formula, dan metadata aturan teredaksi. |
 | created_at           | DATETIME(6)     | Tidak | —           | Waktu snapshot.                                              |
 
-Jumlah baris komponen bersifat provisional: dapat berupa satu baris agregat atau
-beberapa baris per klasifikasi. `orders.pph22_amount` dan
-`invoices.pph22_amount` selalu menyimpan satu hasil gabungan transaksi. Dasar
-pengenaan dan urutan agregasi mengikuti
+Satu order menyimpan satu baris agregat `PPH22`; daftar klasifikasi dan
+ambangnya berada dalam `config_snapshot`. `orders.pph22_amount` dan
+`invoices.pph22_amount` menyimpan hasil `(basis_amount / divisor) × rate`.
+Tarif multi-klasifikasi dan pembulatan mengikuti
 [OPN-006](../requirements/BRD.md#opn-006).
 
 ### 5.6 `invoices`
@@ -406,7 +416,9 @@ pengenaan dan urutan agregasi mengikuti
 | store_name_snapshot    | VARCHAR(191)    | Tidak | —           | Nama toko wajib.                                |
 | store_address_snapshot | TEXT            | Tidak | —           | Alamat toko wajib.                              |
 | store_contact_snapshot | VARCHAR(32)     | Tidak | —           | Kontak toko wajib.                              |
-| store_npwp_snapshot    | VARCHAR(32)     | Tidak | —           | NPWP toko wajib.                                |
+| company_name_snapshot  | VARCHAR(191)    | Tidak | —           | Nama legal perusahaan pada bagian bawah.        |
+| company_npwp_snapshot  | VARCHAR(32)     | Tidak | —           | NPWP perusahaan pada bagian bawah.              |
+| reseller_account_number_snapshot | VARCHAR(64) | Tidak | —     | Nomor akun reseller pemilik order.              |
 | subtotal_amount        | DECIMAL(19,2)   | Tidak | —           | Total harga item.                               |
 | shipping_amount        | DECIMAL(19,2)   | Tidak | `0`         | Ongkir.                                         |
 | pph22_amount           | DECIMAL(19,2)   | Tidak | `0`         | Nilai rupiah PPh 22 jika ada.                   |
@@ -414,9 +426,9 @@ pengenaan dan urutan agregasi mengikuti
 | created_at             | DATETIME(6)     | Tidak | —           | Waktu penyimpanan.                              |
 | updated_at             | DATETIME(6)     | Tidak | —           | Waktu perubahan metadata.                       |
 
-Item invoice dibaca dari `order_items`. Format/awalan nomor mengikuti OPN-008;
-sumber identitas toko, format PDF, dan channel masih
-[OPN-022](../requirements/BRD.md#opn-022).
+Item invoice dibaca dari `order_items`. Invoice tampil di website, dapat
+diunduh PDF, dan dapat dikirim via WhatsApp/email. Format nomor serta identifier
+legal/reseller mengikuti OPN-008 dan [OPN-022](../requirements/BRD.md#opn-022).
 
 ### 5.7 `payments`
 
@@ -448,6 +460,7 @@ sumber identitas toko, format PDF, dan channel masih
 | checksum      | VARCHAR(128)    |   Ya  | IDX         | Deteksi duplikasi/integritas. |
 | is_active     | BOOLEAN         | Tidak | `true`      | Bukti yang sedang dinilai.    |
 | created_at    | DATETIME(6)     | Tidak | —           | Waktu unggah.                 |
+| retain_until  | DATETIME(6)     | Tidak | IDX         | Minimal lima tahun sejak `created_at`. |
 
 ## 6. Shipping
 
@@ -464,7 +477,9 @@ sumber identitas toko, format PDF, dan channel masih
 | created_at  | DATETIME(6)     | Tidak | —           | Waktu pembuatan.     |
 | updated_at  | DATETIME(6)     | Tidak | —           | Waktu perubahan.     |
 
-Data operasional masih [OPN-010](../requirements/BRD.md#opn-010).
+Seluruh kecamatan Kota Bandung dan Kabupaten Bandung dapat diaktifkan. ETA
+default H+1 hari kerja dan dapat menjadi H+2 bila kurir tidak tersedia; Minggu
+dan tanggal merah tidak dihitung. Tarif per area masih OPN-010.
 
 ### 6.2 `shipments`
 
@@ -493,7 +508,12 @@ Data operasional masih [OPN-010](../requirements/BRD.md#opn-010).
 | rate_request_hash                    | VARCHAR(128)    |   Ya  | IDX              | Hash request canonical teredaksi untuk traceability.         |
 | quoted_at                            | DATETIME(6)     |   Ya  | —                | Waktu rate dipilih.                                          |
 | tracking_number                      | VARCHAR(191)    |   Ya  | IDX              | Nomor resi yang ditampilkan kepada pelanggan ketika tersedia. |
+| shipment_group_code                  | VARCHAR(64)     |   Ya  | IDX              | Kode grup order dengan alamat tujuan identik; detail ongkir/status mengikuti OPN-014. |
 | status                               | VARCHAR(32)     | Tidak | IDX              | `PROCESSING`, `PACKED`, `SHIPPED`, atau `COMPLETED`.           |
+| issue_status                         | VARCHAR(24)     | Tidak | `NONE`, IDX      | `NONE` atau `TERKENDALA`; menahan auto-complete.               |
+| issue_reason                         | TEXT            |   Ya  | —                | Keterangan kendala pengiriman.                                 |
+| issue_reported_at                    | DATETIME(6)     |   Ya  | —                | Waktu kendala dicatat.                                         |
+| issue_resolved_at                    | DATETIME(6)     |   Ya  | —                | Waktu admin menutup kendala.                                   |
 | shipped_at                           | DATETIME(6)     |   Ya  | —                | Waktu dikirim.                                               |
 | delivered_at                         | DATETIME(6)     |   Ya  | —                | Waktu penerimaan dikonfirmasi dan status menjadi `COMPLETED`; sumber konfirmasi mengikuti [OPN-020](../requirements/BRD.md#opn-020). |
 | created_at                           | DATETIME(6)     | Tidak | —                | Waktu pembuatan.                                             |
@@ -588,10 +608,10 @@ atau telah direkonsiliasi.
 | Kolom              | Tipe            | Null  | Key/Default | Deskripsi                                                        |
 | ------------------ | --------------- | :---: | ----------- | ---------------------------------------------------------------- |
 | id                 | BIGINT UNSIGNED | Tidak | PK          | Identifier notifikasi.                                           |
-| user_id            | BIGINT UNSIGNED | Tidak | FK, IDX     | Admin penerima.                                                   |
-| order_id           | BIGINT UNSIGNED | Tidak | FK, IDX     | Order baru yang diberitahukan.                                   |
+| user_id            | BIGINT UNSIGNED | Tidak | FK, IDX     | Admin atau reseller penerima.                                    |
+| order_id           | BIGINT UNSIGNED | Tidak | FK, IDX     | Order terkait.                                                    |
 | channel            | VARCHAR(16)     | Tidak | IDX         | `DATABASE` atau `WHATSAPP`.                                      |
-| type               | VARCHAR(64)     | Tidak | IDX         | Baseline `NEW_ORDER`.                                            |
+| type               | VARCHAR(64)     | Tidak | IDX         | `NEW_ORDER` atau `RECEIPT_CONFIRMATION`.                         |
 | data               | JSON            | Tidak | —           | Payload tampilan minimum tanpa credential.                       |
 | status             | VARCHAR(24)     | Tidak | IDX         | `PENDING`, `SENT`, `FAILED`; `DATABASE` langsung `SENT`.         |
 | external_message_id | VARCHAR(191)   |   Ya  | IDX         | Referensi provider WhatsApp bila tersedia.                       |
@@ -600,9 +620,10 @@ atau telah direkonsiliasi.
 | created_at         | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                                  |
 | updated_at         | DATETIME(6)     | Tidak | —           | Waktu perubahan status.                                          |
 
-Provider, penerima, template, retry/fallback WhatsApp, serta perilaku read/clear
-website masih [OPN-023](../requirements/BRD.md#opn-023). Bunyi berasal dari
-aplikasi/perangkat WhatsApp.
+`NEW_ORDER` dikirim ke `081546407702` dengan isi minimum `Cek Order masuk`;
+notifikasi database dibaca saat admin membuka daftar pesanan yang akan diproses.
+Provider, credential, dan retry/fallback mengikuti
+[OPN-023](../requirements/BRD.md#opn-023).
 
 ## 9. Audit
 
@@ -629,7 +650,7 @@ isi file bukti pembayaran tidak boleh masuk `old_values` atau `new_values`.
 
 | Area       | Constraint/Index                                                                                                                  |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Identity   | UK `users.email`, UK `users.phone`, UK `customer_profiles.user_id`.                                                               |
+| Identity   | UK `users.email`, UK `users.phone`, UK `customer_profiles.user_id`, UK `customer_profiles.reseller_account_number`.                 |
 | Product    | UK `products.pos_product_id`, UK `products.sku`, UK gabungan `product_prices(product_id, price_type)`.                            |
 | Cart       | UK parsial/logis satu `carts` aktif per user; UK `cart_items(cart_id, product_id)`.                                               |
 | Order      | UK `orders.order_number`, UK `orders.idempotency_key`; index `(status, cancellation_source, cancelled_at)`.                    |
@@ -651,5 +672,5 @@ isi file bukti pembayaran tidak boleh masuk `old_values` atau `new_values`.
   anonimisasi/retention final mengikuti kebijakan privacy dan operasional.
 - Media produk dan bukti pembayaran dihapus melalui service agar record dan
   object storage tetap konsisten.
-- Retention log dan bukti pembayaran harus ditetapkan sebelum production
-  ([OPN-009](../requirements/BRD.md#opn-009)).
+- Bukti pembayaran dipertahankan minimal lima tahun; log lain mengikuti
+  kebijakan operasional dan hukum yang berlaku.

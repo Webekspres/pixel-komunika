@@ -452,10 +452,6 @@ Keputusan klien:
    | Alamat | Jl. Sawahkurung IV No. 18B, Bandung |
    | Nomor kontak | 081546407702 |
    | NPWP perusahaan | 0821.4146.0442.4000 |
-   | Nama legal perusahaan | Belum diberikan |
-
-6. Masih perlu dipastikan: nama legal perusahaan, format NPWP final, dan format
-   nomor akun reseller yang dicetak di bagian bawah invoice.
 
 ### 8.4 Perhitungan Omzet
 

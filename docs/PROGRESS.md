@@ -11,9 +11,9 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-07
-- Fase aktif: transisi dari Fase 3 ke Fase 4
-- Status umum: on track
+- Tanggal update terakhir: 2026-08-11
+- Fase aktif: rekonsiliasi fondasi Fase 2-4 terhadap klarifikasi klien terbaru
+- Status umum: fondasi tersedia, tetapi belum siap dinyatakan sesuai requirement terbaru
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -41,7 +41,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 2 — Catalog, pricing, stock, dan data contoh POS
 
-- Status: selesai fondasi
+- Status: fondasi tersedia; aturan harga dan pajak perlu diselaraskan
 - Target hasil:
   - adapter data contoh POS
   - import/upsert produk, harga, stok
@@ -50,11 +50,20 @@ Dokumen ini dipakai untuk mencatat:
 - Catatan:
   - Tabel kategori, brand, produk, enrichment, harga, tax rule, snapshot stok, dan ledger stok sudah dibuat.
   - Jalur import data contoh POS-like bersifat idempotent melalui `catalog:import-sample`.
-  - Rule harga partai/grosir dan agregasi PPh 22 dasar sudah memiliki test.
+  - Rule harga partai/grosir dan agregasi PPh 22 dasar sudah memiliki test untuk
+    baseline lama.
+  - Klarifikasi terbaru menetapkan minimal partai default 5 per SKU, partai
+    berlaku untuk seluruh order, dan partai mengalahkan grosir.
+  - `PriceCalculator::resolvePrice()` saat ini masih memeriksa grosir lebih dulu;
+    implementasi dan test perlu diperbaiki sebelum rule dinyatakan selesai.
+  - `PriceCalculator::calculatePph22()` saat ini menghitung
+    `subtotal kategori x tarif`. Requirement terbaru memakai dasar
+    `(subtotal kategori terpicu / 1,11) x tarif`; aturan multi-kategori dan
+    pembulatan masih menunggu keputusan klien.
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: selesai
+- Status: fondasi tersedia; rekonsiliasi requirement terbaru belum selesai
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
@@ -65,6 +74,10 @@ Dokumen ini dipakai untuk mencatat:
   - `CartService` mengelola manipulasi item & kalkulasi PPh 22/partai price.
   - `OrderService` membuat order, snapshot invoice, serta mengurangi stok pada `inventory_snapshot` dan `inventory_ledger`.
   - Fitur UI Livewire `CartIndex`, `Checkout`, `CustomerOrders`, `OrderDetail`, dan `AdminOrders` sudah lengkap & teruji.
+  - Identitas invoice, preview PDF, kanal WhatsApp/email, penggabungan pesanan,
+    resi kondisional, kurir toko Bandung, Biteship production, konfirmasi terima,
+    status `TERKENDALA`, dan auto-complete 5 hari kerja belum tercakup penuh pada
+    fondasi yang ada.
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
@@ -104,6 +117,24 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Log progres
 
+### 2026-08-11
+
+- Selesai:
+  - Klarifikasi klien 7-11 Agustus dipetakan ke BRD, FRD, SRS, MVP, data
+    dictionary, ERD, user flows, dan dokumen persetujuan klien.
+  - Batas ownership POS dan website, reseller V1, invoice, pengiriman,
+    notifikasi order, omzet saat `SHIPPED`, retensi bukti bayar 5 tahun, serta
+    konfirmasi penerimaan sudah masuk baseline dokumentasi.
+- Ditemukan:
+  - Prioritas harga pada implementasi saat ini bertentangan dengan keputusan
+    partai mengalahkan grosir.
+  - Formula PPh 22 pada implementasi belum memakai pembagi `1,11`.
+  - Beberapa keputusan operasional masih terbuka dan tidak boleh diasumsikan.
+- Next:
+  - Dapatkan jawaban klien atas pertanyaan terbuka.
+  - Buat iterasi kode terpisah untuk menyelaraskan pricing, PPh 22, invoice,
+    shipping, reseller, notifikasi, dan fulfillment setelah keputusan lengkap.
+
 ### 2026-08-07
 
 - Selesai:
@@ -124,6 +155,10 @@ Dokumen ini dipakai untuk mencatat:
 - Konfirmasi parameter operasional Biteship
 - Provider / template / fallback WhatsApp
 - Verifikasi shared hosting: cron, log, backup, worker bounded
+- Tarif kurir toko per kecamatan dan kalender hari kerja/libur
+- Nama badan usaha legal, aturan nomor invoice, serta nomor akun reseller
+- Aturan PPh 22 multi-kategori dan pembulatan
+- Aturan ongkir/status untuk penggabungan pesanan serta skema poin loyalitas
 
 ## Keputusan penting
 
@@ -132,6 +167,8 @@ Dokumen ini dipakai untuk mencatat:
 - Data contoh dipakai sampai koneksi POS production siap.
 - Auth dibangun dengan fitur native Laravel session tanpa package auth tambahan.
 - Fondasi data katalog mengikuti jalur import/upsert yang sama dengan adapter POS.
+- POS menjadi sumber SKU dan data dasar produk; nama tampilan, media, berat, dan
+  dimensi dapat dikelola sebagai enrichment website tanpa ditimpa sinkronisasi.
 
 ## Cara pakai
 

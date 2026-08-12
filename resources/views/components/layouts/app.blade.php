@@ -9,7 +9,7 @@
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-zinc-50 font-sans text-zinc-950 antialiased">
+    <body class="app-shell min-h-screen bg-zinc-100 font-sans text-zinc-950 antialiased">
 
         {{--
             Internal App Shell — Fixed Left Sidebar + Topbar Layout
@@ -43,112 +43,73 @@
                  SIDEBAR (Fixed on desktop)
                  ===================================================== --}}
             <aside
-                class="fixed inset-y-0 left-0 z-40 flex w-[240px] flex-col border-r border-zinc-200 bg-white transition-transform duration-200 ease-out lg:translate-x-0 lg:transition-none"
+                class="fixed bottom-4 left-4 top-4 z-40 flex w-[220px] flex-col rounded-[1.5rem] border border-zinc-200 bg-white shadow-card transition-transform duration-200 ease-out lg:translate-x-0 lg:transition-none"
                 :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
                 aria-label="Navigasi aplikasi"
             >
                 {{-- Logo --}}
-                <div class="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-100 px-4">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2" wire:navigate>
+                <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-4 py-4">
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3" wire:navigate>
                         <img
                             src="{{ asset('assets/brand-logo.png') }}"
                             alt="Pixel Komunika"
-                            class="h-7 w-auto"
-                            width="100"
-                            height="28"
+                            class="h-8 w-auto"
+                            width="112"
+                            height="32"
                         >
                     </a>
+                    <span class="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">
+                        admin
+                    </span>
                 </div>
 
                 {{-- Nav --}}
-                <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3" aria-label="Navigasi sidebar">
+                <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Navigasi sidebar">
+                    <p class="mb-2 mt-1 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">Workspace</p>
 
-                    @auth
-                        {{-- Customer nav --}}
-                        @if (auth()->user()->isActiveCustomer())
-                            <p class="mt-1 mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Pelanggan</p>
+                    <a
+                        href="{{ route('admin.dashboard') }}"
+                        wire:navigate
+                        class="sidebar-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                    >
+                        <x-icon name="layout-dashboard" class="size-4 shrink-0" />
+                        <span>Dashboard</span>
+                    </a>
 
-                            <a
-                                href="{{ route('account.dashboard') }}"
-                                wire:navigate
-                                class="sidebar-nav-item {{ request()->routeIs('account.*') ? 'active' : '' }}"
-                            >
-                                <x-icon name="layout-dashboard" class="size-4 shrink-0" />
-                                <span>Dashboard</span>
-                            </a>
+                    <a
+                        href="{{ route('admin.customers.index') }}"
+                        wire:navigate
+                        class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"
+                    >
+                        <x-icon name="users" class="size-4 shrink-0" />
+                        <span>Customer</span>
+                    </a>
 
-                            <a
-                                href="{{ route('orders.index') }}"
-                                wire:navigate
-                                class="sidebar-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}"
-                            >
-                                <x-icon name="package" class="size-4 shrink-0" />
-                                <span>Order saya</span>
-                            </a>
+                    <a
+                        href="{{ route('admin.orders.index') }}"
+                        wire:navigate
+                        class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
+                    >
+                        <x-icon name="clipboard-list" class="size-4 shrink-0" />
+                        <span>Order</span>
+                    </a>
 
-                            <a
-                                href="{{ route('checkout.index') }}"
-                                wire:navigate
-                                class="sidebar-nav-item {{ request()->routeIs('checkout.*') ? 'active' : '' }}"
-                            >
-                                <x-icon name="shopping-cart" class="size-4 shrink-0" />
-                                <span>Checkout</span>
-                            </a>
-                        @elseif (auth()->user()->isCustomer())
-                            {{-- Pending customer --}}
-                            <p class="mt-1 mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Pelanggan</p>
-
-                            <a
-                                href="{{ route('account.dashboard') }}"
-                                wire:navigate
-                                class="sidebar-nav-item {{ request()->routeIs('account.*') ? 'active' : '' }}"
-                            >
-                                <x-icon name="layout-dashboard" class="size-4 shrink-0" />
-                                <span>Akun saya</span>
-                            </a>
-                        @endif
-
-                        {{-- Admin nav --}}
-                        @if (auth()->user()->isAdmin())
-                            <p class="mt-3 mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Admin</p>
-
-                            <a
-                                href="{{ route('admin.customers.index') }}"
-                                wire:navigate
-                                class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"
-                            >
-                                <x-icon name="users" class="size-4 shrink-0" />
-                                <span>Customer</span>
-                            </a>
-
-                            <a
-                                href="{{ route('admin.orders.index') }}"
-                                wire:navigate
-                                class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
-                            >
-                                <x-icon name="clipboard-list" class="size-4 shrink-0" />
-                                <span>Order</span>
-                            </a>
-                        @endif
-
-                        {{-- Shared / account --}}
-                        <p class="mt-3 mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Akun</p>
-
-                        <a
-                            href="{{ route('account.dashboard') }}"
-                            wire:navigate
-                            class="sidebar-nav-item {{ request()->routeIs('account.*') ? 'active' : '' }}"
-                        >
-                            <x-icon name="user-circle" class="size-4 shrink-0" />
-                            <span>Profil</span>
-                        </a>
-                    @endauth
+                    <a
+                        href="{{ route('admin.tax-rules.index') }}"
+                        wire:navigate
+                        class="sidebar-nav-item {{ request()->routeIs('admin.tax-rules.*') ? 'active' : '' }}"
+                    >
+                        <x-icon name="percent" class="size-4 shrink-0" />
+                        <span>PPh 22</span>
+                    </a>
 
                     {{-- Spacer --}}
                     <div class="flex-1"></div>
 
                     {{-- Divider --}}
-                    <div class="border-t border-zinc-100 pt-2 mt-2">
+                    <div class="mt-3 border-t border-zinc-100 pt-3">
+                        <p class="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">Tautan</p>
+
                         <a
                             href="{{ route('home') }}"
                             wire:navigate
@@ -158,23 +119,12 @@
                             <span>Storefront</span>
                         </a>
 
-                        @auth
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button
-                                    type="submit"
-                                    class="sidebar-nav-item w-full text-left text-brand-red/70 hover:bg-red-50 hover:text-brand-red"
-                                >
-                                    <x-icon name="log-out" class="size-4 shrink-0" />
-                                    <span>Logout</span>
-                                </button>
-                            </form>
-                        @else
+                        @guest
                             <a href="{{ route('login') }}" class="sidebar-nav-item">
                                 <x-icon name="log-in" class="size-4 shrink-0" />
                                 <span>Masuk</span>
                             </a>
-                        @endauth
+                        @endguest
                     </div>
                 </nav>
             </aside>
@@ -182,10 +132,10 @@
             {{-- =====================================================
                  MAIN CONTENT AREA (Offset by fixed sidebar on desktop)
                  ===================================================== --}}
-            <div class="flex flex-1 flex-col min-w-0 lg:pl-[240px]">
+            <div class="flex min-w-0 flex-1 flex-col lg:pl-[252px]">
 
                 {{-- TOPBAR --}}
-                <header class="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-sm sm:px-6">
+                <header class="sticky top-0 z-20 flex min-h-[4rem] shrink-0 items-center gap-3 border-b border-zinc-200 bg-white/92 px-4 sm:px-6">
 
                     {{-- Mobile sidebar toggle --}}
                     <button
@@ -198,9 +148,12 @@
                     </button>
 
                     {{-- Page title from slot --}}
-                    @isset($topbarTitle)
-                        <h1 class="truncate text-sm font-semibold text-zinc-800">{{ $topbarTitle }}</h1>
-                    @endisset
+                    <div class="min-w-0">
+                        @isset($topbarTitle)
+                            <h1 class="truncate text-sm font-semibold text-zinc-800">{{ $topbarTitle }}</h1>
+                        @endisset
+                        <p class="text-[11px] text-zinc-400">Internal workspace</p>
+                    </div>
 
                     <div class="ml-auto flex items-center gap-2">
                         {{-- User Dropdown Menu --}}
@@ -209,7 +162,7 @@
                                 <button
                                     type="button"
                                     @click="userMenuOpen = !userMenuOpen"
-                                    class="flex items-center gap-2 rounded-full p-1 text-left transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1"
+                                    class="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-2 py-1.5 pr-3 text-left transition hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1"
                                 >
                                     <div class="inline-flex size-8 items-center justify-center rounded-full bg-amber-400 font-bold text-brand-black shadow-xs text-xs">
                                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -234,69 +187,26 @@
                                     x-transition:leave="transition ease-in duration-75"
                                     x-transition:leave-start="transform opacity-100 scale-100"
                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-lg z-50"
+                                    class="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-[1.25rem] border border-zinc-200 bg-white p-2 shadow-lg"
                                     x-cloak
                                 >
                                     {{-- User info header --}}
                                     <div class="border-b border-zinc-100 px-3 py-2.5">
-                                        <p class="text-xs font-bold text-zinc-900">{{ auth()->user()->name }}</p>
-                                        <p class="truncate text-[11px] text-zinc-500">{{ auth()->user()->email }}</p>
-                                        <div class="mt-1.5 inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 border border-amber-200/60">
+                                        <p class="text-sm font-semibold text-zinc-950">{{ auth()->user()->name }}</p>
+                                        <p class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</p>
+                                        <div class="mt-2 inline-flex items-center gap-1 rounded-lg border border-amber-200/70 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
                                             <span>Status:</span>
                                             <span class="uppercase">{{ auth()->user()->isAdmin() ? 'ADMIN' : (auth()->user()->customerStatus() ?: 'PENDING') }}</span>
                                         </div>
                                     </div>
 
-                                    {{-- Menu links --}}
-                                    <div class="py-1">
-                                        <a
-                                            href="{{ route('account.dashboard') }}"
-                                            wire:navigate
-                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100"
-                                        >
-                                            <x-icon name="user-circle" class="size-4 text-zinc-400" />
-                                            <span>Pengaturan Akun</span>
-                                        </a>
-
-                                        @if(auth()->user()->isActiveCustomer())
-                                            <a
-                                                href="{{ route('orders.index') }}"
-                                                wire:navigate
-                                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100"
-                                            >
-                                                <x-icon name="package" class="size-4 text-zinc-400" />
-                                                <span>Riwayat Pesanan</span>
-                                            </a>
-                                        @endif
-
-                                        @if(auth()->user()->isAdmin())
-                                            <a
-                                                href="{{ route('admin.customers.index') }}"
-                                                wire:navigate
-                                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100"
-                                            >
-                                                <x-icon name="users" class="size-4 text-zinc-400" />
-                                                <span>Review Pelanggan</span>
-                                            </a>
-                                        @endif
-
-                                        <a
-                                            href="{{ route('home') }}"
-                                            wire:navigate
-                                            class="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100"
-                                        >
-                                            <x-icon name="store" class="size-4 text-zinc-400" />
-                                            <span>Kembali ke Storefront</span>
-                                        </a>
-                                    </div>
-
                                     {{-- Logout action --}}
-                                    <div class="border-t border-zinc-100 pt-1">
+                                    <div class="pt-2">
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
                                             <button
                                                 type="submit"
-                                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                                             >
                                                 <x-icon name="log-out" class="size-4 text-red-500" />
                                                 <span>Keluar (Sign Out)</span>

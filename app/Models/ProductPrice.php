@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductPrice extends Model
 {
     public const RETAIL = 'ECERAN';
+
     public const BULK = 'PARTAI';
+
     public const WHOLESALE = 'GROSIR';
 
     protected $fillable = [

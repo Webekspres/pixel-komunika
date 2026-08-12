@@ -60,4 +60,44 @@ class Product extends Model
     {
         return $this->hasOne(InventorySnapshot::class);
     }
+
+    public function listPriceAmount(): ?float
+    {
+        $prices = $this->relationLoaded('prices')
+            ? $this->prices
+            : $this->prices()->get();
+
+        $byType = $prices->keyBy('price_type');
+
+        $grosir = $byType->get(ProductPrice::WHOLESALE);
+        if ($grosir) {
+            return (float) $grosir->amount;
+        }
+
+        $partai = $byType->get(ProductPrice::BULK);
+
+        return $partai ? (float) $partai->amount : null;
+    }
+
+    public function partaiPriceAmount(): ?float
+    {
+        $prices = $this->relationLoaded('prices')
+            ? $this->prices
+            : $this->prices()->get();
+
+        $partai = $prices->firstWhere('price_type', ProductPrice::BULK);
+
+        return $partai ? (float) $partai->amount : null;
+    }
+
+    public function grosirMinimumQuantity(): ?int
+    {
+        $prices = $this->relationLoaded('prices')
+            ? $this->prices
+            : $this->prices()->get();
+
+        $grosir = $prices->firstWhere('price_type', ProductPrice::WHOLESALE);
+
+        return $grosir?->minimum_quantity;
+    }
 }

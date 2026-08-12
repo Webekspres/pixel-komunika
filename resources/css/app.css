@@ -131,7 +131,7 @@
 
 /* Product Card */
 @utility product-card {
-    @apply relative overflow-hidden rounded-2xl border border-brand-black/8 bg-white transition-all duration-300;
+    @apply relative overflow-hidden rounded-[2rem] border border-brand-black/8 bg-white transition-all duration-300;
     box-shadow: var(--shadow-card);
 }
 
@@ -163,11 +163,25 @@
 
 /* Container sizes */
 @utility container-2xl {
-    @apply mx-auto w-full max-w-screen-2xl px-5 sm:px-8 lg:px-12;
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-14;
 }
 
 @utility container-lg {
-    @apply mx-auto w-full max-w-6xl px-5 sm:px-8 lg:px-10;
+    @apply mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8 xl:px-10;
+}
+
+@utility storefront-panel {
+    @apply rounded-[2rem] border border-brand-black/8 bg-white;
+    box-shadow: var(--shadow-card);
+}
+
+@utility storefront-panel-soft {
+    @apply rounded-[2rem] border border-brand-black/8 bg-white/88 backdrop-blur-sm;
+    box-shadow: var(--shadow-card);
+}
+
+@utility storefront-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-brand-black/10 bg-white/70 px-3 py-1.5 text-[11px] font-semibold text-brand-black/70 backdrop-blur-sm;
 }
 
 /* ============================================
@@ -185,10 +199,10 @@ html {
 
 /* Sidebar transition */
 .sidebar-nav-item {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150;
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150;
     @apply text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900;
 }
 
 .sidebar-nav-item.active {
-    @apply bg-amber-50 text-amber-700;
+    @apply bg-brand-black text-white shadow-sm;
 }

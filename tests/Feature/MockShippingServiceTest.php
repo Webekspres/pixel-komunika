@@ -3,7 +3,7 @@
 use App\Services\Shipping\MockBiteshipShippingService;
 
 it('calculates mock shipping rates correctly based on weight and destination', function () {
-    $service = new MockBiteshipShippingService();
+    $service = new MockBiteshipShippingService;
 
     $ratesJakarta = $service->calculateRates('Jakarta Selatan', 1500);
     expect($ratesJakarta)->not->toBeEmpty();

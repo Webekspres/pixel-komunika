@@ -14,6 +14,7 @@ use Livewire\Component;
 class Checkout extends Component
 {
     public ?int $selectedAddressId = null;
+
     public ?string $selectedCourierKey = null;
 
     public function mount(CartService $cartService, ShippingCalculatorInterface $shippingService)
@@ -45,20 +46,22 @@ class Checkout extends Component
 
         $availableRates = $shippingService->calculateRates($address->city_name, $summary['total_weight_grams']);
         $selectedRate = collect($availableRates)->first(function ($rate) {
-            return ($rate['code'] . ':' . $rate['service']) === $this->selectedCourierKey;
+            return ($rate['code'].':'.$rate['service']) === $this->selectedCourierKey;
         });
 
         if (! $selectedRate) {
             session()->flash('error', 'Pilihan ekspedisi tidak valid.');
+
             return;
         }
 
         try {
             $order = $orderService->createOrderFromCart($user, $cart, $address, $selectedRate);
             session()->flash('success', "Pesanan {$order->order_number} berhasil dibuat!");
+
             return redirect()->route('orders.show', $order);
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal membuat pesanan: ' . $e->getMessage());
+            session()->flash('error', 'Gagal membuat pesanan: '.$e->getMessage());
         }
     }
 
@@ -79,12 +82,12 @@ class Checkout extends Component
             );
             if (empty($this->selectedCourierKey) && ! empty($shippingRates)) {
                 $first = $shippingRates[0];
-                $this->selectedCourierKey = $first['code'] . ':' . $first['service'];
+                $this->selectedCourierKey = $first['code'].':'.$first['service'];
             }
         }
 
         $selectedRate = collect($shippingRates)->first(function ($rate) {
-            return ($rate['code'] . ':' . $rate['service']) === $this->selectedCourierKey;
+            return ($rate['code'].':'.$rate['service']) === $this->selectedCourierKey;
         });
 
         $shippingCost = $selectedRate ? (float) $selectedRate['cost'] : 0;

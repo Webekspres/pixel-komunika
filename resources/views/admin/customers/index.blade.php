@@ -4,9 +4,9 @@
         description="Review pendaftaran pelanggan, cek status verifikasi, dan jalankan approval dari satu pola list internal."
     >
         <div class="grid gap-4 md:grid-cols-3">
-            <x-ui.stat-card label="Total di halaman ini" :value="(string) $customers->count()" />
-            <x-ui.stat-card label="Filter status" :value="$selectedStatus ?: 'Semua'" />
-            <x-ui.stat-card label="Keyword" :value="$search !== '' ? $search : '-'" description="Cari nama, email, phone, atau nama usaha." />
+            <x-ui.stat-card label="Total di halaman ini" :value="(string) $customers->count()" icon="users" variant="admin" />
+            <x-ui.stat-card label="Filter status" :value="$selectedStatus ?: 'Semua'" icon="funnel" variant="admin" />
+            <x-ui.stat-card label="Keyword" :value="$search !== '' ? $search : '-'" description="Cari nama, email, phone, atau nama usaha." icon="search" variant="admin" />
         </div>
 
         <x-ui.filter-bar>
@@ -43,7 +43,7 @@
                 icon="users"
             />
         @else
-            <x-ui.section-card title="Daftar customer" description="Pola list ini bisa dipakai ulang untuk modul products, orders, payments, dan reports.">
+            <x-ui.section-card title="Daftar customer" description="Review pendaftaran, lihat konteks usaha, dan jalankan approval dari list yang lebih terstruktur." variant="admin">
                 <flux:table :paginate="$customers" container:class="overflow-x-auto">
                     <flux:table.columns>
                         <flux:table.column>Customer</flux:table.column>

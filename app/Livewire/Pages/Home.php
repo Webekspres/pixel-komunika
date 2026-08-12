@@ -13,6 +13,7 @@ use Livewire\Component;
 class Home extends Component
 {
     public string $selectedCategory = 'all';
+
     public string $search = '';
 
     public function addToCart(int $productId, CartService $cartService)
@@ -39,16 +40,16 @@ class Home extends Component
 
         $categories = Category::all();
 
-        $query = Product::with(['category', 'enrichment', 'latestPrice', 'inventorySnapshot']);
+        $query = Product::with(['category', 'enrichment', 'prices', 'inventorySnapshot']);
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);
         }
 
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
-                  ->orWhere('sku', 'like', "%{$this->search}%");
+                    ->orWhere('sku', 'like', "%{$this->search}%");
             });
         }
 

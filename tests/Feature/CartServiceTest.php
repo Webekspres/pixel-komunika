@@ -43,4 +43,4 @@ it('throws exception if quantity added exceeds available stock', function () {
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
 
     $cartService->addItem($cart, $product->id, 9999);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);

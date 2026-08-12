@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class InventorySnapshot extends Model
 {
     public const AVAILABLE = 'TERSEDIA';
+
     public const LOW = 'MENIPIS';
+
     public const OUT = 'HABIS';
 
     protected $fillable = [

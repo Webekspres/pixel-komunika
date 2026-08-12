@@ -1,4 +1,9 @@
 <x-layout.app-page>
+    <x-storefront.breadcrumb :items="[
+        ['label' => 'Riwayat Pesanan', 'href' => route('orders.index')],
+        ['label' => $order->order_number, 'href' => null],
+    ]" />
+
     <x-ui.page-header
         eyebrow="Pesanan #{{ $order->order_number }}"
         title="Detail Pesanan & Invoice"
@@ -9,7 +14,7 @@
         <div class="lg:col-span-2 space-y-6">
             <!-- Summary Info Card -->
             <x-ui.section-card title="Informasi Pesanan">
-                <div class="grid gap-4 sm:grid-cols-2 text-sm">
+                <div class="grid gap-4 text-sm sm:grid-cols-2">
                     <div>
                         <p class="text-zinc-500">Nomor Order:</p>
                         <p class="font-bold text-zinc-900">{{ $order->order_number }}</p>
@@ -35,12 +40,12 @@
 
             <!-- Shipping Address -->
             <x-ui.section-card title="Tujuan Pengiriman">
-                <div class="text-sm space-y-1">
+                <div class="space-y-1 text-sm">
                     <p class="font-bold text-zinc-900">{{ $order->recipient_name }} ({{ $order->recipient_phone }})</p>
                     <p class="text-zinc-700">{{ $order->shipping_address_line }}</p>
                     <p class="text-zinc-600">{{ $order->shipping_district }}, {{ $order->shipping_city }}, {{ $order->shipping_province }} {{ $order->shipping_postal_code }}</p>
                     <div class="pt-2">
-                        <span class="inline-block px-3 py-1 bg-zinc-100 text-zinc-800 font-semibold text-xs rounded-lg">
+                        <span class="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-800">
                             Ekspedisi: {{ strtoupper($order->courier_code) }} - {{ $order->courier_service }}
                         </span>
                     </div>
@@ -124,7 +129,7 @@
                         <flux:input label="Jumlah Transfer (Rp)" wire:model="amount" type="number" required />
                         <div>
                             <flux:label>File Bukti Pembayaran (Gambar / PDF max 5MB)</flux:label>
-                            <input type="file" wire:model="proof_file" class="mt-1 block w-full text-xs text-zinc-600 border border-zinc-300 rounded-lg p-2" required />
+                            <input type="file" wire:model="proof_file" class="mt-1 block w-full rounded-2xl border border-brand-black/10 p-3 text-xs text-zinc-600" required />
                             @error('proof_file') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                         </div>
 

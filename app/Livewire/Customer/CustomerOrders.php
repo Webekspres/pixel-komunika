@@ -20,6 +20,6 @@ class CustomerOrders extends Component
 
         return view('livewire.customer.customer-orders', [
             'orders' => $orders,
-        ])->layout('layouts.app');
+        ])->layout('components.layouts.customer');
     }
 }

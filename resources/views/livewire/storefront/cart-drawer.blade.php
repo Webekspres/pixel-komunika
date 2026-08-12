@@ -29,21 +29,27 @@
         x-transition:leave="transition transform duration-250 ease-in"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="translate-x-full"
-        class="fixed inset-y-0 right-0 z-50 hidden md:flex w-full max-w-md xl:max-w-lg flex-col bg-white shadow-2xl border-l border-zinc-200"
+        class="fixed inset-y-0 right-0 z-50 hidden w-full max-w-md flex-col border-l border-brand-black/8 bg-white md:flex xl:max-w-lg"
         x-cloak
     >
         {{-- Header --}}
-        <div class="flex items-center justify-between border-b border-zinc-200 p-5">
-            <div class="flex items-center gap-2">
-                <x-icon name="shopping-cart" class="size-5 text-zinc-900" />
-                <h3 class="font-bold text-zinc-900 text-lg">Keranjang Belanja</h3>
-                <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">
-                    {{ $summary['total_items'] }}
-                </span>
+        <div class="border-b border-brand-black/8 bg-brand-yellow-muted/45 p-5">
+            <div class="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/40">
+                <span class="inline-block h-px w-8 bg-brand-yellow"></span>
+                mini checkout
             </div>
-            <button @click="isOpen = false" class="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors">
-                <x-icon name="x" class="size-5" />
-            </button>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <x-icon name="shopping-cart" class="size-5 text-zinc-900" />
+                    <h3 class="text-lg font-bold text-zinc-900">Keranjang Belanja</h3>
+                    <span class="rounded-full bg-brand-yellow px-2.5 py-0.5 text-xs font-bold text-brand-black">
+                        {{ $summary['total_items'] }}
+                    </span>
+                </div>
+                <button @click="isOpen = false" class="rounded-full p-2 text-zinc-400 transition-colors hover:bg-white hover:text-zinc-700">
+                    <x-icon name="x" class="size-5" />
+                </button>
+            </div>
         </div>
 
         {{-- Cart Items Scrollable List --}}
@@ -61,7 +67,7 @@
                 </div>
             @else
                 @foreach ($summary['items'] as $item)
-                    <div class="flex gap-4 p-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/50">
+                    <div class="flex gap-4 rounded-[1.6rem] border border-brand-black/8 bg-zinc-50/70 p-3">
                         <div class="size-16 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
                             <x-icon name="package" class="size-8 text-zinc-400" />
                         </div>
@@ -77,7 +83,7 @@
                             </div>
 
                             <div class="flex items-center justify-between pt-2">
-                                <div class="flex items-center border border-zinc-300 rounded-lg overflow-hidden bg-white">
+                                <div class="flex items-center overflow-hidden rounded-xl border border-brand-black/10 bg-white">
                                     <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})" class="px-2 py-0.5 text-zinc-600 hover:bg-zinc-100 font-bold text-xs">-</button>
                                     <span class="px-2.5 py-0.5 font-bold text-zinc-800 text-xs">{{ $item['quantity'] }}</span>
                                     <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})" class="px-2 py-0.5 text-zinc-600 hover:bg-zinc-100 font-bold text-xs">+</button>
@@ -94,7 +100,7 @@
 
         {{-- Footer Summary & Actions --}}
         @if ($summary['items']->isNotEmpty())
-            <div class="border-t border-zinc-200 p-5 bg-white space-y-4">
+            <div class="space-y-4 border-t border-brand-black/8 bg-white p-5">
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between text-zinc-500">
                         <span>Subtotal Produk</span>
@@ -115,7 +121,7 @@
                         href="{{ route('cart.index') }}"
                         wire:navigate
                         @click="isOpen = false"
-                        class="inline-flex items-center justify-center rounded-xl bg-zinc-100 py-3 text-xs font-bold text-zinc-800 hover:bg-zinc-200 transition-colors"
+                        class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 py-3 text-xs font-bold text-zinc-800 transition-colors hover:bg-zinc-200"
                     >
                         Halaman Keranjang
                     </a>
@@ -126,19 +132,19 @@
                                 href="{{ route('checkout.index') }}"
                                 wire:navigate
                                 @click="isOpen = false"
-                                class="inline-flex items-center justify-center rounded-xl bg-amber-400 py-3 text-xs font-bold text-brand-black hover:bg-amber-300 transition-colors shadow-xs"
+                                class="inline-flex items-center justify-center rounded-2xl bg-brand-black py-3 text-xs font-bold text-brand-white transition-colors hover:bg-brand-black/88 shadow-xs"
                             >
                                 Checkout Sekarang
                             </a>
                         @else
-                            <button disabled class="inline-flex items-center justify-center rounded-xl bg-zinc-200 py-3 text-xs font-bold text-zinc-500 cursor-not-allowed">
+                            <button disabled class="inline-flex cursor-not-allowed items-center justify-center rounded-2xl bg-zinc-200 py-3 text-xs font-bold text-zinc-500">
                                 Menunggu Verifikasi
                             </button>
                         @endif
                     @else
                         <a
                             href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center rounded-xl bg-zinc-900 py-3 text-xs font-bold text-white hover:bg-zinc-800 transition-colors"
+                            class="inline-flex items-center justify-center rounded-2xl bg-brand-yellow py-3 text-xs font-bold text-brand-black transition-colors hover:bg-brand-yellow-soft"
                         >
                             Login Checkout
                         </a>
@@ -159,17 +165,17 @@
         x-transition:leave="transition transform duration-250 ease-in"
         x-transition:leave-start="translate-y-0"
         x-transition:leave-end="translate-y-full"
-        class="fixed inset-x-0 bottom-0 z-50 md:hidden flex flex-col bg-white rounded-t-3xl shadow-2xl max-h-[90vh]"
+        class="fixed inset-x-0 bottom-0 z-50 flex max-h-[90vh] flex-col rounded-t-3xl bg-white shadow-2xl md:hidden"
         x-cloak
     >
         {{-- Touch Pill & Header --}}
-        <div class="flex flex-col items-center pt-3 pb-2 border-b border-zinc-100">
+        <div class="flex flex-col items-center border-b border-brand-black/8 bg-brand-yellow-muted/45 pb-2 pt-3">
             <div class="w-12 h-1.5 bg-zinc-300 rounded-full mb-3"></div>
             <div class="flex items-center justify-between w-full px-5">
                 <div class="flex items-center gap-2">
                     <x-icon name="shopping-cart" class="size-5 text-zinc-900" />
                     <h3 class="font-bold text-zinc-900 text-base">Keranjang Belanja</h3>
-                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
+                    <span class="rounded-full bg-brand-yellow px-2 py-0.5 text-xs font-bold text-brand-black">
                         {{ $summary['total_items'] }}
                     </span>
                 </div>
@@ -219,7 +225,7 @@
 
         {{-- Mobile Sticky Checkout Summary --}}
         @if ($summary['items']->isNotEmpty())
-            <div class="sticky bottom-0 bg-white border-t border-zinc-200 p-4 space-y-3 shadow-lg">
+            <div class="sticky bottom-0 space-y-3 border-t border-brand-black/8 bg-white p-4 shadow-lg">
                 <div class="flex justify-between text-xs font-bold text-zinc-900">
                     <span>Total Estimasi:</span>
                     <span class="text-amber-700 text-sm">Rp {{ number_format($summary['subtotal'] + $summary['pph22'], 0, ',', '.') }}</span>
@@ -230,7 +236,7 @@
                         href="{{ route('cart.index') }}"
                         wire:navigate
                         @click="isOpen = false"
-                        class="inline-flex items-center justify-center rounded-xl bg-zinc-100 py-3 text-xs font-bold text-zinc-800 text-center"
+                        class="inline-flex items-center justify-center rounded-xl bg-zinc-100 py-3 text-center text-xs font-bold text-zinc-800"
                     >
                         Keranjang Full
                     </a>
@@ -241,7 +247,7 @@
                                 href="{{ route('checkout.index') }}"
                                 wire:navigate
                                 @click="isOpen = false"
-                                class="inline-flex items-center justify-center rounded-xl bg-amber-400 py-3 text-xs font-bold text-brand-black text-center shadow-xs"
+                                class="inline-flex items-center justify-center rounded-xl bg-brand-black py-3 text-center text-xs font-bold text-brand-white shadow-xs"
                             >
                                 Checkout
                             </a>
@@ -249,7 +255,7 @@
                     @else
                         <a
                             href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center rounded-xl bg-zinc-900 py-3 text-xs font-bold text-white text-center"
+                            class="inline-flex items-center justify-center rounded-xl bg-brand-yellow py-3 text-center text-xs font-bold text-brand-black"
                         >
                             Login
                         </a>

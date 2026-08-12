@@ -8,26 +8,26 @@
     'actionLabel' => null,
 ])
 
-<div {{ $attributes->class('flex flex-col items-center py-16 text-center') }}>
+<div {{ $attributes->class('storefront-panel-soft flex flex-col items-center px-6 py-14 text-center sm:px-8 sm:py-16') }}>
     @if ($mascot)
         <img
             src="{{ asset('assets/mascot/Maskot-base.webp') }}"
             alt="Pixel Komunika Mascot"
-            class="mb-6 h-32 w-auto opacity-60"
+            class="mb-6 h-32 w-auto opacity-80"
             width="128"
             height="128"
             loading="lazy"
         >
     @else
-        <div class="mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-zinc-100">
-            <x-icon :name="$icon" class="size-7 text-zinc-400" />
+        <div class="mb-6 inline-flex size-16 items-center justify-center rounded-[1.4rem] bg-brand-yellow/20 text-brand-black">
+            <x-icon :name="$icon" class="size-7 text-brand-black/75" />
         </div>
     @endif
 
-    <h3 class="text-base font-semibold text-zinc-800">{{ $title }}</h3>
+    <h3 class="text-lg font-bold text-brand-black">{{ $title }}</h3>
 
     @if ($description)
-        <p class="mt-2 max-w-sm text-sm leading-relaxed text-zinc-500">{{ $description }}</p>
+        <p class="mt-2 max-w-md text-sm leading-relaxed text-brand-black/60">{{ $description }}</p>
     @endif
 
     @if (isset($action))

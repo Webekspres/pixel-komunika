@@ -1,4 +1,6 @@
 <x-layout.app-page>
+    <x-storefront.breadcrumb :items="[['label' => 'Riwayat Pesanan', 'href' => null]]" />
+
     <x-ui.page-header
         eyebrow="Akun Pelanggan"
         title="Riwayat Pesanan"
@@ -10,17 +12,18 @@
             title="Belum Ada Pesanan"
             description="Anda belum pernah membuat pesanan di Pixel Komunika."
             icon="shopping-bag"
+            mascot
         />
         <div class="mt-6 text-center">
-            <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-xl bg-[#F8B818] px-6 py-3 font-semibold text-[#181818] hover:bg-[#F8D820] transition-all shadow-sm">
+            <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-full bg-brand-black px-6 py-3 font-semibold text-white transition-all hover:bg-brand-black/88">
                 Jelajahi Produk
             </a>
         </div>
     @else
         <div class="space-y-4">
             @foreach ($orders as $order)
-                <div class="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 pb-3">
+                <div class="storefront-panel space-y-4 p-6">
+                    <div class="flex flex-col gap-2 border-b border-zinc-100 pb-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <span class="font-bold text-zinc-900 text-lg">{{ $order->order_number }}</span>
                             <span class="text-xs text-zinc-500 ml-2">• {{ $order->created_at->format('d M Y H:i') }}</span>
@@ -46,13 +49,13 @@
                         @endforeach
                     </div>
 
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-zinc-100 gap-4">
+                    <div class="flex flex-col gap-4 border-t border-zinc-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="text-sm">
                             <span class="text-zinc-500">Total Tagihan:</span>
                             <span class="font-bold text-amber-800 text-lg ml-1">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
                         </div>
                         <div>
-                            <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-4 py-2 text-xs font-bold text-white hover:bg-zinc-800 transition-all">
+                            <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center justify-center rounded-full bg-brand-black px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-brand-black/88">
                                 Lihat Detail Order & Invoice
                             </a>
                         </div>

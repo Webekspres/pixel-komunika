@@ -9,6 +9,7 @@ use App\Models\InventorySnapshot;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderReturn;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -35,6 +36,7 @@ class OrderService
         $shippingCost = (float) ($shippingOption['cost'] ?? 0);
         $subtotal = (float) $summary['subtotal'];
         $taxPph22 = (float) $summary['pph22'];
+        $taxPph22Snapshot = $summary['pph22_components'] ?? [];
         $grandTotal = $subtotal + $shippingCost + $taxPph22;
 
         return DB::transaction(function () use (
@@ -45,6 +47,7 @@ class OrderService
             $summary,
             $subtotal,
             $taxPph22,
+            $taxPph22Snapshot,
             $shippingCost,
             $grandTotal
         ) {
@@ -71,6 +74,7 @@ class OrderService
                 'shipping_cost' => $shippingCost,
                 'subtotal' => $subtotal,
                 'tax_pph22' => $taxPph22,
+                'tax_pph22_snapshot' => $taxPph22Snapshot,
                 'grand_total' => $grandTotal,
                 'expires_at' => now()->addHours(24),
             ]);
@@ -98,7 +102,7 @@ class OrderService
                 if ($snapshot) {
                     $qtyBefore = $snapshot->quantity_available;
                     $qtyAfter = max(0, $qtyBefore - $qty);
-                    
+
                     $status = InventorySnapshot::AVAILABLE;
                     if ($qtyAfter == 0) {
                         $status = InventorySnapshot::OUT;
@@ -132,6 +136,10 @@ class OrderService
                 'invoice_number' => $invoiceNumber,
                 'order_id' => $order->id,
                 'user_id' => $user->id,
+                'store_name' => config('store.name'),
+                'store_address' => config('store.address'),
+                'store_phone' => config('store.phone'),
+                'store_npwp' => config('store.npwp'),
                 'subtotal' => $subtotal,
                 'tax_pph22' => $taxPph22,
                 'shipping_cost' => $shippingCost,
@@ -202,13 +210,13 @@ class OrderService
     /**
      * Request an order return from customer.
      */
-    public function requestReturn(Order $order, User $user, string $reason): \App\Models\OrderReturn
+    public function requestReturn(Order $order, User $user, string $reason): OrderReturn
     {
         if ($order->status !== 'completed' && $order->status !== 'shipped') {
-            throw new InvalidArgumentException("Retur hanya dapat diajukan untuk order yang sudah dikirim atau selesai.");
+            throw new InvalidArgumentException('Retur hanya dapat diajukan untuk order yang sudah dikirim atau selesai.');
         }
 
-        return \App\Models\OrderReturn::create([
+        return OrderReturn::create([
             'order_id' => $order->id,
             'user_id' => $user->id,
             'reason' => $reason,
@@ -219,7 +227,7 @@ class OrderService
     /**
      * Admin processes a return request (approve/reject).
      */
-    public function processReturn(\App\Models\OrderReturn $return, string $action, ?float $refundAmount, User $admin, ?string $adminNotes = null): void
+    public function processReturn(OrderReturn $return, string $action, ?float $refundAmount, User $admin, ?string $adminNotes = null): void
     {
         DB::transaction(function () use ($return, $action, $refundAmount, $admin, $adminNotes) {
             if ($action === 'approve') {

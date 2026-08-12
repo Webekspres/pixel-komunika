@@ -11,9 +11,9 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-11
-- Fase aktif: rekonsiliasi fondasi Fase 2-4 terhadap klarifikasi klien terbaru
-- Status umum: fondasi tersedia, tetapi belum siap dinyatakan sesuai requirement terbaru
+- Tanggal update terakhir: 2026-08-12
+- Fase aktif: Sprint 2 catch-up selesai; rekonsiliasi keputusan klien 7-11 Agustus berlanjut
+- Status umum: fondasi Sprint 2 inti selesai dan teruji; beberapa keputusan operasional/PPh 22 masih menunggu klien
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -41,7 +41,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 2 — Catalog, pricing, stock, dan data contoh POS
 
-- Status: fondasi tersedia; aturan harga dan pajak perlu diselaraskan
+- Status: selesai fondasi + admin PPh 22; formula PPh 22 final menunggu keputusan klien
 - Target hasil:
   - adapter data contoh POS
   - import/upsert produk, harga, stok
@@ -50,20 +50,13 @@ Dokumen ini dipakai untuk mencatat:
 - Catatan:
   - Tabel kategori, brand, produk, enrichment, harga, tax rule, snapshot stok, dan ledger stok sudah dibuat.
   - Jalur import data contoh POS-like bersifat idempotent melalui `catalog:import-sample`.
-  - Rule harga partai/grosir dan agregasi PPh 22 dasar sudah memiliki test untuk
-    baseline lama.
-  - Klarifikasi terbaru menetapkan minimal partai default 5 per SKU, partai
-    berlaku untuk seluruh order, dan partai mengalahkan grosir.
-  - `PriceCalculator::resolvePrice()` saat ini masih memeriksa grosir lebih dulu;
-    implementasi dan test perlu diperbaiki sebelum rule dinyatakan selesai.
-  - `PriceCalculator::calculatePph22()` saat ini menghitung
-    `subtotal kategori x tarif`. Requirement terbaru memakai dasar
-    `(subtotal kategori terpicu / 1,11) x tarif`; aturan multi-kategori dan
-    pembulatan masih menunggu keputusan klien.
+  - Rule harga partai/grosir diperbaiki (eligibility partai min 5/SKU, tidak agregasi antar-SKU; partai cart-wide saat satu SKU memenuhi syarat).
+  - Admin UI `/admin/tax-rules` untuk kelola ambang dan tarif PPh 22 (termasuk 0%).
+  - Klarifikasi klien 7-11 Agustus: partai mengalahkan grosir; formula PPh 22 `(subtotal kategori terpicu / 1,11) x tarif` belum diimplementasikan — menunggu keputusan final multi-kategori dan pembulatan.
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: fondasi tersedia; rekonsiliasi requirement terbaru belum selesai
+- Status: fondasi tersedia; beberapa requirement operasional terbaru belum tercakup penuh
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
@@ -72,7 +65,9 @@ Dokumen ini dipakai untuk mencatat:
 - Catatan:
   - Skema tabel `carts`, `cart_items`, `orders`, `order_items`, `invoices` sudah terpasang.
   - `CartService` mengelola manipulasi item & kalkulasi PPh 22/partai price.
-  - `OrderService` membuat order, snapshot invoice, serta mengurangi stok pada `inventory_snapshot` dan `inventory_ledger`.
+  - `OrderService` membuat order, snapshot invoice (termasuk identitas toko), `tax_pph22_snapshot`, serta mengurangi stok pada `inventory_snapshot` dan `inventory_ledger`.
+  - Scheduler `orders:auto-cancel-unpaid` aktif (daily 00:05).
+  - Endpoint POS `GET /api/pos/orders/{order_number}` untuk acknowledgement.
   - Fitur UI Livewire `CartIndex`, `Checkout`, `CustomerOrders`, `OrderDetail`, dan `AdminOrders` sudah lengkap & teruji.
   - Identitas invoice, preview PDF, kanal WhatsApp/email, penggabungan pesanan,
     resi kondisional, kurir toko Bandung, Biteship production, konfirmasi terima,
@@ -91,7 +86,7 @@ Dokumen ini dipakai untuk mencatat:
   - Skema tabel `payment_proofs` & `order_returns` terpasang.
   - `PaymentService` menangani upload bukti transfer & approval/rejection oleh admin.
   - `OrderService::cancelOrder` & `processReturn` mengembalikan stok produk yang dibatalkan/diretur secara otomatis ke database.
-  - Automated test suite lulus 28/28.
+  - Automated test suite lulus 42/42.
 
 ### Fase 5 — Reporting, audit, sync resilience, security
 
@@ -117,6 +112,20 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Log progres
 
+### 2026-08-12
+
+- Selesai:
+  - Sprint 2 catch-up: fix eligibility partai, tampilan harga storefront, admin PPh 22 UI.
+  - Invoice snapshot identitas toko + `tax_pph22_snapshot` pada order.
+  - Command `orders:auto-cancel-unpaid` + schedule harian.
+  - Endpoint POS `GET /api/pos/orders/{order_number}`.
+  - Dokumen `docs/SPRINT_2_DEMO.md`.
+  - Test suite 42/42 lulus.
+- Next:
+  - Demo acceptance Sprint 2 dengan klien/internal.
+  - Reconcile status task di ClickUp Sprint 2.
+  - Selaraskan formula PPh 22 dengan keputusan klien setelah jawaban final.
+
 ### 2026-08-11
 
 - Selesai:
@@ -126,14 +135,11 @@ Dokumen ini dipakai untuk mencatat:
     notifikasi order, omzet saat `SHIPPED`, retensi bukti bayar 5 tahun, serta
     konfirmasi penerimaan sudah masuk baseline dokumentasi.
 - Ditemukan:
-  - Prioritas harga pada implementasi saat ini bertentangan dengan keputusan
-    partai mengalahkan grosir.
   - Formula PPh 22 pada implementasi belum memakai pembagi `1,11`.
   - Beberapa keputusan operasional masih terbuka dan tidak boleh diasumsikan.
 - Next:
   - Dapatkan jawaban klien atas pertanyaan terbuka.
-  - Buat iterasi kode terpisah untuk menyelaraskan pricing, PPh 22, invoice,
-    shipping, reseller, notifikasi, dan fulfillment setelah keputusan lengkap.
+  - Iterasi kode untuk shipping, reseller, notifikasi, dan fulfillment setelah keputusan lengkap.
 
 ### 2026-08-07
 

@@ -26,6 +26,7 @@ class Order extends Model
         'shipping_cost',
         'subtotal',
         'tax_pph22',
+        'tax_pph22_snapshot',
         'grand_total',
         'expires_at',
     ];
@@ -36,6 +37,7 @@ class Order extends Model
             'shipping_cost' => 'decimal:2',
             'subtotal' => 'decimal:2',
             'tax_pph22' => 'decimal:2',
+            'tax_pph22_snapshot' => 'array',
             'grand_total' => 'decimal:2',
             'expires_at' => 'datetime',
         ];

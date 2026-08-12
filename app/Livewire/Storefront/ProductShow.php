@@ -5,17 +5,17 @@ namespace App\Livewire\Storefront;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
 class ProductShow extends Component
 {
     public Product $product;
+
     public int $quantity = 1;
 
     public function mount(Product $product)
     {
-        $this->product = $product->load(['category', 'brand', 'enrichment', 'latestPrice', 'inventorySnapshot']);
+        $this->product = $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot']);
     }
 
     public function incrementQuantity()
@@ -56,7 +56,7 @@ class ProductShow extends Component
         $cartSummary = $cartService->getCartSummary($cart);
 
         // Fetch related products in same category
-        $relatedProducts = Product::with(['category', 'latestPrice', 'inventorySnapshot'])
+        $relatedProducts = Product::with(['category', 'prices', 'inventorySnapshot'])
             ->where('category_id', $this->product->category_id)
             ->where('id', '!=', $this->product->id)
             ->take(4)
@@ -66,7 +66,7 @@ class ProductShow extends Component
             'relatedProducts' => $relatedProducts,
             'cartCount' => $cartSummary['total_items'],
         ])
-        ->layout('layouts.guest')
-        ->title("{$this->product->name} - Pixel Komunika");
+            ->layout('layouts.guest')
+            ->title("{$this->product->name} - Pixel Komunika");
     }
 }

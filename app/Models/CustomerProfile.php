@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CustomerProfile extends Model
 {
     public const PENDING = 'PENDING_VERIFICATION';
+
     public const ACTIVE = 'ACTIVE';
+
     public const REJECTED = 'REJECTED';
+
     public const SUSPENDED = 'SUSPENDED';
 
     protected $fillable = [

@@ -12,8 +12,8 @@
         default => 'text-3xl font-bold tracking-tight text-brand-black sm:text-4xl',
     };
     $wrapClass = $align === 'center'
-        ? 'mx-auto max-w-2xl text-center'
-        : 'max-w-2xl';
+        ? 'mx-auto max-w-3xl text-center'
+        : 'max-w-3xl';
 @endphp
 
 <div {{ $attributes->class($wrapClass) }}>

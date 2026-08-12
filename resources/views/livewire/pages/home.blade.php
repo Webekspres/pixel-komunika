@@ -37,10 +37,10 @@
         ></div>
 
         <div class="container-2xl relative py-16 sm:py-24 lg:py-28">
-            <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] lg:gap-16">
 
                 {{-- Left: Copy --}}
-                <div class="animate-fade-up max-w-xl">
+                <div class="animate-fade-up max-w-2xl">
                     <div class="mb-6 flex flex-wrap items-center gap-2">
                         <span class="inline-flex items-center gap-1.5 rounded-full border border-brand-black/15 bg-white/60 px-3 py-1 text-xs font-semibold text-brand-black backdrop-blur-sm">
                             <x-icon name="badge-check" class="size-3.5 text-brand-black" />
@@ -63,7 +63,7 @@
                         <br>untuk bisnis Anda
                     </h1>
 
-                    <p class="mt-5 text-base leading-relaxed text-brand-black/75 sm:text-lg">
+                    <p class="mt-5 max-w-xl text-base leading-relaxed text-brand-black/75 sm:text-lg">
                         Power bank, charger, audio, kartu data, voucher internet, dan pulsa —
                         <strong class="font-semibold text-brand-black">harga partai &amp; grosir</strong>
                         langsung dari master data POS toko.
@@ -87,6 +87,24 @@
                             Keranjang ({{ $cartCount }})
                         </a>
                     </div>
+
+                    <div class="mt-8 grid gap-3 sm:grid-cols-3">
+                        <div class="storefront-panel-soft px-4 py-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/38">Kurasi</p>
+                            <p class="mt-2 text-2xl font-extrabold text-brand-black">{{ $products->count() }}+</p>
+                            <p class="mt-1 text-xs leading-relaxed text-brand-black/58">Produk pilihan tampil langsung dari master data toko.</p>
+                        </div>
+                        <div class="storefront-panel-soft px-4 py-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/38">Kategori</p>
+                            <p class="mt-2 text-2xl font-extrabold text-brand-black">{{ $categories->count() }}</p>
+                            <p class="mt-1 text-xs leading-relaxed text-brand-black/58">Aksesoris, konektivitas, dan kebutuhan operasional bisnis.</p>
+                        </div>
+                        <div class="storefront-panel-soft px-4 py-4">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/38">Akses</p>
+                            <p class="mt-2 text-2xl font-extrabold text-brand-black">B2B</p>
+                            <p class="mt-1 text-xs leading-relaxed text-brand-black/58">Harga terbuka untuk akun aktif, tetap aman untuk pengunjung umum.</p>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Right: Mascot --}}
@@ -109,7 +127,7 @@
          ========================================================= --}}
     <section id="katalog" class="section-white py-16 sm:py-24">
         <div class="container-2xl">
-            <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <x-storefront.section-header
                     eyebrow="Master Data POS"
                     title="Katalog Produk"
@@ -117,17 +135,17 @@
                 />
 
                 {{-- Search & Category Filter bar --}}
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="storefront-panel-soft flex flex-wrap items-center gap-2 p-3">
                     <button
                         wire:click="$set('selectedCategory', 'all')"
-                        class="rounded-full px-4 py-2 text-xs font-semibold transition {{ $selectedCategory === 'all' ? 'bg-brand-black text-white' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' }}"
+                        class="rounded-full px-4 py-2 text-xs font-semibold transition {{ $selectedCategory === 'all' ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
                     >
                         Semua Produk
                     </button>
                     @foreach ($categories as $category)
                         <button
                             wire:click="$set('selectedCategory', '{{ $category->id }}')"
-                            class="rounded-full px-4 py-2 text-xs font-semibold transition {{ (string)$selectedCategory === (string)$category->id ? 'bg-brand-black text-white' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' }}"
+                            class="rounded-full px-4 py-2 text-xs font-semibold transition {{ (string)$selectedCategory === (string)$category->id ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
                         >
                             {{ $category->name }}
                         </button>
@@ -138,62 +156,41 @@
             {{-- Products Grid --}}
             <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 @forelse ($products as $product)
-                    <div class="group relative flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-5 shadow-xs transition duration-200 hover:-translate-y-1 hover:shadow-lg">
-                        <div>
-                            {{-- Category & Badge --}}
-                            <div class="flex items-center justify-between gap-2 mb-3">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/60">
-                                    {{ $product->category->name }}
-                                </span>
-                                @if ($product->inventorySnapshot?->quantity_available > 0)
-                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                                        Stok: {{ $product->inventorySnapshot->quantity_available }}
-                                    </span>
-                                @else
-                                    <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
-                                        Stok Habis
-                                    </span>
-                                @endif
+                    <x-storefront.product-card
+                        :title="$product->name"
+                        :category="$product->category->name"
+                        :sku="$product->sku"
+                        :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"
+                        :stock-variant="$product->inventorySnapshot?->quantity_available > 0 ? 'available' : 'unavailable'"
+                        :show-price="auth()->user()?->canViewPrices()"
+                        :price="'Rp '.number_format($product->listPriceAmount() ?? 0, 0, ',', '.')"
+                    >
+                        <x-slot:actions>
+                            <div class="grid grid-cols-2 gap-2">
+                                <a
+                                    href="{{ route('products.show', $product) }}"
+                                    wire:navigate
+                                    class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
+                                >
+                                    Detail
+                                </a>
+                                <button
+                                    wire:click="addToCart({{ $product->id }})"
+                                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
+                                >
+                                    <x-icon name="shopping-cart" class="size-4" />
+                                    <span>+ Keranjang</span>
+                                </button>
                             </div>
-
-                            {{-- Product Title & SKU --}}
-                            <h3 class="text-base font-bold text-zinc-900 line-clamp-2 group-hover:text-amber-600 transition-colors">
-                                {{ $product->name }}
-                            </h3>
-                            <p class="mt-1 text-xs text-zinc-400">SKU: {{ $product->sku }}</p>
-                        </div>
-
-                        {{-- Pricing & Add to Cart --}}
-                        <div class="mt-6 border-t border-zinc-100 pt-4">
-                            <div class="flex items-baseline justify-between mb-4">
-                                <span class="text-xs text-zinc-500">Harga Grosir:</span>
-                                @if (auth()->user()?->canViewPrices())
-                                    <span class="text-lg font-extrabold text-zinc-950">
-                                        Rp {{ number_format($product->latestPrice?->price_wholesale_tier1 ?? 0, 0, ',', '.') }}
-                                    </span>
-                                @else
-                                    <span class="text-xs font-semibold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
-                                        🔒 Verifikasi Akun
-                                    </span>
-                                @endif
-                            </div>
-
-                            <button
-                                wire:click="addToCart({{ $product->id }})"
-                                class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-400 py-3 text-xs font-bold text-brand-black transition hover:bg-amber-300 active:scale-[0.98] shadow-sm"
-                            >
-                                <x-icon name="shopping-cart" class="size-4" />
-                                <span>+ Keranjang</span>
-                            </button>
-                        </div>
-                    </div>
+                        </x-slot:actions>
+                    </x-storefront.product-card>
                 @empty
-                    <div class="col-span-full py-12 text-center">
-                        <div class="inline-flex size-14 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-400 mb-3">
-                            <x-icon name="package-search" class="size-7" />
-                        </div>
-                        <h4 class="text-base font-semibold text-zinc-800">Tidak ada produk ditemukan</h4>
-                        <p class="text-xs text-zinc-500 mt-1">Coba gunakan kata kunci pencarian atau kategori lain.</p>
+                    <div class="col-span-full">
+                        <x-ui.empty-state
+                            title="Tidak ada produk ditemukan"
+                            description="Coba gunakan kata kunci pencarian atau kategori lain."
+                            icon="package-search"
+                        />
                     </div>
                 @endforelse
             </div>

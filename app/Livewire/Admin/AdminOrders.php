@@ -17,8 +17,11 @@ class AdminOrders extends Component
     use WithPagination;
 
     public string $statusFilter = 'all';
+
     public string $search = '';
+
     public string $rejectionReason = '';
+
     public ?int $selectedProofId = null;
 
     public function updatingSearch()
@@ -81,13 +84,13 @@ class AdminOrders extends Component
         if (! empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('order_number', 'like', "%{$this->search}%")
-                  ->orWhere('recipient_name', 'like', "%{$this->search}%")
-                  ->orWhere('recipient_phone', 'like', "%{$this->search}%");
+                    ->orWhere('recipient_name', 'like', "%{$this->search}%")
+                    ->orWhere('recipient_phone', 'like', "%{$this->search}%");
             });
         }
 
         return view('livewire.admin.admin-orders', [
             'orders' => $query->paginate(15),
-        ])->layout('layouts.app');
+        ])->layout('components.layouts.app');
     }
 }

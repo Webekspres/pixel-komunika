@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Shipping\MockBiteshipShippingService;
+use App\Services\Shipping\ShippingCalculatorInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,8 +14,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \App\Services\Shipping\ShippingCalculatorInterface::class,
-            \App\Services\Shipping\MockBiteshipShippingService::class
+            ShippingCalculatorInterface::class,
+            MockBiteshipShippingService::class
         );
     }
 

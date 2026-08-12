@@ -5,7 +5,6 @@ use App\Models\Address;
 use App\Models\CustomerProfile;
 use App\Models\InventorySnapshot;
 use App\Models\Order;
-use App\Models\PaymentProof;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;

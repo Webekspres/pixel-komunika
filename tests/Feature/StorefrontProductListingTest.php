@@ -41,11 +41,11 @@ it('shows wholesale prices on PDP to active verified customer', function () {
         'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
-    $product = Product::first();
+    $product = Product::with('prices')->first();
 
     $this->actingAs($customer)
         ->get(route('products.show', $product))
         ->assertOk()
         ->assertSee($product->name)
-        ->assertSee('Rp');
+        ->assertSee(number_format($product->listPriceAmount() ?? 0, 0, ',', '.'));
 });

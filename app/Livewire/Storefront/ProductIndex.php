@@ -5,6 +5,7 @@ namespace App\Livewire\Storefront;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductPrice;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
@@ -86,7 +87,7 @@ class ProductIndex extends Component
         $categories = Category::all();
         $brands = Brand::all();
 
-        $query = Product::with(['category', 'brand', 'enrichment', 'latestPrice', 'inventorySnapshot']);
+        $query = Product::with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot']);
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);
@@ -96,10 +97,10 @@ class ProductIndex extends Component
             $query->where('brand_id', $this->selectedBrand);
         }
 
-        if (!empty($this->search)) {
+        if (! empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
-                  ->orWhere('sku', 'like', "%{$this->search}%");
+                    ->orWhere('sku', 'like', "%{$this->search}%");
             });
         }
 
@@ -110,14 +111,16 @@ class ProductIndex extends Component
         }
 
         if ($this->minPrice !== null && is_numeric($this->minPrice)) {
-            $query->whereHas('latestPrice', function ($q) {
-                $q->where('price_wholesale_tier1', '>=', (float)$this->minPrice);
+            $query->whereHas('prices', function ($q) {
+                $q->where('price_type', ProductPrice::WHOLESALE)
+                    ->where('amount', '>=', (float) $this->minPrice);
             });
         }
 
         if ($this->maxPrice !== null && is_numeric($this->maxPrice)) {
-            $query->whereHas('latestPrice', function ($q) {
-                $q->where('price_wholesale_tier1', '<=', (float)$this->maxPrice);
+            $query->whereHas('prices', function ($q) {
+                $q->where('price_type', ProductPrice::WHOLESALE)
+                    ->where('amount', '<=', (float) $this->maxPrice);
             });
         }
 
@@ -125,12 +128,18 @@ class ProductIndex extends Component
         match ($this->sort) {
             'name_asc' => $query->orderBy('name', 'asc'),
             'name_desc' => $query->orderBy('name', 'desc'),
-            'price_low' => $query->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-                                 ->orderBy('product_prices.price_wholesale_tier1', 'asc')
-                                 ->select('products.*'),
-            'price_high' => $query->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-                                  ->orderBy('product_prices.price_wholesale_tier1', 'desc')
-                                  ->select('products.*'),
+            'price_low' => $query->join('product_prices', function ($join) {
+                $join->on('products.id', '=', 'product_prices.product_id')
+                    ->where('product_prices.price_type', '=', ProductPrice::WHOLESALE);
+            })
+                ->orderBy('product_prices.amount', 'asc')
+                ->select('products.*'),
+            'price_high' => $query->join('product_prices', function ($join) {
+                $join->on('products.id', '=', 'product_prices.product_id')
+                    ->where('product_prices.price_type', '=', ProductPrice::WHOLESALE);
+            })
+                ->orderBy('product_prices.amount', 'desc')
+                ->select('products.*'),
             default => $query->latest(),
         };
 

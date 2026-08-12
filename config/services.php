@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'pos' => [
+        'api_token' => env('POS_API_TOKEN'),
+    ],
+
 ];

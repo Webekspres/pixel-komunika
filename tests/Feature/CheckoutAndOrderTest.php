@@ -54,7 +54,10 @@ it('creates an order and invoice from cart and updates inventory ledger', functi
         ->and($order->status)->toBe('unpaid')
         ->and($order->items)->toHaveCount(1)
         ->and($order->invoice)->not->toBeNull()
-        ->and($order->invoice->status)->toBe('unpaid');
+        ->and($order->invoice->status)->toBe('unpaid')
+        ->and($order->invoice->store_name)->toBe(config('store.name'))
+        ->and($order->invoice->store_npwp)->toBe(config('store.npwp'))
+        ->and($order->tax_pph22_snapshot)->toBeArray();
 
     $stockAfter = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
     expect($stockAfter)->toBe($stockBefore - 2);

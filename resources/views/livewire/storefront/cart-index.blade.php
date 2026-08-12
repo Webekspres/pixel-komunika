@@ -1,4 +1,6 @@
 <x-layout.app-page>
+    <x-storefront.breadcrumb :items="[['label' => 'Keranjang Belanja', 'href' => null]]" />
+
     <x-ui.page-header
         eyebrow="E-Commerce"
         title="Keranjang Belanja"
@@ -22,45 +24,51 @@
             title="Keranjang Belanja Kosong"
             description="Anda belum menambahkan produk ke keranjang belanja."
             icon="shopping-cart"
+            mascot
         />
         <div class="mt-6 text-center">
-            <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-xl bg-[#F8B818] px-6 py-3 font-semibold text-[#181818] hover:bg-[#F8D820] transition-all shadow-sm">
+            <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-full bg-brand-black px-6 py-3 font-semibold text-white transition-all hover:bg-brand-black/88">
                 Jelajahi Produk
             </a>
         </div>
     @else
         <div class="grid gap-8 lg:grid-cols-3">
             <div class="lg:col-span-2 space-y-4">
-                <x-ui.section-card title="Daftar Produk ({{ $summary['total_items'] }} Item)">
+                <x-ui.section-card title="Daftar Produk ({{ $summary['total_items'] }} Item)" description="Semua harga dan estimasi tetap dihitung server-side mengikuti data POS aktif.">
                     <div class="divide-y divide-zinc-200">
                         @foreach ($summary['items'] as $item)
-                            <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div class="space-y-1">
-                                    <h4 class="font-semibold text-zinc-900 text-lg">{{ $item['product']->name }}</h4>
-                                    <p class="text-xs text-zinc-500">SKU: {{ $item['product']->sku }} | Tipe Harga: <span class="font-medium text-amber-700">{{ $item['price_type'] }}</span></p>
-                                    <p class="text-sm font-medium text-zinc-700">Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / unit</p>
+                            <div class="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex size-16 shrink-0 items-center justify-center rounded-[1.4rem] bg-brand-yellow-muted text-brand-black">
+                                        <x-icon name="package" class="size-7 text-brand-black/45" />
+                                    </div>
+                                    <div class="space-y-1">
+                                        <h4 class="text-lg font-semibold text-zinc-900">{{ $item['product']->name }}</h4>
+                                        <p class="text-xs text-zinc-500">SKU: {{ $item['product']->sku }} | Tipe Harga: <span class="font-medium text-amber-700">{{ $item['price_type'] }}</span></p>
+                                        <p class="text-sm font-medium text-zinc-700">Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / unit</p>
+                                    </div>
                                 </div>
 
                                 <div class="flex items-center gap-4">
-                                    <div class="flex items-center border border-zinc-300 rounded-xl overflow-hidden bg-white">
+                                    <div class="flex items-center overflow-hidden rounded-2xl border border-brand-black/10 bg-white">
                                         <button
                                             wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})"
-                                            class="px-3 py-1.5 text-zinc-600 hover:bg-zinc-100 font-bold"
+                                            class="px-3 py-2 text-zinc-600 hover:bg-zinc-100 font-bold"
                                         >-</button>
-                                        <span class="px-4 py-1.5 font-semibold text-zinc-800 text-sm">{{ $item['quantity'] }}</span>
+                                        <span class="px-4 py-2 text-sm font-semibold text-zinc-800">{{ $item['quantity'] }}</span>
                                         <button
                                             wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})"
-                                            class="px-3 py-1.5 text-zinc-600 hover:bg-zinc-100 font-bold"
+                                            class="px-3 py-2 text-zinc-600 hover:bg-zinc-100 font-bold"
                                         >+</button>
                                     </div>
 
-                                    <div class="text-right min-w-[100px]">
+                                    <div class="min-w-[110px] text-right">
                                         <p class="font-bold text-zinc-900">Rp {{ number_format($item['line_subtotal'], 0, ',', '.') }}</p>
                                     </div>
 
                                     <button
                                         wire:click="removeItem({{ $item['id'] }})"
-                                        class="text-red-500 hover:text-red-700 p-2 text-sm font-semibold"
+                                        class="rounded-full p-2 text-sm font-semibold text-red-500 hover:bg-red-50 hover:text-red-700"
                                         title="Hapus item"
                                     >
                                         Hapus
@@ -73,7 +81,7 @@
             </div>
 
             <div class="space-y-4">
-                <x-ui.section-card title="Ringkasan Belanja">
+                <x-ui.section-card title="Ringkasan Belanja" description="Ringkasan ini membantu Anda mengecek kesiapan sebelum lanjut ke checkout.">
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between text-zinc-600">
                             <span>Subtotal Produk</span>
@@ -90,7 +98,7 @@
                             <span class="font-semibold text-zinc-900">{{ number_format($summary['total_weight_grams'] / 1000, 2) }} kg</span>
                         </div>
 
-                        <div class="border-t border-zinc-200 pt-3 flex justify-between text-base font-bold text-zinc-900">
+                        <div class="flex justify-between border-t border-zinc-200 pt-3 text-base font-bold text-zinc-900">
                             <span>Estimasi Total</span>
                             <span class="text-amber-700">Rp {{ number_format($summary['subtotal'] + $summary['pph22'], 0, ',', '.') }}</span>
                         </div>
@@ -99,16 +107,16 @@
                     <div class="mt-6">
                         @auth
                             @if (auth()->user()->customerStatus() === \App\Models\CustomerProfile::ACTIVE || auth()->user()->isAdmin())
-                                <a href="{{ route('checkout.index') }}" class="block w-full text-center rounded-xl bg-[#F8B818] py-3.5 font-bold text-[#181818] hover:bg-[#F8D820] transition-all shadow-md">
+                                <a href="{{ route('checkout.index') }}" class="block w-full rounded-full bg-brand-black py-3.5 text-center font-bold text-white transition-all hover:bg-brand-black/88">
                                     Lanjut ke Checkout
                                 </a>
                             @else
-                                <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 text-center font-medium">
+                                <div class="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center text-xs font-medium text-amber-800">
                                     Akun Anda masih menunggu verifikasi admin untuk melakukan checkout.
                                 </div>
                             @endif
                         @else
-                            <a href="{{ route('login') }}" class="block w-full text-center rounded-xl bg-[#181818] py-3.5 font-bold text-white hover:bg-zinc-800 transition-all shadow-md">
+                            <a href="{{ route('login') }}" class="block w-full rounded-full bg-brand-yellow py-3.5 text-center font-bold text-brand-black transition-all hover:bg-brand-yellow-soft">
                                 Login untuk Checkout
                             </a>
                         @endauth

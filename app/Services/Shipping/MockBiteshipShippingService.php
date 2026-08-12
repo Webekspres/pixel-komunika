@@ -7,7 +7,7 @@ class MockBiteshipShippingService implements ShippingCalculatorInterface
     public function calculateRates(string $destinationCity, int $weightGrams): array
     {
         $weightKg = max(1, (int) ceil($weightGrams / 1000));
-        
+
         // Base rate based on destination
         $baseRate = 12000;
         if (str_contains(strtolower($destinationCity), 'jakarta') || str_contains(strtolower($destinationCity), 'tangerang')) {

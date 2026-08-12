@@ -18,11 +18,18 @@ class PriceCalculator
             return $wholesale;
         }
 
-        if ($cartHasPartaiEligibleSku && $prices->has(ProductPrice::BULK)) {
-            return $prices->get(ProductPrice::BULK);
+        $bulk = $prices->get(ProductPrice::BULK);
+        $bulkMin = (int) ($bulk?->minimum_quantity ?? 5);
+
+        if ($cartHasPartaiEligibleSku && $bulk) {
+            return $bulk;
         }
 
-        return $prices->get(ProductPrice::BULK, $prices->get(ProductPrice::RETAIL));
+        if ($bulk && $quantity >= $bulkMin) {
+            return $bulk;
+        }
+
+        return $prices->get(ProductPrice::RETAIL, $bulk);
     }
 
     public function calculatePph22(Collection $lines): array

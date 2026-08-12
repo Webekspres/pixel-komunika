@@ -10,18 +10,18 @@
         </x-slot>
 
         <div class="grid gap-6 md:grid-cols-3">
-            <x-ui.stat-card label="Status" :value="$customer->verification_status" />
-            <x-ui.stat-card label="Alamat" :value="(string) $customer->user->addresses->count()" />
-            <x-ui.stat-card label="Reviewer" :value="$customer->reviewer?->name ?: '-'" />
+            <x-ui.stat-card label="Status" :value="$customer->verification_status" icon="badge-check" variant="admin" />
+            <x-ui.stat-card label="Alamat" :value="(string) $customer->user->addresses->count()" icon="map-pin" variant="admin" />
+            <x-ui.stat-card label="Reviewer" :value="$customer->reviewer?->name ?: '-'" icon="user-circle" variant="admin" />
         </div>
 
         <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-            <x-ui.section-card :title="$customer->user->name" description="Ringkasan identitas customer untuk proses review admin.">
+            <x-ui.section-card :title="$customer->user->name" description="Ringkasan identitas customer untuk proses review admin." variant="admin">
                 <div class="space-y-4">
                     <div class="flex flex-wrap items-center gap-3">
                         <x-ui.status-badge :status="$customer->verification_status" />
                         @if ($customer->reviewed_at)
-                            <flux:text size="sm">Direview pada {{ $customer->reviewed_at->format('Y-m-d H:i') }}</flux:text>
+                            <p class="text-sm text-zinc-500">Direview pada {{ $customer->reviewed_at->format('Y-m-d H:i') }}</p>
                         @endif
                     </div>
 
@@ -73,22 +73,22 @@
                 </div>
             </x-ui.section-card>
 
-            <x-ui.section-card title="Alamat pelanggan" description="Related record pattern untuk entity admin yang punya child data.">
+            <x-ui.section-card title="Alamat pelanggan" description="Related record pattern untuk entity admin yang punya child data." variant="admin">
                 <div class="grid gap-4">
                     @forelse ($customer->user->addresses as $address)
-                        <flux:card class="space-y-3 bg-zinc-50">
+                        <div class="space-y-3 rounded-[1.6rem] border border-zinc-200 bg-zinc-50/75 p-4">
                             <div class="flex items-center gap-2">
-                                <flux:heading>{{ $address->label ?: 'Alamat pelanggan' }}</flux:heading>
+                                <h3 class="font-bold text-zinc-900">{{ $address->label ?: 'Alamat pelanggan' }}</h3>
                                 @if ($address->is_default)
-                                    <flux:badge color="amber" rounded size="sm">Default</flux:badge>
+                                    <span class="inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">Default</span>
                                 @endif
                             </div>
 
-                            <flux:text>{{ $address->recipient_name }} • {{ $address->recipient_phone }}</flux:text>
-                            <flux:text>
+                            <p class="text-sm text-zinc-700">{{ $address->recipient_name }} • {{ $address->recipient_phone }}</p>
+                            <p class="text-sm leading-relaxed text-zinc-600">
                                 {{ $address->address_line }}, {{ $address->district_name }}, {{ $address->city_name }}, {{ $address->province_name }} {{ $address->postal_code }}
-                            </flux:text>
-                        </flux:card>
+                            </p>
+                        </div>
                     @empty
                         <x-ui.empty-state title="Belum ada alamat" description="Customer ini belum menyimpan alamat pengiriman." icon="map-pin" />
                     @endforelse

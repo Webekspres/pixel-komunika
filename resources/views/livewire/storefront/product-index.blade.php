@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-zinc-50" x-data="{ mobileFilterOpen: false }">
+<div class="min-h-screen bg-zinc-50/70" x-data="{ mobileFilterOpen: false }">
 
     {{-- Notification Toast --}}
     @if (session()->has('success'))
@@ -13,7 +13,7 @@
     <x-storefront.navbar :cart-count="$cartCount" />
 
     {{-- Main Container --}}
-    <div class="container-2xl py-8 sm:py-10">
+    <div class="container-2xl py-6 sm:py-8 lg:py-10">
 
         {{-- Breadcrumb --}}
         <div class="mb-6">
@@ -21,12 +21,25 @@
         </div>
 
         {{-- Page Header Title --}}
-        <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">Katalog Produk POS</h1>
-                <p class="mt-2 text-sm text-zinc-500 max-w-xl">
+        <div class="storefront-panel-soft mb-8 flex flex-col gap-5 p-6 sm:p-7 lg:flex-row lg:items-end lg:justify-between">
+            <div class="max-w-3xl">
+                <p class="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.28em] text-brand-black/45">
+                    <span class="inline-block h-px w-8 bg-brand-yellow"></span>
+                    katalog storefront
+                </p>
+                <h1 class="text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl lg:text-[2.6rem]">Katalog Produk POS</h1>
+                <p class="mt-2 text-sm text-zinc-500 max-w-2xl">
                     Jelajahi seluruh inventaris operasional toko. Harga grosir dan partai terbuka untuk akun terverifikasi.
                 </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <span class="storefront-pill">{{ $products->total() }} produk</span>
+                @if ($selectedCategory !== 'all')
+                    <span class="storefront-pill">Kategori terfilter</span>
+                @endif
+                @if ($inStockOnly)
+                    <span class="storefront-pill">Ready stock</span>
+                @endif
             </div>
         </div>
 
@@ -35,7 +48,7 @@
 
             {{-- Desktop Sidebar --}}
             <div class="hidden lg:block">
-                <div class="sticky top-24 rounded-3xl border border-zinc-200 bg-white p-6 shadow-xs">
+                <div class="storefront-panel sticky top-24 p-6">
                     <x-storefront.filter-sidebar
                         :categories="$categories"
                         :brands="$brands"
@@ -52,7 +65,7 @@
             <div class="space-y-6">
 
                 {{-- Toolbar --}}
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs">
+                <div class="storefront-panel-soft flex flex-col items-stretch justify-between gap-4 p-4 sm:flex-row sm:items-center">
                     
                     {{-- Search Input & Mobile Filter Toggle --}}
                     <div class="flex items-center gap-2 flex-1">
@@ -62,7 +75,7 @@
                                 type="search"
                                 wire:model.live.debounce.300ms="search"
                                 placeholder="Cari nama produk atau SKU..."
-                                class="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-10 text-xs text-zinc-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
+                            class="w-full rounded-2xl border border-brand-black/10 bg-white py-3 pr-4 pl-10 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-amber-400"
                             />
                         </div>
 
@@ -70,7 +83,7 @@
                         <button
                             @click="mobileFilterOpen = true"
                             type="button"
-                            class="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs font-bold text-zinc-800 hover:bg-zinc-100 lg:hidden shrink-0"
+                            class="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand-black/10 bg-white px-3.5 py-3 text-xs font-bold text-zinc-800 hover:bg-zinc-100 lg:hidden"
                         >
                             <x-icon name="sliders-horizontal" class="size-4" />
                             <span>Filter</span>
@@ -78,7 +91,7 @@
                     </div>
 
                     {{-- Sort Dropdown & Result Count --}}
-                    <div class="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-zinc-100 pt-3 sm:pt-0">
+                    <div class="flex items-center justify-between gap-4 border-t border-zinc-100 pt-3 sm:justify-end sm:border-t-0 sm:pt-0">
                         <span class="text-xs text-zinc-500 font-medium">
                             Menampilkan <strong class="text-zinc-900">{{ $products->total() }}</strong> produk
                         </span>
@@ -87,7 +100,7 @@
                             <span class="text-xs text-zinc-400 hidden xl:inline">Urutkan:</span>
                             <select
                                 wire:model.live="sort"
-                                class="rounded-xl border border-zinc-200 bg-white py-2 px-3 text-xs font-semibold text-zinc-800 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                class="rounded-2xl border border-brand-black/10 bg-white px-3 py-2.5 text-xs font-semibold text-zinc-800 focus:outline-none focus:ring-1 focus:ring-amber-400"
                             >
                                 <option value="newest">Terbaru</option>
                                 <option value="name_asc">Nama (A - Z)</option>
@@ -142,59 +155,27 @@
 
                 {{-- Product Grid --}}
                 @if ($products->isEmpty())
-                    <div class="rounded-3xl border border-zinc-200 bg-white">
+                    <div>
                         <x-storefront.empty-products />
                     </div>
                 @else
                     <div class="grid gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         @foreach ($products as $product)
-                            <div class="group relative flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-xs transition duration-200 hover:-translate-y-1 hover:shadow-md">
-                                <div>
-                                    {{-- Category Badge & Stock --}}
-                                    <div class="flex items-center justify-between gap-1 mb-3">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 truncate max-w-[110px]">
-                                            {{ $product->category->name }}
-                                        </span>
-                                        @if ($product->inventorySnapshot?->quantity_available > 0)
-                                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md shrink-0">
-                                                Stok: {{ $product->inventorySnapshot->quantity_available }}
-                                            </span>
-                                        @else
-                                            <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md shrink-0">
-                                                Habis
-                                            </span>
-                                        @endif
-                                    </div>
-
-                                    {{-- Product Title & SKU --}}
-                                    <a href="{{ route('products.show', $product) }}" wire:navigate class="block">
-                                        <h3 class="text-sm font-bold text-zinc-900 line-clamp-2 group-hover:text-amber-600 transition-colors">
-                                            {{ $product->name }}
-                                        </h3>
-                                    </a>
-                                    <p class="mt-1 text-[11px] text-zinc-400">SKU: {{ $product->sku }}</p>
-                                </div>
-
-                                {{-- Pricing & Action --}}
-                                <div class="mt-5 border-t border-zinc-100 pt-3">
-                                    <div class="flex items-baseline justify-between mb-3">
-                                        <span class="text-[11px] text-zinc-500">Harga Grosir:</span>
-                                        @if (auth()->user()?->canViewPrices())
-                                            <span class="text-sm sm:text-base font-extrabold text-zinc-950">
-                                                Rp {{ number_format($product->latestPrice?->price_wholesale_tier1 ?? 0, 0, ',', '.') }}
-                                            </span>
-                                        @else
-                                            <span class="text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                                🔒 Verifikasi
-                                            </span>
-                                        @endif
-                                    </div>
-
+                            <x-storefront.product-card
+                                :title="$product->name"
+                                :category="$product->category->name"
+                                :sku="$product->sku"
+                                :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"
+                                :stock-variant="$product->inventorySnapshot?->quantity_available > 0 ? 'available' : 'unavailable'"
+                                :show-price="auth()->user()?->canViewPrices()"
+                                :price="'Rp '.number_format($product->listPriceAmount() ?? 0, 0, ',', '.')"
+                            >
+                                <x-slot:actions>
                                     <div class="grid grid-cols-2 gap-2">
                                         <a
                                             href="{{ route('products.show', $product) }}"
                                             wire:navigate
-                                            class="inline-flex items-center justify-center rounded-xl bg-zinc-100 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors"
+                                            class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
                                         >
                                             Detail
                                         </a>
@@ -202,14 +183,14 @@
                                         <button
                                             wire:click="addToCart({{ $product->id }})"
                                             type="button"
-                                            class="inline-flex items-center justify-center gap-1 rounded-xl bg-amber-400 py-2 text-xs font-bold text-brand-black hover:bg-amber-300 transition-colors shadow-xs"
+                                            class="inline-flex items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                         >
                                             <x-icon name="shopping-cart" class="size-3.5" />
                                             <span>+ Cart</span>
                                         </button>
                                     </div>
-                                </div>
-                            </div>
+                                </x-slot:actions>
+                            </x-storefront.product-card>
                         @endforeach
                     </div>
 

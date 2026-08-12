@@ -6,16 +6,37 @@
     'trend'       => null,  // 'up' | 'down' | null
     'trendLabel'  => null,
     'accent'      => false, // adds a left yellow accent bar
+    'variant'     => 'storefront',
 ])
 
-<flux:card {{ $attributes->class(['relative overflow-hidden', 'border-l-2 border-amber-400' => $accent]) }}>
+@php
+    $isAdmin = $variant === 'admin';
+    $wrapperClass = $isAdmin
+        ? 'relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-card sm:p-6'
+        : 'storefront-panel relative overflow-hidden p-5 sm:p-6';
+    $labelClass = $isAdmin
+        ? 'text-[11px] font-bold tracking-[0.24em] text-zinc-400 uppercase'
+        : 'text-[11px] font-bold tracking-[0.24em] text-brand-black/38 uppercase';
+    $valueClass = $isAdmin
+        ? 'mt-2 text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl'
+        : 'mt-2 text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl';
+    $descriptionClass = $isAdmin
+        ? 'mt-1 text-sm leading-relaxed text-zinc-500'
+        : 'mt-1 text-sm leading-relaxed text-brand-black/55';
+    $iconClass = $isAdmin
+        ? 'inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100'
+        : 'inline-flex size-10 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow-muted';
+    $iconColorClass = $isAdmin ? 'size-5 text-zinc-600' : 'size-5 text-brand-black/70';
+@endphp
+
+<section {{ $attributes->class([$wrapperClass, 'border-l-4 border-amber-400' => $accent]) }}>
     <div class="flex items-start justify-between gap-3">
         <div class="flex-1 min-w-0">
-            <p class="text-xs font-semibold tracking-wide text-zinc-400 uppercase">{{ $label }}</p>
-            <p class="mt-2 text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">{{ $value }}</p>
+            <p class="{{ $labelClass }}">{{ $label }}</p>
+            <p class="{{ $valueClass }}">{{ $value }}</p>
 
             @if ($description)
-                <flux:text size="sm" class="mt-1">{{ $description }}</flux:text>
+                <p class="{{ $descriptionClass }}">{{ $description }}</p>
             @endif
 
             @if ($trend && $trendLabel)
@@ -29,9 +50,9 @@
         </div>
 
         @if ($icon)
-            <div class="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-50">
-                <x-icon :name="$icon" class="size-5 text-amber-600" />
+            <div class="{{ $iconClass }}">
+                <x-icon :name="$icon" class="{{ $iconColorClass }}" />
             </div>
         @endif
     </div>
-</flux:card>
+</section>

@@ -2,13 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\PaymentProof;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class PaymentService
 {

@@ -5,10 +5,9 @@ namespace App\Services;
 use App\Domains\Pricing\PriceCalculator;
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\InventorySnapshot;
 use App\Models\Product;
+use App\Models\ProductPrice;
 use App\Models\User;
-use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 class CartService
@@ -21,7 +20,7 @@ class CartService
     {
         if ($user) {
             $cart = Cart::firstOrCreate(['user_id' => $user->id]);
-            
+
             // If session cart exists with items, merge session items to user cart
             if ($sessionId) {
                 $sessionCart = Cart::where('session_id', $sessionId)->whereNull('user_id')->first();
@@ -32,6 +31,7 @@ class CartService
                     $sessionCart->delete();
                 }
             }
+
             return $cart;
         }
 
@@ -45,9 +45,9 @@ class CartService
     public function addItem(Cart $cart, int $productId, int $quantity = 1): CartItem
     {
         $product = Product::with('inventorySnapshot')->findOrFail($productId);
-        
+
         $stockAvailable = $product->inventorySnapshot ? $product->inventorySnapshot->quantity_available : 0;
-        
+
         $existingItem = $cart->items()->where('product_id', $productId)->first();
         $newQuantity = $existingItem ? ($existingItem->quantity + $quantity) : $quantity;
 
@@ -57,6 +57,7 @@ class CartService
 
         if ($existingItem) {
             $existingItem->update(['quantity' => $newQuantity]);
+
             return $existingItem;
         }
 
@@ -72,6 +73,7 @@ class CartService
 
         if ($quantity <= 0) {
             $cartItem->delete();
+
             return null;
         }
 
@@ -81,6 +83,7 @@ class CartService
         }
 
         $cartItem->update(['quantity' => $quantity]);
+
         return $cartItem;
     }
 
@@ -99,17 +102,19 @@ class CartService
                 'items' => collect(),
                 'subtotal' => 0,
                 'pph22' => 0,
+                'pph22_components' => [],
                 'total_weight_grams' => 0,
                 'total_items' => 0,
             ];
         }
 
-        // Determine if any item in cart qualifies for wholesale/partai
+        // Determine if any item in cart qualifies for partai (min qty per SKU, not aggregated)
         $hasPartaiEligible = false;
         foreach ($items as $item) {
             $productPrices = $item->product->prices->keyBy('price_type');
-            $wholesalePrice = $productPrices->get(\App\Models\ProductPrice::WHOLESALE);
-            if ($wholesalePrice && $item->quantity >= (int) $wholesalePrice->minimum_quantity) {
+            $bulkPrice = $productPrices->get(ProductPrice::BULK);
+            $minQty = (int) ($bulkPrice?->minimum_quantity ?? 5);
+            if ($bulkPrice && $item->quantity >= $minQty) {
                 $hasPartaiEligible = true;
                 break;
             }
@@ -151,6 +156,7 @@ class CartService
             'items' => $itemSummaries,
             'subtotal' => $subtotal,
             'pph22' => $pph22Result['total'],
+            'pph22_components' => $pph22Result['components'],
             'total_weight_grams' => $totalWeightGrams,
             'total_items' => $items->sum('quantity'),
         ];

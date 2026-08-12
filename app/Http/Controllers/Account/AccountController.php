@@ -9,11 +9,53 @@ use Illuminate\View\View;
 
 class AccountController extends Controller
 {
-    public function show(Request $request): View
+    private function loadUser(Request $request)
     {
-        $user = $request->user()->load(['customerProfile', 'addresses']);
+        return $request->user()->load(['customerProfile', 'addresses']);
+    }
+
+    private function redirectAdmin(Request $request): ?RedirectResponse
+    {
+        return $request->user()->isAdmin()
+            ? redirect()->route('admin.dashboard')
+            : null;
+    }
+
+    public function show(Request $request): View|RedirectResponse
+    {
+        if ($redirect = $this->redirectAdmin($request)) {
+            return $redirect;
+        }
+
+        $user = $this->loadUser($request);
 
         return view('account.dashboard', [
+            'user' => $user,
+        ]);
+    }
+
+    public function profile(Request $request): View|RedirectResponse
+    {
+        if ($redirect = $this->redirectAdmin($request)) {
+            return $redirect;
+        }
+
+        $user = $this->loadUser($request);
+
+        return view('account.profile', [
+            'user' => $user,
+        ]);
+    }
+
+    public function addresses(Request $request): View|RedirectResponse
+    {
+        if ($redirect = $this->redirectAdmin($request)) {
+            return $redirect;
+        }
+
+        $user = $this->loadUser($request);
+
+        return view('account.addresses', [
             'user' => $user,
         ]);
     }

@@ -19,8 +19,11 @@ class OrderDetail extends Component
 
     // Payment proof upload fields
     public $bank_name = '';
+
     public $account_name = '';
+
     public $amount = '';
+
     public $proof_file;
 
     // Return request fields
@@ -58,8 +61,9 @@ class OrderDetail extends Component
 
     public function cancelOrder(OrderService $orderService)
     {
-        if (!in_array($this->order->status, ['unpaid', 'payment_pending'])) {
+        if (! in_array($this->order->status, ['unpaid', 'payment_pending'])) {
             session()->flash('error', 'Pesanan tidak dapat dibatalkan.');
+
             return;
         }
 
@@ -84,6 +88,7 @@ class OrderDetail extends Component
 
     public function render()
     {
-        return view('livewire.customer.order-detail');
+        return view('livewire.customer.order-detail')
+            ->layout('components.layouts.customer');
     }
 }

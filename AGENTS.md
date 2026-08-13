@@ -4,7 +4,7 @@ Instruksi ini berlaku untuk seluruh repository.
 
 ## Always-Active Tooling
 
-RTK, Graphify, dan Ponytail `ultra` wajib aktif pada setiap pekerjaan agent.
+RTK dan Ponytail `ultra` wajib aktif pada setiap pekerjaan agent.
 Jangan melanjutkan secara diam-diam tanpa salah satunya.
 
 ### 1. Rust Token Killer (RTK)
@@ -16,18 +16,7 @@ Jangan melanjutkan secara diam-diam tanpa salah satunya.
 - Periksa ketersediaan dengan `rtk --version` sebelum pekerjaan terminal
   pertama.
 
-### 2. Graphify
-
-- Gunakan Graphify untuk memahami codebase, arsitektur, relasi file, dampak
-  perubahan, dan isi dokumentasi.
-- Jika `graphify-out/graph.json` tersedia, lakukan
-  `rtk graphify query "<pertanyaan>"` sebelum membaca repository secara luas.
-- Rebuild/update graph hanya jika graph belum tersedia, sudah stale, atau
-  pengguna meminta rebuild.
-- Setelah perubahan material pada code atau dokumentasi, perbarui graph sesuai
-  workflow Graphify yang tersedia.
-
-### 3. Ponytail Ultra
+### 2. Ponytail Ultra
 
 - Muat dan terapkan skill Ponytail pada level `ultra` (`/ponytail ultra`) untuk
   seluruh pekerjaan coding, refactor, fix, review, dan pemilihan dependency.
@@ -43,15 +32,11 @@ Jangan melanjutkan secara diam-diam tanpa salah satunya.
 Pada awal task, cek ketiga capability:
 
 1. `rtk --version`
-2. `rtk graphify --help`
-3. skill Ponytail tersedia dan dapat dibaca
+2. skill Ponytail tersedia dan dapat dibaca
 
 Jika capability belum tersedia:
 
 - **RTK:** pasang dari distribusi RTK resmi yang dikonfigurasi pada environment.
-- **Graphify:** gunakan installer resmi; prioritaskan
-  `uv tool install --upgrade graphifyy`, lalu fallback installer resmi yang
-  didukung environment.
 - **Ponytail:** gunakan skill installer/registry resmi environment untuk
   memasang skill `ponytail`.
 - Ikuti approval, sandbox, dan network policy host saat instalasi.
@@ -62,10 +47,9 @@ Jika capability belum tersedia:
 ## Urutan Kerja
 
 1. Jalankan bootstrap capability.
-2. Gunakan Graphify untuk memperoleh konteks dan impact.
-3. Terapkan Ponytail `ultra` untuk memilih perubahan terkecil yang benar.
-4. Jalankan seluruh pemeriksaan terminal melalui RTK.
-5. Validasi hasil secara proporsional sebelum handoff.
+2. Terapkan Ponytail `ultra` untuk memilih perubahan terkecil yang benar.
+3. Jalankan seluruh pemeriksaan terminal melalui RTK.
+4. Validasi hasil secara proporsional sebelum handoff.
 
 ## Kebijakan Branch dan Push
 

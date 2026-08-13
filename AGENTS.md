@@ -4,19 +4,10 @@ Instruksi ini berlaku untuk seluruh repository.
 
 ## Always-Active Tooling
 
-RTK dan Ponytail `ultra` wajib aktif pada setiap pekerjaan agent.
-Jangan melanjutkan secara diam-diam tanpa salah satunya.
+Ponytail `ultra` wajib aktif pada setiap pekerjaan agent.
+Jangan melanjutkan secara diam-diam tanpa skill ini.
 
-### 1. Rust Token Killer (RTK)
-
-- Awali setiap perintah terminal dengan `rtk`.
-- Gunakan `rtk proxy <command>` hanya ketika filtering RTK menghilangkan output
-  yang memang dibutuhkan.
-- Tool native non-shell seperti `apply_patch` tidak memerlukan prefix RTK.
-- Periksa ketersediaan dengan `rtk --version` sebelum pekerjaan terminal
-  pertama.
-
-### 2. Ponytail Ultra
+### 1. Ponytail Ultra
 
 - Muat dan terapkan skill Ponytail pada level `ultra` (`/ponytail ultra`) untuk
   seluruh pekerjaan coding, refactor, fix, review, dan pemilihan dependency.
@@ -29,14 +20,12 @@ Jangan melanjutkan secara diam-diam tanpa salah satunya.
 
 ## Bootstrap Wajib
 
-Pada awal task, cek ketiga capability:
+Pada awal task, cek capability berikut:
 
-1. `rtk --version`
-2. skill Ponytail tersedia dan dapat dibaca
+1. skill Ponytail tersedia dan dapat dibaca
 
 Jika capability belum tersedia:
 
-- **RTK:** pasang dari distribusi RTK resmi yang dikonfigurasi pada environment.
 - **Ponytail:** gunakan skill installer/registry resmi environment untuk
   memasang skill `ponytail`.
 - Ikuti approval, sandbox, dan network policy host saat instalasi.
@@ -48,8 +37,7 @@ Jika capability belum tersedia:
 
 1. Jalankan bootstrap capability.
 2. Terapkan Ponytail `ultra` untuk memilih perubahan terkecil yang benar.
-3. Jalankan seluruh pemeriksaan terminal melalui RTK.
-4. Validasi hasil secara proporsional sebelum handoff.
+3. Validasi hasil secara proporsional sebelum handoff.
 
 ## Kebijakan Branch dan Push
 

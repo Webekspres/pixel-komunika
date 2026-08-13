@@ -1,17 +1,19 @@
 @props([
     'title',
-    'description'    => null,
-    'primaryLabel'   => null,
-    'primaryHref'    => null,
-    'secondaryLabel' => null,
-    'secondaryHref'  => null,
-    'mascot'         => false,
-    'theme'          => 'yellow', // yellow | dark
+    'description'     => null,
+    'primaryLabel'    => null,
+    'primaryHref'     => null,
+    'secondaryLabel'  => null,
+    'secondaryHref'   => null,
+    'mascot'          => false,
+    'theme'           => 'yellow', // yellow | dark
+    'backgroundImage' => null,
 ])
 
 @php
     $isDark = $theme === 'dark';
-    $bg = $isDark ? 'bg-brand-black' : 'bg-brand-yellow';
+    $hasBgImage = filled($backgroundImage);
+    $bg = $hasBgImage ? 'bg-brand-black' : ($isDark ? 'bg-brand-black' : 'bg-brand-yellow');
     $textPrimary = $isDark ? 'text-brand-white' : 'text-brand-black';
     $textMuted = $isDark ? 'text-brand-white/70' : 'text-brand-black/70';
     $primaryBtn = $isDark
@@ -23,15 +25,27 @@
 @endphp
 
 <section {{ $attributes->class(['relative overflow-hidden py-14 sm:py-20', $bg]) }}>
-    {{-- Subtle geometric background pattern --}}
-    <div
-        class="pointer-events-none absolute inset-0 opacity-10"
-        style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 32px 32px;"
-        aria-hidden="true"
-    ></div>
+    @if ($hasBgImage)
+        <div
+            class="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat sm:bg-[position:center_right]"
+            style="background-image: url('{{ $backgroundImage }}')"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute inset-0 bg-linear-to-r from-brand-black via-brand-black/88 to-brand-black/35"
+            aria-hidden="true"
+        ></div>
+    @else
+        {{-- Subtle geometric background pattern --}}
+        <div
+            class="pointer-events-none absolute inset-0 opacity-10"
+            style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 32px 32px;"
+            aria-hidden="true"
+        ></div>
+    @endif
 
     <div class="container-2xl relative">
-        <div class="grid items-center gap-10 lg:grid-cols-2">
+        <div class="grid items-center gap-10 {{ ($mascot || isset($image)) && ! $hasBgImage ? 'lg:grid-cols-2' : '' }}">
             <div class="max-w-xl">
                 <h2 class="text-3xl font-bold tracking-tight {{ $textPrimary }} sm:text-4xl lg:text-5xl">
                     {{ $title }}
@@ -60,7 +74,7 @@
                 @endif
             </div>
 
-            @if ($mascot)
+            @if ($mascot && ! $hasBgImage)
                 <div class="flex justify-center lg:justify-end">
                     <img
                         src="{{ asset('assets/mascot/Maskot-base.webp') }}"
@@ -71,7 +85,7 @@
                         loading="lazy"
                     >
                 </div>
-            @elseif (isset($image))
+            @elseif (isset($image) && ! $hasBgImage)
                 <div class="flex justify-center lg:justify-end">
                     {{ $image }}
                 </div>

@@ -207,6 +207,7 @@
     {{-- Promo dark banner --}}
     <x-storefront.banner
         theme="dark"
+        background-image="{{ asset('assets/hero/cta-partai.webp') }}"
         title="Hemat Lebih Banyak dengan Harga Partai"
         description="Beli minimal 5 unit untuk 1 produk dan nikmati harga partai yang lebih hemat. Semakin banyak, semakin murah!"
         primary-label="Mulai Belanja"

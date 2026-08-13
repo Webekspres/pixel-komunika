@@ -32,7 +32,10 @@ it('renders product detail page', function () {
         ->assertOk()
         ->assertSee($product->name)
         ->assertSee($product->sku)
-        ->assertSee('🔒 Harga grosir hanya dapat dilihat oleh pelanggan terverifikasi');
+        ->assertSee('Harga tersembunyi')
+        ->assertSee('Deskripsi')
+        ->assertSee('Spesifikasi')
+        ->assertSee('Produk Original');
 });
 
 it('shows wholesale prices on PDP to active verified customer', function () {

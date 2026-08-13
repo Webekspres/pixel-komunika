@@ -5,22 +5,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? config('app.name', 'Pixel Komunika') }}</title>
         <meta name="description" content="{{ $metaDescription ?? 'Portal pelanggan Pixel Komunika yang tetap menyatu dengan pengalaman storefront.' }}">
+        <x-favicon />
         @fonts
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-surface-2 font-sans text-brand-black antialiased">
         @php
-            $cartService = app(\App\Services\CartService::class);
-            $storefrontCart = $cartService->getOrCreateCart(auth()->user(), session()->getId());
-            $storefrontCartCount = $cartService->getCartSummary($storefrontCart)['total_items'] ?? 0;
             $navCategories = \App\Models\Category::query()->orderBy('name')->limit(8)->get();
             $customerStatus = auth()->user()?->customerStatus();
             $businessName = auth()->user()?->customerProfile?->business_name;
         @endphp
 
         <div class="flex min-h-screen flex-col bg-surface-2">
-            <x-storefront.navbar :cart-count="$storefrontCartCount" :categories="$navCategories" />
+            <x-storefront.navbar :categories="$navCategories" />
 
             @auth
                 <div class="w-full border-b border-zinc-100 bg-white">

@@ -43,21 +43,21 @@
 
         <div class="container-2xl relative z-10 flex flex-1 flex-col justify-center py-12 sm:py-16 lg:py-20">
             <div class="max-w-xl text-center lg:max-w-2xl lg:text-left">
-                <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
+                <div data-hero-animate class="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
                     <x-icon name="star" class="size-3 fill-current text-brand-yellow" />
                     Platform B2B Terpercaya
                 </div>
 
-                <h1 class="text-4xl leading-tight font-black text-white sm:text-5xl xl:text-6xl">
+                <h1 data-hero-animate class="text-4xl leading-tight font-black text-white sm:text-5xl xl:text-6xl">
                     Belanja Elektronik<br>
                     <span class="text-brand-yellow">Harga Grosir</span>
                 </h1>
 
-                <p class="mt-4 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg {{ auth()->check() ? '' : 'mx-auto lg:mx-0' }}">
+                <p data-hero-animate class="mt-4 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg {{ auth()->check() ? '' : 'mx-auto lg:mx-0' }}">
                     Dapatkan akses eksklusif ke harga partai dan grosir untuk elektronik, aksesoris, dan produk telekomunikasi berkualitas tinggi.
                 </p>
 
-                <div class="mt-6 flex flex-wrap justify-center gap-4 lg:justify-start">
+                <div data-hero-animate class="mt-6 flex flex-wrap justify-center gap-4 lg:justify-start">
                     @foreach (['500+ Produk', '200+ Reseller', 'Pengiriman Bandung', 'Harga Terjamin'] as $badge)
                         <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                             <div class="flex size-4 items-center justify-center rounded-full bg-brand-yellow">
@@ -68,7 +68,7 @@
                     @endforeach
                 </div>
 
-                <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+                <div data-hero-animate class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
                     <a
                         href="{{ route('products.index') }}"
                         wire:navigate
@@ -91,9 +91,27 @@
     </section>
 
     {{-- Categories --}}
-    <section id="kategori" class="w-full bg-white py-12 sm:py-16">
-        <div class="container-2xl">
-            <div class="mb-8 flex items-end justify-between gap-4">
+    <section id="kategori" class="relative w-full overflow-hidden bg-white py-12 sm:py-16">
+        <div
+            class="pointer-events-none absolute inset-0 opacity-[0.045]"
+            style="background-image: radial-gradient(circle at 1px 1px, rgb(24 24 24) 1px, transparent 0); background-size: 24px 24px;"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute -right-8 top-1/2 hidden h-64 w-64 -translate-y-1/2 opacity-[0.12] lg:block xl:h-80 xl:w-80"
+            aria-hidden="true"
+        >
+            <img
+                src="{{ asset('assets/placeholders/accessories.webp') }}"
+                alt=""
+                class="h-full w-full object-contain"
+                width="320"
+                height="320"
+                loading="lazy"
+            >
+        </div>
+        <div class="container-lg relative">
+            <div class="mb-8 flex items-end justify-between gap-4" data-reveal>
                 <div>
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Kategori Produk</h2>
                     <p class="mt-1 text-sm text-zinc-500">Temukan produk sesuai kebutuhanmu</p>
@@ -104,7 +122,7 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 @forelse ($categories as $category)
                     @php
                         $icons = ['battery', 'plug', 'headphones', 'database', 'camera', 'phone', 'keyboard', 'package'];
@@ -113,15 +131,17 @@
                     <a
                         href="{{ route('products.index', ['kategori' => $category->id]) }}"
                         wire:navigate
-                        class="group flex flex-col items-center gap-2 rounded-2xl border-2 border-transparent bg-zinc-50 p-3 text-center transition-all duration-200 hover:border-brand-yellow hover:bg-brand-yellow/10 sm:p-4"
+                        data-reveal
+                        style="--reveal-delay: {{ min($loop->index, 7) * 60 }}ms"
+                        class="group flex flex-col items-center gap-2 rounded-2xl border-2 border-transparent bg-zinc-50/90 p-3 text-center backdrop-blur-sm transition-all duration-200 hover:border-brand-yellow hover:bg-brand-yellow/10 sm:p-5"
                     >
-                        <div class="inline-flex size-11 items-center justify-center rounded-xl bg-white shadow-sm">
+                        <div class="inline-flex size-11 items-center justify-center rounded-xl bg-white shadow-sm sm:size-12">
                             <x-icon :name="$icon" class="size-5 text-brand-black" />
                         </div>
-                        <span class="text-xs leading-tight font-semibold text-zinc-700 group-hover:text-brand-black">{{ $category->name }}</span>
+                        <span class="text-xs leading-tight font-semibold text-zinc-700 group-hover:text-brand-black sm:text-sm">{{ $category->name }}</span>
                     </a>
                 @empty
-                    <div class="col-span-full">
+                    <div class="col-span-full" data-reveal>
                         <x-ui.empty-state title="Belum ada kategori" description="Kategori produk akan muncul setelah data POS tersedia." icon="layout-grid" />
                     </div>
                 @endforelse
@@ -130,9 +150,19 @@
     </section>
 
     {{-- Featured products --}}
-    <section id="katalog" class="section-gray w-full py-12 sm:py-16">
-        <div class="container-2xl">
-            <div class="mb-8 flex items-end justify-between gap-4">
+    <section id="katalog" class="relative w-full overflow-hidden py-12 sm:py-16">
+        <div class="absolute inset-0 bg-surface-2" aria-hidden="true"></div>
+        <div
+            class="pointer-events-none absolute inset-0 opacity-[0.04]"
+            style="background-image: radial-gradient(circle at 1px 1px, rgb(24 24 24) 1px, transparent 0); background-size: 28px 28px;"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute -top-24 left-1/2 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-brand-yellow/15 blur-3xl"
+            aria-hidden="true"
+        ></div>
+        <div class="container-lg relative">
+            <div class="mb-8 flex items-end justify-between gap-4" data-reveal>
                 <div>
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Produk Pilihan</h2>
                     <p class="mt-1 text-sm text-zinc-500">Produk terlaris dengan kualitas terjamin</p>
@@ -143,7 +173,7 @@
                 </a>
             </div>
 
-            <div class="mb-6 flex flex-wrap gap-2">
+            <div class="mb-6 flex flex-wrap gap-2" data-reveal style="--reveal-delay: 80ms">
                 <button
                     wire:click="$set('selectedCategory', 'all')"
                     class="rounded-full px-4 py-2 text-xs font-semibold transition {{ $selectedCategory === 'all' ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
@@ -160,9 +190,11 @@
                 @endforeach
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
                 @forelse ($products as $product)
                     <x-storefront.product-card
+                        data-reveal
+                        style="--reveal-delay: {{ min($loop->index, 7) * 55 }}ms"
                         :title="$product->name"
                         :category="$product->category->name"
                         :sku="$product->sku"
@@ -191,7 +223,7 @@
                         </x-slot:actions>
                     </x-storefront.product-card>
                 @empty
-                    <div class="col-span-full">
+                    <div class="col-span-full" data-reveal>
                         <x-ui.empty-state
                             title="Tidak ada produk ditemukan"
                             description="Coba gunakan kata kunci pencarian atau kategori lain."
@@ -204,7 +236,7 @@
         </div>
     </section>
 
-    {{-- Promo dark banner --}}
+    {{-- Promo dark banner — Figma: copy left + 2x2 trust cards right --}}
     <x-storefront.banner
         theme="dark"
         background-image="{{ asset('assets/hero/cta-partai.webp') }}"
@@ -214,39 +246,67 @@
         :primary-href="route('products.index')"
         :secondary-label="auth()->guest() ? 'Daftar Gratis' : null"
         :secondary-href="auth()->guest() ? route('register') : null"
-    />
+    >
+        <x-slot:aside>
+            <div class="grid grid-cols-2 gap-3 sm:gap-4" data-reveal="scale" style="--reveal-delay: 120ms">
+                @foreach ([
+                    ['value' => 'Min. 5 Unit', 'label' => 'Syarat Harga Partai', 'icon' => 'package'],
+                    ['value' => 'H+1', 'label' => 'Pengiriman Bandung', 'icon' => 'truck'],
+                    ['value' => 'Transfer', 'label' => 'Metode Pembayaran', 'icon' => 'landmark'],
+                    ['value' => 'Terverifikasi', 'label' => 'Jaminan Keaslian', 'icon' => 'badge-check'],
+                ] as $stat)
+                    <div class="rounded-2xl bg-white/10 p-4 text-center backdrop-blur-sm sm:p-5">
+                        <div class="mb-2 inline-flex size-9 items-center justify-center rounded-xl bg-brand-yellow/20 text-brand-yellow">
+                            <x-icon :name="$stat['icon']" class="size-4.5" />
+                        </div>
+                        <p class="text-sm font-bold text-white">{{ $stat['value'] }}</p>
+                        <p class="mt-0.5 text-xs text-white/55">{{ $stat['label'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </x-slot:aside>
+    </x-storefront.banner>
 
     {{-- Benefits --}}
-    <section id="unggulan" class="w-full bg-white py-12 sm:py-16">
-        <div class="container-2xl">
-            <div class="mb-10 text-center">
+    <section id="unggulan" class="relative w-full overflow-hidden bg-white py-12 sm:py-16">
+        <div
+            class="pointer-events-none absolute inset-0 opacity-[0.04]"
+            style="background-image: radial-gradient(circle at 1px 1px, rgb(24 24 24) 1px, transparent 0); background-size: 24px 24px;"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute -bottom-20 right-0 h-56 w-56 rounded-full bg-brand-yellow/20 blur-3xl"
+            aria-hidden="true"
+        ></div>
+        <div class="container-lg relative">
+            <div class="mb-10 text-center" data-reveal>
                 <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Mengapa Pixel Komunika?</h2>
                 <p class="mt-2 text-sm text-zinc-500">Keunggulan yang membuat kami berbeda</p>
             </div>
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 0ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-emerald-100">
                         <x-icon name="shield-check" class="size-5 text-emerald-600" />
                     </div>
                     <h3 class="mb-2 font-bold text-zinc-900">Produk Asli</h3>
                     <p class="text-sm leading-relaxed text-zinc-500">Semua produk 100% original bergaransi dari distributor resmi</p>
                 </div>
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 80ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-blue-100">
                         <x-icon name="truck" class="size-5 text-blue-600" />
                     </div>
                     <h3 class="mb-2 font-bold text-zinc-900">Pengiriman Cepat</h3>
                     <p class="text-sm leading-relaxed text-zinc-500">Kurir toko H+1 ke seluruh Bandung, atau ekspedisi nasional</p>
                 </div>
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 160ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-brand-yellow/20">
                         <x-icon name="users" class="size-5 text-brand-yellow-dark" />
                     </div>
                     <h3 class="mb-2 font-bold text-zinc-900">Khusus Terverifikasi</h3>
                     <p class="text-sm leading-relaxed text-zinc-500">Harga partai eksklusif hanya untuk reseller yang telah diverifikasi</p>
                 </div>
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 240ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-red-100">
                         <x-icon name="star" class="size-5 text-red-500" />
                     </div>
@@ -262,7 +322,7 @@
         <x-storefront.cta
             theme="yellow"
             align="left"
-            mascot
+            background-image="{{ asset('assets/hero/cta-bergabung.webp') }}"
             title="Siap Bergabung?"
             description="Daftarkan usahamu sekarang dan dapatkan akses ke harga grosir dan partai eksklusif. Proses verifikasi cepat dan mudah."
             primary-label="Daftar Sekarang"

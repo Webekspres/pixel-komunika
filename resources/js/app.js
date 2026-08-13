@@ -1,4 +1,5 @@
 import * as lucide from 'lucide';
+import { destroyStorefrontMotion, initStorefrontMotion } from './storefront-motion';
 
 const { createIcons, icons: lucideIcons } = lucide;
 
@@ -40,12 +41,29 @@ function refreshIcons() {
     createIcons({ icons });
 }
 
-document.addEventListener('DOMContentLoaded', refreshIcons);
-document.addEventListener('livewire:navigated', refreshIcons);
+function bootUi(root = document) {
+    refreshIcons();
+    destroyStorefrontMotion();
+    // After full remount (navigate), clear done flags so motion can re-run.
+    if (root === document || root === document.documentElement || root === document.body) {
+        document.querySelectorAll('[data-reveal-done], [data-hero-done]').forEach((el) => {
+            el.removeAttribute('data-reveal-done');
+            el.removeAttribute('data-hero-done');
+        });
+    }
+    initStorefrontMotion(root);
+}
+
+document.addEventListener('DOMContentLoaded', () => bootUi());
+document.addEventListener('livewire:navigated', () => bootUi());
 document.addEventListener('livewire:init', () => {
     Livewire.hook('morph.updated', ({ el }) => {
         if (el?.querySelector?.('[data-lucide], [data-lucide] *') || el?.hasAttribute?.('data-lucide')) {
             refreshIcons();
+        }
+        if (el?.querySelector?.('[data-reveal], [data-hero-animate]') || el?.hasAttribute?.('data-reveal') || el?.hasAttribute?.('data-hero-animate')) {
+            // Morph only: init new nodes without killing existing scroll triggers.
+            initStorefrontMotion(el);
         }
     });
 });

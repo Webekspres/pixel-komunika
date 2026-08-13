@@ -130,6 +130,15 @@
 @utility delay-300 { animation-delay: 300ms; }
 @utility delay-500 { animation-delay: 500ms; }
 
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-fade-in,
+    .animate-slide-in-left,
+    .animate-scale-in {
+        animation: none !important;
+    }
+}
+
 /* ============================================
    STOREFRONT DESIGN SYSTEM
    ============================================ */

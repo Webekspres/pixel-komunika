@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? config('app.name', 'Pixel Komunika') }}</title>
         <meta name="description" content="{{ $metaDescription ?? 'Masuk atau daftarkan akun pelanggan Pixel Komunika — aksesoris elektronik, kartu data, dan pulsa.' }}">
+        <x-favicon />
         @fonts
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])

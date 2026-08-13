@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? config('app.name', 'Pixel Komunika') }}</title>
         <meta name="description" content="{{ $metaDescription ?? 'Admin workspace Pixel Komunika.' }}">
+        <x-favicon />
         @fonts
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])

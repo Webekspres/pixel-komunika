@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Domains\CustomerManagement\CustomerVerificationService;
 use App\Models\CustomerProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,25 +69,19 @@ class CustomerReviewController extends Controller
         ]);
     }
 
-    public function update(Request $request, CustomerProfile $customerProfile): RedirectResponse
+    public function update(Request $request, CustomerProfile $customerProfile, CustomerVerificationService $verification): RedirectResponse
     {
         $validated = $request->validate([
             'action' => ['required', 'in:approve,reject,suspend,reactivate'],
             'reason' => ['nullable', 'string'],
         ]);
 
-        [$status, $reason] = match ($validated['action']) {
-            'approve', 'reactivate' => [CustomerProfile::ACTIVE, null],
-            'reject' => [CustomerProfile::REJECTED, $validated['reason'] ?: 'Permohonan belum dapat disetujui.'],
-            'suspend' => [CustomerProfile::SUSPENDED, $validated['reason'] ?: 'Akun ditangguhkan sementara.'],
-        };
-
-        $customerProfile->update([
-            'verification_status' => $status,
-            'rejection_reason' => $reason,
-            'reviewed_by' => $request->user()->id,
-            'reviewed_at' => now(),
-        ]);
+        $verification->transition(
+            $customerProfile,
+            $validated['action'],
+            $request->user(),
+            $validated['reason'] ?? null,
+        );
 
         return back();
     }

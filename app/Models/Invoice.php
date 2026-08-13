@@ -10,11 +10,14 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_number',
         'order_id',
+        'store_profile_id',
         'user_id',
         'store_name',
         'store_address',
         'store_phone',
         'store_npwp',
+        'company_name_snapshot',
+        'reseller_account_number_snapshot',
         'subtotal',
         'tax_pph22',
         'shipping_cost',
@@ -42,5 +45,10 @@ class Invoice extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function storeProfile(): BelongsTo
+    {
+        return $this->belongsTo(StoreProfile::class);
     }
 }

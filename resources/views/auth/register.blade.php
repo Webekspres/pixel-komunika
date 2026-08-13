@@ -3,6 +3,8 @@
         title="Daftar pelanggan"
         description="Akun baru akan masuk status pending verification sampai direview admin."
         eyebrow="Pendaftaran customer"
+        panel-title="Gabung jadi reseller terverifikasi"
+        panel-description="Daftar usaha kamu. Admin review cepat, lalu akses harga partai."
     >
         <form method="POST" action="{{ route('register.store') }}" class="space-y-5">
             @csrf

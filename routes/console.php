@@ -9,16 +9,14 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('orders:auto-cancel-unpaid')->dailyAt('00:05');
+Schedule::command('orders:auto-complete-shipped')->dailyAt('00:15');
+Schedule::command('pos:sync-masters')->dailyAt('01:00');
+Schedule::command('pos:sync-stock')->dailyAt('01:30');
+Schedule::command('pos:dispatch-sale-reports')->everyFiveMinutes();
+Schedule::command('pos:dispatch-return-reports')->everyFiveMinutes();
+Schedule::command('notifications:dispatch-pending')->everyFiveMinutes();
 
 /*
-| Scheduler stubs (SRS §11) — remaining jobs:
-| - daily POS master/inventory sync
-| - periodic stock reconciliation
-| - sales/return report reconciliation
-| - retry/reconciliation
-| - temporary upload cleanup
-| - log pruning
-|
 | Shared hosting: cron → `php artisan schedule:run`
 | Queue: `php artisan queue:work --stop-when-empty` (bounded worker)
 */

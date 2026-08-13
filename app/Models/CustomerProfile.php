@@ -18,6 +18,7 @@ class CustomerProfile extends Model
     protected $fillable = [
         'user_id',
         'business_name',
+        'reseller_account_number',
         'verification_status',
         'rejection_reason',
         'reviewed_by',

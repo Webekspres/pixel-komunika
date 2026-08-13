@@ -114,12 +114,12 @@ class CartService
         }
 
         // Determine if any item in cart qualifies for partai (min qty per SKU, not aggregated)
+        $partaiMin = $this->priceCalculator->partaiMinimumQuantity();
         $hasPartaiEligible = false;
         foreach ($items as $item) {
             $productPrices = $item->product->prices->keyBy('price_type');
             $bulkPrice = $productPrices->get(ProductPrice::BULK);
-            $minQty = (int) ($bulkPrice?->minimum_quantity ?? 5);
-            if ($bulkPrice && $item->quantity >= $minQty) {
+            if ($bulkPrice && $item->quantity >= $partaiMin) {
                 $hasPartaiEligible = true;
                 break;
             }
@@ -162,6 +162,7 @@ class CartService
             'subtotal' => $subtotal,
             'pph22' => $pph22Result['total'],
             'pph22_components' => $pph22Result['components'],
+            'pph22_aggregate' => $pph22Result['aggregate'],
             'total_weight_grams' => $totalWeightGrams,
             'total_items' => $items->sum('quantity'),
         ];

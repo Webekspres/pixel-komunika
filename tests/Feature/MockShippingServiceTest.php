@@ -7,9 +7,15 @@ it('calculates mock shipping rates correctly based on weight and destination', f
 
     $ratesJakarta = $service->calculateRates('Jakarta Selatan', 1500);
     expect($ratesJakarta)->not->toBeEmpty();
-    expect($ratesJakarta[0]['code'])->toBe('jne');
-    expect($ratesJakarta[0]['cost'])->toBe(18000); // 9000 * 2kg
+
+    $jne = collect($ratesJakarta)->firstWhere('code', 'jne');
+    expect($jne['cost'])->toBe(18000); // 9000 * 2kg
+    expect(collect($ratesJakarta)->pluck('code'))->toContain('grab', 'gojek');
 
     $ratesSurabaya = $service->calculateRates('Surabaya', 500);
-    expect($ratesSurabaya[0]['cost'])->toBe(22000); // 22000 * 1kg
+    $jneSurabaya = collect($ratesSurabaya)->firstWhere('code', 'jne');
+    expect($jneSurabaya['cost'])->toBe(22000); // 22000 * 1kg
+
+    $ratesBandung = $service->calculateRates('Bandung', 1000);
+    expect(collect($ratesBandung)->pluck('code'))->toContain('store');
 });

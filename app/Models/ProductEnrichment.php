@@ -9,9 +9,12 @@ class ProductEnrichment extends Model
 {
     protected $fillable = [
         'product_id',
+        'display_name',
         'slug',
         'short_description',
         'description',
+        'seo_title',
+        'seo_description',
         'label',
         'display_order',
         'is_visible',

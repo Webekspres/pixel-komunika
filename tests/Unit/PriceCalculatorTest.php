@@ -6,7 +6,7 @@ use App\Models\CategoryTaxRule;
 use App\Models\Product;
 use App\Models\ProductPrice;
 
-it('picks wholesale before bulk and bulk before retail fallback', function () {
+it('picks partai over grosir when partai eligible and grosir only when not', function () {
     $category = Category::query()->create([
         'pos_category_id' => 'CAT-TEST',
         'name' => 'Test',
@@ -32,10 +32,11 @@ it('picks wholesale before bulk and bulk before retail fallback', function () {
     expect($calculator->resolvePrice($product->fresh('prices'), 2, false)->price_type)->toBe(ProductPrice::RETAIL)
         ->and($calculator->resolvePrice($product->fresh('prices'), 5, false)->price_type)->toBe(ProductPrice::BULK)
         ->and($calculator->resolvePrice($product->fresh('prices'), 2, true)->price_type)->toBe(ProductPrice::BULK)
-        ->and($calculator->resolvePrice($product->fresh('prices'), 12, true)->price_type)->toBe(ProductPrice::WHOLESALE);
+        ->and($calculator->resolvePrice($product->fresh('prices'), 12, true)->price_type)->toBe(ProductPrice::BULK)
+        ->and($calculator->resolvePrice($product->fresh('prices'), 12, false)->price_type)->toBe(ProductPrice::BULK);
 });
 
-it('aggregates pph22 per category rule that passes its threshold', function () {
+it('calculates pph22 as (triggered subtotal / 1.11) × rate', function () {
     $category = Category::query()->create([
         'pos_category_id' => 'CAT-TAX',
         'name' => 'Taxed',
@@ -55,6 +56,8 @@ it('aggregates pph22 per category rule that passes its threshold', function () {
         ['category_id' => $category->id, 'line_total' => 1500000],
     ]));
 
-    expect($result['total'])->toBe(7500.0)
-        ->and($result['components'])->toHaveCount(1);
+    // (1500000 / 1.11) * 0.5% = 6756.756... → 6756.76
+    expect($result['total'])->toBe(6756.76)
+        ->and($result['aggregate']['basis_amount'])->toBe(1500000.0)
+        ->and($result['aggregate']['divisor'])->toBe(1.11);
 });

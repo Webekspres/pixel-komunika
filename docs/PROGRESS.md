@@ -11,9 +11,9 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-12
-- Fase aktif: Sprint 2 catch-up selesai; rekonsiliasi keputusan klien 7-11 Agustus berlanjut
-- Status umum: fondasi Sprint 2 inti selesai dan teruji; beberapa keputusan operasional/PPh 22 masih menunggu klien
+- Tanggal update terakhir: 2026-08-13
+- Fase aktif: Backend MVP P0 (services/schema/jobs/seed) siap untuk wiring frontend
+- Status umum: skema ERD gap ditutup; service domain + adapter POS/WA stub + scheduler aktif; Pest 52/52
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -41,63 +41,52 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 2 — Catalog, pricing, stock, dan data contoh POS
 
-- Status: selesai fondasi + admin PPh 22; formula PPh 22 final menunggu keputusan klien
+- Status: selesai fondasi + admin PPh 22; multi-rate/pembulatan PPh tetap provisional (OPN-006)
 - Target hasil:
   - adapter data contoh POS
   - import/upsert produk, harga, stok
   - aturan harga partai/grosir
   - konfigurasi PPh 22
 - Catatan:
-  - Tabel kategori, brand, produk, enrichment, harga, tax rule, snapshot stok, dan ledger stok sudah dibuat.
-  - Jalur import data contoh POS-like bersifat idempotent melalui `catalog:import-sample`.
-  - Rule harga partai/grosir diperbaiki (eligibility partai min 5/SKU, tidak agregasi antar-SKU; partai cart-wide saat satu SKU memenuhi syarat).
+  - Tabel kategori, brand, produk, enrichment, media, harga, tax rule, snapshot stok, dan ledger stok sudah dibuat.
+  - Jalur import data contoh POS-like bersifat idempotent melalui `catalog:import-sample` / `pos:sync-masters`.
+  - Partai cart-wide mengalahkan grosir; PPh 22 memakai `(basis / 1,11) × tarif` dengan rounding config.
   - Admin UI `/admin/tax-rules` untuk kelola ambang dan tarif PPh 22 (termasuk 0%).
-  - Klarifikasi klien 7-11 Agustus: partai mengalahkan grosir; formula PPh 22 `(subtotal kategori terpicu / 1,11) x tarif` belum diimplementasikan — menunggu keputusan final multi-kategori dan pembulatan.
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: fondasi tersedia; beberapa requirement operasional terbaru belum tercakup penuh
+- Status: backend siap; wiring UI lanjutan (PDF/resi/WA link) masih berikutnya
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
-  - ongkir Biteship (dikembangkan menggunakan adapter `MockBiteshipShippingService`)
-  - order + invoice + expiry unpaid
+  - ongkir Biteship (mock) + kurir toko Bandung
+  - order + invoice + expiry unpaid + shipment/payment rows
 - Catatan:
-  - Skema tabel `carts`, `cart_items`, `orders`, `order_items`, `invoices` sudah terpasang.
-  - `CartService` mengelola manipulasi item & kalkulasi PPh 22/partai price.
-  - `OrderService` membuat order, snapshot invoice (termasuk identitas toko), `tax_pph22_snapshot`, serta mengurangi stok pada `inventory_snapshot` dan `inventory_ledger`.
-  - Scheduler `orders:auto-cancel-unpaid` aktif (daily 00:05).
-  - Endpoint POS `GET /api/pos/orders/{order_number}` untuk acknowledgement.
-  - Fitur UI Livewire `CartIndex`, `Checkout`, `CustomerOrders`, `OrderDetail`, dan `AdminOrders` sudah lengkap & teruji.
-  - Identitas invoice, preview PDF, kanal WhatsApp/email, penggabungan pesanan,
-    resi kondisional, kurir toko Bandung, Biteship production, konfirmasi terima,
-    status `TERKENDALA`, dan auto-complete 5 hari kerja belum tercakup penuh pada
-    fondasi yang ada.
+  - Checkout menulis `order_charge_components`, `shipments`, `payments`, outbox POS sale, notifikasi NEW_ORDER.
+  - Scheduler `orders:auto-cancel-unpaid` + `orders:auto-complete-shipped` (skip `TERKENDALA`).
+  - Endpoint POS `GET /api/pos/orders/{order_number}` tetap satu-satunya HTTP POS.
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
-- Status: selesai
-- Target hasil:
-  - upload bukti bayar privat (`PaymentProof`)
-  - approval/reject pembayaran oleh admin (`PaymentService`)
-  - pembatalan pesanan + pengembalian stok otomatis (`InventoryLedger` & `InventorySnapshot`)
-  - pengajuan & pengolahan retur pesanan (`OrderReturn`)
+- Status: selesai (service-level)
 - Catatan:
-  - Skema tabel `payment_proofs` & `order_returns` terpasang.
-  - `PaymentService` menangani upload bukti transfer & approval/rejection oleh admin.
-  - `OrderService::cancelOrder` & `processReturn` mengembalikan stok produk yang dibatalkan/diretur secara otomatis ke database.
-  - Automated test suite lulus 42/42.
+  - `payments` + `retain_until` 5 tahun; audit pada verify/reject.
+  - Cancel menyimpan metadata `ADMIN`/`SYSTEM` + `sales_returns` + return outbox.
+  - `processReturn` mengembalikan stok dan mengantri `WEB_RETURN_REPORT`.
 
 ### Fase 5 — Reporting, audit, sync resilience, security
 
-- Status: belum mulai
+- Status: fondasi backend selesai (tanpa UI laporan baru)
 - Target hasil:
   - laporan dasar
   - audit trail
   - retry/idempotency sync POS
   - security checks
 - Catatan:
-  - TBD
+  - `ReportingService` omzet dari status `shipped`/`completed` (satu snapshot, tanpa double-count logika terpisah).
+  - `AuditLogger` + policies Order/PaymentProof/CustomerProfile.
+  - Sample POS sync + ack simulator (success/fail/timeout); WhatsApp stub (`log`/`fake`).
+  - Scheduler: `pos:sync-*`, `pos:dispatch-*-reports`, `notifications:dispatch-pending`.
 
 ### Fase 6 — Release readiness
 
@@ -111,6 +100,17 @@ Dokumen ini dipakai untuk mencatat:
   - TBD
 
 ## Log progres
+
+### 2026-08-13
+
+- Selesai:
+  - Migrasi ERD parity (store/bank/media/charges/payments/shipments/POS sync/notifications/audit).
+  - Domain services: PPh `/1.11`, fulfillment, reporting, audit, notifications, POS outbox/sample sync, enrichment, customer verification + reseller account.
+  - Seed demo lengkap (store, bank, kurir Bandung, customer statuses, sample orders).
+  - Pest 52/52 termasuk `BackendMvpReadyTest`.
+- Next:
+  - Fokus wiring/frontend Livewire terhadap service yang sudah ada.
+  - Tunggu OPN eksternal untuk POS HTTP real, WA provider, rounding PPh final.
 
 ### 2026-08-12
 

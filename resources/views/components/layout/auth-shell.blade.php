@@ -1,25 +1,33 @@
 @props([
     'title',
-    'description'  => null,
-    'eyebrow'      => null,
-    'mascotVariant' => 'base',
+    'description' => null,
+    'eyebrow' => null,
+    'panelTitle' => 'Platform Belanja B2B Terpercaya',
+    'panelDescription' => 'Akses harga grosir dan partai eksklusif untuk pelanggan terverifikasi.',
 ])
 
 {{--
     Auth Shell — split brand panel + form.
-    Brand assets: brand-logo.png + Maskot-base.webp (Laravel, not Figma SVG)
+    Dark hero-style panel: auth-panel.webp + dark pattern (not yellow wash).
 --}}
 <div class="flex min-h-screen flex-col lg:flex-row" id="auth-page">
 
-    <div class="relative hidden flex-col justify-between overflow-hidden bg-brand-yellow px-10 py-10 lg:flex lg:w-[45%] xl:w-[40%] xl:px-14">
-        <div class="pointer-events-none absolute inset-0 opacity-10" aria-hidden="true">
-            @for ($i = 0; $i < 6; $i++)
-                <div
-                    class="absolute rounded-full border-4 border-brand-black"
-                    style="width: {{ 120 + $i * 60 }}px; height: {{ 120 + $i * 60 }}px; top: 50%; left: 50%; transform: translate(-50%, -50%);"
-                ></div>
-            @endfor
-        </div>
+    <div class="relative hidden flex-col justify-between overflow-hidden bg-brand-black px-10 py-10 lg:flex lg:w-[45%] xl:w-[40%] xl:px-14">
+        <div
+            class="pointer-events-none absolute inset-0 bg-cover bg-[position:center_40%] bg-no-repeat"
+            style="background-image: url('{{ asset('assets/hero/auth-panel.webp') }}')"
+            aria-hidden="true"
+        ></div>
+        {{-- Soft dark wash like hero — keeps copy readable without yellow overlay --}}
+        <div
+            class="pointer-events-none absolute inset-0 bg-linear-to-b from-brand-black/80 via-brand-black/45 to-brand-black/85"
+            aria-hidden="true"
+        ></div>
+        <div
+            class="pointer-events-none absolute inset-0 opacity-[0.12]"
+            style="background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0); background-size: 22px 22px;"
+            aria-hidden="true"
+        ></div>
 
         <div class="relative z-10">
             <a href="{{ route('home') }}" aria-label="Pixel Komunika beranda">
@@ -33,34 +41,26 @@
             </a>
         </div>
 
-        <div class="relative z-10 flex flex-col items-center">
-            <img
-                src="{{ asset('assets/mascot/Maskot-base.webp') }}"
-                alt="Pixel Komunika Mascot"
-                class="animate-float w-44 drop-shadow-2xl xl:w-48"
-                width="192"
-                height="192"
-                loading="eager"
-            >
-            <h2 class="mt-4 text-center text-2xl leading-tight font-black text-brand-black">
-                Platform Belanja B2B<br>Terpercaya
+        <div class="relative z-10 mt-auto">
+            <h2 class="text-center text-2xl leading-tight font-black text-white">
+                {{ $panelTitle }}
             </h2>
-            <p class="mt-3 max-w-xs text-center text-sm leading-relaxed text-brand-black/70">
-                Akses harga grosir dan partai eksklusif untuk pelanggan terverifikasi.
+            <p class="mx-auto mt-3 max-w-xs text-center text-sm leading-relaxed text-white/70">
+                {{ $panelDescription }}
             </p>
-        </div>
 
-        <div class="relative z-10 grid grid-cols-3 gap-3">
-            @foreach ([
-                ['value' => '500+', 'label' => 'Produk'],
-                ['value' => '200+', 'label' => 'Reseller Aktif'],
-                ['value' => '24/7', 'label' => 'Dukungan'],
-            ] as $stat)
-                <div class="rounded-2xl bg-white/30 px-3 py-3 text-center">
-                    <p class="text-xl font-black text-brand-black">{{ $stat['value'] }}</p>
-                    <p class="text-xs font-semibold text-brand-black/70">{{ $stat['label'] }}</p>
-                </div>
-            @endforeach
+            <div class="mt-8 grid grid-cols-3 gap-3">
+                @foreach ([
+                    ['value' => '500+', 'label' => 'Produk'],
+                    ['value' => '200+', 'label' => 'Reseller Aktif'],
+                    ['value' => '24/7', 'label' => 'Dukungan'],
+                ] as $stat)
+                    <div class="rounded-2xl border border-white/10 bg-white/10 px-3 py-3 text-center backdrop-blur-sm">
+                        <p class="text-xl font-black text-brand-yellow">{{ $stat['value'] }}</p>
+                        <p class="text-xs font-semibold text-white/65">{{ $stat['label'] }}</p>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
 

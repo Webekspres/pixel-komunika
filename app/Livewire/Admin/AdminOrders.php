@@ -70,7 +70,7 @@ class AdminOrders extends Component
     public function cancelOrder(int $orderId, OrderService $orderService)
     {
         $order = Order::findOrFail($orderId);
-        $orderService->cancelOrder($order, 'Dibatalkan oleh Admin', 'ADMIN');
+        $orderService->cancelOrder($order, 'Dibatalkan oleh Admin', 'ADMIN', auth()->user());
 
         session()->flash('success', "Order #{$order->order_number} berhasil dibatalkan dan stok telah direstore.");
     }

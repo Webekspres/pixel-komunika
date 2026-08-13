@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PaymentProof extends Model
 {
     protected $fillable = [
+        'payment_id',
         'order_id',
         'user_id',
         'bank_name',
         'account_name',
         'amount',
         'proof_path',
+        'checksum',
+        'retain_until',
         'status',
+        'is_active',
         'rejection_reason',
         'reviewed_by',
         'reviewed_at',
@@ -23,11 +27,18 @@ class PaymentProof extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'reviewed_at' => 'datetime',
+        'retain_until' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class);
     }
 
     public function user(): BelongsTo

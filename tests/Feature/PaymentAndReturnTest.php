@@ -117,9 +117,10 @@ it('restores inventory stock when an order is cancelled', function () {
     expect($snapshotAfterOrder)->toBe($snapshotBefore - 3);
 
     // Cancel order
-    $orderService->cancelOrder($order, 'Testing cancellation', 'ADMIN');
+    $orderService->cancelOrder($order, 'Testing cancellation', 'SYSTEM');
 
     $snapshotAfterCancel = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
     expect($snapshotAfterCancel)->toBe($snapshotBefore);
     expect($order->fresh()->status)->toBe('cancelled');
+    expect($order->fresh()->cancellation_source)->toBe('SYSTEM');
 });

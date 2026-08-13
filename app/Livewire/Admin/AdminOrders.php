@@ -8,6 +8,7 @@ use App\Services\OrderService;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,6 +17,7 @@ class AdminOrders extends Component
 {
     use WithPagination;
 
+    #[Url]
     public string $statusFilter = 'all';
 
     public string $search = '';

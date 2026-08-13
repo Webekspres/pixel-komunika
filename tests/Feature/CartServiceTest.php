@@ -36,6 +36,26 @@ it('can add products to cart, update quantity, and get summary', function () {
     expect($summaryEmpty['total_items'])->toBe(0);
 });
 
+it('can clear all cart items at once', function () {
+    $cartService = app(CartService::class);
+    $user = User::factory()->create();
+    $cart = $cartService->getOrCreateCart($user);
+
+    $products = Product::query()->take(2)->get();
+    expect($products)->toHaveCount(2);
+
+    $cartService->addItem($cart, $products[0]->id, 1);
+    $cartService->addItem($cart, $products[1]->id, 1);
+
+    expect($cartService->getCartSummary($cart)['items'])->toHaveCount(2);
+
+    $deleted = $cartService->clearCart($cart);
+
+    expect($deleted)->toBeGreaterThan(0)
+        ->and($cartService->getCartSummary($cart)['total_items'])->toBe(0)
+        ->and($cartService->getCartSummary($cart)['items'])->toHaveCount(0);
+});
+
 it('throws exception if quantity added exceeds available stock', function () {
     $cartService = app(CartService::class);
     $user = User::factory()->create();

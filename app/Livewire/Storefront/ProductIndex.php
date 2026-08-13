@@ -75,8 +75,9 @@ class ProductIndex extends Component
 
         try {
             $cartService->addItem($cart, $productId, 1);
+            $productName = Product::query()->whereKey($productId)->value('name') ?? 'Produk';
             $this->dispatch('cart-updated');
-            $this->dispatch('open-cart-drawer');
+            $this->dispatch('cart-item-added', name: $productName);
         } catch (\InvalidArgumentException $e) {
             session()->flash('error', $e->getMessage());
         }
@@ -155,6 +156,6 @@ class ProductIndex extends Component
             'brands' => $brands,
             'products' => $products,
             'cartCount' => $cartSummary['total_items'],
-        ])->layout('layouts.guest');
+        ])->layout('layouts.storefront');
     }
 }

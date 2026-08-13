@@ -45,11 +45,13 @@ it('blocks pending customers from checkout and order history', function () {
 
     $this->actingAs($pending)
         ->get(route('checkout.index'))
-        ->assertForbidden();
+        ->assertRedirect(route('cart.index'))
+        ->assertSessionHas('error');
 
     $this->actingAs($pending)
         ->get(route('orders.index'))
-        ->assertForbidden();
+        ->assertRedirect(route('cart.index'))
+        ->assertSessionHas('error');
 });
 
 it('allows active customers to access checkout and order history', function () {

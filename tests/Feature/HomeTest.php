@@ -10,9 +10,9 @@ it('shows the branded home page', function () {
     $this->get(route('home'))
         ->assertOk()
         ->assertSee('Pixel Komunika')
-        ->assertSee('Aksesoris')
-        ->assertSee('konektivitas')
-        ->assertSee('Katalog Produk')
-        ->assertSee('Dirancang untuk reseller')
-        ->assertSee('Akun terverifikasi');
+        ->assertSee('Belanja Elektronik')
+        ->assertSee('Harga Grosir')
+        ->assertSee('Kategori Produk')
+        ->assertSee('Produk Pilihan')
+        ->assertSee('Mengapa Pixel Komunika');
 });

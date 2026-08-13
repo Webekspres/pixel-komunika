@@ -92,6 +92,11 @@ class CartService
         return (bool) $cart->items()->where('id', $cartItemId)->delete();
     }
 
+    public function clearCart(Cart $cart): int
+    {
+        return $cart->items()->delete();
+    }
+
     public function getCartSummary(Cart $cart): array
     {
         $cart->load(['items.product.category', 'items.product.prices']);

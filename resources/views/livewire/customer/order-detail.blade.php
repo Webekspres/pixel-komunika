@@ -1,4 +1,31 @@
 <x-layout.app-page>
+    @if (session()->has('success'))
+        <div class="overflow-hidden rounded-3xl border border-zinc-100 bg-white">
+            <div class="relative bg-brand-yellow px-6 py-8 text-center">
+                <img
+                    src="{{ asset('assets/mascot/Maskot-base.webp') }}"
+                    alt="Maskot Pixel Komunika"
+                    class="mx-auto mb-3 h-28 w-auto drop-shadow-lg"
+                    width="112"
+                    height="112"
+                >
+                <div class="flex items-center justify-center gap-2">
+                    <x-icon name="check-circle" class="size-5 text-emerald-700" />
+                    <h2 class="text-xl font-black text-brand-black">Pesanan Berhasil!</h2>
+                </div>
+                <p class="mt-1 text-sm text-brand-black/70">{{ session('success') }}</p>
+            </div>
+            <div class="space-y-3 bg-amber-50 p-5 text-sm text-amber-800">
+                <p class="font-bold">Langkah selanjutnya</p>
+                <ol class="space-y-2 text-xs text-amber-700">
+                    <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">1</span> Transfer ke rekening yang tersedia</li>
+                    <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">2</span> Unggah bukti transfer di halaman ini</li>
+                    <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">3</span> Tunggu verifikasi pembayaran dari admin</li>
+                </ol>
+            </div>
+        </div>
+    @endif
+
     <x-storefront.breadcrumb :items="[
         ['label' => 'Riwayat Pesanan', 'href' => route('orders.index')],
         ['label' => $order->order_number, 'href' => null],

@@ -9,7 +9,7 @@
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-zinc-100 font-sans text-brand-black antialiased">
+    <body class="min-h-screen bg-white font-sans text-brand-black antialiased">
 
         {{--
             Auth Shell — Completely standalone.

@@ -52,6 +52,16 @@ class CartDrawer extends Component
         $this->dispatch('cart-updated');
     }
 
+    public function clearCart(CartService $cartService)
+    {
+        $user = Auth::user();
+        $sessionId = session()->getId();
+        $cart = $cartService->getOrCreateCart($user, $sessionId);
+
+        $cartService->clearCart($cart);
+        $this->dispatch('cart-updated');
+    }
+
     public function render(CartService $cartService)
     {
         $user = Auth::user();

@@ -1,160 +1,166 @@
 {{--
-    Storefront Homepage — Pixel Komunika
-    Surface rhythm: Hero (yellow) → Categories (white) → Products Grid (gray-50)
-    → Promo Banner (yellow-muted) → Benefits (white) → CTA (yellow) → Footer (black)
+    Storefront Homepage — Pixel Komunika (Figma Make parity)
+    Rhythm: Hero → Categories → Products → Promo → Benefits → CTA → Footer (layout)
+    Brand assets: hero-storefront.webp (mascot baked in) + brand-logo.png
 --}}
-<div class="min-h-screen" x-data="{ mobileMenu: false }">
-
-    {{-- Flash Notifications --}}
+<div>
     @if (session()->has('success'))
-        <div class="fixed bottom-5 right-5 z-50 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl flex items-center gap-2" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+        <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
             <x-icon name="check-circle" class="size-5" />
             <span>{{ session('success') }}</span>
-            <a href="{{ route('cart.index') }}" class="underline ml-2 text-emerald-100 hover:text-white">Lihat Keranjang</a>
+            <a href="{{ route('cart.index') }}" class="ml-2 text-emerald-100 underline hover:text-white">Lihat Keranjang</a>
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="fixed bottom-5 right-5 z-50 rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-xl flex items-center gap-2" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+        <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
             <x-icon name="x-circle" class="size-5" />
             <span>{{ session('error') }}</span>
         </div>
     @endif
 
-    {{-- Storefront Navigation --}}
-    <x-storefront.navbar :cart-count="$cartCount" />
+    {{-- Hero: fills remaining viewport under sticky header (no leftover on scroll) --}}
+    <section
+        class="relative flex w-full flex-col overflow-hidden"
+        style="height: calc(100svh - var(--storefront-header-height, 8rem)); min-height: calc(100svh - var(--storefront-header-height, 8rem));"
+    >
+        <img
+            src="{{ asset('assets/hero/hero-storefront.webp') }}"
+            alt=""
+            aria-hidden="true"
+            class="absolute inset-0 h-full w-full object-cover object-center sm:object-[70%_center]"
+            width="1536"
+            height="1024"
+            fetchpriority="high"
+            decoding="async"
+        >
 
-    {{-- =========================================================
-         HERO — Yellow
-         ========================================================= --}}
-    <section class="relative overflow-hidden bg-brand-yellow">
-
-        {{-- Dot-grid background --}}
+        {{-- Left-weighted overlay for copy contrast --}}
         <div
-            class="pointer-events-none absolute inset-0 opacity-20"
-            style="background-image: radial-gradient(circle at 1px 1px, #181818 1px, transparent 0); background-size: 28px 28px;"
+            class="absolute inset-0 bg-linear-to-r from-brand-black/75 via-brand-black/45 to-brand-black/15 sm:via-brand-black/40 sm:to-transparent"
             aria-hidden="true"
         ></div>
 
-        <div class="container-2xl relative py-16 sm:py-24 lg:py-28">
-            <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] lg:gap-16">
-
-                {{-- Left: Copy --}}
-                <div class="animate-fade-up max-w-2xl">
-                    <div class="mb-6 flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-brand-black/15 bg-white/60 px-3 py-1 text-xs font-semibold text-brand-black backdrop-blur-sm">
-                            <x-icon name="badge-check" class="size-3.5 text-brand-black" />
-                            B2B Terverifikasi
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-brand-black/15 bg-white/60 px-3 py-1 text-xs font-semibold text-brand-black backdrop-blur-sm">
-                            <x-icon name="tag" class="size-3.5 text-brand-black" />
-                            Harga Partai & Grosir
-                        </span>
-                    </div>
-
-                    <h1 class="text-4xl font-bold tracking-tight text-brand-black sm:text-5xl lg:text-6xl">
-                        Aksesoris &amp;<br>
-                        <span class="relative whitespace-nowrap">
-                            konektivitas
-                            <svg class="absolute -bottom-1 left-0 w-full" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path d="M2 9.5C50 4 150 2 298 5" stroke="#181818" stroke-width="3.5" stroke-linecap="round" opacity="0.35"/>
-                            </svg>
-                        </span>
-                        <br>untuk bisnis Anda
-                    </h1>
-
-                    <p class="mt-5 max-w-xl text-base leading-relaxed text-brand-black/75 sm:text-lg">
-                        Power bank, charger, audio, kartu data, voucher internet, dan pulsa —
-                        <strong class="font-semibold text-brand-black">harga partai &amp; grosir</strong>
-                        langsung dari master data POS toko.
-                    </p>
-
-                    {{-- CTAs --}}
-                    <div class="mt-8 flex flex-wrap items-center gap-3">
-                        <a
-                            href="#katalog"
-                            class="inline-flex items-center gap-2 rounded-full bg-brand-black px-7 py-3.5 text-sm font-semibold text-brand-white transition hover:bg-brand-black/85"
-                        >
-                            Jelajahi Katalog POS
-                            <x-icon name="arrow-down" class="size-4" />
-                        </a>
-                        <a
-                            href="{{ route('cart.index') }}"
-                            wire:navigate
-                            class="inline-flex items-center gap-2 rounded-full border-2 border-brand-black/20 bg-white/50 px-6 py-3.5 text-sm font-semibold text-brand-black transition hover:border-brand-black/40 hover:bg-white/70"
-                        >
-                            <x-icon name="shopping-cart" class="size-4" />
-                            Keranjang ({{ $cartCount }})
-                        </a>
-                    </div>
-
-                    <div class="mt-8 grid gap-3 sm:grid-cols-3">
-                        <div class="storefront-panel-soft px-4 py-4">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/38">Kurasi</p>
-                            <p class="mt-2 text-2xl font-extrabold text-brand-black">{{ $products->count() }}+</p>
-                            <p class="mt-1 text-xs leading-relaxed text-brand-black/58">Produk pilihan tampil langsung dari master data toko.</p>
-                        </div>
-                        <div class="storefront-panel-soft px-4 py-4">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/38">Kategori</p>
-                            <p class="mt-2 text-2xl font-extrabold text-brand-black">{{ $categories->count() }}</p>
-                            <p class="mt-1 text-xs leading-relaxed text-brand-black/58">Aksesoris, konektivitas, dan kebutuhan operasional bisnis.</p>
-                        </div>
-                        <div class="storefront-panel-soft px-4 py-4">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/38">Akses</p>
-                            <p class="mt-2 text-2xl font-extrabold text-brand-black">B2B</p>
-                            <p class="mt-1 text-xs leading-relaxed text-brand-black/58">Harga terbuka untuk akun aktif, tetap aman untuk pengunjung umum.</p>
-                        </div>
-                    </div>
+        <div class="container-2xl relative z-10 flex flex-1 flex-col justify-center py-12 sm:py-16 lg:py-20">
+            <div class="max-w-xl text-center lg:max-w-2xl lg:text-left">
+                <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
+                    <x-icon name="star" class="size-3 fill-current text-brand-yellow" />
+                    Platform B2B Terpercaya
                 </div>
 
-                {{-- Right: Mascot --}}
-                <div class="animate-fade-up relative flex justify-center lg:justify-end">
-                    <img
-                        src="{{ asset('assets/mascot/Maskot-base.webp') }}"
-                        alt="Maskot Pixel Komunika"
-                        class="animate-float relative z-10 w-full max-w-xs drop-shadow-2xl sm:max-w-sm lg:max-w-md"
-                        width="450"
-                        height="450"
-                        fetchpriority="high"
+                <h1 class="text-4xl leading-tight font-black text-white sm:text-5xl xl:text-6xl">
+                    Belanja Elektronik<br>
+                    <span class="text-brand-yellow">Harga Grosir</span>
+                </h1>
+
+                <p class="mt-4 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg {{ auth()->check() ? '' : 'mx-auto lg:mx-0' }}">
+                    Dapatkan akses eksklusif ke harga partai dan grosir untuk elektronik, aksesoris, dan produk telekomunikasi berkualitas tinggi.
+                </p>
+
+                <div class="mt-6 flex flex-wrap justify-center gap-4 lg:justify-start">
+                    @foreach (['500+ Produk', '200+ Reseller', 'Pengiriman Bandung', 'Harga Terjamin'] as $badge)
+                        <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
+                            <div class="flex size-4 items-center justify-center rounded-full bg-brand-yellow">
+                                <span class="text-[10px] text-brand-black">✓</span>
+                            </div>
+                            {{ $badge }}
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+                    <a
+                        href="{{ route('products.index') }}"
+                        wire:navigate
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-yellow px-7 py-3.5 text-base font-bold text-brand-black transition-colors hover:bg-brand-yellow-soft"
                     >
+                        Belanja Sekarang
+                        <x-icon name="arrow-right" class="size-4.5" />
+                    </a>
+                    <a
+                        href="{{ route('register') }}"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 bg-white/15 px-7 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25"
+                    >
+                        Daftar Pelanggan
+                    </a>
                 </div>
+            </div>
+        </div>
+
+        <div class="relative z-10 h-8 w-full shrink-0 bg-white" style="clip-path: ellipse(60% 100% at 50% 100%)" aria-hidden="true"></div>
+    </section>
+
+    {{-- Categories --}}
+    <section id="kategori" class="w-full bg-white py-12 sm:py-16">
+        <div class="container-2xl">
+            <div class="mb-8 flex items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Kategori Produk</h2>
+                    <p class="mt-1 text-sm text-zinc-500">Temukan produk sesuai kebutuhanmu</p>
+                </div>
+                <a href="{{ route('products.index') }}" wire:navigate class="hidden items-center gap-1 text-sm font-semibold text-brand-black transition-colors hover:text-brand-yellow sm:inline-flex">
+                    Lihat Semua
+                    <x-icon name="arrow-right" class="size-3.5" />
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+                @forelse ($categories as $category)
+                    @php
+                        $icons = ['battery', 'plug', 'headphones', 'database', 'camera', 'phone', 'keyboard', 'package'];
+                        $icon = $icons[$loop->index % count($icons)];
+                    @endphp
+                    <a
+                        href="{{ route('products.index', ['kategori' => $category->id]) }}"
+                        wire:navigate
+                        class="group flex flex-col items-center gap-2 rounded-2xl border-2 border-transparent bg-zinc-50 p-3 text-center transition-all duration-200 hover:border-brand-yellow hover:bg-brand-yellow/10 sm:p-4"
+                    >
+                        <div class="inline-flex size-11 items-center justify-center rounded-xl bg-white shadow-sm">
+                            <x-icon :name="$icon" class="size-5 text-brand-black" />
+                        </div>
+                        <span class="text-xs leading-tight font-semibold text-zinc-700 group-hover:text-brand-black">{{ $category->name }}</span>
+                    </a>
+                @empty
+                    <div class="col-span-full">
+                        <x-ui.empty-state title="Belum ada kategori" description="Kategori produk akan muncul setelah data POS tersedia." icon="layout-grid" />
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
 
-    {{-- =========================================================
-         LIVE CATALOG GRID — E-Commerce Experience
-         ========================================================= --}}
-    <section id="katalog" class="section-white py-16 sm:py-24">
+    {{-- Featured products --}}
+    <section id="katalog" class="section-gray w-full py-12 sm:py-16">
         <div class="container-2xl">
-            <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                <x-storefront.section-header
-                    eyebrow="Master Data POS"
-                    title="Katalog Produk"
-                    description="Pilih produk dari inventaris toko. Tambahkan langsung ke keranjang belanja Anda."
-                />
-
-                {{-- Search & Category Filter bar --}}
-                <div class="storefront-panel-soft flex flex-wrap items-center gap-2 p-3">
-                    <button
-                        wire:click="$set('selectedCategory', 'all')"
-                        class="rounded-full px-4 py-2 text-xs font-semibold transition {{ $selectedCategory === 'all' ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
-                    >
-                        Semua Produk
-                    </button>
-                    @foreach ($categories as $category)
-                        <button
-                            wire:click="$set('selectedCategory', '{{ $category->id }}')"
-                            class="rounded-full px-4 py-2 text-xs font-semibold transition {{ (string)$selectedCategory === (string)$category->id ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
-                        >
-                            {{ $category->name }}
-                        </button>
-                    @endforeach
+            <div class="mb-8 flex items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Produk Pilihan</h2>
+                    <p class="mt-1 text-sm text-zinc-500">Produk terlaris dengan kualitas terjamin</p>
                 </div>
+                <a href="{{ route('products.index') }}" wire:navigate class="hidden items-center gap-1 text-sm font-semibold text-brand-black transition-colors hover:text-brand-yellow sm:inline-flex">
+                    Lihat Semua
+                    <x-icon name="arrow-right" class="size-3.5" />
+                </a>
             </div>
 
-            {{-- Products Grid --}}
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="mb-6 flex flex-wrap gap-2">
+                <button
+                    wire:click="$set('selectedCategory', 'all')"
+                    class="rounded-full px-4 py-2 text-xs font-semibold transition {{ $selectedCategory === 'all' ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
+                >
+                    Semua
+                </button>
+                @foreach ($categories as $category)
+                    <button
+                        wire:click="$set('selectedCategory', '{{ $category->id }}')"
+                        class="rounded-full px-4 py-2 text-xs font-semibold transition {{ (string) $selectedCategory === (string) $category->id ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
+                    >
+                        {{ $category->name }}
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @forelse ($products as $product)
                     <x-storefront.product-card
                         :title="$product->name"
@@ -170,16 +176,16 @@
                                 <a
                                     href="{{ route('products.show', $product) }}"
                                     wire:navigate
-                                    class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
+                                    class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
                                 >
                                     Detail
                                 </a>
                                 <button
                                     wire:click="addToCart({{ $product->id }})"
-                                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
+                                    class="inline-flex items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                 >
-                                    <x-icon name="shopping-cart" class="size-4" />
-                                    <span>+ Keranjang</span>
+                                    <x-icon name="shopping-cart" class="size-3.5" />
+                                    + Keranjang
                                 </button>
                             </div>
                         </x-slot:actions>
@@ -190,6 +196,7 @@
                             title="Tidak ada produk ditemukan"
                             description="Coba gunakan kata kunci pencarian atau kategori lain."
                             icon="package-search"
+                            mascot
                         />
                     </div>
                 @endforelse
@@ -197,114 +204,70 @@
         </div>
     </section>
 
-    {{-- =========================================================
-         BENEFITS / WHY US — White
-         ========================================================= --}}
-    <section id="unggulan" class="section-gray border-t border-zinc-200 py-20 sm:py-28">
-        <div class="container-2xl">
-            <x-storefront.section-header
-                eyebrow="Kenapa kami"
-                title="Dirancang untuk reseller &amp; bisnis"
-                description="Portal untuk pelanggan terverifikasi — bukan toko publik terbuka. Setiap fitur dibangun untuk mendukung operasional grosir Anda."
-                align="center"
-                class="mb-14"
-            />
+    {{-- Promo dark banner --}}
+    <x-storefront.banner
+        theme="dark"
+        title="Hemat Lebih Banyak dengan Harga Partai"
+        description="Beli minimal 5 unit untuk 1 produk dan nikmati harga partai yang lebih hemat. Semakin banyak, semakin murah!"
+        primary-label="Mulai Belanja"
+        :primary-href="route('products.index')"
+        :secondary-label="auth()->guest() ? 'Daftar Gratis' : null"
+        :secondary-href="auth()->guest() ? route('register') : null"
+    />
 
-            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-                <x-storefront.feature-card
-                    icon="badge-check"
-                    title="Akun terverifikasi"
-                    description="Setelah disetujui admin, harga partai & grosir siap dipakai untuk pemesanan langsung dari platform."
-                />
-                <x-storefront.feature-card
-                    icon="package"
-                    title="Katalog dari POS"
-                    description="Produk, stok, dan harga mengikuti master operasional toko — bukan inventaris spekulatif atau data manual."
-                />
-                <x-storefront.feature-card
-                    icon="truck"
-                    title="Pengiriman jelas"
-                    description="Pilihan kurir toko atau rate pengiriman eksternal saat checkout, dengan total yang dihitung server-side secara akurat."
-                />
-                <x-storefront.feature-card
-                    icon="receipt"
-                    title="Invoice otomatis"
-                    description="Setiap pesanan menghasilkan invoice yang bisa diunduh, lengkap dengan detail harga, pajak, dan ongkos kirim."
-                />
-                <x-storefront.feature-card
-                    icon="history"
-                    title="Riwayat order"
-                    description="Lihat semua pesanan Anda dalam satu dashboard — dari pending hingga terkirim, lengkap dengan status terkini."
-                />
-                <x-storefront.feature-card
-                    icon="shield-check"
-                    title="Data aman"
-                    description="Harga grosir hanya terlihat untuk akun yang sudah disetujui. Tamu dan akun pending tidak mendapat akses."
-                />
+    {{-- Benefits --}}
+    <section id="unggulan" class="w-full bg-white py-12 sm:py-16">
+        <div class="container-2xl">
+            <div class="mb-10 text-center">
+                <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Mengapa Pixel Komunika?</h2>
+                <p class="mt-2 text-sm text-zinc-500">Keunggulan yang membuat kami berbeda</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                    <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-emerald-100">
+                        <x-icon name="shield-check" class="size-5 text-emerald-600" />
+                    </div>
+                    <h3 class="mb-2 font-bold text-zinc-900">Produk Asli</h3>
+                    <p class="text-sm leading-relaxed text-zinc-500">Semua produk 100% original bergaransi dari distributor resmi</p>
+                </div>
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                    <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-blue-100">
+                        <x-icon name="truck" class="size-5 text-blue-600" />
+                    </div>
+                    <h3 class="mb-2 font-bold text-zinc-900">Pengiriman Cepat</h3>
+                    <p class="text-sm leading-relaxed text-zinc-500">Kurir toko H+1 ke seluruh Bandung, atau ekspedisi nasional</p>
+                </div>
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                    <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-brand-yellow/20">
+                        <x-icon name="users" class="size-5 text-brand-yellow-dark" />
+                    </div>
+                    <h3 class="mb-2 font-bold text-zinc-900">Khusus Terverifikasi</h3>
+                    <p class="text-sm leading-relaxed text-zinc-500">Harga partai eksklusif hanya untuk reseller yang telah diverifikasi</p>
+                </div>
+                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md">
+                    <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-red-100">
+                        <x-icon name="star" class="size-5 text-red-500" />
+                    </div>
+                    <h3 class="mb-2 font-bold text-zinc-900">Layanan Prioritas</h3>
+                    <p class="text-sm leading-relaxed text-zinc-500">Dukungan via WhatsApp dan penanganan order yang cepat</p>
+                </div>
             </div>
         </div>
     </section>
 
-    {{-- =========================================================
-         FOOTER — Black
-         ========================================================= --}}
-    <footer class="section-black border-t border-brand-white/8">
-        <div class="container-2xl py-14 sm:py-16">
-            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
-
-                {{-- Brand --}}
-                <div class="sm:col-span-2 lg:col-span-1">
-                    <img
-                        src="{{ asset('assets/brand-logo.png') }}"
-                        alt="Pixel Komunika"
-                        class="mb-5 h-9 w-auto brightness-0 invert"
-                        width="140"
-                        height="36"
-                        loading="lazy"
-                    >
-                    <p class="max-w-xs text-sm leading-relaxed text-brand-white/55">
-                        E-commerce pelanggan terverifikasi untuk aksesoris elektronik, kartu &amp; voucher, dan pulsa — harga partai &amp; grosir.
-                    </p>
-                </div>
-
-                {{-- Platform --}}
-                <div>
-                    <h3 class="mb-4 text-xs font-semibold tracking-widest text-brand-white/35 uppercase">Platform</h3>
-                    <ul class="space-y-2.5 text-sm text-brand-white/60">
-                        <li><a href="#katalog" class="transition hover:text-brand-yellow">Katalog produk</a></li>
-                        <li><a href="#unggulan" class="transition hover:text-brand-yellow">Keunggulan</a></li>
-                        <li><a href="{{ route('cart.index') }}" wire:navigate class="transition hover:text-brand-yellow">Keranjang Belanja</a></li>
-                    </ul>
-                </div>
-
-                {{-- Legal --}}
-                <div>
-                    <h3 class="mb-4 text-xs font-semibold tracking-widest text-brand-white/35 uppercase">Legal</h3>
-                    <ul class="space-y-2.5 text-sm text-brand-white/60">
-                        <li><span class="text-brand-white/30">Kebijakan privasi</span></li>
-                        <li><span class="text-brand-white/30">Syarat layanan</span></li>
-                    </ul>
-                </div>
-
-                {{-- Account --}}
-                <div>
-                    <h3 class="mb-4 text-xs font-semibold tracking-widest text-brand-white/35 uppercase">Akun</h3>
-                    <ul class="space-y-2.5 text-sm text-brand-white/60">
-                        @auth
-                            <li><a href="{{ route('account.dashboard') }}" class="transition hover:text-brand-yellow">Dashboard akun</a></li>
-                        @else
-                            <li><a href="{{ route('register') }}" class="transition hover:text-brand-yellow">Daftar</a></li>
-                            <li><a href="{{ route('login') }}" class="transition hover:text-brand-yellow">Masuk</a></li>
-                        @endauth
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mt-12 flex flex-col items-start justify-between gap-4 border-t border-brand-white/8 pt-8 sm:flex-row sm:items-center">
-                <p class="text-xs text-brand-white/35">&copy; {{ date('Y') }} Pixel Komunika. All rights reserved.</p>
-                <p class="text-xs text-brand-white/25">Dibangun dengan ❤ di Indonesia</p>
-            </div>
-        </div>
-    </footer>
-
+    {{-- Guest registration CTA --}}
+    @guest
+        <x-storefront.cta
+            theme="yellow"
+            align="left"
+            mascot
+            title="Siap Bergabung?"
+            description="Daftarkan usahamu sekarang dan dapatkan akses ke harga grosir dan partai eksklusif. Proses verifikasi cepat dan mudah."
+            primary-label="Daftar Sekarang"
+            :primary-href="route('register')"
+            secondary-label="Sudah punya akun? Masuk"
+            :secondary-href="route('login')"
+        />
+    @endguest
 </div>

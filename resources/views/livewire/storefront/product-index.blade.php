@@ -1,35 +1,24 @@
-<div class="min-h-screen bg-zinc-50/70" x-data="{ mobileFilterOpen: false }">
+<div class="min-h-screen bg-surface-2" x-data="{ mobileFilterOpen: false }">
 
-    {{-- Notification Toast --}}
     @if (session()->has('success'))
-        <div class="fixed bottom-5 right-5 z-50 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl flex items-center gap-2" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+        <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
             <x-icon name="check-circle" class="size-5" />
             <span>{{ session('success') }}</span>
-            <a href="{{ route('cart.index') }}" class="underline ml-2 text-emerald-100 hover:text-white">Lihat Keranjang</a>
+            <a href="{{ route('cart.index') }}" class="ml-2 text-emerald-100 underline hover:text-white">Lihat Keranjang</a>
         </div>
     @endif
 
-    {{-- Storefront Header --}}
-    <x-storefront.navbar :cart-count="$cartCount" />
-
-    {{-- Main Container --}}
     <div class="container-2xl py-6 sm:py-8 lg:py-10">
 
-        {{-- Breadcrumb --}}
         <div class="mb-6">
             <x-storefront.breadcrumb :items="[['label' => 'Katalog Produk', 'href' => null]]" />
         </div>
 
-        {{-- Page Header Title --}}
-        <div class="storefront-panel-soft mb-8 flex flex-col gap-5 p-6 sm:p-7 lg:flex-row lg:items-end lg:justify-between">
+        <div class="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-3xl">
-                <p class="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.28em] text-brand-black/45">
-                    <span class="inline-block h-px w-8 bg-brand-yellow"></span>
-                    katalog storefront
-                </p>
-                <h1 class="text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl lg:text-[2.6rem]">Katalog Produk POS</h1>
-                <p class="mt-2 text-sm text-zinc-500 max-w-2xl">
-                    Jelajahi seluruh inventaris operasional toko. Harga grosir dan partai terbuka untuk akun terverifikasi.
+                <h1 class="text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl">Katalog Produk</h1>
+                <p class="mt-2 max-w-2xl text-sm text-zinc-500">
+                    Jelajahi inventaris operasional toko. Harga grosir dan partai terbuka untuk akun terverifikasi.
                 </p>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -50,6 +39,7 @@
             <div class="hidden lg:block">
                 <div class="storefront-panel sticky top-24 p-6">
                     <x-storefront.filter-sidebar
+                        group="desktop"
                         :categories="$categories"
                         :brands="$brands"
                         :selectedCategory="$selectedCategory"
@@ -227,6 +217,7 @@
             </div>
 
             <x-storefront.filter-sidebar
+                group="mobile"
                 :categories="$categories"
                 :brands="$brands"
                 :selectedCategory="$selectedCategory"

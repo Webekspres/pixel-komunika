@@ -4,6 +4,7 @@ use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Account\AddressController;
 use App\Http\Controllers\Admin\CategoryTaxRuleController;
 use App\Http\Controllers\Admin\CustomerReviewController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Livewire\Admin\AdminOrders;
@@ -14,7 +15,6 @@ use App\Livewire\Storefront\CartIndex;
 use App\Livewire\Storefront\Checkout;
 use App\Livewire\Storefront\ProductIndex;
 use App\Livewire\Storefront\ProductShow;
-use App\Models\CustomerProfile;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -51,14 +51,7 @@ Route::middleware(['auth', 'active.customer'])->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () {
-        return view('admin.dashboard', [
-            'customerCount' => CustomerProfile::count(),
-            'pendingCustomerCount' => CustomerProfile::where('verification_status', CustomerProfile::PENDING)->count(),
-            'orderCount' => Order::count(),
-            'unpaidOrderCount' => Order::whereIn('status', ['unpaid', 'payment_pending'])->count(),
-        ]);
-    })->name('dashboard');
+    Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/customers', [CustomerReviewController::class, 'index'])->name('customers.index');
     Route::get('/customers/{customerProfile}', [CustomerReviewController::class, 'show'])->name('customers.show');
     Route::patch('/customers/{customerProfile}', [CustomerReviewController::class, 'update'])->name('customers.update');

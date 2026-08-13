@@ -15,8 +15,16 @@ class CustomerReviewController extends Controller
         $status = $request->string('status')->toString();
         $search = trim($request->string('q')->toString());
 
+        $statusCounts = [
+            'all' => CustomerProfile::query()->count(),
+            CustomerProfile::PENDING => CustomerProfile::query()->where('verification_status', CustomerProfile::PENDING)->count(),
+            CustomerProfile::ACTIVE => CustomerProfile::query()->where('verification_status', CustomerProfile::ACTIVE)->count(),
+            CustomerProfile::REJECTED => CustomerProfile::query()->where('verification_status', CustomerProfile::REJECTED)->count(),
+            CustomerProfile::SUSPENDED => CustomerProfile::query()->where('verification_status', CustomerProfile::SUSPENDED)->count(),
+        ];
+
         $customers = CustomerProfile::query()
-            ->with(['user', 'reviewer'])
+            ->with(['user.addresses' => fn ($q) => $q->orderByDesc('is_default')])
             ->when($status !== '', fn ($query) => $query->where('verification_status', $status))
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search): void {
@@ -28,7 +36,12 @@ class CustomerReviewController extends Controller
                         });
                 });
             })
-            ->orderBy('verification_status')
+            ->orderByRaw("CASE verification_status
+                WHEN 'PENDING_VERIFICATION' THEN 0
+                WHEN 'ACTIVE' THEN 1
+                WHEN 'REJECTED' THEN 2
+                WHEN 'SUSPENDED' THEN 3
+                ELSE 4 END")
             ->orderByDesc('created_at')
             ->paginate(12)
             ->withQueryString();
@@ -37,11 +50,13 @@ class CustomerReviewController extends Controller
             'customers' => $customers,
             'selectedStatus' => $status,
             'search' => $search,
-            'statuses' => [
-                CustomerProfile::PENDING,
-                CustomerProfile::ACTIVE,
-                CustomerProfile::REJECTED,
-                CustomerProfile::SUSPENDED,
+            'statusCounts' => $statusCounts,
+            'tabs' => [
+                ['key' => '', 'label' => 'Semua', 'countKey' => 'all'],
+                ['key' => CustomerProfile::PENDING, 'label' => 'Menunggu', 'countKey' => CustomerProfile::PENDING],
+                ['key' => CustomerProfile::ACTIVE, 'label' => 'Aktif', 'countKey' => CustomerProfile::ACTIVE],
+                ['key' => CustomerProfile::REJECTED, 'label' => 'Ditolak', 'countKey' => CustomerProfile::REJECTED],
+                ['key' => CustomerProfile::SUSPENDED, 'label' => 'Dibekukan', 'countKey' => CustomerProfile::SUSPENDED],
             ],
         ]);
     }

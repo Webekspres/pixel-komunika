@@ -34,6 +34,17 @@ class CartIndex extends Component
         session()->flash('success', 'Item berhasil dihapus dari keranjang.');
     }
 
+    public function clearCart(CartService $cartService)
+    {
+        $user = Auth::user();
+        $sessionId = session()->getId();
+        $cart = $cartService->getOrCreateCart($user, $sessionId);
+
+        $cartService->clearCart($cart);
+        $this->dispatch('cart-updated');
+        session()->flash('success', 'Keranjang berhasil dikosongkan.');
+    }
+
     public function render(CartService $cartService)
     {
         $user = Auth::user();
@@ -43,6 +54,6 @@ class CartIndex extends Component
 
         return view('livewire.storefront.cart-index', [
             'summary' => $summary,
-        ])->layout('layouts.app');
+        ])->layout('layouts.storefront');
     }
 }

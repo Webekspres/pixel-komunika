@@ -24,9 +24,9 @@
         ? 'mt-1 text-sm leading-relaxed text-zinc-500'
         : 'mt-1 text-sm leading-relaxed text-brand-black/55';
     $iconClass = $isAdmin
-        ? 'inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100'
+        ? 'inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-yellow/20'
         : 'inline-flex size-10 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow-muted';
-    $iconColorClass = $isAdmin ? 'size-5 text-zinc-600' : 'size-5 text-brand-black/70';
+    $iconColorClass = $isAdmin ? 'size-5 text-brand-yellow-dark' : 'size-5 text-brand-black/70';
 @endphp
 
 <section {{ $attributes->class([$wrapperClass, 'border-l-4 border-amber-400' => $accent]) }}>

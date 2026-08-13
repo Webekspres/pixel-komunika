@@ -1,17 +1,64 @@
 @props([
     'cartCount' => 0,
+    'categories' => collect(),
 ])
 
+{{-- Brand assets: brand-logo.png (Laravel) — not Figma text-mark --}}
 <header
-    class="sticky top-0 z-40 border-b border-brand-black/8 bg-brand-white/95 backdrop-blur-md"
-    x-data="{ scrolled: false, mobileMenu: false }"
-    @scroll.window="scrolled = window.scrollY > 12"
-    :class="scrolled ? 'shadow-sm' : ''"
+    x-ref="storefrontHeader"
+    class="sticky top-0 z-50 w-full border-b border-zinc-100 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.06)]"
+    x-data="{
+        mobileMenu: false,
+        announceVisible: true,
+        lastY: 0,
+        measureHeader() {
+            this.\$nextTick(() => {
+                const h = this.\$refs.storefrontHeader?.offsetHeight ?? 0;
+                document.documentElement.style.setProperty('--storefront-header-height', h + 'px');
+            });
+        },
+        onScroll() {
+            const y = window.scrollY || 0;
+            if (y < 24) {
+                this.announceVisible = true;
+            } else if (y > this.lastY + 4) {
+                this.announceVisible = false;
+            } else if (y < this.lastY - 4) {
+                this.announceVisible = true;
+            }
+            this.lastY = y;
+        },
+    }"
+    x-init="
+        measureHeader();
+        \$watch('announceVisible', () => measureHeader());
+        new ResizeObserver(() => measureHeader()).observe(\$refs.storefrontHeader);
+    "
+    @scroll.window="onScroll()"
 >
-    <div class="container-2xl">
-        <div class="flex h-16 items-center gap-6 sm:h-[68px]">
+    {{-- Announcement bar — hide on scroll down, show on scroll up --}}
+    <div
+        x-show="announceVisible"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 -translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-2"
+        class="w-full overflow-hidden bg-brand-black"
+        @transitionend="measureHeader()"
+    >
+        <div class="flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium text-white">
+            <x-icon name="party-popper" class="size-3.5 shrink-0 text-brand-yellow" />
+            <span>
+                Harga spesial untuk pelanggan terverifikasi!
+                <a href="{{ route('register') }}" class="ml-1 font-semibold underline transition-colors hover:text-brand-yellow">Daftar sekarang</a>
+            </span>
+        </div>
+    </div>
 
-            {{-- Logo --}}
+    <nav class="container-2xl" aria-label="Navigasi utama">
+        <div class="flex h-16 items-center gap-4">
             <a href="{{ route('home') }}" wire:navigate class="shrink-0" aria-label="Pixel Komunika beranda">
                 <img
                     src="{{ asset('assets/brand-logo.png') }}"
@@ -22,179 +69,97 @@
                 >
             </a>
 
-            {{-- Desktop Navigation Links --}}
-            <nav class="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
-                <a
-                    href="{{ route('products.index') }}"
-                    wire:navigate
-                    class="rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors {{ request()->routeIs('products.*') ? 'bg-amber-400/20 text-amber-900 font-bold' : 'text-brand-black/75 hover:bg-brand-black/5 hover:text-brand-black' }}"
+            <form action="{{ route('products.index') }}" method="GET" class="relative hidden max-w-2xl flex-1 md:block">
+                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
+                <input
+                    type="search"
+                    name="cari"
+                    value="{{ request('cari') }}"
+                    placeholder="Cari charger, kabel data, headset, power bank..."
+                    class="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-brand-black transition focus:border-brand-yellow focus:bg-white focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
                 >
-                    Katalog Produk
-                </a>
+            </form>
 
-                <a
-                    href="{{ route('products.index') }}#kategori"
-                    wire:navigate
-                    class="rounded-lg px-3.5 py-2 text-sm font-medium text-brand-black/75 transition-colors hover:bg-brand-black/5 hover:text-brand-black"
-                >
-                    Kategori
-                </a>
-
-                <a
-                    href="{{ route('home') }}#unggulan"
-                    wire:navigate
-                    class="rounded-lg px-3.5 py-2 text-sm font-medium text-brand-black/75 transition-colors hover:bg-brand-black/5 hover:text-brand-black"
-                >
-                    Keunggulan
-                </a>
-            </nav>
-
-            {{-- Right Actions Area --}}
-            <div class="ml-auto flex items-center gap-2 sm:gap-3">
-
-                {{-- Global Search Bar (Desktop) --}}
-                <form action="{{ route('products.index') }}" method="GET" class="relative hidden lg:block">
-                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-brand-black/40" />
-                    <input
-                        type="search"
-                        name="cari"
-                        value="{{ request('cari') }}"
-                        placeholder="Cari katalog & SKU..."
-                        class="w-52 rounded-full border border-brand-black/15 bg-zinc-50 py-2 pr-4 pl-9 text-xs text-brand-black transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400 xl:w-64"
-                    >
-                </form>
-
-                {{-- Cart Trigger Button --}}
+            <div class="ml-auto flex items-center gap-1">
                 <button
                     type="button"
                     @click="$dispatch('open-cart-drawer')"
-                    class="relative inline-flex size-10 items-center justify-center rounded-full text-brand-black/75 transition hover:bg-brand-black/5 hover:text-brand-black cursor-pointer"
+                    class="relative inline-flex size-10 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-50"
                     aria-label="Keranjang belanja"
                 >
                     <x-icon name="shopping-cart" class="size-5" />
                     @if ($cartCount > 0)
-                        <span class="absolute -top-1 -right-1 inline-flex size-5 items-center justify-center rounded-full bg-amber-400 text-[11px] font-extrabold text-brand-black shadow-xs">
-                            {{ $cartCount }}
+                        <span class="absolute -top-0.5 -right-0.5 inline-flex size-5 items-center justify-center rounded-full bg-brand-red text-[10px] font-bold text-white">
+                            {{ $cartCount > 9 ? '9+' : $cartCount }}
                         </span>
                     @endif
                 </button>
 
-                {{-- User Avatar Dropdown (Authenticated) / Auth Links (Guest) --}}
                 @auth
-                    <div class="relative" x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false">
+                    <div class="relative hidden sm:block" x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false">
                         <button
                             type="button"
                             @click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center gap-2 rounded-full border border-zinc-200/80 bg-zinc-50 p-1.5 pr-3 text-left transition hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                            class="flex items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-zinc-50"
                         >
-                            <div class="inline-flex size-7 items-center justify-center rounded-full bg-amber-400 font-extrabold text-brand-black text-xs shadow-xs">
+                            <div class="inline-flex size-7 items-center justify-center rounded-full bg-brand-yellow text-xs font-bold text-brand-black">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
-                            <span class="hidden text-xs font-bold text-zinc-800 lg:block max-w-[120px] truncate">
-                                {{ auth()->user()->name }}
-                            </span>
-                            <x-icon name="chevron-down" class="size-3.5 text-zinc-400 transition-transform duration-150" ::class="userMenuOpen ? 'rotate-180' : ''" />
+                            <span class="max-w-[100px] truncate text-sm font-medium text-zinc-700">{{ auth()->user()->name }}</span>
+                            <x-icon name="chevron-down" class="size-3.5 text-zinc-400" />
                         </button>
 
-                        {{-- Dropdown Card --}}
                         <div
                             x-show="userMenuOpen"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-60 origin-top-right rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl z-50"
                             x-cloak
+                            x-transition
+                            class="absolute right-0 z-50 mt-1 w-48 rounded-2xl border border-zinc-100 bg-white py-1.5 shadow-lg"
                         >
-                            {{-- Header User Info --}}
-                            <div class="border-b border-zinc-100 px-3 py-2.5">
-                                <p class="text-xs font-bold text-zinc-900 truncate">{{ auth()->user()->name }}</p>
-                                <p class="truncate text-[11px] text-zinc-400 mt-0.5">{{ auth()->user()->email }}</p>
-                                <div class="mt-2 inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200/60">
-                                    <span>Status:</span>
-                                    <span class="uppercase">{{ auth()->user()->isAdmin() ? 'ADMIN' : (auth()->user()->customerStatus() ?: 'PENDING') }}</span>
-                                </div>
-                            </div>
-
-                            {{-- Navigation Menu --}}
-                            <div class="py-1.5 space-y-0.5">
-                                <a
-                                    href="{{ route('account.dashboard') }}"
-                                    wire:navigate
-                                    class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100"
-                                >
-                                    <x-icon name="user-circle" class="size-4 text-zinc-400" />
-                                    <span>Dashboard Akun</span>
+                            @if (auth()->user()->isAdmin())
+                                <a href="{{ route('admin.dashboard') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50">
+                                    <x-icon name="shield" class="size-4 text-zinc-400" />
+                                    Admin
                                 </a>
-
-                                @if (auth()->user()->isActiveCustomer())
-                                    <a
-                                        href="{{ route('orders.index') }}"
-                                        wire:navigate
-                                        class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100"
-                                    >
-                                        <x-icon name="package" class="size-4 text-zinc-400" />
-                                        <span>Riwayat Order</span>
-                                    </a>
-
-                                    <a
-                                        href="{{ route('checkout.index') }}"
-                                        wire:navigate
-                                        class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100"
-                                    >
-                                        <x-icon name="shopping-bag" class="size-4 text-zinc-400" />
-                                        <span>Checkout</span>
-                                    </a>
-                                @endif
-
-                                @if (auth()->user()->isAdmin())
-                                    <a
-                                        href="{{ route('admin.customers.index') }}"
-                                        wire:navigate
-                                        class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-amber-800 transition hover:bg-amber-50"
-                                    >
-                                        <x-icon name="shield-check" class="size-4 text-amber-600" />
-                                        <span>Panel Admin</span>
-                                    </a>
-                                @endif
-                            </div>
-
-                            {{-- Sign Out Button --}}
-                            <div class="border-t border-zinc-100 pt-1.5">
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button
-                                        type="submit"
-                                        class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50"
-                                    >
-                                        <x-icon name="log-out" class="size-4 text-red-500" />
-                                        <span>Keluar (Sign Out)</span>
-                                    </button>
-                                </form>
-                            </div>
+                            @else
+                                <a href="{{ route('account.dashboard') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50">
+                                    <x-icon name="user" class="size-4 text-zinc-400" />
+                                    Akun Saya
+                                </a>
+                            @endif
+                            @if (auth()->user()->isActiveCustomer())
+                                <a href="{{ route('orders.index') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50">
+                                    <x-icon name="package" class="size-4 text-zinc-400" />
+                                    Pesanan Saya
+                                </a>
+                                <a href="{{ route('account.addresses.index') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50">
+                                    <x-icon name="map-pin" class="size-4 text-zinc-400" />
+                                    Alamat
+                                </a>
+                            @endif
+                            <div class="my-1 border-t border-zinc-100"></div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 transition hover:bg-red-50">
+                                    <x-icon name="log-out" class="size-4" />
+                                    Keluar
+                                </button>
+                            </form>
                         </div>
                     </div>
                 @else
-                    <a
-                        href="{{ route('login') }}"
-                        class="hidden text-xs font-bold text-brand-black/75 transition hover:text-brand-black sm:inline"
-                    >
-                        Masuk
-                    </a>
-                    <a
-                        href="{{ route('register') }}"
-                        class="inline-flex items-center gap-1 rounded-full bg-brand-yellow px-4 py-2 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft shadow-xs"
-                    >
-                        Daftar
-                    </a>
+                    <div class="hidden items-center gap-2 sm:flex">
+                        <a href="{{ route('login') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 hover:text-zinc-900">
+                            Masuk
+                        </a>
+                        <a href="{{ route('register') }}" class="rounded-xl bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-dark">
+                            Daftar
+                        </a>
+                    </div>
                 @endauth
 
-                {{-- Mobile Menu Toggle --}}
                 <button
                     type="button"
-                    class="inline-flex size-9 items-center justify-center rounded-lg text-brand-black/60 transition hover:bg-brand-black/5 md:hidden"
+                    class="inline-flex size-10 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-50 md:hidden"
                     @click="mobileMenu = !mobileMenu"
                     :aria-expanded="mobileMenu"
                     aria-label="Buka menu"
@@ -204,59 +169,88 @@
                 </button>
             </div>
         </div>
-    </div>
 
-    {{-- Mobile Dropdown Drawer Menu --}}
+        @if ($categories->isNotEmpty())
+            <div class="hidden h-10 items-center gap-0 overflow-x-auto lg:flex -mx-1">
+                <a
+                    href="{{ route('products.index') }}"
+                    wire:navigate
+                    class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:bg-zinc-50 hover:text-brand-black' }}"
+                >
+                    Semua Produk
+                </a>
+                @foreach ($categories as $category)
+                    <a
+                        href="{{ route('products.index', ['kategori' => $category->id]) }}"
+                        wire:navigate
+                        class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request('kategori') == $category->id ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:bg-zinc-50 hover:text-brand-black' }}"
+                    >
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </nav>
+
     <div
         x-show="mobileMenu"
-        x-transition:enter="transition duration-150 ease-out"
-        x-transition:enter-start="opacity-0 -translate-y-2"
-        x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition duration-100 ease-in"
-        x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-2"
-        class="border-t border-brand-black/8 bg-brand-white md:hidden"
         x-cloak
+        x-transition
+        class="space-y-3 border-t border-zinc-100 bg-white px-4 py-4 md:hidden"
         @click.outside="mobileMenu = false"
     >
-        <nav class="container-2xl grid gap-1 py-3">
-            <a
-                href="{{ route('products.index') }}"
-                wire:navigate
-                @click="mobileMenu = false"
-                class="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-black/80 hover:bg-brand-black/5"
+        <form action="{{ route('products.index') }}" method="GET" class="relative">
+            <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+            <input
+                type="search"
+                name="cari"
+                placeholder="Cari produk..."
+                class="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-9 text-sm focus:border-brand-yellow focus:outline-none"
             >
-                Katalog Produk
-            </a>
-            <a
-                href="{{ route('products.index') }}#kategori"
-                wire:navigate
-                @click="mobileMenu = false"
-                class="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-black/70 hover:bg-brand-black/5"
-            >
-                Kategori
-            </a>
-            <a
-                href="{{ route('home') }}#unggulan"
-                wire:navigate
-                @click="mobileMenu = false"
-                class="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-black/70 hover:bg-brand-black/5"
-            >
-                Keunggulan
-            </a>
+        </form>
 
-            <div class="my-2 border-t border-brand-black/8"></div>
+        @guest
+            <div class="flex gap-2">
+                <a href="{{ route('login') }}" class="flex-1 rounded-xl border-2 border-zinc-200 px-4 py-2.5 text-center text-sm font-semibold text-zinc-700">Masuk</a>
+                <a href="{{ route('register') }}" class="flex-1 rounded-xl bg-brand-yellow px-4 py-2.5 text-center text-sm font-semibold text-brand-black">Daftar</a>
+            </div>
+        @endguest
 
-            @auth
-                <a href="{{ route('account.dashboard') }}" wire:navigate class="rounded-lg px-3 py-2.5 text-sm font-bold text-zinc-900 hover:bg-zinc-100">Dashboard Akun</a>
-                <form method="POST" action="{{ route('logout') }}" class="pt-1">
+        @if ($categories->isNotEmpty())
+            <div class="grid grid-cols-2 gap-1.5">
+                <a
+                    href="{{ route('products.index') }}"
+                    wire:navigate
+                    @click="mobileMenu = false"
+                    class="rounded-xl bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100"
+                >
+                    Semua Produk
+                </a>
+                @foreach ($categories as $category)
+                    <a
+                        href="{{ route('products.index', ['kategori' => $category->id]) }}"
+                        wire:navigate
+                        @click="mobileMenu = false"
+                        class="rounded-xl bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100"
+                    >
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
+        @auth
+            <div class="space-y-1 border-t border-zinc-100 pt-3">
+                @if (auth()->user()->isAdmin())
+                    <a href="{{ route('admin.dashboard') }}" wire:navigate class="block rounded-lg px-3 py-2.5 text-sm font-semibold">Dashboard Admin</a>
+                @else
+                    <a href="{{ route('account.dashboard') }}" wire:navigate class="block rounded-lg px-3 py-2.5 text-sm font-semibold">Akun Saya</a>
+                @endif
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full text-left rounded-lg px-3 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50">Sign Out</button>
+                    <button type="submit" class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-red-600">Keluar</button>
                 </form>
-            @else
-                <a href="{{ route('login') }}" class="rounded-lg px-3 py-2.5 text-sm font-medium text-brand-black/70 hover:bg-brand-black/5">Masuk</a>
-                <a href="{{ route('register') }}" class="mt-1 inline-flex w-full justify-center rounded-full bg-brand-yellow px-4 py-2.5 text-sm font-bold text-brand-black">Daftar Akun</a>
-            @endauth
-        </nav>
+            </div>
+        @endauth
     </div>
 </header>

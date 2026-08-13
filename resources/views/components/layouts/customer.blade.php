@@ -9,56 +9,82 @@
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-brand-white font-sans text-brand-black antialiased">
-        <div class="min-h-screen bg-linear-to-b from-brand-yellow-muted/55 via-brand-white to-zinc-50">
-            <x-storefront.navbar :cart-count="0" />
+    <body class="min-h-screen bg-surface-2 font-sans text-brand-black antialiased">
+        @php
+            $cartService = app(\App\Services\CartService::class);
+            $storefrontCart = $cartService->getOrCreateCart(auth()->user(), session()->getId());
+            $storefrontCartCount = $cartService->getCartSummary($storefrontCart)['total_items'] ?? 0;
+            $navCategories = \App\Models\Category::query()->orderBy('name')->limit(8)->get();
+            $customerStatus = auth()->user()?->customerStatus();
+            $businessName = auth()->user()?->customerProfile?->business_name;
+        @endphp
+
+        <div class="flex min-h-screen flex-col bg-surface-2">
+            <x-storefront.navbar :cart-count="$storefrontCartCount" :categories="$navCategories" />
 
             @auth
-                <section class="border-b border-brand-black/8 bg-white/72 backdrop-blur-sm">
+                <div class="w-full border-b border-zinc-100 bg-white">
                     <div class="container-2xl py-4">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                            <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/40">Portal pelanggan</p>
-                                <h1 class="mt-2 text-2xl font-bold tracking-tight text-brand-black sm:text-3xl">Akun Saya</h1>
-                                <p class="mt-1 text-sm text-brand-black/55">Ringkasan akun, pesanan, profil, dan alamat Anda tetap berada dalam pengalaman storefront Pixel Komunika.</p>
+                        <div class="mb-3 flex items-center gap-3">
+                            <div class="flex size-10 items-center justify-center rounded-full bg-brand-yellow">
+                                <span class="text-sm font-bold text-brand-black">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                             </div>
-
-                            <nav class="flex flex-wrap gap-2" aria-label="Navigasi akun pelanggan">
-                                <a
-                                    href="{{ route('account.dashboard') }}"
-                                    class="rounded-full px-4 py-2 text-sm font-semibold transition {{ request()->routeIs('account.dashboard') ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
-                                >
-                                    Ringkasan
-                                </a>
-                                @if (auth()->user()->isActiveCustomer())
-                                    <a
-                                        href="{{ route('orders.index') }}"
-                                        class="rounded-full px-4 py-2 text-sm font-semibold transition {{ request()->routeIs('orders.*') ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
-                                    >
-                                        Pesanan Saya
-                                    </a>
-                                @endif
-                                <a
-                                    href="{{ route('account.profile') }}"
-                                    class="rounded-full px-4 py-2 text-sm font-semibold transition {{ request()->routeIs('account.profile') ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
-                                >
-                                    Profil
-                                </a>
-                                <a
-                                    href="{{ route('account.addresses.index') }}"
-                                    class="rounded-full px-4 py-2 text-sm font-semibold transition {{ request()->routeIs('account.addresses.*') ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
-                                >
-                                    Alamat
-                                </a>
-                            </nav>
+                            <div class="min-w-0">
+                                <p class="truncate text-sm font-bold text-zinc-900">{{ auth()->user()->name }}</p>
+                                <p class="truncate text-xs text-zinc-500">{{ $businessName ?: auth()->user()->email }}</p>
+                            </div>
+                            @if ($customerStatus === \App\Models\CustomerProfile::ACTIVE)
+                                <span class="ml-auto rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Aktif</span>
+                            @elseif ($customerStatus)
+                                <span class="ml-auto rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 uppercase">{{ $customerStatus }}</span>
+                            @endif
                         </div>
+
+                        <nav class="flex gap-1 overflow-x-auto pb-1" aria-label="Navigasi akun pelanggan">
+                            <a
+                                href="{{ route('account.dashboard') }}"
+                                wire:navigate
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors {{ request()->routeIs('account.dashboard') ? 'bg-brand-yellow text-brand-black' : 'text-zinc-600 hover:bg-zinc-100' }}"
+                            >
+                                <x-icon name="layout-dashboard" class="size-3.5" />
+                                Ringkasan
+                            </a>
+                            @if (auth()->user()->isActiveCustomer())
+                                <a
+                                    href="{{ route('orders.index') }}"
+                                    wire:navigate
+                                    class="inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors {{ request()->routeIs('orders.*') ? 'bg-brand-yellow text-brand-black' : 'text-zinc-600 hover:bg-zinc-100' }}"
+                                >
+                                    <x-icon name="package" class="size-3.5" />
+                                    Pesanan Saya
+                                </a>
+                            @endif
+                            <a
+                                href="{{ route('account.profile') }}"
+                                wire:navigate
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors {{ request()->routeIs('account.profile') ? 'bg-brand-yellow text-brand-black' : 'text-zinc-600 hover:bg-zinc-100' }}"
+                            >
+                                <x-icon name="user" class="size-3.5" />
+                                Profil
+                            </a>
+                            <a
+                                href="{{ route('account.addresses.index') }}"
+                                wire:navigate
+                                class="inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors {{ request()->routeIs('account.addresses.*') ? 'bg-brand-yellow text-brand-black' : 'text-zinc-600 hover:bg-zinc-100' }}"
+                            >
+                                <x-icon name="map-pin" class="size-3.5" />
+                                Alamat
+                            </a>
+                        </nav>
                     </div>
-                </section>
+                </div>
             @endauth
 
-            <main>
+            <main class="flex-1">
                 {{ $slot }}
             </main>
+
+            <x-storefront.footer :categories="$navCategories" />
         </div>
 
         @livewire('storefront.cart-drawer')

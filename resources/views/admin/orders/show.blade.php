@@ -11,7 +11,7 @@
 
         <div class="grid gap-6 md:grid-cols-3">
             <x-ui.stat-card label="Pelanggan" :value="$order->user->name" icon="users" variant="admin" />
-            <x-ui.stat-card label="Status order" :value="strtoupper($order->status)" icon="clipboard-list" variant="admin" />
+            <x-ui.stat-card label="Status order" :value="\App\Services\Admin\AdminDashboardService::orderStatusLabel($order->status)" icon="clipboard-list" variant="admin" />
             <x-ui.stat-card label="Status invoice" :value="strtoupper($order->invoice?->status ?? 'draft')" icon="badge-check" variant="admin" />
         </div>
 

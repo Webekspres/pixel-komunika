@@ -99,6 +99,6 @@ class Checkout extends Component
             'shippingRates' => $shippingRates,
             'shippingCost' => $shippingCost,
             'grandTotal' => $grandTotal,
-        ])->layout('layouts.app');
+        ])->layout('layouts.storefront');
     }
 }

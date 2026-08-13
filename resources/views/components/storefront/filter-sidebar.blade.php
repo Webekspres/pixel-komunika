@@ -6,6 +6,7 @@
     'inStockOnly' => false,
     'minPrice' => null,
     'maxPrice' => null,
+    'group' => 'filter',
 ])
 
 <aside {{ $attributes->class('w-full space-y-6') }}>
@@ -32,10 +33,10 @@
             <label class="flex cursor-pointer items-center gap-2.5 text-xs text-brand-black/70 hover:text-brand-black">
                 <input
                     type="radio"
-                    name="category_filter"
+                    name="category_filter_{{ $group }}"
                     wire:model.live="selectedCategory"
                     value="all"
-                    class="size-4 border-zinc-300 text-amber-500 focus:ring-amber-400"
+                    class="size-4 border-zinc-300 accent-amber-500 text-amber-500 focus:ring-amber-400"
                 />
                 <span class="font-medium">Semua Kategori</span>
             </label>
@@ -44,10 +45,10 @@
                     <div class="flex items-center gap-2.5">
                         <input
                             type="radio"
-                            name="category_filter"
+                            name="category_filter_{{ $group }}"
                             wire:model.live="selectedCategory"
-                            value="{{ $cat->id }}"
-                            class="size-4 text-amber-500 border-zinc-300 focus:ring-amber-400"
+                            value="{{ (string) $cat->id }}"
+                            class="size-4 accent-amber-500 text-amber-500 border-zinc-300 focus:ring-amber-400"
                         />
                         <span class="font-medium">{{ $cat->name }}</span>
                     </div>

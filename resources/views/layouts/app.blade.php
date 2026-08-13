@@ -62,6 +62,7 @@
         </div>
 
         @livewire('storefront.cart-drawer')
+        <x-storefront.cart-toast />
         @livewireScripts
         @fluxScripts
     </body>

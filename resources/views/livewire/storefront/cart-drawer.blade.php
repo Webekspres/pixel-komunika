@@ -33,24 +33,39 @@
         x-cloak
     >
         {{-- Header --}}
-        <div class="border-b border-brand-black/8 bg-brand-yellow-muted/45 p-5">
-            <div class="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-brand-black/40">
-                <span class="inline-block h-px w-8 bg-brand-yellow"></span>
+        <div class="border-b border-brand-black/8 bg-brand-yellow p-5">
+            <div class="mb-3 flex items-center gap-2 text-[11px] font-bold tracking-[0.24em] text-brand-black/50 uppercase">
+                <span class="inline-block h-px w-8 bg-brand-black/40"></span>
                 mini checkout
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <x-icon name="shopping-cart" class="size-5 text-zinc-900" />
-                    <h3 class="text-lg font-bold text-zinc-900">Keranjang Belanja</h3>
-                    <span class="rounded-full bg-brand-yellow px-2.5 py-0.5 text-xs font-bold text-brand-black">
+                    <x-icon name="shopping-cart" class="size-5 text-brand-black" />
+                    <h3 class="text-lg font-bold text-brand-black">Keranjang Belanja</h3>
+                    <span class="rounded-full bg-brand-black px-2.5 py-0.5 text-xs font-bold text-brand-yellow">
                         {{ $summary['total_items'] }}
                     </span>
                 </div>
-                <button @click="isOpen = false" class="rounded-full p-2 text-zinc-400 transition-colors hover:bg-white hover:text-zinc-700">
+                <button @click="isOpen = false" class="rounded-full p-2 text-brand-black/50 transition-colors hover:bg-white/60 hover:text-brand-black">
                     <x-icon name="x" class="size-5" />
                 </button>
             </div>
         </div>
+
+        @if ($summary['items']->isNotEmpty())
+            <div class="flex items-center justify-between border-b border-brand-black/8 bg-white px-5 py-2.5">
+                <span class="text-[11px] font-medium text-brand-black/45">{{ $summary['items']->count() }} jenis produk</span>
+                <button
+                    type="button"
+                    wire:click="clearCart"
+                    wire:confirm="Kosongkan seluruh isi keranjang?"
+                    class="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 transition-colors hover:text-red-700"
+                >
+                    <x-icon name="trash-2" class="size-3.5" />
+                    Hapus Semua
+                </button>
+            </div>
+        @endif
 
         {{-- Cart Items Scrollable List --}}
         <div class="flex-1 overflow-y-auto p-5 space-y-4">
@@ -127,7 +142,7 @@
                     </a>
 
                     @auth
-                        @if (auth()->user()->customerStatus() === \App\Models\CustomerProfile::ACTIVE || auth()->user()->isAdmin())
+                        @if (auth()->user()->isActiveCustomer())
                             <a
                                 href="{{ route('checkout.index') }}"
                                 wire:navigate
@@ -138,7 +153,7 @@
                             </a>
                         @else
                             <button disabled class="inline-flex cursor-not-allowed items-center justify-center rounded-2xl bg-zinc-200 py-3 text-xs font-bold text-zinc-500">
-                                Menunggu Verifikasi
+                                {{ auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING ? 'Menunggu Verifikasi' : 'Checkout Terkunci' }}
                             </button>
                         @endif
                     @else
@@ -183,6 +198,20 @@
                     <x-icon name="x" class="size-6" />
                 </button>
             </div>
+            @if ($summary['items']->isNotEmpty())
+                <div class="mt-2 flex w-full items-center justify-between px-5 pb-1">
+                    <span class="text-[11px] font-medium text-zinc-400">{{ $summary['items']->count() }} jenis produk</span>
+                    <button
+                        type="button"
+                        wire:click="clearCart"
+                        wire:confirm="Kosongkan seluruh isi keranjang?"
+                        class="inline-flex items-center gap-1 text-xs font-bold text-red-600"
+                    >
+                        <x-icon name="trash-2" class="size-3.5" />
+                        Hapus Semua
+                    </button>
+                </div>
+            @endif
         </div>
 
         {{-- Mobile Scrollable Items --}}
@@ -242,7 +271,7 @@
                     </a>
 
                     @auth
-                        @if (auth()->user()->customerStatus() === \App\Models\CustomerProfile::ACTIVE || auth()->user()->isAdmin())
+                        @if (auth()->user()->isActiveCustomer())
                             <a
                                 href="{{ route('checkout.index') }}"
                                 wire:navigate
@@ -251,6 +280,10 @@
                             >
                                 Checkout
                             </a>
+                        @else
+                            <button disabled class="inline-flex cursor-not-allowed items-center justify-center rounded-xl bg-zinc-200 py-3 text-center text-xs font-bold text-zinc-500">
+                                {{ auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING ? 'Menunggu Verifikasi' : 'Checkout Terkunci' }}
+                            </button>
                         @endif
                     @else
                         <a

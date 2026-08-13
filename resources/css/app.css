@@ -13,8 +13,10 @@
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
         'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
+    /* Brand tokens aligned with Figma Make + DESIGN.md */
     --color-brand-yellow: #f8b818;
     --color-brand-yellow-soft: #f8d820;
+    --color-brand-yellow-dark: #d4950f;
     --color-brand-yellow-muted: #fef3c7;
     --color-brand-black: #181818;
     --color-brand-white: #ffffff;
@@ -25,8 +27,11 @@
     --color-surface-3: #f5f5f5;
 
     --color-success: #15803d;
+    --color-success-bg: #dcfce7;
     --color-warning: #f8b818;
-    --color-danger: #f81818;
+    --color-warning-bg: #fef3c7;
+    --color-danger: #dc2626;
+    --color-danger-bg: #fee2e2;
 
     --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
     --shadow-card-hover: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 8px -2px rgb(0 0 0 / 0.08);
@@ -161,13 +166,13 @@
     @apply bg-brand-black text-brand-white;
 }
 
-/* Container sizes */
+/* Storefront full-bleed padding (Figma: px-4 sm:px-6 lg:px-10 xl:px-12) — no max-width */
 @utility container-2xl {
-    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-14;
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-10 xl:px-12;
 }
 
 @utility container-lg {
-    @apply mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8 xl:px-10;
+    @apply mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-10 xl:px-12;
 }
 
 @utility storefront-panel {
@@ -191,6 +196,7 @@
 :root {
     --sidebar-width: 240px;
     --topbar-height: 56px;
+    --storefront-header-height: 8rem;
 }
 
 html {
@@ -205,4 +211,18 @@ html {
 
 .sidebar-nav-item.active {
     @apply bg-brand-black text-white shadow-sm;
+}
+
+/* Admin dark sidebar nav (Figma AdminShell) */
+.admin-nav-item {
+    @apply mx-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-zinc-400 transition-colors;
+    @apply hover:bg-white/10 hover:text-white;
+}
+
+.admin-nav-item.active {
+    @apply bg-brand-yellow font-semibold text-brand-black hover:bg-brand-yellow hover:text-brand-black;
+}
+
+.admin-nav-item-disabled {
+    @apply cursor-not-allowed opacity-55 hover:bg-transparent hover:text-zinc-400;
 }

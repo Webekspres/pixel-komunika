@@ -12,7 +12,7 @@ beforeEach(function () {
 it('renders product listing page with catalog items', function () {
     $this->get(route('products.index'))
         ->assertOk()
-        ->assertSee('Katalog Produk POS')
+        ->assertSee('Katalog Produk')
         ->assertSee('Filter Produk')
         ->assertSee('Verifikasi');
 });

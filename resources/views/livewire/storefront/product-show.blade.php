@@ -1,21 +1,15 @@
-<div class="min-h-screen bg-zinc-50/70 pb-24 lg:pb-12">
+<div class="min-h-screen bg-surface-2 pb-24 lg:pb-12">
 
-    {{-- Notification Toast --}}
     @if (session()->has('success'))
-        <div class="fixed bottom-5 right-5 z-50 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl flex items-center gap-2" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+        <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
             <x-icon name="check-circle" class="size-5" />
             <span>{{ session('success') }}</span>
-            <a href="{{ route('cart.index') }}" class="underline ml-2 text-emerald-100 hover:text-white">Lihat Keranjang</a>
+            <a href="{{ route('cart.index') }}" class="ml-2 text-emerald-100 underline hover:text-white">Lihat Keranjang</a>
         </div>
     @endif
 
-    {{-- Storefront Header --}}
-    <x-storefront.navbar :cart-count="$cartCount" />
-
-    {{-- Main PDP Container --}}
     <div class="container-2xl py-6 sm:py-8 lg:py-10">
 
-        {{-- Breadcrumb --}}
         <div class="mb-8">
             <x-storefront.breadcrumb :items="[
                 ['label' => 'Katalog Produk', 'href' => route('products.index')],

@@ -42,7 +42,7 @@ class ProductShow extends Component
         try {
             $cartService->addItem($cart, $this->product->id, $this->quantity);
             $this->dispatch('cart-updated');
-            $this->dispatch('open-cart-drawer');
+            $this->dispatch('cart-item-added', name: $this->product->name);
         } catch (\InvalidArgumentException $e) {
             session()->flash('error', $e->getMessage());
         }
@@ -66,7 +66,7 @@ class ProductShow extends Component
             'relatedProducts' => $relatedProducts,
             'cartCount' => $cartSummary['total_items'],
         ])
-            ->layout('layouts.guest')
+            ->layout('layouts.storefront')
             ->title("{$this->product->name} - Pixel Komunika");
     }
 }

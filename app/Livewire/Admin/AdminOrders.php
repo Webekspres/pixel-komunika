@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Domains\Notifications\NotificationService;
 use App\Domains\Order\FulfillmentService;
 use App\Models\Order;
 use App\Models\PaymentProof;
@@ -27,6 +28,17 @@ class AdminOrders extends Component
     public string $rejectionReason = '';
 
     public ?int $selectedProofId = null;
+
+    public function mount(NotificationService $notifications): void
+    {
+        // FR-NTF-001: seluruh notifikasi order baru dianggap dibaca saat admin
+        // membuka daftar pesanan yang akan diproses.
+        $user = Auth::user();
+        if ($user) {
+            $notifications->markOrderNotificationsRead($user);
+            $this->dispatch('notifications-updated');
+        }
+    }
 
     public function updatingSearch()
     {

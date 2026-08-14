@@ -77,7 +77,7 @@
                                         <div class="size-10 shrink-0 overflow-hidden rounded-xl border border-neutral-100 bg-neutral-50">
                                             @if ($primaryMedia)
                                                 <img
-                                                    src="{{ route('admin.products.media.show', $primaryMedia) }}"
+                                                    src="{{ $primaryMedia->url() }}"
                                                     alt="{{ $product->name }}"
                                                     class="size-full object-cover"
                                                     loading="lazy"

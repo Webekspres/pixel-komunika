@@ -98,10 +98,13 @@ it('filters reports by period and district', function () {
         ->assertOk()
         ->assertSee($order->order_number);
 
+    // Order dengan kecamatan berbeda tidak masuk tabel laporan (nomor order tetap
+    // muncul di panel notifikasi bell admin, sehingga validasi memakai isi tabel).
     $this->actingAs($admin)
         ->get(route('admin.reports.index', ['district' => 'Kecamatan Fiktif']))
         ->assertOk()
-        ->assertDontSee($order->order_number);
+        ->assertSee('Tidak ada transaksi pada periode ini.')
+        ->assertDontSee('Total omzet periode');
 });
 
 it('excludes unpaid orders from omzet report', function () {
@@ -112,7 +115,8 @@ it('excludes unpaid orders from omzet report', function () {
     $this->actingAs($admin)
         ->get(route('admin.reports.index'))
         ->assertOk()
-        ->assertDontSee($order->order_number);
+        ->assertSee('Tidak ada transaksi pada periode ini.')
+        ->assertDontSee('Total omzet periode');
 });
 
 it('blocks non-admins from reports', function () {

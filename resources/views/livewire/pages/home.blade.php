@@ -192,10 +192,12 @@
 
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
                 @forelse ($products as $product)
+                    @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                     <x-storefront.product-card
                         data-reveal
                         style="--reveal-delay: {{ min($loop->index, 7) * 55 }}ms"
                         :title="$product->name"
+                        :image="$primaryMedia?->url()"
                         :category="$product->category->name"
                         :sku="$product->sku"
                         :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"

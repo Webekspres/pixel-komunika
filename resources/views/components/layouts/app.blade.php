@@ -74,6 +74,10 @@
                         <x-icon name="award" class="size-4 shrink-0" />
                         <span>Merek</span>
                     </a>
+                    <a href="{{ route('admin.media.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.media.*') ? 'active' : '' }}">
+                        <x-icon name="image" class="size-4 shrink-0" />
+                        <span>Media</span>
+                    </a>
 
                     <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Pelanggan</p>
                     <a href="{{ route('admin.customers.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
@@ -140,16 +144,7 @@
                     </div>
 
                     <div class="ml-auto flex items-center gap-2">
-                        <button
-                            type="button"
-                            disabled
-                            class="relative inline-flex size-8 cursor-not-allowed items-center justify-center rounded-lg text-zinc-400"
-                            title="Notifikasi segera hadir"
-                            aria-label="Notifikasi"
-                        >
-                            <x-icon name="bell" class="size-4" />
-                            <span class="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-brand-red"></span>
-                        </button>
+                        <livewire:admin.notifications />
 
                         @auth
                             <div class="relative border-l border-neutral-200 pl-2" x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false">

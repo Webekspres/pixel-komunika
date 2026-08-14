@@ -4,8 +4,6 @@ namespace App\Domains\Catalog;
 
 use App\Models\Product;
 use App\Models\ProductEnrichment;
-use App\Models\ProductMedia;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductEnrichmentService
@@ -29,29 +27,5 @@ class ProductEnrichmentService
         }
 
         return $product->enrichment()->updateOrCreate([], $payload);
-    }
-
-    public function addMedia(Product $product, array $data): ProductMedia
-    {
-        return DB::transaction(function () use ($product, $data) {
-            if (! empty($data['is_primary'])) {
-                $product->media()->update(['is_primary' => false]);
-            }
-
-            return $product->media()->create([
-                'media_type' => $data['media_type'] ?? ProductMedia::IMAGE,
-                'object_key' => $data['object_key'],
-                'alt_text' => $data['alt_text'] ?? null,
-                'mime_type' => $data['mime_type'],
-                'file_size' => $data['file_size'],
-                'sort_order' => $data['sort_order'] ?? 0,
-                'is_primary' => (bool) ($data['is_primary'] ?? false),
-            ]);
-        });
-    }
-
-    public function removeMedia(ProductMedia $media): void
-    {
-        $media->delete();
     }
 }

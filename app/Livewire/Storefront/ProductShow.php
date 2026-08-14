@@ -15,7 +15,7 @@ class ProductShow extends Component
 
     public function mount(Product $product)
     {
-        $this->product = $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot']);
+        $this->product = $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
     }
 
     public function incrementQuantity()
@@ -56,7 +56,7 @@ class ProductShow extends Component
         $cartSummary = $cartService->getCartSummary($cart);
 
         // Fetch related products in same category
-        $relatedProducts = Product::with(['category', 'prices', 'inventorySnapshot'])
+        $relatedProducts = Product::with(['category', 'prices', 'inventorySnapshot', 'media.library'])
             ->where('category_id', $this->product->category_id)
             ->where('id', '!=', $this->product->id)
             ->take(4)

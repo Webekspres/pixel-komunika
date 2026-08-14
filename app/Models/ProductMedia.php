@@ -7,19 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductMedia extends Model
 {
-    public const IMAGE = 'IMAGE';
-
-    public const VIDEO = 'VIDEO';
-
     protected $table = 'product_media';
 
     protected $fillable = [
         'product_id',
-        'media_type',
-        'object_key',
+        'media_id',
         'alt_text',
-        'mime_type',
-        'file_size',
         'sort_order',
         'is_primary',
     ];
@@ -28,12 +21,22 @@ class ProductMedia extends Model
     {
         return [
             'is_primary' => 'boolean',
-            'file_size' => 'integer',
+            'sort_order' => 'integer',
         ];
     }
 
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function library(): BelongsTo
+    {
+        return $this->belongsTo(MediaLibrary::class, 'media_id');
+    }
+
+    public function url(): string
+    {
+        return $this->library?->url() ?? '';
     }
 }

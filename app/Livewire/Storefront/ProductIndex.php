@@ -88,7 +88,7 @@ class ProductIndex extends Component
         $categories = Category::all();
         $brands = Brand::all();
 
-        $query = Product::with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot']);
+        $query = Product::with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);

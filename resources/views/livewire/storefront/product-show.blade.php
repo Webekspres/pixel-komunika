@@ -32,14 +32,43 @@
 
         <div class="storefront-panel mb-10 overflow-hidden">
             <div class="grid gap-0 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)]">
-                {{-- Gallery (no product image column yet — polished placeholder) --}}
+                {{-- Gallery --}}
                 <div class="p-6 sm:p-8">
+                    @php
+                        $mediaList = $product->media->sortBy('sort_order')->values();
+                        $primaryMedia = $mediaList->firstWhere('is_primary', true) ?? $mediaList->first();
+                    @endphp
                     <div class="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-brand-black/8 bg-zinc-50 group">
-                        <x-icon name="package" class="relative z-10 size-28 text-zinc-300 transition-transform duration-300 group-hover:scale-105 sm:size-32" />
+                        @if ($primaryMedia)
+                            <img
+                                src="{{ $primaryMedia->url() }}"
+                                x-ref="mainImage"
+                                alt="{{ $primaryMedia->alt_text ?: $product->name }}"
+                                class="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
+                                loading="lazy"
+                            >
+                        @else
+                            <x-icon name="package" class="relative z-10 size-28 text-zinc-300 transition-transform duration-300 group-hover:scale-105 sm:size-32" />
+                        @endif
                         <div class="absolute top-4 left-4">
                             <span class="storefront-pill bg-white/90">{{ $product->category->name }}</span>
                         </div>
                     </div>
+
+                    @if ($mediaList->count() > 1)
+                        <div class="mt-3 flex gap-2 overflow-x-auto">
+                            @foreach ($mediaList as $index => $media)
+                                <button
+                                    type="button"
+                                    @click="$refs.mainImage.src = '{{ $media->url() }}'"
+                                    class="relative size-16 shrink-0 overflow-hidden rounded-xl border-2 transition"
+                                    :class="$refs.mainImage && $refs.mainImage.src.endsWith('{{ $media->url() }}') ? 'border-brand-yellow' : 'border-transparent opacity-70 hover:opacity-100'"
+                                >
+                                    <img src="{{ $media->url() }}" alt="{{ $media->alt_text ?: $product->name }}" class="size-full object-cover" loading="lazy">
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Info --}}
@@ -227,8 +256,10 @@
                 <h2 class="text-xl font-black text-zinc-900">Produk Serupa</h2>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                     @foreach ($relatedProducts as $rel)
+                        @php($relPrimary = $rel->media->firstWhere('is_primary', true) ?? $rel->media->first())
                         <x-storefront.product-card
                             :title="$rel->name"
+                            :image="$relPrimary?->url()"
                             :href="route('products.show', $rel)"
                             :category="$rel->category->name"
                             :sku="$rel->sku"

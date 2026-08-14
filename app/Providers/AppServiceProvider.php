@@ -13,7 +13,10 @@ use App\Policies\OrderPolicy;
 use App\Policies\PaymentProofPolicy;
 use App\Services\Shipping\MockBiteshipShippingService;
 use App\Services\Shipping\ShippingCalculatorInterface;
+use Illuminate\Database\Events\DatabaseRefreshed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,5 +40,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(PaymentProof::class, PaymentProofPolicy::class);
         Gate::policy(CustomerProfile::class, CustomerProfilePolicy::class);
+
+        // Saat DB di-reset (migrate:fresh), media unggahan lokal ikut dibersihkan
+        // agar konsisten dengan tabel media_library yang ter-wipe. Khusus dev/staging,
+        // tidak pernah di production.
+        Event::listen(DatabaseRefreshed::class, function (): void {
+            if (! app()->environment(['local', 'staging']) || app()->runningUnitTests()) {
+                return;
+            }
+
+            Storage::disk('public')->deleteDirectory('product-media');
+        });
     }
 }

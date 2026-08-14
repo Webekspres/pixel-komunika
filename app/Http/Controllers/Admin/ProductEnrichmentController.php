@@ -6,13 +6,10 @@ use App\Domains\Catalog\ProductEnrichmentService;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductMedia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductEnrichmentController extends Controller
 {
@@ -22,7 +19,7 @@ class ProductEnrichmentController extends Controller
         $categoryId = $request->integer('category');
 
         $products = Product::query()
-            ->with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media'])
+            ->with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library'])
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($query) use ($search): void {
                     $query->where('name', 'like', '%'.$search.'%')
@@ -45,7 +42,7 @@ class ProductEnrichmentController extends Controller
     public function edit(Product $product): View
     {
         return view('admin.products.edit', [
-            'product' => $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media']),
+            'product' => $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']),
             'categories' => Category::query()->orderBy('name')->get(),
         ]);
     }
@@ -72,43 +69,5 @@ class ProductEnrichmentController extends Controller
         return redirect()
             ->route('admin.products.edit', $product)
             ->with('status', "Presentasi produk {$product->name} berhasil disimpan.");
-    }
-
-    public function storeMedia(Request $request, Product $product, ProductEnrichmentService $enrichment): RedirectResponse
-    {
-        $validated = $request->validate([
-            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'is_primary' => ['sometimes', 'boolean'],
-        ]);
-
-        $file = $validated['image'];
-        $path = $file->store('product-media', 'local');
-
-        $enrichment->addMedia($product, [
-            'media_type' => ProductMedia::IMAGE,
-            'object_key' => $path,
-            'alt_text' => $product->name,
-            'mime_type' => $file->getMimeType(),
-            'file_size' => $file->getSize(),
-            'is_primary' => $request->boolean('is_primary'),
-        ]);
-
-        return back()->with('status', 'Gambar produk berhasil ditambahkan.');
-    }
-
-    public function showMedia(ProductMedia $media): StreamedResponse
-    {
-        abort_unless(Storage::disk('local')->exists($media->object_key), 404);
-
-        return Storage::disk('local')->response($media->object_key);
-    }
-
-    public function destroyMedia(ProductMedia $media, ProductEnrichmentService $enrichment): RedirectResponse
-    {
-        $productName = $media->product->name;
-        Storage::disk('local')->delete($media->object_key);
-        $enrichment->removeMedia($media);
-
-        return back()->with('status', "Gambar untuk {$productName} berhasil dihapus.");
     }
 }

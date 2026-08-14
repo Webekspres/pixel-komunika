@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PaymentReviewController;
 use App\Http\Controllers\Admin\ProductEnrichmentController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Livewire\Admin\MediaLibrary;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -75,11 +76,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/payments/{paymentProof}', [PaymentReviewController::class, 'update'])->name('payments.update');
 
     Route::get('/products', [ProductEnrichmentController::class, 'index'])->name('products.index');
-    Route::get('/products/media/{media}', [ProductEnrichmentController::class, 'showMedia'])->name('products.media.show');
-    Route::delete('/products/media/{media}', [ProductEnrichmentController::class, 'destroyMedia'])->name('products.media.destroy');
     Route::get('/products/{product}', [ProductEnrichmentController::class, 'edit'])->name('products.edit');
     Route::patch('/products/{product}', [ProductEnrichmentController::class, 'update'])->name('products.update');
-    Route::post('/products/{product}/media', [ProductEnrichmentController::class, 'storeMedia'])->name('products.media.store');
+
+    Route::get('/media', MediaLibrary::class)->name('media.index');
 
     Route::get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
     Route::patch('/categories/{category}', [CatalogController::class, 'toggleCategory'])->name('categories.toggle');

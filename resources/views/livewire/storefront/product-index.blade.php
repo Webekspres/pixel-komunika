@@ -151,8 +151,10 @@
                 @else
                     <div class="grid gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         @foreach ($products as $product)
+                            @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                             <x-storefront.product-card
                                 :title="$product->name"
+                                :image="$primaryMedia?->url()"
                                 :category="$product->category->name"
                                 :sku="$product->sku"
                                 :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"

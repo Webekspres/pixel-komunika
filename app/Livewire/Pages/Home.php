@@ -41,7 +41,7 @@ class Home extends Component
 
         $categories = Category::all();
 
-        $query = Product::with(['category', 'enrichment', 'prices', 'inventorySnapshot']);
+        $query = Product::with(['category', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);

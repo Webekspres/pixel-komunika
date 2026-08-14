@@ -57,7 +57,7 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="text-xs text-zinc-400">SKU: {{ $item['product']->sku }}</p>
-                                <h3 class="text-sm font-semibold leading-snug text-zinc-900 sm:text-base">{{ $item['product']->name }}</h3>
+                                <h3 class="text-sm font-semibold leading-snug text-zinc-900 sm:text-base">{{ $item['product']->displayName() }}</h3>
                                 <p class="mt-0.5 text-xs font-semibold text-zinc-500">
                                     Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / pcs · {{ $item['price_type'] }}
                                 </p>

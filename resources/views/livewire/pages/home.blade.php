@@ -196,7 +196,7 @@
                     <x-storefront.product-card
                         data-reveal
                         style="--reveal-delay: {{ min($loop->index, 7) * 55 }}ms"
-                        :title="$product->name"
+                        :title="$product->displayName()"
                         :image="$primaryMedia?->url()"
                         :category="$product->category->name"
                         :sku="$product->sku"

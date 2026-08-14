@@ -69,6 +69,19 @@ class Product extends Model
         return $this->hasMany(ProductMedia::class)->orderBy('sort_order');
     }
 
+    /**
+     * Nama yang ditampilkan di storefront: nama tampilan website bila di-set,
+     * fallback ke nama dasar POS (FR-CAT-004/005).
+     */
+    public function displayName(): string
+    {
+        $enrichment = $this->relationLoaded('enrichment')
+            ? $this->enrichment
+            : $this->enrichment()->first();
+
+        return $enrichment?->display_name ?: $this->name;
+    }
+
     public function listPriceAmount(): ?float
     {
         $prices = $this->relationLoaded('prices')

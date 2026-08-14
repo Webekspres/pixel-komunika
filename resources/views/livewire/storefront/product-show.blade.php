@@ -1,4 +1,40 @@
-<div class="min-h-screen bg-surface-2 pb-24 lg:pb-12">
+@php
+    $stockQty = (int) ($product->inventorySnapshot?->quantity_available ?? 0);
+    $inStock = $stockQty > 0;
+    $canViewPrices = auth()->user()?->canViewPrices() ?? false;
+    $isPendingCustomer = auth()->check()
+        && auth()->user()->isCustomer()
+        && auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING;
+    $description = $product->enrichment?->description
+        ?: $product->enrichment?->short_description
+        ?: 'Deskripsi produk belum tersedia. Hubungi toko untuk detail spesifikasi lebih lanjut.';
+    $mediaList = $product->media->sortBy('sort_order')->values();
+    $primaryMedia = $mediaList->firstWhere('is_primary', true) ?? $mediaList->first();
+    $primaryIndex = $primaryMedia ? max(0, $mediaList->search(fn ($m) => $m->id === $primaryMedia->id) ?: 0) : 0;
+    $mediaUrls = $mediaList->map(fn ($m) => $m->url())->values()->all();
+@endphp
+
+<div
+    class="min-h-screen bg-surface-2 pb-24 lg:pb-12"
+    x-data="{
+        activeIndex: {{ $primaryIndex }},
+        lightboxOpen: false,
+        zoomed: false,
+        lightboxIndex: {{ $primaryIndex }},
+        lightboxUrls: {{ Js::from($mediaUrls) }},
+        openLightbox(i) {
+            this.lightboxIndex = i;
+            this.zoomed = false;
+            this.lightboxOpen = true;
+        },
+        prevImage() {
+            this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxUrls.length) % this.lightboxUrls.length;
+        },
+        nextImage() {
+            this.lightboxIndex = (this.lightboxIndex + 1) % this.lightboxUrls.length;
+        }
+    }"
+>
 
     @if (session()->has('success'))
         <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
@@ -8,43 +44,28 @@
         </div>
     @endif
 
-    @php
-        $stockQty = (int) ($product->inventorySnapshot?->quantity_available ?? 0);
-        $inStock = $stockQty > 0;
-        $canViewPrices = auth()->user()?->canViewPrices() ?? false;
-        $isPendingCustomer = auth()->check()
-            && auth()->user()->isCustomer()
-            && auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING;
-        $description = $product->enrichment?->description
-            ?: $product->enrichment?->short_description
-            ?: 'Deskripsi produk belum tersedia. Hubungi toko untuk detail spesifikasi lebih lanjut.';
-    @endphp
-
     <div class="container-2xl py-6 sm:py-8 lg:py-10">
 
         <div class="mb-6">
             <x-storefront.breadcrumb :items="[
                 ['label' => 'Beranda', 'href' => route('home')],
                 ['label' => 'Produk', 'href' => route('products.index')],
-                ['label' => $product->name, 'href' => null],
+                ['label' => $product->displayName(), 'href' => null],
             ]" />
         </div>
 
-        <div class="storefront-panel mb-10 overflow-hidden">
-            <div class="grid gap-0 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)]">
-                {{-- Gallery --}}
-                <div class="p-6 sm:p-8">
-                    @php
-                        $mediaList = $product->media->sortBy('sort_order')->values();
-                        $primaryMedia = $mediaList->firstWhere('is_primary', true) ?? $mediaList->first();
-                    @endphp
+        <div class="storefront-panel mb-10">
+            <div class="grid gap-0 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+                {{-- Gallery (sticky mengikuti scroll) --}}
+                <div class="p-6 sm:p-8 lg:sticky lg:top-24 lg:self-start">
                     <div class="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-brand-black/8 bg-zinc-50 group">
                         @if ($primaryMedia)
                             <img
                                 src="{{ $primaryMedia->url() }}"
-                                x-ref="mainImage"
-                                alt="{{ $primaryMedia->alt_text ?: $product->name }}"
-                                class="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
+                                :src="lightboxUrls[activeIndex]"
+                                @click="openLightbox(activeIndex)"
+                                alt="{{ $primaryMedia->alt_text ?: $product->displayName() }}"
+                                class="absolute inset-0 size-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105"
                                 loading="lazy"
                             >
                         @else
@@ -60,25 +81,26 @@
                             @foreach ($mediaList as $index => $media)
                                 <button
                                     type="button"
-                                    @click="$refs.mainImage.src = '{{ $media->url() }}'"
+                                    @click="activeIndex = {{ $index }}"
                                     class="relative size-16 shrink-0 overflow-hidden rounded-xl border-2 transition"
-                                    :class="$refs.mainImage && $refs.mainImage.src.endsWith('{{ $media->url() }}') ? 'border-brand-yellow' : 'border-transparent opacity-70 hover:opacity-100'"
+                                    :class="activeIndex === {{ $index }} ? 'border-brand-yellow' : 'border-transparent opacity-70 hover:opacity-100'"
                                 >
-                                    <img src="{{ $media->url() }}" alt="{{ $media->alt_text ?: $product->name }}" class="size-full object-cover" loading="lazy">
+                                    <img src="{{ $media->url() }}" alt="{{ $media->alt_text ?: $product->displayName() }}" class="size-full object-cover" loading="lazy">
                                 </button>
                             @endforeach
                         </div>
                     @endif
+
                 </div>
 
-                {{-- Info --}}
-                <div class="flex flex-col justify-between space-y-6 border-t border-zinc-100 p-6 sm:p-8 lg:border-t-0 lg:border-l">
+                {{-- Info + Deskripsi + Spesifikasi --}}
+                <div class="flex flex-col space-y-6 border-t border-zinc-100 p-6 sm:p-8 lg:border-t-0 lg:border-l">
                     <div class="space-y-4">
                         <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">
                             {{ $product->brand?->name ?? 'Pixel Komunika' }} · {{ $product->category->name }}
                         </p>
                         <h1 class="text-xl font-black leading-tight tracking-tight text-zinc-950 sm:text-2xl">
-                            {{ $product->name }}
+                            {{ $product->displayName() }}
                         </h1>
                         <p class="font-mono text-xs text-zinc-400">SKU: {{ $product->sku }}</p>
 
@@ -193,14 +215,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {{-- Tabs: Deskripsi | Spesifikasi --}}
-            <div
-                class="border-t border-zinc-100 p-6 sm:p-8"
-                x-data="{ tab: 'desc' }"
-            >
+                    {{-- Tabs: Deskripsi | Spesifikasi --}}
+                    <div
+                        class="border-t border-zinc-100 pt-6"
+                        x-data="{ tab: 'desc' }"
+                    >
                 <div class="mb-5 flex gap-1">
                     <button
                         type="button"
@@ -246,6 +266,8 @@
                     <div class="flex items-center gap-3 rounded-xl bg-zinc-50 px-4 py-2.5">
                         <span class="w-28 shrink-0 text-xs font-semibold text-zinc-500">SKU</span>
                         <span class="font-mono text-sm font-medium text-zinc-800">{{ $product->sku }}</span>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +280,7 @@
                     @foreach ($relatedProducts as $rel)
                         @php($relPrimary = $rel->media->firstWhere('is_primary', true) ?? $rel->media->first())
                         <x-storefront.product-card
-                            :title="$rel->name"
+                            :title="$rel->displayName()"
                             :image="$relPrimary?->url()"
                             :href="route('products.show', $rel)"
                             :category="$rel->category->name"
@@ -291,6 +313,75 @@
                     <x-icon name="shopping-cart" class="size-4" />
                     <span>Tambah ke Keranjang</span>
                 </button>
+            </div>
+        </div>
+    @endif
+
+    {{-- Lightbox modal (klik gambar utama) --}}
+    @if ($mediaList->isNotEmpty())
+        <div
+            x-show="lightboxOpen"
+            x-cloak
+            x-effect="document.body.style.overflow = lightboxOpen ? 'hidden' : ''"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+            @click="lightboxOpen = false"
+            @keydown.escape.window="lightboxOpen = false"
+            @keydown.arrow-left.window="if (lightboxOpen) prevImage()"
+            @keydown.arrow-right.window="if (lightboxOpen) nextImage()"
+        >
+            <div
+                class="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-zinc-950 shadow-2xl ring-1 ring-white/10"
+                @click.stop
+            >
+                {{-- Header --}}
+                <div class="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+                    <p class="min-w-0 truncate text-sm font-semibold text-white">{{ $product->displayName() }}</p>
+                    <div class="flex shrink-0 items-center gap-2">
+                        @if ($mediaList->count() > 1)
+                            <span class="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/80" x-text="(lightboxIndex + 1) + ' / {{ $mediaList->count() }}'"></span>
+                        @endif
+                        <button
+                            type="button"
+                            @click="lightboxOpen = false"
+                            class="inline-flex size-8 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                            aria-label="Tutup lightbox"
+                        >
+                            <x-icon name="x" class="size-4" />
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Image area --}}
+                <div class="relative flex items-center justify-center bg-zinc-950">
+                    @if ($mediaList->count() > 1)
+                        <button
+                            type="button"
+                            @click.stop="prevImage()"
+                            class="absolute left-2 z-10 inline-flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/25"
+                            aria-label="Gambar sebelumnya"
+                        >
+                            <x-icon name="chevron-left" class="size-5" />
+                        </button>
+                        <button
+                            type="button"
+                            @click.stop="nextImage()"
+                            class="absolute right-2 z-10 inline-flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/25"
+                            aria-label="Gambar berikutnya"
+                        >
+                            <x-icon name="chevron-right" class="size-5" />
+                        </button>
+                    @endif
+
+                    <div class="flex max-h-[65vh] w-full items-center justify-center overflow-auto" @click.stop>
+                        <img
+                            :src="lightboxUrls[lightboxIndex]"
+                            alt="{{ $product->displayName() }}"
+                            @click="zoomed = !zoomed"
+                            :class="zoomed ? 'cursor-zoom-out scale-150' : 'cursor-zoom-in scale-100'"
+                            class="max-h-[65vh] max-w-full object-contain transition-transform duration-300"
+                        >
+                    </div>
+                </div>
             </div>
         </div>
     @endif

@@ -42,7 +42,7 @@ class ProductShow extends Component
         try {
             $cartService->addItem($cart, $this->product->id, $this->quantity);
             $this->dispatch('cart-updated');
-            $this->dispatch('cart-item-added', name: $this->product->name);
+            $this->dispatch('cart-item-added', name: $this->product->displayName());
         } catch (\InvalidArgumentException $e) {
             session()->flash('error', $e->getMessage());
         }
@@ -56,7 +56,7 @@ class ProductShow extends Component
         $cartSummary = $cartService->getCartSummary($cart);
 
         // Fetch related products in same category
-        $relatedProducts = Product::with(['category', 'prices', 'inventorySnapshot', 'media.library'])
+        $relatedProducts = Product::with(['category', 'enrichment', 'prices', 'inventorySnapshot', 'media.library'])
             ->where('category_id', $this->product->category_id)
             ->where('id', '!=', $this->product->id)
             ->take(4)
@@ -67,6 +67,6 @@ class ProductShow extends Component
             'cartCount' => $cartSummary['total_items'],
         ])
             ->layout('layouts.storefront')
-            ->title("{$this->product->name} - Pixel Komunika");
+            ->title("{$this->product->displayName()} - Pixel Komunika");
     }
 }

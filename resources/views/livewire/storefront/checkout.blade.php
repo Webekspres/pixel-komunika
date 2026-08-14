@@ -92,7 +92,7 @@
                                 @foreach ($summary['items'] as $item)
                                     <div class="flex items-center justify-between gap-4 py-3 text-sm">
                                         <div class="min-w-0">
-                                            <p class="font-semibold text-zinc-900">{{ $item['product']->name }}</p>
+                                            <p class="font-semibold text-zinc-900">{{ $item['product']->displayName() }}</p>
                                             <p class="text-xs text-zinc-500">{{ $item['quantity'] }} × Rp {{ number_format($item['unit_price'], 0, ',', '.') }}</p>
                                         </div>
                                         <span class="font-bold text-zinc-900">Rp {{ number_format($item['line_subtotal'], 0, ',', '.') }}</span>

@@ -24,7 +24,7 @@ class Home extends Component
 
         try {
             $cartService->addItem($cart, $productId, 1);
-            $productName = Product::query()->whereKey($productId)->value('name') ?? 'Produk';
+            $productName = Product::query()->with('enrichment')->find($productId)?->displayName() ?? 'Produk';
             $this->dispatch('cart-updated');
             $this->dispatch('cart-item-added', name: $productName);
         } catch (\InvalidArgumentException $e) {

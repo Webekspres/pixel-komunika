@@ -25,6 +25,27 @@ it('filters products by search keyword', function () {
         ->assertSee($product->name);
 });
 
+it('uses display name on storefront when set, falls back to pos name', function () {
+    $product = Product::with('enrichment')->first();
+
+    $product->enrichment()->update(['display_name' => 'Power Bank Premium Edition']);
+
+    $this->get(route('products.index'))
+        ->assertOk()
+        ->assertSee('Power Bank Premium Edition');
+
+    $this->get(route('products.show', $product))
+        ->assertOk()
+        ->assertSee('Power Bank Premium Edition')
+        ->assertDontSee($product->name);
+
+    $product->enrichment()->update(['display_name' => null]);
+
+    $this->get(route('products.show', $product))
+        ->assertOk()
+        ->assertSee($product->name);
+});
+
 it('renders product detail page', function () {
     $product = Product::first();
 

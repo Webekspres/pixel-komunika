@@ -153,7 +153,7 @@
                         @foreach ($products as $product)
                             @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                             <x-storefront.product-card
-                                :title="$product->name"
+                                :title="$product->displayName()"
                                 :image="$primaryMedia?->url()"
                                 :category="$product->category->name"
                                 :sku="$product->sku"

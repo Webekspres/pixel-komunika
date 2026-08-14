@@ -118,7 +118,7 @@ class OrderService
                     'product_id' => $product->id,
                     'category_id_snapshot' => $product->category_id,
                     'category_name_snapshot' => $product->category?->name ?? 'Unknown',
-                    'product_name' => $product->name,
+                    'product_name' => $product->displayName(),
                     'sku' => $product->sku,
                     'price_type' => $itemData['price_type'] ?? null,
                     'unit_price' => $unitPrice,

@@ -89,7 +89,7 @@
                                             @endif
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="truncate font-semibold text-zinc-900">{{ $product->enrichment?->display_name ?: $product->name }}</p>
+                                            <p class="truncate font-semibold text-zinc-900">{{ $product->displayName() }}</p>
                                             <p class="truncate text-xs text-zinc-400">{{ $product->name }}</p>
                                         </div>
                                     </div>

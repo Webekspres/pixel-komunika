@@ -56,28 +56,24 @@
                         <x-icon name="shopping-bag" class="size-4 shrink-0" />
                         <span>Pesanan</span>
                     </a>
-                    <span class="admin-nav-item admin-nav-item-disabled" title="Segera hadir" aria-disabled="true">
+                    <a href="{{ route('admin.payments.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                         <x-icon name="credit-card" class="size-4 shrink-0" />
-                        <span class="flex-1">Pembayaran</span>
-                        <span class="text-[9px] font-bold tracking-wide text-zinc-600 uppercase">Segera</span>
-                    </span>
+                        <span>Pembayaran</span>
+                    </a>
 
                     <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Katalog</p>
-                    <span class="admin-nav-item admin-nav-item-disabled" title="Segera hadir" aria-disabled="true">
+                    <a href="{{ route('admin.products.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                         <x-icon name="package" class="size-4 shrink-0" />
-                        <span class="flex-1">Produk</span>
-                        <span class="text-[9px] font-bold tracking-wide text-zinc-600 uppercase">Segera</span>
-                    </span>
-                    <span class="admin-nav-item admin-nav-item-disabled" title="Segera hadir" aria-disabled="true">
+                        <span>Produk</span>
+                    </a>
+                    <a href="{{ route('admin.categories.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                         <x-icon name="tag" class="size-4 shrink-0" />
-                        <span class="flex-1">Kategori</span>
-                        <span class="text-[9px] font-bold tracking-wide text-zinc-600 uppercase">Segera</span>
-                    </span>
-                    <span class="admin-nav-item admin-nav-item-disabled" title="Segera hadir" aria-disabled="true">
+                        <span>Kategori</span>
+                    </a>
+                    <a href="{{ route('admin.brands.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
                         <x-icon name="award" class="size-4 shrink-0" />
-                        <span class="flex-1">Merek</span>
-                        <span class="text-[9px] font-bold tracking-wide text-zinc-600 uppercase">Segera</span>
-                    </span>
+                        <span>Merek</span>
+                    </a>
 
                     <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Pelanggan</p>
                     <a href="{{ route('admin.customers.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
@@ -86,22 +82,20 @@
                     </a>
 
                     <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Analitik</p>
-                    <span class="admin-nav-item admin-nav-item-disabled" title="Segera hadir" aria-disabled="true">
+                    <a href="{{ route('admin.reports.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                         <x-icon name="bar-chart-3" class="size-4 shrink-0" />
-                        <span class="flex-1">Laporan</span>
-                        <span class="text-[9px] font-bold tracking-wide text-zinc-600 uppercase">Segera</span>
-                    </span>
+                        <span>Laporan</span>
+                    </a>
 
                     <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Sistem</p>
                     <a href="{{ route('admin.tax-rules.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.tax-rules.*') ? 'active' : '' }}">
                         <x-icon name="percent" class="size-4 shrink-0" />
                         <span>PPh 22</span>
                     </a>
-                    <span class="admin-nav-item admin-nav-item-disabled" title="Segera hadir" aria-disabled="true">
+                    <a href="{{ route('admin.settings.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                         <x-icon name="settings" class="size-4 shrink-0" />
-                        <span class="flex-1">Pengaturan</span>
-                        <span class="text-[9px] font-bold tracking-wide text-zinc-600 uppercase">Segera</span>
-                    </span>
+                        <span>Pengaturan</span>
+                    </a>
                 </nav>
 
                 <div class="shrink-0 border-t border-white/10 p-4">

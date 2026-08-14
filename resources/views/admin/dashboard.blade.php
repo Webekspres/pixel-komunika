@@ -154,7 +154,7 @@
 
                 <div class="grid grid-cols-2 gap-2">
                     <a
-                        href="{{ route('admin.orders.index', ['statusFilter' => 'payment_pending']) }}"
+                        href="{{ route('admin.payments.index') }}"
                         wire:navigate
                         class="flex flex-col items-center gap-1.5 rounded-xl border border-neutral-100 bg-white p-3 transition hover:border-neutral-200"
                     >
@@ -163,15 +163,16 @@
                         </div>
                         <span class="text-center text-[11px] font-semibold text-zinc-600">Verifikasi Bayar</span>
                     </a>
-                    <div
-                        class="flex cursor-not-allowed flex-col items-center gap-1.5 rounded-xl border border-neutral-100 bg-white p-3 opacity-60"
-                        title="Segera hadir"
+                    <a
+                        href="{{ route('admin.reports.index') }}"
+                        wire:navigate
+                        class="flex flex-col items-center gap-1.5 rounded-xl border border-neutral-100 bg-white p-3 transition hover:border-neutral-200"
                     >
                         <div class="inline-flex size-9 items-center justify-center rounded-xl bg-blue-50">
                             <x-icon name="trending-up" class="size-4 text-blue-500" />
                         </div>
                         <span class="text-center text-[11px] font-semibold text-zinc-600">Laporan</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>

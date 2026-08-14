@@ -12,6 +12,12 @@
         </div>
     @endif
 
+    @if (session()->has('error'))
+        <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="rounded-2xl border border-neutral-100 bg-white">
         <div class="flex flex-col gap-3 border-b border-neutral-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="relative w-full sm:max-w-sm">
@@ -32,6 +38,7 @@
                 <option value="payment_pending">Pembayaran Diajukan</option>
                 <option value="paid">Dibayar</option>
                 <option value="processing">Diproses</option>
+                <option value="packed">Dikemas</option>
                 <option value="shipped">Dikirim</option>
                 <option value="completed">Selesai</option>
                 <option value="cancelled">Dibatalkan</option>
@@ -51,6 +58,7 @@
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b border-neutral-100">
+                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">No. Order</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Pelanggan</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Total</th>
@@ -61,6 +69,7 @@
                     <tbody class="divide-y divide-neutral-50">
                         @foreach ($orders as $order)
                             <tr class="transition-colors hover:bg-neutral-50">
+                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $orders->firstItem() + $loop->index }}</td>
                                 <td class="px-5 py-3.5">
                                     <p class="font-bold text-zinc-900">{{ $order->order_number }}</p>
                                     <p class="text-xs text-zinc-500">{{ $order->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
@@ -95,23 +104,37 @@
                                             >
                                                 Verifikasi Bayar
                                             </button>
-                                        @elseif ($order->status === 'unpaid')
-                                            <button
-                                                wire:click="updateOrderStatus({{ $order->id }}, 'paid')"
-                                                class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
-                                            >
-                                                Mark Paid
-                                            </button>
                                         @elseif ($order->status === 'paid')
                                             <button
-                                                wire:click="updateOrderStatus({{ $order->id }}, 'shipped')"
+                                                wire:click="transitionStatus({{ $order->id }}, 'processing')"
+                                                class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
+                                            >
+                                                Proses
+                                            </button>
+                                        @elseif ($order->status === 'processing')
+                                            <button
+                                                wire:click="transitionStatus({{ $order->id }}, 'packed')"
+                                                class="rounded-xl bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700"
+                                            >
+                                                Packing
+                                            </button>
+                                        @elseif ($order->status === 'packed')
+                                            <button
+                                                wire:click="transitionStatus({{ $order->id }}, 'shipped')"
                                                 class="rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
                                             >
                                                 Kirim
                                             </button>
+                                        @elseif ($order->status === 'shipped')
+                                            <button
+                                                wire:click="transitionStatus({{ $order->id }}, 'completed')"
+                                                class="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-700"
+                                            >
+                                                Selesai
+                                            </button>
                                         @endif
 
-                                        @if (! in_array($order->status, ['cancelled', 'completed', 'returned']))
+                                        @if (in_array($order->status, ['unpaid', 'payment_pending', 'paid', 'processing', 'packed']))
                                             <button
                                                 wire:click="cancelOrder({{ $order->id }})"
                                                 wire:confirm="Yakin membatalkan order ini?"

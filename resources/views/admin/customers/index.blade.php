@@ -64,8 +64,8 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-t border-neutral-100">
-                            @foreach (['Pelanggan', 'Email', 'Telepon', 'Kota', 'Status', 'Terdaftar', ''] as $heading)
-                                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-zinc-400 uppercase">{{ $heading }}</th>
+                            @foreach (['No', 'Pelanggan', 'Email', 'Telepon', 'Kota', 'Status', 'Terdaftar', ''] as $heading)
+                                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-zinc-400 uppercase {{ $heading === 'No' ? 'w-12 text-center' : '' }}">{{ $heading }}</th>
                             @endforeach
                         </tr>
                     </thead>
@@ -79,6 +79,7 @@
                                 $badgeClass = $statusClasses[$customer->verification_status] ?? 'bg-zinc-100 text-zinc-700';
                             @endphp
                             <tr class="transition-colors hover:bg-neutral-50">
+                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $customers->firstItem() + $loop->index }}</td>
                                 <td class="px-5 py-3.5">
                                     <div class="flex items-center gap-3">
                                         <div class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-yellow/15">
@@ -112,7 +113,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-10 text-center text-sm text-zinc-400">
+                                <td colspan="8" class="px-5 py-10 text-center text-sm text-zinc-400">
                                     Tidak ada pelanggan yang cocok.
                                 </td>
                             </tr>

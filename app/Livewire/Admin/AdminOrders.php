@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Admin;
 
+use App\Domains\Order\FulfillmentService;
 use App\Models\Order;
 use App\Models\PaymentProof;
 use App\Services\OrderService;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -36,13 +38,18 @@ class AdminOrders extends Component
         $this->resetPage();
     }
 
-    public function updateOrderStatus(int $orderId, string $newStatus)
+    public function transitionStatus(int $orderId, string $newStatus, FulfillmentService $fulfillment)
     {
         $order = Order::findOrFail($orderId);
-        $order->update(['status' => $newStatus]);
-        if ($order->invoice && $newStatus === 'paid') {
-            $order->invoice->update(['status' => 'paid']);
+
+        try {
+            $fulfillment->transition($order, $newStatus, Auth::user());
+        } catch (InvalidArgumentException $e) {
+            session()->flash('error', $e->getMessage());
+
+            return;
         }
+
         session()->flash('success', "Status pesanan {$order->order_number} diperbarui menjadi {$newStatus}.");
     }
 

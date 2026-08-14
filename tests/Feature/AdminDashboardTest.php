@@ -69,7 +69,8 @@ it('shows figma-style admin dashboard with live aggregates for admins', function
         ->assertSee('Verifikasi Pelanggan')
         ->assertSee('Maya Pending')
         ->assertSee('Status Sinkronisasi POS')
-        ->assertSee('Segera');
+        ->assertSee('Verifikasi Bayar')
+        ->assertSee('Laporan');
 
     $data = app(AdminDashboardService::class)->build();
     expect($data['activeCustomers'])->toBeGreaterThanOrEqual(2)

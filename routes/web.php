@@ -2,9 +2,14 @@
 
 use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Account\AddressController;
+use App\Http\Controllers\Admin\CatalogController;
 use App\Http\Controllers\Admin\CategoryTaxRuleController;
 use App\Http\Controllers\Admin\CustomerReviewController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PaymentReviewController;
+use App\Http\Controllers\Admin\ProductEnrichmentController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Livewire\Admin\AdminOrders;
@@ -64,6 +69,33 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/tax-rules', [CategoryTaxRuleController::class, 'index'])->name('tax-rules.index');
     Route::get('/tax-rules/{category}/edit', [CategoryTaxRuleController::class, 'edit'])->name('tax-rules.edit');
     Route::patch('/tax-rules/{category}', [CategoryTaxRuleController::class, 'update'])->name('tax-rules.update');
+
+    Route::get('/payments', [PaymentReviewController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{paymentProof}', [PaymentReviewController::class, 'show'])->name('payments.show');
+    Route::patch('/payments/{paymentProof}', [PaymentReviewController::class, 'update'])->name('payments.update');
+
+    Route::get('/products', [ProductEnrichmentController::class, 'index'])->name('products.index');
+    Route::get('/products/media/{media}', [ProductEnrichmentController::class, 'showMedia'])->name('products.media.show');
+    Route::delete('/products/media/{media}', [ProductEnrichmentController::class, 'destroyMedia'])->name('products.media.destroy');
+    Route::get('/products/{product}', [ProductEnrichmentController::class, 'edit'])->name('products.edit');
+    Route::patch('/products/{product}', [ProductEnrichmentController::class, 'update'])->name('products.update');
+    Route::post('/products/{product}/media', [ProductEnrichmentController::class, 'storeMedia'])->name('products.media.store');
+
+    Route::get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
+    Route::patch('/categories/{category}', [CatalogController::class, 'toggleCategory'])->name('categories.toggle');
+    Route::get('/brands', [CatalogController::class, 'brands'])->name('brands.index');
+    Route::patch('/brands/{brand}', [CatalogController::class, 'toggleBrand'])->name('brands.toggle');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('/settings/store-profile', [SettingsController::class, 'updateStoreProfile'])->name('settings.store-profile.update');
+    Route::post('/settings/bank-accounts', [SettingsController::class, 'storeBankAccount'])->name('settings.bank-accounts.store');
+    Route::patch('/settings/bank-accounts/{bankAccount}', [SettingsController::class, 'updateBankAccount'])->name('settings.bank-accounts.update');
+    Route::delete('/settings/bank-accounts/{bankAccount}', [SettingsController::class, 'destroyBankAccount'])->name('settings.bank-accounts.destroy');
+    Route::post('/settings/courier-rates', [SettingsController::class, 'storeCourierRate'])->name('settings.courier-rates.store');
+    Route::patch('/settings/courier-rates/{courierRate}', [SettingsController::class, 'updateCourierRate'])->name('settings.courier-rates.update');
+    Route::delete('/settings/courier-rates/{courierRate}', [SettingsController::class, 'destroyCourierRate'])->name('settings.courier-rates.destroy');
 });
 
 Route::get('/health', function () {

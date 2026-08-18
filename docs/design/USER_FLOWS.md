@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.7 - Klarifikasi Klien 7-11 Agustus 2026 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 0.8 - Klarifikasi Klien 12 Agustus 2026 |
+| Tanggal | Rabu, 12 Agustus 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Model data | [ERD](ERD.md) dan [Data Dictionary](DATA_DICTIONARY.md) |
@@ -706,5 +706,5 @@ Provider, credential, dan retry/fallback mengikuti
 | [OPN-010](../requirements/BRD.md#opn-010) | Tarif per kecamatan kurir toko pada UF-07/UF-17. |
 | [OPN-014](../requirements/BRD.md#opn-014) | Pembebanan ongkir dan propagasi resi/status order gabungan. |
 | [OPN-021](../requirements/BRD.md#opn-021) | Definisi produk besar, fallback berat/dimensi, kode layanan, akun production, dan biaya provider pada UF-07. |
-| [OPN-022](../requirements/BRD.md#opn-022) | Nama legal perusahaan, format NPWP/akun reseller, nomor invoice, dan kontrak channel pada UF-09. |
+| [OPN-022](../requirements/BRD.md#opn-022) | Format NPWP/akun reseller, nomor invoice, dan kontrak channel pada UF-09. |
 | [OPN-023](../requirements/BRD.md#opn-023) | Provider, credential, serta retry/fallback WhatsApp pada UF-19. |

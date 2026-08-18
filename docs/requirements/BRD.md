@@ -7,8 +7,8 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.16 - Klarifikasi Klien 7-11 Agustus 2026 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 0.18 - Penyederhanaan Pertanyaan Terbuka 12 Agustus 2026 |
+| Tanggal | Rabu, 12 Agustus 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
 | MVP delivery | `MVP.md` |
@@ -58,6 +58,8 @@ Status requirement:
 | CR-015 | Rabu, 29 Juli 2026 | Klarifikasi sumber pembatalan | Pembatalan manual oleh admin dan pembatalan kedaluwarsa oleh sistem harus dapat dibedakan tanpa memecah lifecycle menjadi dua status batal. | Status tetap `CANCELLED`; sumber `ADMIN`/`SYSTEM`, pelaku admin jika ada, alasan, dan waktu pembatalan disimpan serta ditampilkan pada rincian order. | Baseline clarification |
 | CR-016 | Jumat, 31 Juli 2026 | Konfirmasi resmi klien melalui System Analyst | Production menggunakan shared hosting milik klien dan developer Webekspres akan diberikan akses yang diperlukan untuk setup serta deployment. | OPN-001 diperkuat sebagai keputusan final. Komitmen penyediaan akses pada PRE-006 selesai; kredensial aktual, domain/DNS, akun layanan, kemampuan runtime, cron, log, dan backup tetap diverifikasi saat technical handoff. | Resolved - hosting ownership and access commitment |
 | CR-017 | Jumat-Selasa, 7-11 Agustus 2026 | Jawaban tertulis klien melalui WhatsApp | Klien memperjelas ownership nama produk, formula PPh 22, harga partai/grosir, isi dan channel invoice, omzet, kurir toko/Biteship, retensi bukti pembayaran, notifikasi admin, reseller, penggabungan pengiriman, serta penyelesaian order. | Requirement bisnis, fungsi, model data, user flow, dan keputusan terbuka diperbarui. Detail tarif multi-klasifikasi, penomoran akun reseller, nama legal perusahaan, ongkir/invoice order gabungan, provider WhatsApp, dan aturan poin tetap membutuhkan keputusan. | Partially resolved; baseline updated |
+| CR-018 | Rabu, 12 Agustus 2026 | Klarifikasi klien | Nama legal perusahaan yang digunakan saat ini adalah `Pixel Komunika` dan dapat diubah melalui panel admin. | Nilai awal identitas perusahaan ditetapkan dan tidak lagi menjadi pertanyaan terbuka. | Resolved |
+| CR-019 | Rabu, 12 Agustus 2026 | Arahan dokumentasi klien | Daftar pertanyaan hanya menampilkan hal yang belum terjawab; pertanyaan selesai dihapus dan keputusannya tetap berada pada requirement atau riwayat perubahan. | Bagian pertanyaan BRD, dokumen review klien, dan open technical items diringkas. | Documentation baseline updated |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -274,7 +276,7 @@ flowchart LR
 | BR-013 | Sistem harus menyimpan riwayat perubahan stok efektif website beserta sumbernya: sinkronisasi penuh, pengecekan per produk, penjualan web, retur web, atau koreksi. | Baseline |
 | BR-014 | Website harus membuat order dan invoice secara atomik, mengurangi stok efektif website ketika penjualan tercatat, lalu mengirim laporan penjualan ke POS untuk mencatat transaksi dan mengurangi stok POS. Gangguan pelaporan POS tidak boleh menghapus atau menggandakan transaksi website; status pelaporan harus dapat direkonsiliasi ([lihat OPN-005](#opn-005)). | Baseline; API contract partially open |
 | BR-015 | Sistem harus menghitung subtotal, ongkir, PPh 22 yang aktif, dan total transaksi. Seluruh subtotal klasifikasi yang melewati ambang digabung, dibagi `1,11`, lalu dikalikan persentase PPh 22 menjadi satu nilai yang ditampilkan terpisah pada cart, checkout, invoice, dan laporan. Detail tarif multi-klasifikasi serta pembulatan mengikuti [OPN-006](#opn-006). | Baseline; formula resolved, rate/rounding partial |
-| BR-016 | Website harus menerbitkan invoice untuk setiap transaksi dan menampilkannya di website serta menyediakan unduhan PDF. Bagian atas memuat nama toko, alamat, dan nomor kontak; bagian bawah memuat nama legal perusahaan, NPWP perusahaan, dan nomor akun reseller terdaftar. Invoice juga memuat jumlah, nama, SKU, harga satuan, total harga setiap item, total pembelian keseluruhan, dan nilai PPh 22 jika berlaku. Identitas dikelola admin melalui pengaturan website. Pelanggan dapat memilih penyampaian melalui WhatsApp atau email. Format nomor, nama legal perusahaan, format nomor akun reseller, dan kontrak channel mengikuti [OPN-008](#opn-008) dan [OPN-022](#opn-022). | Baseline; layout/channel resolved, identifiers partial |
+| BR-016 | Website harus menerbitkan invoice untuk setiap transaksi dan menampilkannya di website serta menyediakan unduhan PDF. Bagian atas memuat nama toko, alamat, dan nomor kontak; bagian bawah memuat nama legal perusahaan, NPWP perusahaan, dan nomor akun reseller terdaftar. Invoice juga memuat jumlah, nama, SKU, harga satuan, total harga setiap item, total pembelian keseluruhan, dan nilai PPh 22 jika berlaku. Nilai awal nama legal perusahaan adalah `Pixel Komunika`; seluruh identitas dikelola admin melalui pengaturan website. Pelanggan dapat memilih penyampaian melalui WhatsApp atau email. Format nomor invoice, format NPWP, format nomor akun reseller, dan kontrak channel mengikuti [OPN-008](#opn-008) dan [OPN-022](#opn-022). | Baseline; legal name/layout/channel resolved, identifiers partial |
 | BR-017 | Satu pelanggan dapat memiliki lebih dari satu invoice. | Baseline |
 | BR-018 | Pembayaran dilakukan melalui transfer bank dan diverifikasi admin. | Baseline |
 | BR-019 | Pelanggan harus dapat mengunggah bukti pembayaran. Bukti pembayaran disimpan selama lima tahun; batas ukuran dan tipe file mengikuti validasi teknis. | Baseline |
@@ -487,15 +489,11 @@ Nilai target final harus disetujui pada technical kickoff
 | RSK-010 | Laporan retur diterima POS sebelum laporan penjualan asal. | Stok POS dapat bertambah tanpa penjualan asal tercatat. | Tahan laporan retur sampai laporan penjualan asal berstatus berhasil atau sudah direkonsiliasi. |
 | RSK-011 | Provider, template, penerima, atau fallback WhatsApp belum final. | Admin tidak menerima notifikasi order baru melalui WhatsApp. | Website badge tetap menjadi channel minimum; selesaikan OPN-023 sebelum integration acceptance WhatsApp. |
 
-## 15. Keputusan Terbuka
+## 15. Register Keputusan dan Item Terbuka
 
-Setiap penanda *open question*, `TBD`, atau requirement berstatus `Proposed`
-harus merujuk ke item pada bagian ini. Jawaban yang telah disepakati kemudian
-dipindahkan ke requirement atau aturan bisnis terkait.
-
-Teks `~~dicoret~~` menandakan pertanyaan atau keputusan tersebut telah selesai.
-ID, status, pemilik, dan jawabannya tetap dipertahankan sebagai audit trail.
-Item `Partially resolved` tidak dicoret karena masih memiliki keputusan terbuka.
+Bagian ini adalah register keputusan yang menjadi target referensi requirement.
+Item selesai dipertahankan sebagai keputusan, bukan sebagai pertanyaan. Daftar
+pertanyaan aktif hanya berada pada [Bagian 15.1](#151-klarifikasi-klien-28-juli-2026).
 
 ### OPN-001
 
@@ -725,10 +723,11 @@ pilihan pelanggan. Identitas berasal dari pengaturan website. Bagian atas
 memuat nama toko, alamat, dan nomor kontak; bagian bawah memuat nama legal
 perusahaan, NPWP perusahaan, serta nomor akun reseller terdaftar. Nilai awal
 yang tersedia: nama toko `Pixel Komunika`, alamat `Jl. Sawahkurung IV No. 18B,
-Bandung`, nomor WhatsApp `081546407702`, dan NPWP
-`0821.4146.0442.4000`. Yang masih terbuka adalah nama legal perusahaan,
-konfirmasi format NPWP, format nomor akun reseller, format nomor invoice, serta
-provider/template pengiriman WhatsApp/email.
+Bandung`, nomor WhatsApp `081546407702`, nama legal perusahaan `Pixel
+Komunika`, dan NPWP `0821.4146.0442.4000`. Seluruh identitas tersebut dapat
+diubah melalui panel admin. Yang masih terbuka adalah konfirmasi format NPWP,
+format nomor akun reseller, format nomor invoice, serta provider/template
+pengiriman WhatsApp/email.
 
 **Pemilik:** Klien / Webekspres · **Target:** Sebelum Sprint 2 · **Status:** Partially resolved
 
@@ -744,39 +743,19 @@ serta aturan retry/fallback.
 
 ### 15.1 Klarifikasi Klien 28 Juli 2026
 
-Pertanyaan berstatus `Open` harus dijawab dan dicatat tertulis sebelum
-requirement terdampak dipindahkan ke sprint. Q-012 dipertahankan sebagai audit
-trail karena sudah dijawab pada 27 Juli 2026.
+Daftar ini hanya memuat pertanyaan yang masih membutuhkan jawaban. Keputusan
+yang sudah final dicatat pada riwayat perubahan dan requirement terkait.
 
 | ID | Pertanyaan | Requirement Terdampak | Status |
 |---|---|---|---|
-| Q-001 | ~~Apakah PPh 22 dihapus sepenuhnya dari MVP atau hanya cara perhitungannya yang berubah?~~ | BR-008, BR-015, RULE-006 | Resolved - PPh 22 tetap dalam MVP |
-| Q-002 | ~~Apakah istilah “biaya tambahan berbentuk persentase/surcharge” pada proposal dan dokumen saat ini merujuk pada PPh 22?~~ | BR-008, OPN-006 | Resolved - dikonfirmasi sebagai PPh 22 |
-| Q-003 | Jika PPh 22 tetap digunakan, siapa yang dikenakan, produk/transaksi apa yang terkena, berapa tarifnya, dan apa dasar perhitungannya? | BR-008, FR-PRC-004 | Partially resolved - klasifikasi, ambang, tarif, dasar seluruh subtotal terpicu, pembagi `1,11`, dan agregasi telah ditetapkan; tarif multi-klasifikasi serta pembulatan mengikuti OPN-006 |
-| Q-004 | ~~Apakah batas maksimal penjualan dihapus sepenuhnya untuk semua produk atau hanya produk/pelanggan tertentu?~~ | BR-007, FR-PRC-003 | Resolved - bukan batas maksimum; dikoreksi menjadi ambang nilai per klasifikasi |
-| Q-005 | ~~Jika batas dihapus, apakah kuantitas pembelian hanya dibatasi oleh stok tersedia dan tingkat harga?~~ | BR-006, BR-007, aturan stok | Resolved - tidak ada hard limit dari aturan ini; ambang memicu PPh 22 |
-| Q-006 | ~~Apakah surcharge ketika batas terlampaui ikut dihapus jika batas maksimal penjualan dihapus?~~ | BR-008, FR-PRC-004 | Resolved - komponen tersebut adalah PPh 22 |
-| Q-007 | ~~Apakah tiga tingkat harga berdasarkan kuantitas tetap berlaku tanpa perubahan?~~ | BR-006, OPN-013 | Resolved - minimum partai global dapat diubah admin (awal lima); berlaku ke seluruh order; partai menang terhadap grosir |
-| Q-008 | ~~Apakah PPh 22 harus tampil sebagai baris terpisah pada cart, checkout, invoice, dan laporan?~~ | BR-015, RULE-006, laporan | Resolved - ditampilkan sebagai komponen terpisah; pada invoice hanya jika transaksi terkena PPh 22 |
-| Q-009 | ~~Apakah konfigurasi klasifikasi, ambang, dan tarif PPh 22 berasal dari POS atau dikelola di website?~~ | BR-008, BR-009, OPN-006 | Resolved - dikelola melalui website |
-| Q-010 | ~~Apa saja “poin-poin yang berkenaan” yang juga ingin dihapus atau diubah oleh klien?~~ | Seluruh traceability terkait | Resolved - tidak ada penghapusan scope berdasarkan CR-004 |
-| Q-011 | ~~Apakah perubahan ini memengaruhi nilai proposal, scope komersial, atau deadline 45 hari kerja?~~ | MVP baseline dan change control | Resolved - mengikuti plan/proposal awal |
-| Q-012 | ~~Siapa yang memberikan persetujuan final dan kapan keputusan tersebut efektif menjadi baseline?~~ | OPN-017 | Resolved - klien memberi persetujuan final; efektif setelah persetujuan tertulis kedua pihak pada hari kerja |
-| Q-013 | ~~Apakah data contoh boleh digunakan pada production jika koneksi POS belum tersedia saat go-live?~~ | BR-009, OPN-019 | Resolved - tidak; data production wajib berasal dari POS |
-| Q-014 | ~~Kapan koneksi data POS ditargetkan tersedia dan siapa PIC vendor yang memvalidasi kontrak data?~~ | OPN-005, OPN-019 | Resolved - PIC POS adalah Kak Rio; akses dibuka setelah alur website berbasis data contoh berjalan |
-| Q-015 | ~~Untuk harga partai, apakah harga partai berlaku untuk seluruh item dalam struk atau hanya item yang memenuhi syarat; dan bagaimana prioritasnya jika item juga memenuhi syarat grosir?~~ | BR-006, OPN-013 | Resolved - berlaku untuk seluruh item dan harga partai diprioritaskan |
-| Q-016 | PPh 22 dihitung dari seluruh subtotal klasifikasi, hanya nilai di atas ambang, atau dasar lain; apakah multi-klasifikasi digabung sebelum tarif atau dihitung per klasifikasi lalu dijumlahkan? | BR-008, BR-015, OPN-006 | Partially resolved - seluruh subtotal klasifikasi terpicu digabung, dibagi `1,11`, lalu dikali tarif; tarif multi-klasifikasi dan pembulatan open |
-| Q-017 | ~~Status/event apa yang dianggap sebagai penjualan untuk mengurangi stok; apakah perlu reservasi sebelumnya; dan bagaimana retur menambah stok?~~ | BR-011 - BR-014, OPN-004 | Resolved - commit penjualan/retur website memperbarui stok efektif; POS menerima laporan penjualan/retur |
 | Q-018 | Apakah nama operasi pada diagram sudah final; bagaimana URL/method, autentikasi, payload/response, pagination, rate limit, dan kode error setiap operasi? | OPN-005, SRS 7.1 | Open - vendor POS |
 | Q-019 | Apakah POS mendukung external reference/idempotency dan lookup untuk mencegah laporan penjualan atau retur ganda ketika request timeout dan di-retry? | BR-014, BR-021 - BR-022, OPN-005 | Open - vendor POS |
-| Q-020 | ~~Apakah invoice POS menjadi invoice resmi tunggal, atau website tetap membuat nomor/dokumen invoice sendiri?~~ | BR-016, OPN-008, OPN-022 | Resolved - transaksi dan invoice dibuat di website; format nomor masih mengikuti OPN-008 |
-| Q-021 | Bagaimana kontrak laporan penjualan dan retur dari website ke POS, termasuk acknowledgement, lookup, dan data yang disinkronkan berkala? | BR-009, BR-014, OPN-005 | Partially resolved - arah dan tujuan bisnis resolved; kontrak vendor POS open |
-| Q-022 | Apakah nama, alamat, nomor kontak, dan NPWP toko pada invoice berasal dari payload POS atau konfigurasi website, dan siapa yang menyediakan nilai finalnya? | BR-016, OPN-022, SRS 9.1 | Partially resolved - pengaturan website, layout, data toko/NPWP tersedia; nama legal perusahaan, format NPWP/akun reseller, dan nomor invoice open |
-| Q-023 | Siapa admin/nomor penerima WhatsApp, provider apa yang digunakan, bagaimana isi/approval template, retry/fallback, serta kapan indikator website dianggap sudah dibaca? | BR-031, OPN-023 | Partially resolved - penerima, isi minimum, dan read behavior selesai; provider/credential/retry open |
+| Q-021 | Apa kontrak teknis laporan penjualan dan retur, termasuk payload, acknowledgement, lookup, serta data sinkronisasi berkala? | BR-009, BR-014, OPN-005 | Open - vendor POS |
+| Q-023 | Provider, kredensial, template final, retry, dan fallback apa yang digunakan untuk notifikasi WhatsApp? | BR-031, OPN-023 | Open - klien/Webekspres |
 | Q-024 | Apakah payload stok POS memiliki timestamp/cutoff dan bagaimana website mengetahui laporan penjualan/retur mana yang sudah tercakup agar delta stok tidak dihitung dua kali? | BR-009, BR-014, OPN-005 | Open - vendor POS |
-| Q-025 | Kondisi apa yang memindahkan order dari `PROCESSING` ke `PACKED`, `PACKED` ke `SHIPPED`, dan `SHIPPED` ke `COMPLETED`; apakah nomor resi wajib; siapa yang mengonfirmasi barang diterima; dan bagaimana menangani barang yang belum diterima? | RULE-025, OPN-020, FR-ORD-005 | Partially resolved - resi kondisional, tautan WhatsApp, auto-complete lima hari kerja, dan penanda TERKENDALA selesai; provider, kalender, serta poin open |
+| Q-025 | Provider/template tautan WhatsApp dan kalender hari kerja apa yang digunakan; berapa aturan poin; dan apakah admin boleh menyelesaikan order manual? | RULE-025, OPN-020, FR-ORD-005 | Open - klien/Webekspres |
 | Q-026 | Jika beberapa klasifikasi terpicu dengan tarif PPh 22 berbeda, tarif mana yang dipakai setelah dasarnya digabung; dan bagaimana pembulatan nilai rupiah dilakukan? | BR-008, BR-015, OPN-006 | Open - klien/keuangan/System Analyst |
-| Q-027 | Apa nama legal perusahaan, format NPWP final, aturan nomor akun reseller, dan format/awalan nomor invoice? | BR-016, OPN-008, OPN-022 | Open - klien |
+| Q-027 | Apa format NPWP final, aturan nomor akun reseller, dan format/awalan nomor invoice? | BR-016, OPN-008, OPN-022 | Open - klien |
 | Q-028 | Untuk order gabungan, bagaimana ongkir dibebankan, siapa yang membuat grup, dan apakah satu resi/status otomatis diterapkan ke semua order? | BR-033, OPN-014 | Open - klien/System Analyst |
 | Q-029 | Apakah order WhatsApp dicatat menjadi order website; berapa poin konfirmasi penerimaan, kapan kedaluwarsa, dan dapat dipakai untuk apa? | BR-032, BR-034, OPN-002, OPN-020 | Open - klien |
 | Q-030 | Apa definisi produk berkapasitas besar, fallback berat/dimensi, kode layanan Grab/Gojek, serta siapa pemilik akun/biaya Biteship? | BR-024, OPN-021 | Open - klien/Webekspres |
@@ -817,7 +796,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - harga partai, expiry, dan lifecycle selesai; provider/calendar/poin pada OPN-020 tetap open |
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
 | PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Parsial - origin, berat, dimensi produk besar, Grab/Gojek, fallback, area, dan SLA tersedia; tarif, fallback data, kode layanan, akun/biaya tetap OPN-010/OPN-021 |
-| PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - layout, sumber website, preview/PDF/channel, penerima, isi, dan read behavior selesai; nama legal, format NPWP/akun reseller/nomor invoice, provider/credential/retry tetap OPN-022/OPN-023 |
+| PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - nama legal, layout, sumber website, preview/PDF/channel, penerima, isi, dan read behavior selesai; format NPWP/akun reseller/nomor invoice serta provider/credential/retry tetap OPN-022/OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Parsial - shared hosting milik klien dan komitmen pemberian akses developer resolved pada OPN-001/CR-016; kredensial aktual, domain/DNS, akun layanan, kemampuan runtime, cron, log, backup, dan jadwal handoff masih perlu disediakan atau diverifikasi |
 | PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |
 

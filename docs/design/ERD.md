@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.5 - Klarifikasi Klien 7-11 Agustus 2026 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 0.6 - Klarifikasi Klien 12 Agustus 2026 |
+| Tanggal | Rabu, 12 Agustus 2026 |
 | Status | Internal - siap menjadi dasar migration MVP |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Detail field | [Data Dictionary](DATA_DICTIONARY.md) |
@@ -19,8 +19,8 @@ ERD ini sudah cukup untuk implementasi MVP. Bagian berikut masih
   ([OPN-006](../requirements/BRD.md#opn-006));
 - nama field, payload, autentikasi, error, dan idempotency API POS
   ([OPN-005](../requirements/BRD.md#opn-005));
-- nama legal perusahaan, format NPWP/akun reseller, nomor invoice, dan provider
-  channel invoice ([OPN-022](../requirements/BRD.md#opn-022));
+- format NPWP/akun reseller, nomor invoice, dan provider channel invoice
+  ([OPN-022](../requirements/BRD.md#opn-022));
 - provider, credential, dan retry/fallback WhatsApp
   ([OPN-023](../requirements/BRD.md#opn-023));
 - tarif kurir toko, fallback berat/dimensi, kode layanan, akun, dan biaya

@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.14 - Klarifikasi Klien 7-11 Agustus 2026 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 0.15 - Klarifikasi Klien 12 Agustus 2026 |
+| Tanggal | Rabu, 12 Agustus 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Dokumen induk | `BRD.md` |
@@ -253,7 +253,7 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
 | FR-ORD-001 | Sistem | Sistem membuat nomor order dan invoice website yang unik. | Constraint unik mencegah duplikasi nomor order/invoice; format dan aturan penomoran invoice mengikuti [OPN-008](BRD.md#opn-008). | Baseline; ownership resolved, number format open |
-| FR-ORD-002 | Sistem | Order menyimpan snapshot item, identitas usaha, reseller, dan biaya untuk invoice. | Snapshot bagian atas mencakup nama/alamat/kontak toko; bagian bawah mencakup nama legal perusahaan, NPWP, dan nomor akun reseller; item, ongkir, total, dan PPh 22 tersimpan. | Baseline; legal/account identifiers partial |
+| FR-ORD-002 | Sistem | Order menyimpan snapshot item, identitas usaha, reseller, dan biaya untuk invoice. | Snapshot bagian atas mencakup nama/alamat/kontak toko; bagian bawah mencakup nama legal perusahaan dengan nilai awal `Pixel Komunika`, NPWP, dan nomor akun reseller; item, ongkir, total, dan PPh 22 tersimpan. | Baseline; legal name resolved, account identifiers partial |
 | FR-ORD-003 | Pelanggan Aktif | Pelanggan aktif dapat melihat detail dan riwayat order sendiri. | Guest dan pelanggan pending ditolak; pelanggan aktif tidak dapat mengakses order pengguna lain. | Baseline |
 | FR-ORD-004 | Admin | Admin dapat melihat dan memfilter seluruh order. | Filter minimal periode, status, pelanggan, area, dan metode kirim. | Baseline |
 | FR-ORD-005 | Admin / Sistem | Status operasional order mengikuti urutan `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`. | `PROCESSING` dimulai setelah pembayaran diterima; `PACKED` setelah barang siap; `SHIPPED` setelah diserahkan ke kurir. Resi wajib hanya untuk metode yang memilikinya. Pelanggan dapat konfirmasi lewat tautan WhatsApp; tanpa kendala sistem auto-complete lima hari kerja setelah `SHIPPED`. | Baseline; provider/calendar partial |
@@ -414,8 +414,9 @@ FRD dapat dibaseline setelah:
   lokasi Biteship mengikuti [OPN-021](BRD.md#opn-021); fallback berat/dimensi,
   kode layanan, dan akun provider harus tersedia sebelum integration test;
 - layout, sumber identitas, preview/PDF, serta pilihan penyampaian invoice
-  mengikuti [OPN-022](BRD.md#opn-022); nama legal perusahaan, format NPWP,
-  nomor akun reseller, dan nomor invoice harus dilengkapi; dan
+  mengikuti [OPN-022](BRD.md#opn-022); nama legal awal `Pixel Komunika` dapat
+  diubah admin, sedangkan format NPWP, nomor akun reseller, dan nomor invoice
+  harus dilengkapi; dan
   kontrak notifikasi WhatsApp diselesaikan melalui
   [OPN-023](BRD.md#opn-023);
 - hak akses katalog dan harga sebelum approval disetujui;

@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.17 - Klarifikasi Klien 7-11 Agustus 2026 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 0.19 - Penyederhanaan Pertanyaan Terbuka 12 Agustus 2026 |
+| Tanggal | Rabu, 12 Agustus 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Kebutuhan bisnis | `BRD.md` |
@@ -53,7 +53,7 @@ implementasi dilakukan iteratif per sprint.
 - Perubahan tetap harus menjaga backward compatibility, migration safety, test,
   observability, dan rollback.
 
-### 2.2 Change Notice dan Klarifikasi 27 Juli-11 Agustus 2026
+### 2.2 Change Notice dan Klarifikasi 27 Juli-12 Agustus 2026
 
 Klarifikasi klien pada 28 Juli 2026 menetapkan:
 
@@ -87,8 +87,9 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - field POS menjadi sumber utama ketika tersedia, sedangkan website hanya
   melengkapi field yang belum tersedia;
 - invoice tampil di website dan dapat diunduh sebagai PDF; bagian atas memuat
-  identitas toko, bagian bawah nama legal perusahaan, NPWP, dan nomor akun
-  reseller; pelanggan dapat memilih penyampaian WhatsApp atau email;
+  identitas toko, bagian bawah nama legal perusahaan dengan nilai awal `Pixel
+  Komunika`, NPWP, dan nomor akun reseller; identitas dapat diubah admin dan
+  pelanggan dapat memilih penyampaian WhatsApp atau email;
 - setelah pembayaran diverifikasi, order berlanjut melalui `PROCESSING`,
   `PACKED`, `SHIPPED`, dan `COMPLETED`; resi wajib hanya untuk metode yang
   memilikinya; konfirmasi menggunakan tautan WhatsApp, auto-complete berjalan
@@ -556,7 +557,8 @@ antar-klasifikasi dan pembulatan mengikuti [`OPN-006`](BRD.md#opn-006).
 Kontrak tampilan invoice minimum:
 
 - bagian atas: nama toko, alamat, dan nomor kontak;
-- bagian bawah: nama legal perusahaan, NPWP, dan nomor akun reseller;
+- bagian bawah: nama legal perusahaan dengan nilai awal `Pixel Komunika`, NPWP,
+  dan nomor akun reseller;
 - setiap item: jumlah, nama barang, SKU, harga satuan, dan total harga item;
 - ringkasan: total pembelian keseluruhan serta nilai rupiah PPh 22 jika
   transaksi terkena PPh 22;
@@ -918,28 +920,26 @@ sebagai sumber stok production.
 | FR-AUD | Logging, Audit, Observability |
 | FR-NTF | Queue, Data Model, Resilience |
 
-## 20. Technical Decisions and Open Items
+## 20. Open Technical Items
 
-Teks `~~dicoret~~` menandakan keputusan yang sudah final dan dipertahankan
-untuk audit trail. Baris dengan kontrak atau detail yang masih terbuka tidak
-dicoret meskipun sebagian keputusan bisnisnya sudah selesai.
+Daftar ini hanya memuat detail teknis yang belum final. Keputusan yang sudah
+selesai berada pada requirement dan riwayat perubahan terkait.
 
 | ID | Decision | Referensi BRD | Status |
 |---|---|---|---|
-| TD-001 | ~~Shared hosting milik klien menjadi production baseline dan klien akan memberikan akses setup/deployment kepada developer Webekspres.~~ Detail kredensial serta kemampuan panel, database, cron, log, backup, dan SSH/terminal diverifikasi saat technical handoff. | OPN-001, PRE-006 | Hosting/access commitment resolved; technical handoff pending |
+| TD-001 | Verifikasi kredensial serta kemampuan panel, database, cron, log, backup, dan SSH/terminal saat technical handoff. | OPN-001, PRE-006 | Open - technical handoff |
 | TD-002 | MySQL/MariaDB mengikuti versi yang tersedia pada shared hosting. | OPN-001 | Confirm during setup |
-| TD-003 | Working operation POS tersedia; Kak Rio menjadi PIC dan akses dibuka setelah alur website berbasis data contoh berjalan. URL/method/payload/auth/error/idempotency belum final; data contoh hanya dipakai di non-production. | OPN-005, OPN-019 | PIC/access trigger resolved; connection contract open |
-| TD-004 | Website membuat transaksi/invoice dan memperbarui stok efektif; POS menerima laporan penjualan/retur untuk pencatatan transaksi serta perubahan stok POS. | OPN-004, OPN-005 | Business flow resolved; technical contract open |
-| TD-005 | ~~Master tiga jenis harga, kategori, merek, nama dasar produk, dan SKU berasal dari POS; nama tampilan produk dapat dioverride melalui website.~~ | OPN-003, OPN-013 | Resolved |
-| TD-006 | Full master/inventory sync sekali sehari; stock-by-product berkala bila diperlukan. | OPN-005 | Resolved working cadence; SLA/trigger final open |
-| TD-007 | Object storage provider open; bukti pembayaran disimpan lima tahun. | OPN-009 | Retention resolved; provider open |
+| TD-003 | Tetapkan URL, method, payload, autentikasi, error, dan idempotency koneksi POS. | OPN-005, OPN-019 | Open - vendor POS |
+| TD-004 | Tetapkan kontrak teknis laporan penjualan dan retur ke POS. | OPN-004, OPN-005 | Open - vendor POS |
+| TD-006 | Tetapkan SLA dan trigger final sinkronisasi POS. | OPN-005 | Open - vendor POS |
+| TD-007 | Tetapkan provider object storage untuk bukti pembayaran. | OPN-009 | Open |
 | TD-008 | Baseline pengguna bersamaan normal maksimal 50 pengguna. | OPN-012 | Assumption; validate by load test |
 | TD-009 | RPO, RTO, availability, dan monitoring provider. | OPN-012 | Open |
-| TD-010 | PPh 22 memakai seluruh subtotal klasifikasi terpicu yang digabung, dibagi `1,11`, lalu dikali tarif. | OPN-006, OPN-007 | Formula/expiry resolved; tariff/rounding partial |
-| TD-011 | Web mengelola lifecycle `PROCESSING` -> `PACKED` -> `SHIPPED` -> `COMPLETED`; resi kondisional, konfirmasi WhatsApp, auto-complete lima hari kerja, dan penanda `TERKENDALA` ditetapkan. | OPN-020 | Lifecycle resolved; provider/calendar/points partial |
-| TD-012 | Biteship memakai Maps/Rates dengan origin Sawahkurung IV No. 18B, berat per produk, dimensi produk besar, dan Grab/Gojek same-day. | OPN-021 | Core operations resolved; fallback/account partial |
-| TD-013 | Layout invoice, preview/PDF, channel WhatsApp/email, penerima notifikasi admin, isi minimum, dan read behavior ditetapkan. Identifier legal/reseller dan kontrak provider belum final. | OPN-022, OPN-023 | Business behavior resolved; identifiers/provider partial |
-| TD-014 | Website menerbitkan invoice transaksi web; format/awalan nomor serta identifier legal/reseller masih perlu ditetapkan. | OPN-008, OPN-022 | Ownership/delivery resolved; identifiers open |
+| TD-010 | Tetapkan tarif untuk klasifikasi terpicu yang berbeda dan aturan pembulatan PPh 22. | OPN-006, OPN-007 | Open |
+| TD-011 | Tetapkan provider/template konfirmasi WhatsApp, kalender hari kerja, aturan poin, dan kewenangan penyelesaian manual. | OPN-020 | Open |
+| TD-012 | Tetapkan fallback berat/dimensi, kode layanan, akun production, dan biaya Biteship. | OPN-021 | Open |
+| TD-013 | Tetapkan format NPWP/nomor akun reseller serta kontrak provider invoice dan notifikasi. | OPN-022, OPN-023 | Open |
+| TD-014 | Tetapkan format atau awalan nomor invoice. | OPN-008, OPN-022 | Open |
 
 ## 21. Referensi Teknis
 

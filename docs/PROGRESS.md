@@ -121,6 +121,11 @@ Dokumen ini dipakai untuk mencatat:
   - Endpoint POS `GET /api/pos/orders/{order_number}`.
   - Dokumen `docs/SPRINT_2_DEMO.md`.
   - Test suite 42/42 lulus.
+  - Nama legal perusahaan ditetapkan `Pixel Komunika` sebagai nilai awal dan
+    dapat diubah melalui panel admin.
+  - Pertanyaan terbuka dan dokumentasi invoice terkait nama legal diselaraskan.
+  - Daftar pertanyaan diringkas agar hanya memuat hal yang belum terjawab;
+    keputusan final tetap dicatat pada requirement dan riwayat perubahan.
 - Next:
   - Demo acceptance Sprint 2 dengan klien/internal.
   - Reconcile status task di ClickUp Sprint 2.
@@ -162,7 +167,7 @@ Dokumen ini dipakai untuk mencatat:
 - Provider / template / fallback WhatsApp
 - Verifikasi shared hosting: cron, log, backup, worker bounded
 - Tarif kurir toko per kecamatan dan kalender hari kerja/libur
-- Nama badan usaha legal, aturan nomor invoice, serta nomor akun reseller
+- Aturan nomor invoice serta nomor akun reseller
 - Aturan PPh 22 multi-kategori dan pembulatan
 - Aturan ongkir/status untuk penggabungan pesanan serta skema poin loyalitas
 

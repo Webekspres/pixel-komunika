@@ -5,8 +5,8 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.12 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 1.15 |
+| Tanggal | Jumat, 14 Agustus 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
 | Pengembang | PT Webekspres Teknologi Indonesia |
@@ -66,12 +66,10 @@ Untuk pemeriksaan paling cepat:
    [kedudukan dan batas fungsi dokumen](#pemberitahuan-penting-kedudukan-dokumen);
 2. periksa [fitur yang termasuk dalam versi pertama](#3-fitur-yang-termasuk-dalam-versi-pertama);
 3. sampaikan persetujuan, revisi, penolakan, atau pilihan lain dengan mengikuti
-   [cara memberikan tanggapan melalui grup WhatsApp](#11-cara-memberikan-tanggapan-melalui-grup-whatsapp);
-4. jawab [keputusan yang masih diperlukan dari klien](#8-keputusan-yang-masih-diperlukan-dari-klien),
-   termasuk [cara memastikan barang telah diterima](#811-perubahan-status-pengiriman-dan-konfirmasi-barang-diterima);
-5. periksa [kriteria penerimaan versi pertama](#9-kriteria-penerimaan-versi-pertama);
+   [cara memberikan tanggapan melalui grup WhatsApp](#10-cara-memberikan-tanggapan-melalui-grup-whatsapp);
+4. periksa [kriteria penerimaan versi pertama](#8-kriteria-penerimaan-versi-pertama);
    dan
-6. berikan [persetujuan akhir](#11-persetujuan) melalui grup WhatsApp proyek.
+5. berikan [persetujuan akhir](#10-persetujuan) melalui grup WhatsApp proyek.
 
 ### 1.1 Cara Memberikan Tanggapan melalui Grup WhatsApp
 
@@ -85,9 +83,7 @@ Klien dapat memberikan tanggapan dengan cara:
 2. memberikan daftar poin yang perlu direvisi;
 3. menolak saran tertentu dan, jika memungkinkan, menjelaskan alasannya;
 4. memberikan pilihan atau solusi lain yang lebih sesuai dengan operasional
-   Pixel Komunika; dan
-5. menjawab pertanyaan pada
-   [Bagian 8](#8-keputusan-yang-masih-diperlukan-dari-klien).
+   Pixel Komunika.
 
 Jawaban dapat diberikan sekaligus atau bertahap. Format berikut **hanya contoh
 dan tidak wajib digunakan**. Format ini disediakan agar poin tanggapan mudah
@@ -99,7 +95,7 @@ Contoh format tanggapan:
 
 > **Status:** Setuju / Setuju dengan revisi / Belum setuju
 >
-> **Bagian atau poin:** Contoh, Bagian 8.1
+> **Bagian atau poin:** Contoh, Bagian 6
 >
 > **Jawaban atau revisi:** ...
 >
@@ -377,7 +373,7 @@ Nilai awal yang sudah diberikan klien:
 | Alamat | Jl. Sawahkurung IV No. 18B, Bandung |
 | Nomor kontak/WhatsApp | 081546407702 |
 | NPWP perusahaan | 0821.4146.0442.4000 |
-| Nama legal perusahaan | Belum diberikan |
+| Nama legal perusahaan | Pixel Komunika |
 
 Identitas ini dapat diubah admin melalui pengaturan website. Invoice dapat
 dilihat di website, diunduh sebagai PDF, serta dikirim melalui WhatsApp atau
@@ -399,181 +395,9 @@ tertulis:
 4. pengembalian dana otomatis di luar proses pembatalan dan pengembalian stok;
 5. reset kata sandi mandiri;
 6. pencarian dan penyaringan katalog lanjutan;
-7. ekspor laporan ke CSV atau Excel; dan
-8. fitur tambahan di luar ruang lingkup yang disepakati dalam dokumen ini.
+7. ekspor laporan ke CSV atau Excel.
 
-## 8. Rekap Jawaban dan Keputusan yang Masih Diperlukan
-
-Jawaban dapat diberikan bertahap. Klien dapat memberi tanda pada pilihan yang
-sesuai atau menuliskan jawaban sendiri.
-
-### 8.1 Perhitungan PPh 22
-
-Rumus yang dipilih sebaiknya telah dikonfirmasi oleh pihak keuangan atau
-perpajakan Pixel Komunika. Website akan menerapkan rumus yang disetujui klien.
-
-Keputusan klien:
-
-- [x] gunakan seluruh nilai belanja pada klasifikasi yang melewati batas;
-- [x] gabungkan nilai semua klasifikasi yang terpicu;
-- [x] hitung dengan rumus `(nilai gabungan / 1,11) × persentase PPh 22`.
-
-Masih perlu dipastikan: jika klasifikasi yang terpicu memiliki persentase
-berbeda, persentase mana yang dipakai, dan bagaimana pembulatan rupiahnya?
-
-### 8.2 Harga Partai dan Grosir
-
-Keputusan klien:
-
-- [x] minimum awal lima unit harus berasal dari satu jenis produk;
-- [x] minimum tersebut dapat diubah admin melalui website;
-- [x] setelah syarat terpenuhi, harga partai berlaku untuk seluruh produk dalam
-  pesanan; dan
-- [x] jika satu produk memenuhi partai dan grosir, harga partai digunakan.
-
-### 8.3 Nomor dan Penyampaian Invoice
-
-1. Format atau awalan nomor invoice masih diperlukan:
-   ______________________________________________________________.
-2. Ketersediaan invoice:
-   - [x] tampilan di website;
-   - [x] file PDF.
-3. Penyampaian invoice sesuai pilihan pelanggan:
-   - [x] website;
-   - [x] WhatsApp;
-   - [x] email.
-4. Identitas invoice:
-   - [x] diambil dari pengaturan website dan dapat diubah admin.
-5. Identitas yang telah diberikan:
-
-   | Data | Nilai |
-   |---|---|
-   | Nama toko | Pixel Komunika |
-   | Alamat | Jl. Sawahkurung IV No. 18B, Bandung |
-   | Nomor kontak | 081546407702 |
-   | NPWP perusahaan | 0821.4146.0442.4000 |
-
-### 8.4 Perhitungan Omzet
-
-Transaksi mulai dihitung sebagai omzet ketika:
-
-- [x] pesanan telah dikirim.
-
-### 8.5 Kurir Toko
-
-1. Area: seluruh kecamatan di Kota Bandung dan Kabupaten Bandung.
-2. Tarif per area: masih dalam evaluasi.
-3. Perkiraan: H+1 hari kerja; dapat menjadi H+2 jika kurir tidak tersedia.
-   Minggu dan tanggal merah tidak dihitung.
-
-### 8.6 Pengiriman melalui Biteship
-
-Mohon melengkapi:
-
-1. alamat asal: Jl. Sawahkurung IV No. 18B, Bandung;
-2. sumber berat: berat masing-masing produk;
-3. apakah ukuran panjang, lebar, dan tinggi paket digunakan?
-   - [x] Ya, untuk produk berkapasitas besar
-   - [ ] Tidak
-4. kurir atau layanan yang ingin ditampilkan:
-   Grab dan Gojek untuk layanan same-day;
-5. pihak yang menyediakan dan menanggung akun Biteship:
-   ______________________________________________________________.
-
-Jika pengecekan ongkir Biteship sedang tidak dapat digunakan, pelanggan:
-
-- [x] diminta menghubungi admin;
-- [ ] menggunakan tarif manual yang ditentukan admin;
-- [ ] diminta mencoba kembali;
-- [ ] menggunakan cara lain: ___________________________________.
-
-### 8.7 Bukti Pembayaran
-
-Berapa lama bukti pembayaran perlu disimpan?
-
-- [ ] 1 tahun;
-- [ ] 2 tahun;
-- [x] 5 tahun;
-- [ ] mengikuti kebijakan lain: _________________________________.
-
-### 8.8 Notifikasi Order Baru
-
-1. Nomor WhatsApp penerima: `081546407702`.
-2. Isi minimum: `Cek Order masuk`.
-3. Tanda notifikasi merah pada website dianggap sudah dibaca ketika:
-   - [x] admin membuka daftar pesanan yang akan diproses;
-   - [ ] admin membuka detail pesanan;
-   - [ ] admin menandainya secara manual;
-   - [ ] cara lain: _____________________________________________.
-
-### 8.9 Reseller
-
-Apakah reseller termasuk dalam versi pertama?
-
-- [ ] Tidak, disiapkan untuk tahap berikutnya.
-- [x] Ya, pemesanan dilakukan melalui website.
-- [x] Ya, pemesanan dilakukan melalui WhatsApp.
-- [ ] Aturan lain: _____________________________________________.
-
-Jika reseller termasuk, apakah reseller dapat melihat harga?
-
-- [x] Ya, untuk reseller terdaftar yang disetujui admin
-- [ ] Tidak
-
-### 8.10 Penggabungan Pesanan
-
-Apakah beberapa pesanan boleh digabungkan menjadi satu pengiriman?
-
-- [ ] Tidak.
-- [x] Ya, hanya jika alamat tujuan pengiriman sama.
-
-Nomor order dan invoice tetap terpisah. Masih perlu dipastikan: cara membagi
-ongkir serta apakah satu resi dan perubahan status diterapkan sekaligus ke
-seluruh order dalam grup.
-
-### 8.11 Perubahan Status Pengiriman dan Konfirmasi Barang Diterima
-
-Usulan alur perubahan status:
-
-1. status `Diproses` dimulai setelah pembayaran diterima;
-2. admin mengubah status menjadi `Dikemas` setelah seluruh barang selesai
-   disiapkan, diperiksa, dan dikemas;
-3. admin mengubah status menjadi `Dikirim` setelah barang diserahkan kepada
-   kurir; dan
-4. status `Selesai` hanya diberikan setelah penerimaan barang dikonfirmasi.
-
-Apakah usulan tersebut disetujui?
-
-- [x] Ya.
-- [ ] Perlu revisi: ____________________________________________.
-
-Apakah nomor resi wajib diisi sebelum status menjadi `Dikirim`?
-
-- [ ] Ya, untuk seluruh metode pengiriman.
-- [x] Ya, hanya untuk pengiriman yang memang memiliki nomor resi.
-- [ ] Tidak.
-- [ ] Aturan lain: _____________________________________________.
-
-Siapa atau proses apa yang mengonfirmasi bahwa barang telah diterima?
-
-- [x] pelanggan membuka tautan WhatsApp dan menekan konfirmasi penerimaan;
-- [ ] admin mengubah status setelah memperoleh konfirmasi pelanggan atau kurir;
-- [ ] sistem otomatis menyelesaikan pesanan setelah ______ hari sejak dikirim;
-- [x] sistem otomatis menyelesaikan setelah lima hari kerja sejak dikirim jika
-      tidak ada kendala;
-- [ ] cara lain: _______________________________________________.
-
-Jika barang belum diterima atau pelanggan melaporkan kendala:
-
-- [x] status tetap `Dikirim` sampai admin menyelesaikan kendala;
-- [x] gunakan penanda tambahan: `Terkendala`;
-- [ ] penanganan lain: _________________________________________.
-
-Konfirmasi pelanggan memberikan poin. Masih perlu dipastikan: jumlah poin,
-masa berlaku, kegunaan poin, provider/template tautan WhatsApp, kalender hari
-kerja untuk auto-complete, dan apakah admin boleh menyelesaikan order manual.
-
-## 9. Kriteria Penerimaan Versi Pertama
+## 8. Kriteria Penerimaan Versi Pertama
 
 Versi pertama dapat diterima apabila:
 
@@ -614,7 +438,7 @@ Versi pertama dapat diterima apabila:
 Pengujian penerimaan dilakukan bersama klien sebelum website dinyatakan siap
 digunakan.
 
-## 10. Perubahan Setelah Persetujuan
+## 9. Perubahan Setelah Persetujuan
 
 Persetujuan dokumen ini menetapkan ruang lingkup versi pertama. Ide atau
 perubahan baru tetap dapat dibahas selama pengerjaan.
@@ -624,7 +448,7 @@ biaya, Webekspres akan menyampaikan dampaknya terlebih dahulu. Perubahan mulai
 berlaku setelah disetujui secara tertulis oleh klien dan Webekspres pada hari
 kerja.
 
-## 11. Persetujuan
+## 10. Persetujuan
 
 Klien tidak perlu mengisi atau mengirimkan ulang tabel di bawah ini.
 Persetujuan cukup disampaikan oleh perwakilan klien melalui grup WhatsApp

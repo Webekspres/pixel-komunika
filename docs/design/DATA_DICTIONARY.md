@@ -4,8 +4,8 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.6 - Klarifikasi Klien 7-11 Agustus 2026                                                                                      |
-| Tanggal  | Selasa, 11 Agustus 2026                                                                                                         |
+| Versi    | 0.7 - Klarifikasi Klien 12 Agustus 2026                                                                                         |
+| Tanggal  | Rabu, 12 Agustus 2026                                                                                                           |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
 | Sumber   | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -295,7 +295,7 @@ kuantitas antar-SKU tidak dijumlahkan.
 | store_name              | VARCHAR(191)    | Tidak | —           | Nama toko pada bagian atas invoice; awal `Pixel Komunika`. |
 | address                 | TEXT            | Tidak | —           | Alamat toko; awal `Jl. Sawahkurung IV No. 18B, Bandung`. |
 | contact_number          | VARCHAR(32)     | Tidak | —           | Kontak toko; awal `081546407702`.              |
-| company_name            | VARCHAR(191)    |   Ya  | —           | Nama legal perusahaan pada bagian bawah invoice; masih TBD. |
+| company_name            | VARCHAR(191)    | Tidak | `Pixel Komunika` | Nama legal perusahaan pada bagian bawah invoice; dapat diubah admin. |
 | company_npwp            | VARCHAR(32)     | Tidak | —           | NPWP perusahaan; awal `0821.4146.0442.4000`, format final perlu konfirmasi. |
 | partai_minimum_quantity | INT UNSIGNED    | Tidak | `5`         | Minimum global satu SKU untuk memicu harga partai. |
 | origin_biteship_area_id | VARCHAR(191)    |   Ya  | IDX         | Area ID origin untuk rate reguler.             |
@@ -304,8 +304,9 @@ kuantitas antar-SKU tidak dijumlahkan.
 | created_at              | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                               |
 | updated_at              | DATETIME(6)     | Tidak | —           | Waktu perubahan.                               |
 
-Identitas dikelola melalui website. Nama legal perusahaan, format NPWP, dan
-format nomor akun reseller mengikuti [OPN-022](../requirements/BRD.md#opn-022).
+Identitas dikelola melalui website. Nama legal perusahaan diawali `Pixel
+Komunika` dan dapat diubah admin. Format NPWP dan nomor akun reseller mengikuti
+[OPN-022](../requirements/BRD.md#opn-022).
 
 ### 5.2 `bank_accounts`
 

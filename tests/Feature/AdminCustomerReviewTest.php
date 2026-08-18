@@ -1,7 +1,10 @@
 <?php
 
+use App\Livewire\Admin\CustomerReviewDetail;
+use App\Models\AuditLog;
 use App\Models\CustomerProfile;
 use App\Models\User;
+use Livewire\Livewire;
 
 it('allows admins to review and change customer verification status', function () {
     $admin = User::factory()->admin()->create();
@@ -12,36 +15,34 @@ it('allows admins to review and change customer verification status', function (
         'verification_status' => CustomerProfile::PENDING,
     ]);
 
-    $this->actingAs($admin)
-        ->patch(route('admin.customers.update', $profile), [
-            'action' => 'approve',
-        ])
-        ->assertRedirect();
+    Livewire::actingAs($admin)
+        ->test(CustomerReviewDetail::class, ['customerProfile' => $profile])
+        ->call('approve')
+        ->assertHasNoErrors();
 
     expect($profile->fresh()->verification_status)->toBe(CustomerProfile::ACTIVE)
-        ->and($profile->fresh()->reviewed_by)->toBe($admin->id);
+        ->and($profile->fresh()->reviewed_by)->toBe($admin->id)
+        ->and($profile->fresh()->rejection_reason)->toBeNull();
 
-    $this->actingAs($admin)
-        ->patch(route('admin.customers.update', $profile), [
-            'action' => 'suspend',
-            'reason' => 'Dokumen perlu diperbarui.',
-        ])
-        ->assertRedirect();
+    Livewire::actingAs($admin)
+        ->test(CustomerReviewDetail::class, ['customerProfile' => $profile])
+        ->set('rejectionReason', 'Dokumen perlu diperbarui.')
+        ->call('suspend')
+        ->assertHasNoErrors();
 
     expect($profile->fresh()->verification_status)->toBe(CustomerProfile::SUSPENDED)
         ->and($profile->fresh()->rejection_reason)->toBe('Dokumen perlu diperbarui.');
 
-    $this->actingAs($admin)
-        ->patch(route('admin.customers.update', $profile), [
-            'action' => 'reactivate',
-        ])
-        ->assertRedirect();
+    Livewire::actingAs($admin)
+        ->test(CustomerReviewDetail::class, ['customerProfile' => $profile])
+        ->call('reactivate')
+        ->assertHasNoErrors();
 
     expect($profile->fresh()->verification_status)->toBe(CustomerProfile::ACTIVE)
         ->and($profile->fresh()->rejection_reason)->toBeNull();
 });
 
-it('lets admins reject customers with a reason', function () {
+it('records verification changes to audit logs', function () {
     $admin = User::factory()->admin()->create();
     $customer = User::factory()->create();
 
@@ -49,12 +50,39 @@ it('lets admins reject customers with a reason', function () {
         'verification_status' => CustomerProfile::PENDING,
     ]);
 
-    $this->actingAs($admin)
-        ->patch(route('admin.customers.update', $profile), [
-            'action' => 'reject',
-            'reason' => 'Data usaha belum lengkap.',
-        ])
-        ->assertRedirect();
+    Livewire::actingAs($admin)
+        ->test(CustomerReviewDetail::class, ['customerProfile' => $profile])
+        ->call('approve');
+
+    expect(AuditLog::query()->where('auditable_type', CustomerProfile::class)
+        ->where('auditable_id', $profile->id)
+        ->where('action', 'CUSTOMER_APPROVE')
+        ->exists())->toBeTrue();
+});
+
+it('rejects customers only with a valid reason', function () {
+    $admin = User::factory()->admin()->create();
+    $customer = User::factory()->create();
+
+    $profile = $customer->customerProfile()->create([
+        'verification_status' => CustomerProfile::PENDING,
+    ]);
+
+    // Alasan terlalu pendek → validasi gagal, status tidak berubah.
+    Livewire::actingAs($admin)
+        ->test(CustomerReviewDetail::class, ['customerProfile' => $profile])
+        ->set('rejectionReason', 'abc')
+        ->call('reject')
+        ->assertHasErrors('rejectionReason');
+
+    expect($profile->fresh()->verification_status)->toBe(CustomerProfile::PENDING);
+
+    // Alasan valid → ditolak.
+    Livewire::actingAs($admin)
+        ->test(CustomerReviewDetail::class, ['customerProfile' => $profile])
+        ->set('rejectionReason', 'Data usaha belum lengkap.')
+        ->call('reject')
+        ->assertHasNoErrors();
 
     expect($profile->fresh()->verification_status)->toBe(CustomerProfile::REJECTED)
         ->and($profile->fresh()->rejection_reason)->toBe('Data usaha belum lengkap.');
@@ -106,5 +134,48 @@ it('lets admins search customers and view customer detail', function () {
         ->get(route('admin.customers.show', $profile))
         ->assertOk()
         ->assertSee('sylvi@example.com')
-        ->assertSee('Toko Utama');
+        ->assertSee('Toko Utama')
+        ->assertSee('Setujui Pendaftaran')
+        ->assertSee('Laporan') // shell admin (sidebar) tetap tampil
+        ->assertDontSee('Cari pelanggan, produk, pesanan'); // search global navbar dihapus
+});
+
+it('shows state-driven actions on customer detail page', function () {
+    $admin = User::factory()->admin()->create();
+
+    $makeProfile = function (string $status) use ($admin): CustomerProfile {
+        $customer = User::factory()->create();
+        $profile = $customer->customerProfile()->create([
+            'verification_status' => $status,
+            'rejection_reason' => $status === CustomerProfile::PENDING ? null : 'Alasan contoh yang valid.',
+            'reviewed_by' => $admin->id,
+            'reviewed_at' => now(),
+        ]);
+
+        return $profile;
+    };
+
+    $pending = $makeProfile(CustomerProfile::PENDING);
+    $this->actingAs($admin)->get(route('admin.customers.show', $pending))
+        ->assertOk()
+        ->assertSee('Setujui Pendaftaran')
+        ->assertSee('Tolak Pendaftaran');
+
+    $active = $makeProfile(CustomerProfile::ACTIVE);
+    $this->actingAs($admin)->get(route('admin.customers.show', $active))
+        ->assertOk()
+        ->assertSee('Tangguhkan Akun')
+        ->assertDontSee('Setujui Pendaftaran');
+
+    $suspended = $makeProfile(CustomerProfile::SUSPENDED);
+    $this->actingAs($admin)->get(route('admin.customers.show', $suspended))
+        ->assertOk()
+        ->assertSee('Aktifkan Kembali')
+        ->assertSee('Akun ditangguhkan');
+
+    $rejected = $makeProfile(CustomerProfile::REJECTED);
+    $this->actingAs($admin)->get(route('admin.customers.show', $rejected))
+        ->assertOk()
+        ->assertSee('Tinjau & Setujui', false)
+        ->assertSee('Pendaftaran ditolak');
 });

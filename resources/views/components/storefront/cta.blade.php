@@ -52,7 +52,7 @@
         ></div>
     @endif
 
-    <div class="container-lg relative">
+    <div class="container-2xl relative">
         <div
             data-reveal
             @class([

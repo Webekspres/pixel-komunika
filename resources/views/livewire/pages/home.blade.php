@@ -97,20 +97,7 @@
             style="background-image: radial-gradient(circle at 1px 1px, rgb(24 24 24) 1px, transparent 0); background-size: 24px 24px;"
             aria-hidden="true"
         ></div>
-        <div
-            class="pointer-events-none absolute -right-8 top-1/2 hidden h-64 w-64 -translate-y-1/2 opacity-[0.12] lg:block xl:h-80 xl:w-80"
-            aria-hidden="true"
-        >
-            <img
-                src="{{ asset('assets/placeholders/accessories.webp') }}"
-                alt=""
-                class="h-full w-full object-contain"
-                width="320"
-                height="320"
-                loading="lazy"
-            >
-        </div>
-        <div class="container-lg relative">
+        <div class="container-2xl relative">
             <div class="mb-8 flex items-end justify-between gap-4" data-reveal>
                 <div>
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Kategori Produk</h2>
@@ -161,7 +148,7 @@
             class="pointer-events-none absolute -top-24 left-1/2 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-brand-yellow/15 blur-3xl"
             aria-hidden="true"
         ></div>
-        <div class="container-lg relative">
+        <div class="container-2xl relative">
             <div class="mb-8 flex items-end justify-between gap-4" data-reveal>
                 <div>
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Produk Pilihan</h2>
@@ -190,7 +177,7 @@
                 @endforeach
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 @forelse ($products as $product)
                     @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                     <x-storefront.product-card

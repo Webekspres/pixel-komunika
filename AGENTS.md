@@ -39,6 +39,21 @@ Jika capability belum tersedia:
 2. Terapkan Ponytail `ultra` untuk memilih perubahan terkecil yang benar.
 3. Validasi hasil secara proporsional sebelum handoff.
 
+## Sprint Tasks
+
+- Rincian task per sprint disimpan di `docs/sprints/` (contoh:
+  `docs/sprints/SPRINT_3.md`).
+- Sebelum mengerjakan task sprint, baca file sprint terkait dan verifikasi
+  relevansinya terhadap kode aktual.
+- File sprint bisa berasal dari sumber eksternal (misal screenshot ClickUp yang
+  diubah ke markdown oleh AI), sehingga detail teknis — nama tabel/kolom,
+  status, referensi dokumen, alamat/URL, dan istilah domain — wajib dicek ulang
+  ke `docs/requirements/`, `docs/design/`, dan kode sebelum implementasi.
+- Dokumen requirements (`BRD.md`, `FRD.md`, `SRS.md`, dll.) tetap menjadi
+  sumber kebenaran; file sprint hanyalah penjabaran task.
+- Jika ditemukan ketidaksesuaian antara sprint file dan kode/requirements,
+  laporkan di hasil kerja dan jangan implementasikan langsung tanpa konfirmasi.
+
 ## Kebijakan Branch dan Push
 
 Gunakan alur promosi `dev` -> `staging` -> `main`. Jangan melewati tingkat

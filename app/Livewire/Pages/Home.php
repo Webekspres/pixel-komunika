@@ -19,6 +19,14 @@ class Home extends Component
     public function addToCart(int $productId, CartService $cartService)
     {
         $user = Auth::user();
+
+        // FR-CART-001: hanya pelanggan aktif yang dapat menambahkan ke keranjang.
+        if (! $user) {
+            session()->flash('error', 'Silakan masuk terlebih dahulu untuk menambahkan produk ke keranjang.');
+
+            return redirect()->route('login');
+        }
+
         $sessionId = session()->getId();
         $cart = $cartService->getOrCreateCart($user, $sessionId);
 

@@ -1,7 +1,7 @@
 <?php
 
-use App\Domains\Notifications\FakeWhatsAppNotifier;
 use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
+use App\Domains\Notifications\FakeWhatsAppNotifier;
 use App\Domains\Notifications\NotificationService;
 use App\Domains\Order\FulfillmentService;
 use App\Domains\PosIntegration\SamplePosSyncService;
@@ -12,13 +12,10 @@ use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\BankAccount;
 use App\Models\CustomerProfile;
-use App\Models\Order;
-use App\Models\OrderReturn;
 use App\Models\PosIntegrationOperation;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\SalesReturn;
-use App\Models\Shipment;
 use App\Models\StoreProfile;
 use App\Models\User;
 use App\Services\CartService;

@@ -9,11 +9,12 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PaymentReviewController;
 use App\Http\Controllers\Admin\ProductEnrichmentController;
 use App\Http\Controllers\Admin\ReportController;
-use App\Livewire\Admin\MediaLibrary;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Livewire\Admin\AdminOrders;
+use App\Livewire\Admin\CustomerReviewDetail;
+use App\Livewire\Admin\MediaLibrary;
 use App\Livewire\Customer\CustomerOrders;
 use App\Livewire\Customer\OrderDetail;
 use App\Livewire\Pages\Home;
@@ -59,8 +60,7 @@ Route::middleware(['auth', 'active.customer'])->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/customers', [CustomerReviewController::class, 'index'])->name('customers.index');
-    Route::get('/customers/{customerProfile}', [CustomerReviewController::class, 'show'])->name('customers.show');
-    Route::patch('/customers/{customerProfile}', [CustomerReviewController::class, 'update'])->name('customers.update');
+    Route::get('/customers/{customerProfile}', CustomerReviewDetail::class)->name('customers.show');
     Route::get('/orders', AdminOrders::class)->name('orders.index');
     Route::get('/orders/{order}', function (Order $order) {
         return view('admin.orders.show', [

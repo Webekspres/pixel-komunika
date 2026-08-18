@@ -44,6 +44,11 @@ class CartService
 
     public function addItem(Cart $cart, int $productId, int $quantity = 1): CartItem
     {
+        // FR-CART-001: hanya pelanggan aktif (terautentikasi) yang dapat menambahkan ke keranjang.
+        if ($cart->user_id === null) {
+            throw new InvalidArgumentException('Silakan masuk untuk menambahkan produk ke keranjang.');
+        }
+
         $product = Product::with('inventorySnapshot')->findOrFail($productId);
 
         $stockAvailable = $product->inventorySnapshot ? $product->inventorySnapshot->quantity_available : 0;

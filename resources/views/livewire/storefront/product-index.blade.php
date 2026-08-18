@@ -149,7 +149,7 @@
                         <x-storefront.empty-products />
                     </div>
                 @else
-                    <div class="grid gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div class="grid gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[1720px]:grid-cols-6">
                         @foreach ($products as $product)
                             @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                             <x-storefront.product-card
@@ -178,7 +178,7 @@
                                             class="inline-flex items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                         >
                                             <x-icon name="shopping-cart" class="size-3.5" />
-                                            <span>+ Cart</span>
+                                            <span>+ Keranjang</span>
                                         </button>
                                     </div>
                                 </x-slot:actions>

@@ -2,10 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Domains\Order\FulfillmentService;
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
 use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\CustomerProfile;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\Role;
 use App\Models\StoreCourierRate;
 use App\Models\StoreProfile;
@@ -13,9 +16,9 @@ use App\Models\User;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Http\UploadedFile;
 
 class DatabaseSeeder extends Seeder
 {
@@ -139,13 +142,13 @@ class DatabaseSeeder extends Seeder
     protected function seedSampleOrders(User $customer, User $admin): void
     {
         $address = $customer->addresses()->first();
-        $product = \App\Models\Product::query()->where('is_active', true)->first();
+        $product = Product::query()->where('is_active', true)->first();
         if (! $address || ! $product) {
             return;
         }
 
         // Avoid duplicating demo orders on re-seed
-        if (\App\Models\Order::query()->where('user_id', $customer->id)->exists()) {
+        if (Order::query()->where('user_id', $customer->id)->exists()) {
             return;
         }
 
@@ -186,7 +189,7 @@ class DatabaseSeeder extends Seeder
             'amount' => $paid->grand_total,
         ], $file2);
         $paymentService->approvePayment($proof, $admin);
-        app(\App\Domains\Order\FulfillmentService::class)->transition($paid->fresh(), 'processing', $admin);
+        app(FulfillmentService::class)->transition($paid->fresh(), 'processing', $admin);
 
         $shipped = $makeOrder(1);
         $file3 = UploadedFile::fake()->image('proof3.jpg');
@@ -196,7 +199,7 @@ class DatabaseSeeder extends Seeder
             'amount' => $shipped->grand_total,
         ], $file3);
         $paymentService->approvePayment($proof3, $admin);
-        $fulfillment = app(\App\Domains\Order\FulfillmentService::class);
+        $fulfillment = app(FulfillmentService::class);
         $fulfillment->transition($shipped->fresh(), 'processing', $admin);
         $fulfillment->transition($shipped->fresh(), 'packed', $admin);
         $fulfillment->transition($shipped->fresh(), 'shipped', $admin, 'RESI-SEED-001');

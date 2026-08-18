@@ -52,6 +52,16 @@
                             <dt class="text-xs font-medium text-zinc-500">Stok tersedia</dt>
                             <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $product->inventorySnapshot?->quantity_available ?? 0 }}</dd>
                         </div>
+                        <div>
+                            <dt class="text-xs font-medium text-zinc-500">Berat</dt>
+                            <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $product->weight_grams }} gram</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-zinc-500">Dimensi</dt>
+                            <dd class="mt-1 text-sm font-semibold text-zinc-900">
+                                {{ $product->length_cm ?? '-' }} × {{ $product->width_cm ?? '-' }} × {{ $product->height_cm ?? '-' }} cm
+                            </dd>
+                        </div>
                     </dl>
 
                     <div class="mt-5 border-t border-neutral-100 pt-4">

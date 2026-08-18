@@ -44,12 +44,11 @@
         </div>
     @endif
 
-    <div class="container-2xl py-6 sm:py-8 lg:py-10">
+    <div class="container-lg py-6 sm:py-8 lg:py-10">
 
         <div class="mb-6">
             <x-storefront.breadcrumb :items="[
-                ['label' => 'Beranda', 'href' => route('home')],
-                ['label' => 'Produk', 'href' => route('products.index')],
+                ['label' => 'Katalog Produk', 'href' => route('products.index')],
                 ['label' => $product->displayName(), 'href' => null],
             ]" />
         </div>

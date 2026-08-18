@@ -20,5 +20,7 @@ it('imports sample catalog data through an idempotent path', function () {
     $product = Product::query()->where('sku', 'PB-10000')->firstOrFail();
 
     expect($product->enrichment)->not->toBeNull()
+        ->and($product->enrichment->short_description)->toContain('dual output USB')
+        ->and($product->enrichment->description)->not->toContain('Placeholder katalog')
         ->and($product->inventorySnapshot->stock_status)->toBe('TERSEDIA');
 });

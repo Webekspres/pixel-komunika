@@ -9,6 +9,12 @@
         <form method="POST" action="{{ route('login.store') }}" class="space-y-5">
             @csrf
 
+            @if (session('error'))
+                <div class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">
                     {{ $errors->first() }}

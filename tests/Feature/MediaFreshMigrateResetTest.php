@@ -8,7 +8,7 @@ it('wipes product media files when the database is refreshed in local', function
     Storage::disk('public')->put('product-media/foto.jpg', 'foto');
 
     app()->instance('env', 'local');
-    event(new DatabaseRefreshed());
+    event(new DatabaseRefreshed);
 
     expect(Storage::disk('public')->exists('product-media/foto.jpg'))->toBeFalse();
 });
@@ -18,7 +18,7 @@ it('keeps product media files when the database is refreshed outside local', fun
     Storage::disk('public')->put('product-media/foto.jpg', 'foto');
 
     app()->instance('env', 'testing');
-    event(new DatabaseRefreshed());
+    event(new DatabaseRefreshed);
 
     expect(Storage::disk('public')->exists('product-media/foto.jpg'))->toBeTrue();
 });

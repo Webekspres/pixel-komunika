@@ -1,7 +1,6 @@
 <?php
 
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
-use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\Order;
 use App\Models\Product;

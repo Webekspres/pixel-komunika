@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-surface-2 py-6 sm:py-8">
-    <div class="container-2xl space-y-6">
+    <div class="container-lg space-y-6">
         <div>
             <x-storefront.breadcrumb :items="[
                 ['label' => 'Keranjang Belanja', 'href' => route('cart.index')],

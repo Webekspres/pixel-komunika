@@ -732,6 +732,26 @@ It should intentionally feel different from the public storefront.
 
 ---
 
+# 24.1 Data Tables & Pagination
+
+Every admin list table uses server-side pagination. Do not render the full
+dataset on a single page.
+
+Required behavior for every list page (Pelanggan, Produk, Pesanan, Media, dll.):
+
+- **Rows-per-page selector**: a "Lihat per" dropdown with options [5, 10, 25, 50].
+  Default is 10. Changing the value resets back to page 1.
+- **Clear pagination controls**: First / Previous / numbered pages / Next / Last,
+  plus a summary of what is shown, e.g. `Menampilkan 1–10 dari 128`.
+- **State preserved**: changing page or rows-per-page keeps the active filters,
+  search query, and status tabs intact (via URL query strings).
+- **Empty state**: when a page has zero rows, show the empty-state component
+  instead of a blank table body.
+- Use the same per-page control on every list so behavior stays consistent
+  across the admin workspace.
+
+---
+
 # 25. Authentication
 
 Login and Register must use dedicated pages.

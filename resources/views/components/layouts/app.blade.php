@@ -132,17 +132,6 @@
                         <x-icon name="menu" class="size-4.5" />
                     </button>
 
-                    <div class="relative hidden max-w-sm flex-1 sm:block">
-                        <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-zinc-400" />
-                        <input
-                            type="search"
-                            disabled
-                            placeholder="Cari pelanggan, produk, pesanan..."
-                            class="w-full cursor-not-allowed rounded-lg border border-neutral-200 bg-neutral-50 py-1.5 pr-3 pl-8 text-xs text-zinc-500"
-                            title="Pencarian global segera hadir"
-                        >
-                    </div>
-
                     <div class="ml-auto flex items-center gap-2">
                         <livewire:admin.notifications />
 

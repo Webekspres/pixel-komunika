@@ -2,11 +2,11 @@
 
 namespace App\Domains\Notifications;
 
+use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
 use App\Models\AppNotification;
 use App\Models\Order;
 use App\Models\Role;
 use App\Models\User;
-use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 

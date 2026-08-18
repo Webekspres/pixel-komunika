@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Domains\CustomerManagement\CustomerVerificationService;
 use App\Models\CustomerProfile;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -60,29 +58,5 @@ class CustomerReviewController extends Controller
                 ['key' => CustomerProfile::SUSPENDED, 'label' => 'Dibekukan', 'countKey' => CustomerProfile::SUSPENDED],
             ],
         ]);
-    }
-
-    public function show(CustomerProfile $customerProfile): View
-    {
-        return view('admin.customers.show', [
-            'customer' => $customerProfile->load(['user', 'reviewer', 'user.addresses']),
-        ]);
-    }
-
-    public function update(Request $request, CustomerProfile $customerProfile, CustomerVerificationService $verification): RedirectResponse
-    {
-        $validated = $request->validate([
-            'action' => ['required', 'in:approve,reject,suspend,reactivate'],
-            'reason' => ['nullable', 'string'],
-        ]);
-
-        $verification->transition(
-            $customerProfile,
-            $validated['action'],
-            $request->user(),
-            $validated['reason'] ?? null,
-        );
-
-        return back();
     }
 }

@@ -45,7 +45,7 @@
         ></div>
     @endif
 
-    <div class="container-lg relative">
+    <div class="container-2xl relative">
         <div @class(['grid items-center gap-8 lg:gap-12', 'lg:grid-cols-2' => $hasAside])>
             <div class="max-w-xl {{ $hasAside ? '' : 'mx-auto text-center lg:mx-0 lg:text-left' }}" data-reveal>
                 <h2 class="text-3xl font-bold tracking-tight {{ $textPrimary }} sm:text-4xl lg:text-5xl">

@@ -257,14 +257,14 @@
         {{-- Desktop category row: kategori + telepon/sosmed --}}
         <div class="hidden h-10 items-center justify-between gap-4 lg:flex">
             <div class="-mx-1 flex min-w-0 flex-1 items-center gap-0 overflow-x-auto">
+                <a
+                    href="{{ route('products.index') }}"
+                    wire:navigate
+                    class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-yellow' }}"
+                >
+                    Semua Produk
+                </a>
                 @if ($categories->isNotEmpty())
-                    <a
-                        href="{{ route('products.index') }}"
-                        wire:navigate
-                        class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-yellow' }}"
-                    >
-                        Semua Produk
-                    </a>
                     @foreach ($categories as $category)
                         <a
                             href="{{ route('products.index', ['kategori' => $category->id]) }}"

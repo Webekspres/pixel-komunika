@@ -1,6 +1,6 @@
 @props([
-    'categories' => [],
-    'brands' => [],
+    'categories' => collect(),
+    'brands' => collect(),
     'selectedCategory' => 'all',
     'selectedBrand' => 'all',
     'inStockOnly' => false,
@@ -27,35 +27,37 @@
     </div>
 
     {{-- Filter by Category --}}
-    <div class="space-y-3 border-b border-brand-black/8 pb-5">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-brand-black">Kategori</h4>
-        <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-            <label class="flex cursor-pointer items-center gap-2.5 text-xs text-brand-black/70 hover:text-brand-black">
-                <input
-                    type="radio"
-                    name="category_filter_{{ $group }}"
-                    wire:model.live="selectedCategory"
-                    value="all"
-                    class="size-4 border-zinc-300 accent-amber-500 text-amber-500 focus:ring-amber-400"
-                />
-                <span class="font-medium">Semua Kategori</span>
-            </label>
-            @foreach ($categories as $cat)
-                <label class="flex cursor-pointer items-center justify-between text-xs text-brand-black/70 hover:text-brand-black">
-                    <div class="flex items-center gap-2.5">
-                        <input
-                            type="radio"
-                            name="category_filter_{{ $group }}"
-                            wire:model.live="selectedCategory"
-                            value="{{ (string) $cat->id }}"
-                            class="size-4 accent-amber-500 text-amber-500 border-zinc-300 focus:ring-amber-400"
-                        />
-                        <span class="font-medium">{{ $cat->name }}</span>
-                    </div>
+    @if ($categories->isNotEmpty())
+        <div class="space-y-3 border-b border-brand-black/8 pb-5">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-black">Kategori</h4>
+            <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                <label class="flex cursor-pointer items-center gap-2.5 text-xs text-brand-black/70 hover:text-brand-black">
+                    <input
+                        type="radio"
+                        name="category_filter_{{ $group }}"
+                        wire:model.live="selectedCategory"
+                        value="all"
+                        class="size-4 border-zinc-300 accent-amber-500 text-amber-500 focus:ring-amber-400"
+                    />
+                    <span class="font-medium">Semua Kategori</span>
                 </label>
-            @endforeach
+                @foreach ($categories as $cat)
+                    <label class="flex cursor-pointer items-center justify-between text-xs text-brand-black/70 hover:text-brand-black">
+                        <div class="flex items-center gap-2.5">
+                            <input
+                                type="radio"
+                                name="category_filter_{{ $group }}"
+                                wire:model.live="selectedCategory"
+                                value="{{ (string) $cat->id }}"
+                                class="size-4 accent-amber-500 text-amber-500 border-zinc-300 focus:ring-amber-400"
+                            />
+                            <span class="font-medium">{{ $cat->name }}</span>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
         </div>
-    </div>
+    @endif
 
     {{-- Filter by Brand --}}
     @if ($brands->isNotEmpty())

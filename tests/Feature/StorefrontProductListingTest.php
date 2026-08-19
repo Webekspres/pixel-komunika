@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
+use App\Models\Category;
 use App\Models\CustomerProfile;
 use App\Models\Product;
 use App\Models\User;
@@ -15,6 +16,15 @@ it('renders product listing page with catalog items', function () {
         ->assertSee('Katalog Produk')
         ->assertSee('Filter Produk')
         ->assertSee('Verifikasi');
+});
+
+it('keeps Semua Produk visible and hides empty category filter when no categories exist', function () {
+    Category::query()->delete();
+
+    $this->get(route('products.index'))
+        ->assertOk()
+        ->assertSee('Semua Produk')
+        ->assertDontSee('Semua Kategori');
 });
 
 it('filters products by search keyword', function () {

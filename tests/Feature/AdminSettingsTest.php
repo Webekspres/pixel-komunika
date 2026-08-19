@@ -51,6 +51,36 @@ it('shows settings tabs and updates store profile with audit trail', function ()
         ->and(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->where('auditable_type', StoreProfile::class)->count())->toBe(1);
 });
 
+it('saves identitas and partai tabs independently', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->patch(route('admin.settings.store-profile.update'), [
+            'store_name' => 'Toko Baru',
+            'address' => 'Jl. Contoh No. 7',
+            'contact_number' => '082122223333',
+            'company_npwp' => '12.345.678.9-012.345',
+            'tab' => 'identitas',
+        ])
+        ->assertRedirect()
+        ->assertSessionHasNoErrors();
+
+    expect(StoreProfile::active()->store_name)->toBe('Toko Baru')
+        ->and(StoreProfile::active()->partai_minimum_quantity)->toBe(5);
+
+    $this->actingAs($admin)
+        ->patch(route('admin.settings.store-profile.update'), [
+            'partai_minimum_quantity' => 25,
+            'tab' => 'partai',
+        ])
+        ->assertRedirect()
+        ->assertSessionHasNoErrors();
+
+    expect(StoreProfile::active()->partai_minimum_quantity)->toBe(25)
+        ->and(StoreProfile::active()->store_name)->toBe('Toko Baru')
+        ->and(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->where('auditable_type', StoreProfile::class)->count())->toBe(1);
+});
+
 it('manages bank account CRUD', function () {
     $admin = User::factory()->admin()->create();
 

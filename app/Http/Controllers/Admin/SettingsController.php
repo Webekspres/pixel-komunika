@@ -51,12 +51,12 @@ class SettingsController extends Controller
     public function updateStoreProfile(Request $request, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
-            'store_name' => ['required', 'string', 'max:191'],
-            'address' => ['required', 'string'],
-            'contact_number' => ['required', 'string', 'max:32'],
+            'store_name' => ['sometimes', 'required', 'string', 'max:191'],
+            'address' => ['sometimes', 'required', 'string'],
+            'contact_number' => ['sometimes', 'required', 'string', 'max:32'],
             'company_name' => ['nullable', 'string', 'max:191'],
-            'company_npwp' => ['required', 'string', 'max:32'],
-            'partai_minimum_quantity' => ['required', 'integer', 'min:1', 'max:100000'],
+            'company_npwp' => ['sometimes', 'required', 'string', 'max:32'],
+            'partai_minimum_quantity' => ['sometimes', 'required', 'integer', 'min:1', 'max:100000'],
             'origin_postal_code' => ['nullable', 'string', 'max:16'],
         ]);
 
@@ -67,7 +67,9 @@ class SettingsController extends Controller
 
         $store->fill([...$validated, 'is_active' => true])->save();
 
-        $audit->log('STORE_PROFILE_UPDATED', $store, $request->user(), $oldValues, $store->only(['partai_minimum_quantity']));
+        if (array_key_exists('partai_minimum_quantity', $validated)) {
+            $audit->log('STORE_PROFILE_UPDATED', $store, $request->user(), $oldValues, $store->only(['partai_minimum_quantity']));
+        }
 
         return $this->backToTab($request, 'Pengaturan toko berhasil disimpan.');
     }

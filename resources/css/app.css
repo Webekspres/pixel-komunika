@@ -145,6 +145,21 @@
 }
 
 /* ============================================
+   REQUIRED-FIELD INDICATORS
+   ============================================ */
+
+/* Red asterisk for required fields: Flux labels render as <ui-label>, plain
+   HTML forms use <label> with the control as the next sibling. */
+ui-field:has([data-flux-control][required]) > ui-label::after,
+ui-label:has(+ input[required])::after,
+label:has(+ input[required])::after,
+label:has(+ textarea[required])::after {
+    content: ' *';
+    color: var(--color-danger);
+    font-weight: 700;
+}
+
+/* ============================================
    STOREFRONT DESIGN SYSTEM
    ============================================ */
 

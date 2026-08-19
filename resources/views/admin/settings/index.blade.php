@@ -179,10 +179,10 @@
                     @csrf
                     <input type="hidden" name="tab" value="rekening">
                     <div class="grid gap-3 sm:grid-cols-2">
-                        <input type="text" name="bank_name" placeholder="Nama bank (mis. BCA)" required maxlength="100" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
-                        <input type="text" name="account_number" placeholder="Nomor rekening" required maxlength="64" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                        <input type="text" name="bank_name" placeholder="* Nama bank (mis. BCA)" required maxlength="100" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                        <input type="text" name="account_number" placeholder="* Nomor rekening" required maxlength="64" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                     </div>
-                    <input type="text" name="account_holder" placeholder="Atas nama" required maxlength="191" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                    <input type="text" name="account_holder" placeholder="* Atas nama" required maxlength="191" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                     <input type="text" name="instructions" placeholder="Instruksi transfer (opsional)" maxlength="255" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                     <label class="flex cursor-pointer items-center gap-1.5 text-xs text-zinc-600">
                         <input type="checkbox" name="is_active" value="1" checked class="rounded border-zinc-300">
@@ -321,7 +321,7 @@
                                                         @method('PATCH')
                                                         <input type="hidden" name="tab" value="kurir">
                                                         <div class="grid gap-3 sm:grid-cols-2">
-                                                            <input type="text" name="area_name" value="{{ $rate->area_name }}" required maxlength="191" placeholder="Kecamatan" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                                                            <input type="text" name="area_name" value="{{ $rate->area_name }}" required maxlength="191" placeholder="* Kecamatan" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                                                             <input type="text" name="area_code" value="{{ $rate->area_code }}" maxlength="32" placeholder="Kode area (opsional)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                                                         </div>
                                                         <input type="number" name="rate_amount" value="{{ $rate->rate_amount }}" required min="0" step="1" placeholder="Tarif (Rp)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
@@ -358,11 +358,11 @@
                     @csrf
                     <input type="hidden" name="tab" value="kurir">
                     <div class="grid gap-3 sm:grid-cols-2">
-                        <input type="text" name="area_name" placeholder="Kecamatan (mis. Coblong)" required maxlength="191" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                        <input type="text" name="area_name" placeholder="* Kecamatan (mis. Coblong)" required maxlength="191" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                         <input type="text" name="area_code" placeholder="Kode area (opsional)" maxlength="32" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                     </div>
                     <div class="grid gap-3 sm:grid-cols-2">
-                        <input type="number" name="rate_amount" placeholder="Tarif (Rp)" required min="0" step="1" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                        <input type="number" name="rate_amount" placeholder="* Tarif (Rp)" required min="0" step="1" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                         <input type="text" name="eta_text" placeholder="Estimasi (opsional)" maxlength="100" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                     </div>
                     <label class="flex cursor-pointer items-center gap-1.5 text-xs text-zinc-600">

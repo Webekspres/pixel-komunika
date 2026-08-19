@@ -15,6 +15,8 @@
             <x-ui.stat-card label="Status invoice" :value="strtoupper($order->invoice?->status ?? 'draft')" icon="badge-check" variant="admin" />
         </div>
 
+        <livewire:admin.order-fulfillment-actions :order="$order" />
+
         <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <x-ui.section-card title="Informasi order" description="Snapshot transaksi untuk review admin." variant="admin">
                 <div class="grid gap-4 text-sm sm:grid-cols-2">

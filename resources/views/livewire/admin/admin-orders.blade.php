@@ -54,106 +54,137 @@
                 />
             </div>
         @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-neutral-100">
-                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">No. Order</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Pelanggan</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Total</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Status</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-50">
-                        @foreach ($orders as $order)
-                            <tr class="transition-colors hover:bg-neutral-50">
-                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $orders->firstItem() + $loop->index }}</td>
-                                <td class="px-5 py-3.5">
-                                    <p class="font-bold text-zinc-900">{{ $order->order_number }}</p>
-                                    <p class="text-xs text-zinc-500">{{ $order->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
-                                </td>
-                                <td class="px-5 py-3.5">
-                                    <p class="font-medium text-zinc-900">{{ $order->recipient_name }}</p>
-                                    <p class="text-xs text-zinc-500">{{ $order->recipient_phone }}</p>
-                                </td>
-                                <td class="px-5 py-3.5 font-bold text-zinc-900">
-                                    Rp {{ number_format($order->grand_total, 0, ',', '.') }}
-                                </td>
-                                <td class="px-5 py-3.5">
+            <flux:table :paginate="$orders" container:class="[&_ui-table-scroll-area]:max-h-[70vh]">
+                <flux:table.columns>
+                    <flux:table.column align="center" class="w-12">No</flux:table.column>
+                    <flux:table.column>No. Order</flux:table.column>
+                    <flux:table.column>Pelanggan</flux:table.column>
+                    <flux:table.column align="end" class="w-36">Total</flux:table.column>
+                    <flux:table.column class="w-48">Status</flux:table.column>
+                    <flux:table.column align="end" class="w-28">Aksi</flux:table.column>
+                </flux:table.columns>
+
+                <flux:table.rows>
+                    @foreach ($orders as $order)
+                        <flux:table.row
+                            :key="$order->id"
+                            class="cursor-pointer transition-colors hover:bg-neutral-50"
+                            @click="window.location.href = '{{ route('admin.orders.show', $order) }}'"
+                        >
+                            <flux:table.cell align="center" class="w-12 text-xs text-zinc-400">{{ $orders->firstItem() + $loop->index }}</flux:table.cell>
+                            <flux:table.cell>
+                                <p class="font-bold text-zinc-900">{{ $order->order_number }}</p>
+                                <p class="text-xs text-zinc-500">{{ $order->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
+                            </flux:table.cell>
+                            <flux:table.cell>
+                                <p class="font-medium text-zinc-900">{{ $order->recipient_name }}</p>
+                                <p class="text-xs text-zinc-500">{{ $order->recipient_phone }}</p>
+                            </flux:table.cell>
+                            <flux:table.cell align="end" class="font-bold text-zinc-900">
+                                Rp {{ number_format($order->grand_total, 0, ',', '.') }}
+                            </flux:table.cell>
+                            <flux:table.cell>
+                                <div class="space-y-1">
                                     <x-ui.status-badge :status="$order->status" />
                                     @if ($order->latestPaymentProof)
-                                        <div class="mt-1">
-                                            <span class="rounded border border-purple-200 bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
-                                                Bukti: {{ $order->latestPaymentProof->bank_name }} ({{ strtoupper($order->latestPaymentProof->status) }})
-                                            </span>
-                                        </div>
+                                        <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-semibold
+                                            {{ $order->latestPaymentProof->status === 'approved' ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                : ($order->latestPaymentProof->status === 'rejected' ? 'border-rose-200 bg-rose-50 text-rose-600'
+                                                : 'border-amber-200 bg-amber-50 text-amber-800') }}">
+                                            Bukti bayar: {{ $order->latestPaymentProof->bank_name }} ({{ strtoupper($order->latestPaymentProof->status) }})
+                                        </span>
                                     @endif
-                                </td>
-                                <td class="px-5 py-3.5 text-right">
-                                    <div class="flex flex-wrap items-center justify-end gap-2">
-                                        <a href="{{ route('admin.orders.show', $order) }}" class="rounded-xl bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-800 hover:bg-zinc-200">
-                                            Detail
-                                        </a>
+                                    @if ($order->shipment && $order->shipment->issue_status === \App\Models\Shipment::ISSUE_TERKENDALA)
+                                        <span class="inline-flex items-center rounded border border-rose-200 bg-rose-50 px-1.5 py-0.5 text-[11px] font-semibold text-rose-600">
+                                            Terkendala pengiriman
+                                        </span>
+                                    @endif
+                                </div>
+                            </flux:table.cell>
+                            <flux:table.cell align="end" class="w-28" @click.stop>
+                                <div class="flex items-center justify-end gap-2">
+                                    <flux:button href="{{ route('admin.orders.show', $order) }}" variant="ghost" size="sm">
+                                        Detail
+                                    </flux:button>
 
-                                        @if ($order->latestPaymentProof && $order->latestPaymentProof->status === 'pending')
-                                            <button
-                                                wire:click="approvePayment({{ $order->latestPaymentProof->id }})"
-                                                class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
-                                            >
-                                                Verifikasi Bayar
-                                            </button>
-                                        @elseif ($order->status === 'paid')
-                                            <button
-                                                wire:click="transitionStatus({{ $order->id }}, 'processing')"
-                                                class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
-                                            >
-                                                Proses
-                                            </button>
-                                        @elseif ($order->status === 'processing')
-                                            <button
-                                                wire:click="transitionStatus({{ $order->id }}, 'packed')"
-                                                class="rounded-xl bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700"
-                                            >
-                                                Packing
-                                            </button>
-                                        @elseif ($order->status === 'packed')
-                                            <button
-                                                wire:click="transitionStatus({{ $order->id }}, 'shipped')"
-                                                class="rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
-                                            >
-                                                Kirim
-                                            </button>
-                                        @elseif ($order->status === 'shipped')
-                                            <button
-                                                wire:click="transitionStatus({{ $order->id }}, 'completed')"
-                                                class="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-700"
-                                            >
-                                                Selesai
-                                            </button>
-                                        @endif
+                                    <flux:dropdown align="end">
+                                        <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" aria-label="Aksi lainnya" />
+                                        <flux:menu>
+                                            <flux:menu.item icon="eye" href="{{ route('admin.orders.show', $order) }}">Lihat Detail Pesanan</flux:menu.item>
+                                            <flux:menu.item icon="document-arrow-down" disabled suffix="Segera">Unduh Invoice (PDF)</flux:menu.item>
 
-                                        @if (in_array($order->status, ['unpaid', 'payment_pending', 'paid', 'processing', 'packed']))
-                                            <button
-                                                wire:click="cancelOrder({{ $order->id }})"
-                                                wire:confirm="Yakin membatalkan order ini?"
-                                                class="rounded-xl bg-red-100 px-2 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200"
-                                            >
-                                                Batal
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                            @if ($this->canCancelToday($order))
+                                                <flux:menu.separator />
+                                                <flux:menu.item icon="x-mark" variant="danger" wire:click="openCancelModal({{ $order->id }})">Batalkan Pesanan</flux:menu.item>
+                                            @endif
 
-            <div class="border-t border-neutral-100 px-5 py-4">
-                {{ $orders->links() }}
-            </div>
+                                            @if ($order->status === 'shipped')
+                                                <flux:menu.item icon="triangle-alert" wire:click="openTerkendalaModal({{ $order->id }})">Tandai Terkendala</flux:menu.item>
+                                            @endif
+                                        </flux:menu>
+                                    </flux:dropdown>
+                                </div>
+                            </flux:table.cell>
+                        </flux:table.row>
+                    @endforeach
+                </flux:table.rows>
+            </flux:table>
         @endif
     </div>
+
+    @if ($showCancelModal)
+        <flux:modal wire:model.self="showCancelModal" name="cancel-modal" class="md:w-96" @close="resetCancelModal">
+            <div class="space-y-5">
+                <div>
+                    <flux:heading size="lg">Batalkan Pesanan {{ $cancelOrder?->order_number }}</flux:heading>
+                    <flux:subheading class="mt-2">Pembatalan mengembalikan stok produk, menonaktifkan invoice, dan mencatat laporan retur POS. Tindakan ini tidak dapat dibatalkan.</flux:subheading>
+                </div>
+
+                <flux:textarea
+                    wire:model="cancelReason"
+                    label="Alasan Pembatalan"
+                    placeholder="Tuliskan alasan pembatalan (min. 5 karakter)"
+                    rows="3"
+                />
+                @error('cancelReason')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
+
+                <div class="flex justify-end gap-2">
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Kembali</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="danger" wire:click="confirmCancelOrder">Konfirmasi Batalkan</flux:button>
+                </div>
+            </div>
+        </flux:modal>
+    @endif
+
+    @if ($showTerkendalaModal)
+        <flux:modal wire:model.self="showTerkendalaModal" name="terkendala-modal" class="md:w-96" @close="resetTerkendalaModal">
+            <div class="space-y-5">
+                <div>
+                    <flux:heading size="lg">Tandai Terkendala {{ $terkendalaOrder?->order_number }}</flux:heading>
+                    <flux:subheading class="mt-2">Pengiriman menuju pelanggan mengalami kendala sehingga tidak dapat diselesaikan otomatis.</flux:subheading>
+                </div>
+
+                <flux:textarea
+                    wire:model="terkendalaReason"
+                    label="Kendala Pengiriman"
+                    placeholder="Deskripsikan kendala (min. 5 karakter)"
+                    rows="3"
+                />
+                @error('terkendalaReason')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
+
+                <div class="flex justify-end gap-2">
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Kembali</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="danger" wire:click="confirmTerkendala">Tandai Terkendala</flux:button>
+                </div>
+            </div>
+        </flux:modal>
+    @endif
 </div>

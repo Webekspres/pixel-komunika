@@ -108,10 +108,12 @@
                                     id="slug"
                                     name="slug"
                                     type="text"
+                                    readonly
                                     value="{{ old('slug', $product->enrichment?->slug) }}"
-                                    placeholder="otomatis dari nama"
-                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                    placeholder="otomatis dari nama tampilan"
+                                    class="w-full cursor-not-allowed rounded-xl border border-neutral-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500 focus:outline-none"
                                 >
+                                <p class="mt-1 text-xs text-zinc-400">Diisi otomatis dari nama tampilan + ID produk saat pertama disimpan.</p>
                             </div>
                             <div>
                                 <label for="label" class="mb-1.5 block text-xs font-semibold text-zinc-700">Label</label>

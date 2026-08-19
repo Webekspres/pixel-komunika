@@ -33,10 +33,10 @@
         </div>
 
         {{-- Main Layout: 2 Columns (Filter Sidebar + Toolbar/Grid) --}}
-        <div class="grid gap-8 lg:grid-cols-[260px_1fr] xl:grid-cols-[280px_1fr]">
+        <div class="grid gap-8 lg:grid-cols-[auto_1fr]">
 
             {{-- Desktop Sidebar --}}
-            <div class="hidden lg:block">
+            <div class="hidden w-64 shrink-0 lg:block">
                 <div class="storefront-panel sticky top-24 p-6">
                     <x-storefront.filter-sidebar
                         group="desktop"
@@ -149,12 +149,13 @@
                         <x-storefront.empty-products />
                     </div>
                 @else
-                    <div class="grid gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[1720px]:grid-cols-6">
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                         @foreach ($products as $product)
                             @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                             <x-storefront.product-card
                                 :title="$product->displayName()"
                                 :image="$primaryMedia?->url()"
+                                :badge="$product->enrichment?->label"
                                 :category="$product->category->name"
                                 :sku="$product->sku"
                                 :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"
@@ -163,11 +164,11 @@
                                 :price="'Rp '.number_format($product->listPriceAmount() ?? 0, 0, ',', '.')"
                             >
                                 <x-slot:actions>
-                                    <div class="grid grid-cols-2 gap-2">
+                                    <div class="flex items-center gap-2">
                                         <a
                                             href="{{ route('products.show', $product) }}"
                                             wire:navigate
-                                            class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
+                                            class="inline-flex shrink-0 items-center justify-center rounded-2xl bg-zinc-100 px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
                                         >
                                             Detail
                                         </a>
@@ -175,7 +176,7 @@
                                         <button
                                             wire:click="addToCart({{ $product->id }})"
                                             type="button"
-                                            class="inline-flex items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
+                                            class="inline-flex flex-1 items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                         >
                                             <x-icon name="shopping-cart" class="size-3.5" />
                                             <span>+ Keranjang</span>

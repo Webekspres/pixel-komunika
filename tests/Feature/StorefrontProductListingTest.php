@@ -27,6 +27,20 @@ it('keeps Semua Produk visible and hides empty category filter when no categorie
         ->assertDontSee('Semua Kategori');
 });
 
+it('renders enrichment label as badge on storefront', function () {
+    $product = Product::with('enrichment')
+        ->whereHas('enrichment', fn ($q) => $q->whereNotNull('label'))
+        ->firstOrFail();
+
+    $this->get(route('products.index'))
+        ->assertOk()
+        ->assertSee($product->enrichment->label);
+
+    $this->get(route('products.show', $product))
+        ->assertOk()
+        ->assertSee($product->enrichment->label);
+});
+
 it('filters products by search keyword', function () {
     $product = Product::first();
 

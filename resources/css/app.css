@@ -150,12 +150,12 @@
 
 /* Product Card */
 @utility product-card {
-    @apply relative overflow-hidden rounded-[2rem] border border-brand-black/8 bg-white transition-all duration-300;
+    @apply relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-white transition-all duration-300;
     box-shadow: var(--shadow-card);
 }
 
 @utility product-card-hover {
-    @apply hover:-translate-y-1;
+    @apply hover:-translate-y-1 hover:border-amber-400;
     &:hover { box-shadow: var(--shadow-card-hover); }
 }
 
@@ -180,13 +180,13 @@
     @apply bg-brand-black text-brand-white;
 }
 
-/* Storefront full-bleed padding (Figma: px-4 sm:px-6 lg:px-10 xl:px-12) — no max-width */
+/* Storefront full-bleed section padding + constrained centered container (max ~1440px) */
 @utility container-2xl {
-    @apply mx-auto w-full px-4 sm:px-6 lg:px-10 xl:px-12;
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
 }
 
 @utility container-lg {
-    @apply mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-10 xl:px-12;
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
 }
 
 @utility storefront-panel {

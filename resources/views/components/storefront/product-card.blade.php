@@ -80,7 +80,7 @@
     <div class="p-4 sm:p-5">
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
-                <h3 class="text-sm font-bold leading-snug text-brand-black transition group-hover:text-brand-black sm:text-base">
+                <h3 class="line-clamp-2 min-h-[2.75rem] text-sm leading-snug font-bold text-brand-black transition group-hover:text-brand-black sm:text-base">
                     {{ $title }}
                 </h3>
                 @if ($sku)

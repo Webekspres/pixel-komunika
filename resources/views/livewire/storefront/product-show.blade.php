@@ -98,6 +98,11 @@
                         <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">
                             {{ $product->brand?->name ?? 'Pixel Komunika' }} · {{ $product->category->name }}
                         </p>
+                        @if ($product->enrichment?->label)
+                            <span class="inline-flex w-fit items-center rounded-full bg-brand-yellow px-2.5 py-1 text-xs font-bold text-brand-black">
+                                {{ $product->enrichment->label }}
+                            </span>
+                        @endif
                         <h1 class="text-xl font-black leading-tight tracking-tight text-zinc-950 sm:text-2xl">
                             {{ $product->displayName() }}
                         </h1>
@@ -281,6 +286,7 @@
                         <x-storefront.product-card
                             :title="$rel->displayName()"
                             :image="$relPrimary?->url()"
+                            :badge="$rel->enrichment?->label"
                             :href="route('products.show', $rel)"
                             :category="$rel->category->name"
                             :sku="$rel->sku"

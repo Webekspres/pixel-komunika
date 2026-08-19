@@ -91,7 +91,7 @@
     </section>
 
     {{-- Categories --}}
-    <section id="kategori" class="relative w-full overflow-hidden bg-white py-12 sm:py-16">
+    <section id="kategori" class="relative w-full overflow-hidden border-b border-zinc-200/80 bg-white py-12 sm:py-16">
         <div
             class="pointer-events-none absolute inset-0 opacity-[0.045]"
             style="background-image: radial-gradient(circle at 1px 1px, rgb(24 24 24) 1px, transparent 0); background-size: 24px 24px;"
@@ -109,7 +109,7 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 @forelse ($categories as $category)
                     @php
                         $icons = ['battery', 'plug', 'headphones', 'database', 'camera', 'phone', 'keyboard', 'package'];
@@ -120,9 +120,9 @@
                         wire:navigate
                         data-reveal
                         style="--reveal-delay: {{ min($loop->index, 7) * 60 }}ms"
-                        class="group flex flex-col items-center gap-2 rounded-2xl border-2 border-transparent bg-zinc-50/90 p-3 text-center backdrop-blur-sm transition-all duration-200 hover:border-brand-yellow hover:bg-brand-yellow/10 sm:p-5"
+                        class="group flex flex-col items-center gap-2.5 rounded-2xl border border-zinc-200/80 bg-white p-3 text-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:shadow-md sm:p-5"
                     >
-                        <div class="inline-flex size-11 items-center justify-center rounded-xl bg-white shadow-sm sm:size-12">
+                        <div class="inline-flex size-11 items-center justify-center rounded-xl bg-zinc-50 shadow-sm transition-colors duration-200 group-hover:bg-brand-yellow-muted sm:size-12">
                             <x-icon :name="$icon" class="size-5 text-brand-black" />
                         </div>
                         <span class="text-xs leading-tight font-semibold text-zinc-700 group-hover:text-brand-black sm:text-sm">{{ $category->name }}</span>
@@ -177,7 +177,7 @@
                 @endforeach
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            <div class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
                 @forelse ($products as $product)
                     @php($primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first())
                     <x-storefront.product-card
@@ -185,6 +185,7 @@
                         style="--reveal-delay: {{ min($loop->index, 7) * 55 }}ms"
                         :title="$product->displayName()"
                         :image="$primaryMedia?->url()"
+                        :badge="$product->enrichment?->label"
                         :category="$product->category->name"
                         :sku="$product->sku"
                         :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"
@@ -193,17 +194,17 @@
                         :price="'Rp '.number_format($product->listPriceAmount() ?? 0, 0, ',', '.')"
                     >
                         <x-slot:actions>
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="flex items-center gap-2">
                                 <a
                                     href="{{ route('products.show', $product) }}"
                                     wire:navigate
-                                    class="inline-flex items-center justify-center rounded-2xl bg-zinc-100 px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
+                                    class="inline-flex shrink-0 items-center justify-center rounded-2xl bg-zinc-100 px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
                                 >
                                     Detail
                                 </a>
                                 <button
                                     wire:click="addToCart({{ $product->id }})"
-                                    class="inline-flex items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
+                                    class="inline-flex flex-1 items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                 >
                                     <x-icon name="shopping-cart" class="size-3.5" />
                                     + Keranjang
@@ -257,7 +258,7 @@
     </x-storefront.banner>
 
     {{-- Benefits --}}
-    <section id="unggulan" class="relative w-full overflow-hidden bg-white py-12 sm:py-16">
+    <section id="unggulan" class="relative w-full overflow-hidden bg-surface-2 py-12 sm:py-16">
         <div
             class="pointer-events-none absolute inset-0 opacity-[0.04]"
             style="background-image: radial-gradient(circle at 1px 1px, rgb(24 24 24) 1px, transparent 0); background-size: 24px 24px;"
@@ -274,28 +275,28 @@
             </div>
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 0ms">
+                <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:shadow-md" data-reveal style="--reveal-delay: 0ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-emerald-100">
                         <x-icon name="shield-check" class="size-5 text-emerald-600" />
                     </div>
                     <h3 class="mb-2 font-bold text-zinc-900">Produk Asli</h3>
                     <p class="text-sm leading-relaxed text-zinc-500">Semua produk 100% original bergaransi dari distributor resmi</p>
                 </div>
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 80ms">
+                <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:shadow-md" data-reveal style="--reveal-delay: 80ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-blue-100">
                         <x-icon name="truck" class="size-5 text-blue-600" />
                     </div>
                     <h3 class="mb-2 font-bold text-zinc-900">Pengiriman Cepat</h3>
                     <p class="text-sm leading-relaxed text-zinc-500">Kurir toko H+1 ke seluruh Bandung, atau ekspedisi nasional</p>
                 </div>
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 160ms">
+                <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:shadow-md" data-reveal style="--reveal-delay: 160ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-brand-yellow/20">
                         <x-icon name="users" class="size-5 text-brand-yellow-dark" />
                     </div>
                     <h3 class="mb-2 font-bold text-zinc-900">Khusus Terverifikasi</h3>
                     <p class="text-sm leading-relaxed text-zinc-500">Harga partai eksklusif hanya untuk reseller yang telah diverifikasi</p>
                 </div>
-                <div class="rounded-2xl bg-zinc-50 p-5 transition-shadow hover:shadow-md" data-reveal style="--reveal-delay: 240ms">
+                <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400 hover:shadow-md" data-reveal style="--reveal-delay: 240ms">
                     <div class="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-red-100">
                         <x-icon name="star" class="size-5 text-red-500" />
                     </div>

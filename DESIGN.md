@@ -172,35 +172,55 @@ Storefront sections should generally use:
 
 ```css
 width: 100%;
+max-width: 1440px;
+margin-inline: auto;
 ```
 
 with responsive horizontal padding.
 
-Recommended approach:
+Recommended padding:
 
 ```text
-Mobile:
+Base (mobile):
 px-4
 
-Small:
-px-5
-
-Tablet:
+Tablet (sm):
 px-6
 
-Desktop:
+Desktop and up (lg):
 px-8
-
-Large Desktop:
-px-10
-
-Very Large Desktop:
-px-12
 ```
 
-The content should expand naturally with the viewport.
+The content should expand naturally with the viewport up to the 1440px cap.
 
-Do not artificially stop the content at 1200px / 1280px / 1440px unless there is a strong UX reason.
+The current implementation exposes this as the `container-2xl` and
+`container-lg` utilities (both identical: `mx-auto w-full max-w-[1440px]
+px-4 sm:px-6 lg:px-8`).
+
+## Fluid but capped: the 1440px container
+
+The storefront is intentionally fluid with a soft cap at `max-width: 1440px`
+(via the `container-2xl` / `container-lg` utilities in `resources/css/app.css`).
+
+This is a deliberate compromise:
+
+- Section backgrounds remain full bleed (edge to edge).
+- Content inside a section is centered with responsive horizontal padding
+  (`px-4 sm:px-6 lg:px-8`) and capped at 1440px.
+- The cap protects card density and text readability at ultra-wide viewports,
+  while still using the available width up to 1440px.
+
+```css
+@utility container-2xl {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
+}
+
+@utility container-lg {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
+}
+```
+
+Do NOT add a narrower cap (e.g. `max-w-7xl`) on top of this system.
 
 ---
 
@@ -260,6 +280,12 @@ DO NOT:
 
 The storefront should feel intentionally designed for large displays.
 
+Current behavior:
+
+- Content caps at 1440px (centered whitespace absorbs the extra width).
+- The product grid expands to 4 columns at `2xl` (≥1536px) and stays at 4
+  columns max; the filter sidebar stays a fixed ~256px column.
+
 ---
 
 # 8. Responsive Philosophy
@@ -286,7 +312,8 @@ On mobile:
 
 - Reduce horizontal padding.
 - Collapse navigation.
-- Use hamburger / mobile menu.
+- Use the horizontally scrollable category row with an ellipsis "more"
+  overflow dropdown (no hamburger menu), plus a dedicated mobile search toggle.
 - Make search easily accessible.
 - Convert filter sidebar into drawer / bottom sheet.
 - Convert multi-column layouts into 1–2 columns where appropriate.
@@ -335,6 +362,20 @@ When scrolling:
 - Preserve account access.
 
 Avoid an oversized dashboard-like navigation.
+
+Current implementation (`components/storefront/navbar.blade.php`):
+
+- **Announcement bar**: guest-only register CTA on a black bar
+  ("Harga spesial untuk pelanggan terverifikasi! — Daftar sekarang").
+- **Main row**: logo, wide desktop search (hidden on mobile), cart badge,
+  account menu (or Masuk / Daftar for guests), mobile search toggle.
+- **Mobile category row** (`< lg`): horizontally scrollable "Semua Produk" +
+  first 2 categories + ellipsis overflow dropdown with the remaining
+  categories.
+- **Desktop category row** (`≥ lg`): "Semua Produk" + up to 8 categories +
+  phone number and social icons.
+- Sticky header height is measured into `--storefront-header-height` and used
+  by the homepage hero and sticky PDP elements.
 
 ---
 
@@ -402,7 +443,8 @@ The primary cart interaction should use a:
 Desktop:
 
 - Slide from the right.
-- Approximately 35–40% viewport width.
+- Fixed width: `max-w-md` (448px) on `md+`, `xl:max-w-lg` (512px) — roughly
+  35–40% of the viewport on laptop/desktop widths, slightly less on ultra-wide.
 - Does not navigate away from the current page.
 - Displays cart items, quantities, subtotal, and actions.
 
@@ -527,19 +569,18 @@ Do not constrain the product grid to a narrow centered container.
 
 Large screens should naturally display more products per row when appropriate.
 
-Example:
+Actual responsive grid (inside the 1440px container, with a ~256px filter
+sidebar):
 
-Desktop:
+- Mobile (base): 1 column.
+- `sm` (≥640px): 2 columns.
+- `lg` (≥1024px): 3 columns.
+- `xl` (≥1280px): 3 columns.
+- `2xl` (≥1536px): 4 columns.
 
-4–6 columns depending on viewport width.
-
-Tablet:
-
-2–4 columns.
-
-Mobile:
-
-2 columns.
+Target card width is roughly 280–320px. The grid stays at 4 columns max —
+additional viewport width is absorbed as centered whitespace inside the
+1440px container rather than more columns per row.
 
 ---
 
@@ -600,10 +641,16 @@ Because Pixel Komunika uses customer verification:
 
 Price may be hidden / blurred.
 
-Show:
+Product card:
 
 ```text
-Login untuk melihat harga grosir
+Verifikasi Akun   (lock icon, no price shown)
+```
+
+Product detail page:
+
+```text
+Harga tersembunyi — Login untuk melihat harga grosir
 ```
 
 ### Pending Approval
@@ -737,7 +784,14 @@ It should intentionally feel different from the public storefront.
 Every admin list table uses server-side pagination. Do not render the full
 dataset on a single page.
 
-Required behavior for every list page (Pelanggan, Produk, Pesanan, Media, dll.):
+Current implementation:
+
+- Admin list pages paginate server-side using Laravel's default
+  `->links()` pagination (e.g. `resources/views/admin/customers/index.blade.php`).
+- A dedicated rows-per-page selector is not yet implemented.
+
+Target behavior (not yet implemented) for every list page
+(Pelanggan, Produk, Pesanan, Media, dll.):
 
 - **Rows-per-page selector**: a "Lihat per" dropdown with options [5, 10, 25, 50].
   Default is 10. Changing the value resets back to page 1.
@@ -796,13 +850,17 @@ Body:
 
 Labels:
 
-500
+500–600
 
-Headings:
+Headings / display:
 
-600–700
+700–900 (hero and section titles use `font-black`, 900)
 
-Avoid excessive font weight.
+Prices / key figures:
+
+800 (`font-extrabold`)
+
+Avoid excessive font weight on long body copy.
 
 Typography should create hierarchy through:
 
@@ -821,15 +879,29 @@ Typography should create hierarchy through:
 
     --color-brand-yellow: #F8B818;
     --color-brand-yellow-soft: #F8D820;
+    --color-brand-yellow-dark: #D4950F;
+    --color-brand-yellow-muted: #FEF3C7;
     --color-brand-black: #181818;
     --color-brand-white: #FFFFFF;
     --color-brand-red: #F81818;
 
+    --color-surface-1: #FFFFFF;
+    --color-surface-2: #FAFAFA;
+    --color-surface-3: #F5F5F5;
+
     --color-success: #15803D;
+    --color-success-bg: #DCFCE7;
     --color-warning: #F8B818;
-    --color-danger: #F81818;
+    --color-warning-bg: #FEF3C7;
+    --color-danger: #DC2626;
+    --color-danger-bg: #FEE2E2;
 }
 ```
+
+Note: `--color-brand-red` (#F81818) is the brand accent; the semantic
+`danger` token is `#DC2626` (used for destructive actions like "Hapus Semua").
+`--color-brand-yellow-dark` (hover) and `--color-brand-yellow-muted`
+(soft yellow surfaces) extend the yellow scale.
 
 ---
 
@@ -854,6 +926,22 @@ Primary surface.
 Neutral Gray:
 
 Supporting backgrounds and borders.
+
+Surfaces:
+
+- `surface-1` (#FFFFFF): primary white surface.
+- `surface-2` (#FAFAFA): default section background (e.g. catalog page,
+  PDP, benefits section).
+- `surface-3` (#F5F5F5): subtle contrast surface.
+
+Semantic status colors:
+
+- `success` (#15803D) + `success-bg` (#DCFCE7): stock available, positive
+  states.
+- `warning` (#F8B818) + `warning-bg` (#FEF3C7): pending / caution states.
+- `danger` (#DC2626) + `danger-bg` (#FEE2E2): destructive actions and errors
+  (e.g. "Hapus Semua", "Stok Habis"). This is separate from the `brand-red`
+  (#F81818) brand accent.
 
 Avoid:
 
@@ -1068,7 +1156,8 @@ Before implementing any new component:
 5. Do not introduce unnecessary dependencies.
 6. Do not introduce new database fields for visual purposes.
 7. Ensure desktop and mobile behavior are both considered.
-8. Avoid `max-w-*` constraints unless there is a specific UX reason.
+8. Avoid `max-w-*` constraints narrower than the standard 1440px container
+   (`container-2xl` / `container-lg`) unless there is a specific UX reason.
 9. Prefer fluid width with responsive horizontal padding.
 10. Keep storefront and internal UI architecture separate.
 

@@ -67,7 +67,7 @@
                     <div>
                         <p class="text-zinc-500">Status Pesanan:</p>
                         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold
-                            {{ $order->status === 'unpaid' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' }}
+                            {{ $order->status === 'unpaid' ? 'bg-amber-100 text-amber-800' : ($order->status === 'payment_rejected' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800') }}
                         ">
                             {{ strtoupper($order->status) }}
                         </span>
@@ -150,7 +150,7 @@
             </x-ui.section-card>
 
             <!-- Payment Upload / Proof Section -->
-            @if ($order->status === 'unpaid' || $order->status === 'payment_pending')
+            @if (in_array($order->status, ['unpaid', 'payment_pending', 'payment_rejected'], true))
                 @if ($bankAccounts->isNotEmpty())
                     <x-ui.section-card title="Rekening Tujuan Pembayaran">
                         <div class="space-y-3">

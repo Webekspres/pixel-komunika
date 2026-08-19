@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Livewire\Admin\AdminOrders;
+use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\CustomerReviewDetail;
 use App\Livewire\Admin\MediaLibrary;
 use App\Livewire\Customer\CustomerOrders;
@@ -71,9 +72,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/tax-rules/{category}/edit', [CategoryTaxRuleController::class, 'edit'])->name('tax-rules.edit');
     Route::patch('/tax-rules/{category}', [CategoryTaxRuleController::class, 'update'])->name('tax-rules.update');
 
-    Route::get('/payments', [PaymentReviewController::class, 'index'])->name('payments.index');
-    Route::get('/payments/{paymentProof}', [PaymentReviewController::class, 'show'])->name('payments.show');
-    Route::patch('/payments/{paymentProof}', [PaymentReviewController::class, 'update'])->name('payments.update');
+    Route::get('/payments', AdminPayments::class)->name('payments.index');
+    Route::get('/payments/{paymentProof}', [PaymentReviewController::class, 'show'])
+        ->name('payments.show')
+        ->middleware('signed');
 
     Route::get('/products', [ProductEnrichmentController::class, 'index'])->name('products.index');
     Route::get('/products/{product}', [ProductEnrichmentController::class, 'edit'])->name('products.edit');

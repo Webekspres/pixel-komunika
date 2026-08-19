@@ -77,7 +77,7 @@ it('allows customer to upload payment proof and admin to approve it', function (
     $paymentService->approvePayment($proof, $admin);
 
     expect($proof->fresh()->status)->toBe('approved');
-    expect($order->fresh()->status)->toBe('paid');
+    expect($order->fresh()->status)->toBe('processing');
     expect($order->invoice->fresh()->status)->toBe('paid');
 });
 

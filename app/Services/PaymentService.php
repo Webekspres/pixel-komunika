@@ -90,7 +90,7 @@ class PaymentService
             ]);
 
             $order = $proof->order;
-            $order->update(['status' => 'paid']);
+            $order->update(['status' => 'processing']);
 
             if ($order->invoice) {
                 $order->invoice->update(['status' => 'paid']);
@@ -119,7 +119,7 @@ class PaymentService
             ]);
 
             $order = $proof->order;
-            $order->update(['status' => 'unpaid']);
+            $order->update(['status' => 'payment_rejected']);
 
             if ($order->invoice) {
                 $order->invoice->update(['status' => 'unpaid']);

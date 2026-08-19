@@ -16,6 +16,10 @@
         'shipped' => 'Dikirim',
         'completed' => 'Selesai',
         'cancelled' => 'Dibatalkan',
+        'pending' => 'Menunggu Verifikasi',
+        'approved' => 'Disetujui',
+        'rejected' => 'Ditolak',
+        'payment_rejected' => 'Pembayaran Ditolak',
         default => is_string($status) ? str_replace('_', ' ', $status) : (string) $status,
     };
 
@@ -31,6 +35,9 @@
         'packed' => 'bg-sky-50 text-sky-700 border-sky-200',
         'shipped' => 'bg-violet-50 text-violet-700 border-violet-200',
         'cancelled' => 'bg-rose-50 text-rose-600 border-rose-200',
+        'pending' => 'bg-amber-50 text-amber-800 border-amber-200',
+        'approved' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'rejected', 'payment_rejected' => 'bg-rose-50 text-rose-600 border-rose-200',
         default => 'bg-zinc-100 text-zinc-700 border-zinc-200',
     };
 @endphp

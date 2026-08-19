@@ -10,6 +10,7 @@ use App\Services\OrderService;
 use App\Services\PaymentService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 beforeEach(function () {
     app(SampleCatalogImporter::class)->import();
@@ -37,6 +38,8 @@ beforeEach(function () {
 
 function paymentFixtureOrder(): array
 {
+    Storage::fake('local');
+
     $customer = User::factory()->activeCustomer()->create();
     $admin = User::factory()->admin()->create();
 
@@ -71,60 +74,22 @@ function paymentFixtureOrder(): array
     return compact('customer', 'admin', 'order', 'proof');
 }
 
-it('shows pending queue and streams proof preview for admins', function () {
-    Storage::fake('local');
+it('streams proof preview only through a temporary signed URL', function () {
     ['admin' => $admin, 'proof' => $proof] = paymentFixtureOrder();
-
-    $this->actingAs($admin)
-        ->get(route('admin.payments.index'))
-        ->assertOk()
-        ->assertSee('Antrian Verifikasi')
-        ->assertSee($proof->order->order_number)
-        ->assertSee('1 menunggu verifikasi');
 
     $this->actingAs($admin)
         ->get(route('admin.payments.show', $proof))
+        ->assertForbidden();
+
+    $signed = URL::temporarySignedRoute(
+        'admin.payments.show',
+        now()->addMinutes(30),
+        ['paymentProof' => $proof->id]
+    );
+
+    $this->actingAs($admin)
+        ->get($signed)
         ->assertOk();
-});
-
-it('lets admins approve a pending payment proof', function () {
-    Storage::fake('local');
-    ['admin' => $admin, 'order' => $order, 'proof' => $proof] = paymentFixtureOrder();
-
-    $this->actingAs($admin)
-        ->patch(route('admin.payments.update', $proof), ['action' => 'approve'])
-        ->assertRedirect();
-
-    expect($proof->fresh()->status)->toBe('approved')
-        ->and($proof->fresh()->reviewed_by)->toBe($admin->id)
-        ->and($order->fresh()->status)->toBe('paid');
-});
-
-it('lets admins reject a pending payment proof with reason', function () {
-    Storage::fake('local');
-    ['admin' => $admin, 'order' => $order, 'proof' => $proof] = paymentFixtureOrder();
-
-    $this->actingAs($admin)
-        ->patch(route('admin.payments.update', $proof), [
-            'action' => 'reject',
-            'reason' => 'Nominal tidak sesuai tagihan.',
-        ])
-        ->assertRedirect();
-
-    expect($proof->fresh()->status)->toBe('rejected')
-        ->and($proof->fresh()->is_active)->toBeFalse()
-        ->and($order->fresh()->status)->toBe('unpaid');
-});
-
-it('requires a reason when rejecting', function () {
-    Storage::fake('local');
-    ['admin' => $admin, 'proof' => $proof] = paymentFixtureOrder();
-
-    $this->actingAs($admin)
-        ->patch(route('admin.payments.update', $proof), ['action' => 'reject'])
-        ->assertSessionHasErrors('reason');
-
-    expect($proof->fresh()->status)->toBe('pending');
 });
 
 it('blocks non-admins from payment review', function () {

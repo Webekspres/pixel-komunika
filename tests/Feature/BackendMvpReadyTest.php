@@ -125,7 +125,7 @@ it('rejects payment with audit and retain_until on upload', function () {
     $paymentService->rejectPayment($proof, 'Nominal tidak cocok', $admin);
 
     expect($proof->fresh()->status)->toBe('rejected')
-        ->and($order->fresh()->status)->toBe('unpaid')
+        ->and($order->fresh()->status)->toBe('payment_rejected')
         ->and(AuditLog::where('action', 'PAYMENT_REJECTED')->exists())->toBeTrue();
 });
 

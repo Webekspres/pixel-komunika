@@ -18,10 +18,24 @@
             <div class="space-y-3 bg-amber-50 p-5 text-sm text-amber-800">
                 <p class="font-bold">Langkah selanjutnya</p>
                 <ol class="space-y-2 text-xs text-amber-700">
-                    <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">1</span> Transfer ke rekening yang tersedia</li>
+                    <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">1</span> Transfer ke rekening yang tersedia di bawah ini</li>
                     <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">2</span> Unggah bukti transfer di halaman ini</li>
                     <li class="flex gap-2"><span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-800">3</span> Tunggu verifikasi pembayaran dari admin</li>
                 </ol>
+                @if ($bankAccounts->isNotEmpty())
+                    <div class="space-y-2 border-t border-amber-200 pt-3">
+                        <p class="text-xs font-bold text-amber-800">Rekening tujuan pembayaran</p>
+                        @foreach ($bankAccounts as $account)
+                            <div class="rounded-xl bg-white/80 px-3 py-2.5 text-xs text-amber-900">
+                                <p class="font-bold">{{ $account->bank_name }} <span class="font-mono font-semibold text-amber-800">{{ $account->account_number }}</span></p>
+                                <p class="text-amber-800/80">a.n. {{ $account->account_holder }}</p>
+                                @if ($account->instructions)
+                                    <p class="mt-1 text-[11px] leading-relaxed text-amber-700">{{ $account->instructions }}</p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
     @endif
@@ -137,6 +151,23 @@
 
             <!-- Payment Upload / Proof Section -->
             @if ($order->status === 'unpaid' || $order->status === 'payment_pending')
+                @if ($bankAccounts->isNotEmpty())
+                    <x-ui.section-card title="Rekening Tujuan Pembayaran">
+                        <div class="space-y-3">
+                            @foreach ($bankAccounts as $account)
+                                <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                                    <p class="text-sm font-bold text-zinc-900">{{ $account->bank_name }}</p>
+                                    <p class="mt-0.5 font-mono text-sm font-semibold text-zinc-800">{{ $account->account_number }}</p>
+                                    <p class="text-xs text-zinc-500">a.n. {{ $account->account_holder }}</p>
+                                    @if ($account->instructions)
+                                        <p class="mt-2 rounded-xl bg-white px-3 py-2 text-xs leading-relaxed text-zinc-600">{{ $account->instructions }}</p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </x-ui.section-card>
+                @endif
+
                 <x-ui.section-card title="Upload Bukti Pembayaran">
                     @if (session()->has('success'))
                         <div class="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-medium mb-3">

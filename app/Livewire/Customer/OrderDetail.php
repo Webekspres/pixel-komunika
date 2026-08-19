@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Customer;
 
+use App\Models\BankAccount;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\PaymentService;
@@ -88,7 +89,12 @@ class OrderDetail extends Component
 
     public function render()
     {
-        return view('livewire.customer.order-detail')
+        return view('livewire.customer.order-detail', [
+            'bankAccounts' => BankAccount::query()
+                ->where('is_active', true)
+                ->oldest('id')
+                ->get(),
+        ])
             ->layout('components.layouts.customer');
     }
 }

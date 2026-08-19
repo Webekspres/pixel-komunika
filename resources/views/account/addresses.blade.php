@@ -73,7 +73,7 @@
             >
                 <div class="grid gap-4">
                     @forelse ($user->addresses as $address)
-                        <div class="rounded-[1.75rem] border border-brand-black/8 bg-zinc-50/80 p-5 shadow-card">
+                        <div class="rounded-[1.75rem] border border-brand-black/8 bg-zinc-50/80 p-5 shadow-card" x-data="{ editing: false }">
                             <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                                 <div>
                                     <div class="flex flex-wrap items-center gap-2">
@@ -89,41 +89,62 @@
                                     </p>
                                 </div>
 
-                                <form method="POST" action="{{ route('account.addresses.destroy', $address) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <flux:button type="submit" variant="danger" size="sm">
-                                        Hapus
+                                <div class="flex items-center gap-2">
+                                    <flux:button type="button" variant="ghost" size="sm" @click="editing = !editing">
+                                        <span x-text="editing ? 'Tutup' : 'Edit'">Edit</span>
                                     </flux:button>
-                                </form>
+
+                                    @php
+                                        $deleteDescription = $address->label
+                                            ? "Yakin ingin menghapus alamat \"{$address->label}\"? Tindakan ini tidak bisa dibatalkan."
+                                            : 'Yakin ingin menghapus alamat ini? Tindakan ini tidak bisa dibatalkan.';
+                                    @endphp
+                                    <x-ui.confirm-dialog
+                                        title="Hapus alamat"
+                                        :description="$deleteDescription"
+                                        confirm-label="Ya, hapus"
+                                        cancel-label="Batal"
+                                        confirm-variant="danger"
+                                        action="{{ route('account.addresses.destroy', $address) }}"
+                                        method="DELETE"
+                                    >
+                                        <x-slot:trigger>
+                                            <flux:button type="button" variant="danger" size="sm">
+                                                Hapus
+                                            </flux:button>
+                                        </x-slot:trigger>
+                                    </x-ui.confirm-dialog>
+                                </div>
                             </div>
 
-                            <form method="POST" action="{{ route('account.addresses.update', $address) }}" class="grid gap-4 md:grid-cols-2">
-                                @csrf
-                                @method('PATCH')
+                            <div x-show="editing" x-cloak x-transition class="mt-5 border-t border-brand-black/8 pt-5">
+                                <form method="POST" action="{{ route('account.addresses.update', $address) }}" class="grid gap-4 md:grid-cols-2">
+                                    @csrf
+                                    @method('PATCH')
 
-                                <flux:input name="label" label="Label" value="{{ $address->label }}" />
-                                <flux:input name="recipient_name" label="Nama penerima" value="{{ $address->recipient_name }}" required />
-                                <flux:input name="recipient_phone" label="Nomor penerima" value="{{ $address->recipient_phone }}" required />
-                                <flux:input name="province_name" label="Provinsi" value="{{ $address->province_name }}" required />
-                                <flux:input name="city_name" label="Kota / Kabupaten" value="{{ $address->city_name }}" required />
-                                <flux:input name="district_name" label="Kecamatan" value="{{ $address->district_name }}" required />
-                                <flux:input name="postal_code" label="Kode pos" value="{{ $address->postal_code }}" />
+                                    <flux:input name="label" label="Label" value="{{ $address->label }}" />
+                                    <flux:input name="recipient_name" label="Nama penerima" value="{{ $address->recipient_name }}" required />
+                                    <flux:input name="recipient_phone" label="Nomor penerima" value="{{ $address->recipient_phone }}" required />
+                                    <flux:input name="province_name" label="Provinsi" value="{{ $address->province_name }}" required />
+                                    <flux:input name="city_name" label="Kota / Kabupaten" value="{{ $address->city_name }}" required />
+                                    <flux:input name="district_name" label="Kecamatan" value="{{ $address->district_name }}" required />
+                                    <flux:input name="postal_code" label="Kode pos" value="{{ $address->postal_code }}" />
 
-                                <div class="md:col-span-2">
-                                    <flux:textarea name="address_line" label="Alamat lengkap" rows="3" required>{{ $address->address_line }}</flux:textarea>
-                                </div>
+                                    <div class="md:col-span-2">
+                                        <flux:textarea name="address_line" label="Alamat lengkap" rows="3" required>{{ $address->address_line }}</flux:textarea>
+                                    </div>
 
-                                <flux:field variant="inline">
-                                    <flux:checkbox name="is_default" value="1" label="Jadikan default" :checked="$address->is_default" />
-                                </flux:field>
+                                    <flux:field variant="inline">
+                                        <flux:checkbox name="is_default" value="1" label="Jadikan default" :checked="$address->is_default" />
+                                    </flux:field>
 
-                                <div class="md:col-span-2">
-                                    <flux:button type="submit" variant="primary" color="amber">
-                                        Update alamat
-                                    </flux:button>
-                                </div>
-                            </form>
+                                    <div class="md:col-span-2">
+                                        <flux:button type="submit" variant="primary" color="amber">
+                                            Update alamat
+                                        </flux:button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     @empty
                         <x-ui.empty-state

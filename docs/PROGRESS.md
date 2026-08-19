@@ -11,9 +11,9 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-13
-- Fase aktif: Backend MVP P0 (services/schema/jobs/seed) siap untuk wiring frontend
-- Status umum: skema ERD gap ditutup; service domain + adapter POS/WA stub + scheduler aktif; Pest 52/52
+- Tanggal update terakhir: 2026-08-19
+- Fase aktif: UI/wiring frontend terhadap service selesai untuk alur inti; menuju Fase 6 (release readiness)
+- Status umum: alur end-to-end registrasi s/d verifikasi pembayaran + fulfillment aktif; status order kini mengikuti FRD (`PROCESSING` setelah bayar diterima, `payment_rejected` saat ditolak); branch `staging` dibuat; Pest 109/109
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -55,7 +55,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: backend siap; wiring UI lanjutan (PDF/resi/WA link) masih berikutnya
+- Status: backend + wiring UI inti selesai; invoice PDF, nomor resi, dan tautan konfirmasi WhatsApp masih berikutnya
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
@@ -65,41 +65,64 @@ Dokumen ini dipakai untuk mencatat:
   - Checkout menulis `order_charge_components`, `shipments`, `payments`, outbox POS sale, notifikasi NEW_ORDER.
   - Scheduler `orders:auto-cancel-unpaid` + `orders:auto-complete-shipped` (skip `TERKENDALA`).
   - Endpoint POS `GET /api/pos/orders/{order_number}` tetap satu-satunya HTTP POS.
+  - Detail pesanan pelanggan menampilkan rekening tujuan pembayaran (dari `BankAccount` aktif).
+  - Belum ada: generator PDF invoice (tombol admin sengaja disabled "Segera"), tampilan nomor resi di detail order, tautan konfirmasi penerimaan.
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
-- Status: selesai (service-level)
+- Status: selesai (service-level + UI admin)
 - Catatan:
   - `payments` + `retain_until` 5 tahun; audit pada verify/reject.
   - Cancel menyimpan metadata `ADMIN`/`SYSTEM` + `sales_returns` + return outbox.
   - `processReturn` mengembalikan stok dan mengantri `WEB_RETURN_REPORT`.
+  - Halaman `/admin/payments` direvamp menjadi Livewire: tabel terpadu dengan status tabs, search/filter bank, dan modal review 2 kolom; bukti streaming lewat temporary signed URL (privat).
+  - Daftar `/admin/orders` memakai pola detail-first + dropdown action (batal same-day, tandai `TERKENDALA`, transisi status ada di detail order).
+  - Transisi status diselaraskan dengan FRD: pembayaran diterima -> order `processing`; ditolak -> order `payment_rejected` (pelanggan dapat unggah ulang).
 
 ### Fase 5 — Reporting, audit, sync resilience, security
 
-- Status: fondasi backend selesai (tanpa UI laporan baru)
+- Status: fondasi backend + laporan UI dasar selesai; audit search UI belum
 - Target hasil:
   - laporan dasar
   - audit trail
   - retry/idempotency sync POS
   - security checks
 - Catatan:
-  - `ReportingService` omzet dari status `shipped`/`completed` (satu snapshot, tanpa double-count logika terpisah).
-  - `AuditLogger` + policies Order/PaymentProof/CustomerProfile.
+  - `ReportingService` omzet dari status `shipped`/`completed` (satu snapshot, tanpa double-count logika terpisah); UI `/admin/reports` filter periode + kecamatan.
+  - `AuditLogger` + policies Order/PaymentProof/CustomerProfile; UI pencarian audit log belum ada.
   - Sample POS sync + ack simulator (success/fail/timeout); WhatsApp stub (`log`/`fake`).
   - Scheduler: `pos:sync-*`, `pos:dispatch-*-reports`, `notifications:dispatch-pending`.
 
 ### Fase 6 — Release readiness
 
-- Status: belum mulai
+- Status: persiapan dimulai (branch `staging` dibuat & dipush dari `dev`); smoke test/UAT/contract test belum
 - Target hasil:
   - contract test POS/Biteship
   - staging smoke test
   - shared-hosting readiness
   - UAT, training, sign-off
 - Catatan:
-  - TBD
+  - Estimasi keseluruhan ±70% MVP; gap utama fungsional: invoice PDF, tautan konfirmasi WhatsApp, nomor resi, penggabungan order, UI audit search; sisanya blocker eksternal (POS, Biteship, WhatsApp, format invoice/akun, PPh 22 final).
 
 ## Log progres
+
+### 2026-08-19
+
+- Selesai:
+  - Storefront: perbaikan tampilan "Semua Produk" saat kategori kosong, badge enrichment, polish layout katalog & homepage, penyelarasan `DESIGN.md` dengan implementasi.
+  - Admin katalog: slug produk read-only dengan auto-fill dari nama tampilan; perbaikan migrasi kompatibel SQLite.
+  - Akun/UI: daftar alamat jadi accordion + konfirmasi hapus; input wajib bertanda asterisk; aturan destructive actions di `AGENTS.md`.
+  - Pengaturan toko: validasi tab identitas/partai independen; form tambah rekening & tarif kurir dalam modal.
+  - Order: rekening tujuan pembayaran tampil di detail pesanan pelanggan.
+  - Admin order: daftar detail-first + dropdown action (batal same-day FR-ORD-006, tandai `TERKENDALA`).
+  - Admin pembayaran: revamp tabel terpadu + status tabs + search/filter bank + modal review 2 kolom dengan signed URL.
+  - Transisi status diselaraskan dengan FRD: `approve -> processing`, `reject -> payment_rejected`.
+  - Branch `staging` dibuat dari `dev` dan dipush ke `origin/staging`.
+  - Pest 109/109 lulus.
+- Next:
+  - Gap fungsional: invoice PDF + pilihan channel, tautan konfirmasi WhatsApp, nomor resi di detail order, penggabungan order, UI audit search.
+  - Fase 6: deploy & smoke test staging, contract test POS/Biteship, UAT, training, sign-off.
+  - Tunggu keputusan eksternal: POS (Kak Rio), Biteship, WhatsApp, format invoice/akun, PPh 22 final.
 
 ### 2026-08-13
 

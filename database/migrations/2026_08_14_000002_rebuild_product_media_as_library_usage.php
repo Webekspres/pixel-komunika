@@ -37,6 +37,8 @@ return new class extends Migration
 
         Schema::table('product_media', function (Blueprint $table) {
             $table->unsignedBigInteger('media_id')->nullable(false)->change();
+            // SQLite menolak DROP COLUMN pada kolom yang masih direferensikan index (object_key unique).
+            $table->dropUnique(['object_key']);
             $table->dropColumn(['object_key', 'media_type', 'mime_type', 'file_size']);
             $table->unique(['product_id', 'media_id']);
         });

@@ -95,6 +95,22 @@ promosi.
 - Jika branch tujuan belum tersedia, buat branch hanya dari baseline yang sudah
   disepakati; jika baseline tidak jelas, hentikan promosi dan minta arahan.
 
+## Aturan Destructive Actions (Hapus Data)
+
+- Setiap aksi penghapusan data (delete/destroy) dari UI wajib dikonfirmasi
+  pengguna terlebih dahulu sebelum dieksekusi.
+- Gunakan komponen shared `x-ui.confirm-dialog` (modal custom responsif)
+  sebagai mekanisme konfirmasi default. Untuk konteks yang tidak cocok dengan
+  modal, gunakan mekanisme paling sederhana yang tersedia:
+  `onsubmit="return confirm('...')"` pada form HTML biasa, atau
+  `wire:confirm` pada aksi Livewire.
+- Jangan memakai `alert()`/`confirm()` native jika modal custom dapat dipakai;
+  komponen shared harus diutamakan agar konsisten dan responsif di mobile.
+- Pesan konfirmasi harus menyebutkan objek yang dihapus dan menegaskan bahwa
+  tindakan tidak dapat dibatalkan.
+- Jangan menghapus data tanpa konfirmasi meskipun tombol/kontrolnya tampak
+  jelas; hal ini untuk mencegah penghapusan tidak sengaja.
+
 ## Format Commit
 
 Setiap commit memakai Conventional Commits:

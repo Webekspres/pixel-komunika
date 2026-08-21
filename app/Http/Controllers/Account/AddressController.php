@@ -87,6 +87,7 @@ class AddressController extends Controller
             'city_name' => ['required', 'string', 'max:100'],
             'district_name' => ['required', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:16'],
+            'biteship_area_id' => ['nullable', 'string', 'max:191'],
         ]);
     }
 }

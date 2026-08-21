@@ -57,6 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/akun/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show'])->name('orders.invoice');
     Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
     Route::get('/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
+    Route::get('/api/areas/search', [\App\Http\Controllers\Api\AreaSearchController::class, 'search'])->name('api.areas.search');
+    Route::get('/api/areas/districts', [\App\Http\Controllers\Api\AreaSearchController::class, 'districts'])->name('api.areas.districts');
 });
 
 Route::middleware(['auth', 'active.customer'])->group(function () {

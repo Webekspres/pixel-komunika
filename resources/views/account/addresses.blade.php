@@ -10,7 +10,7 @@
                 <button
                     type="button"
                     @click="addModalOpen = true"
-                    class="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                    class="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                 >
                     <x-icon name="plus" class="size-4" />
                     <span>Tambah Alamat Baru</span>
@@ -23,12 +23,12 @@
             <div class="rounded-2xl border border-zinc-200/80 bg-white p-12 text-center shadow-2xs">
                 <x-icon name="map-pin" class="size-12 mx-auto text-zinc-300" />
                 <h3 class="mt-3 text-base font-bold text-zinc-800">Belum Ada Alamat Tersimpan</h3>
-                <p class="mt-1 text-xs text-zinc-500 max-w-sm mx-auto">Tambahkan minimal satu alamat tujuan pengiriman untuk mempermudah transaksi belanja Anda.</p>
+                <p class="mt-1 text-xs sm:text-sm text-zinc-500 max-w-sm mx-auto">Tambahkan minimal satu alamat tujuan pengiriman untuk mempermudah transaksi belanja Anda.</p>
                 <div class="mt-5">
                     <button
                         type="button"
                         @click="addModalOpen = true"
-                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                     >
                         <x-icon name="plus" class="size-4" />
                         <span>Tambah Alamat Sekarang</span>
@@ -53,8 +53,8 @@
                             </div>
 
                             <!-- Card Body -->
-                            <div class="space-y-1.5 text-xs">
-                                <p class="font-bold text-zinc-900 text-sm">{{ $address->recipient_name }}</p>
+                            <div class="space-y-1.5 text-xs sm:text-sm">
+                                <p class="font-bold text-zinc-900">{{ $address->recipient_name }}</p>
                                 <p class="text-zinc-600 font-medium">{{ $address->recipient_phone }}</p>
                                 <p class="text-zinc-600 leading-relaxed pt-1">
                                     {{ $address->address_line }}<br>
@@ -64,7 +64,7 @@
                         </div>
 
                         <!-- Card Actions Footer -->
-                        <div class="flex items-center justify-between border-t border-zinc-100 pt-3 mt-4 text-xs">
+                        <div class="flex items-center justify-between border-t border-zinc-100 pt-3 mt-4 text-xs sm:text-sm">
                             <div>
                                 @if (! $address->is_default)
                                     <form method="POST" action="{{ route('account.addresses.default', $address) }}">
@@ -83,7 +83,7 @@
                                 <button
                                     type="button"
                                     @click="editAddressId = {{ $address->id }}"
-                                    class="inline-flex items-center gap-1 font-semibold text-zinc-700 hover:text-zinc-950 px-2 py-1 rounded-lg hover:bg-zinc-100 transition"
+                                    class="inline-flex items-center gap-1 font-semibold text-zinc-700 hover:text-zinc-950 px-2.5 py-1 rounded-lg hover:bg-zinc-100 transition"
                                 >
                                     <x-icon name="pencil" class="size-3.5" />
                                     <span>Ubah</span>
@@ -104,7 +104,7 @@
                                     method="DELETE"
                                 >
                                     <x-slot:trigger>
-                                        <button type="button" class="inline-flex items-center gap-1 font-semibold text-red-600 hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-50 transition">
+                                        <button type="button" class="inline-flex items-center gap-1 font-semibold text-red-600 hover:text-red-700 px-2.5 py-1 rounded-lg hover:bg-red-50 transition">
                                             <x-icon name="trash-2" class="size-3.5" />
                                             <span>Hapus</span>
                                         </button>
@@ -156,37 +156,86 @@
                                         @csrf
                                         @method('PATCH')
 
-                                        <flux:input name="label" label="Label Alamat" value="{{ $address->label }}" placeholder="Misal: Toko Cabang / Gudang" />
+                                        <div>
+                                            <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">Label Alamat</label>
+                                            <input
+                                                type="text"
+                                                name="label"
+                                                value="{{ $address->label }}"
+                                                placeholder="Contoh: Toko Utama / Rumah / Gudang"
+                                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                            />
+                                        </div>
                                         
                                         <div class="grid gap-4 sm:grid-cols-2">
-                                            <flux:input name="recipient_name" label="Nama Penerima" value="{{ $address->recipient_name }}" required />
-                                            <flux:input name="recipient_phone" label="Nomor Penerima" value="{{ $address->recipient_phone }}" required />
+                                            <div>
+                                                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                                                    Nama Penerima <span class="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="recipient_name"
+                                                    value="{{ $address->recipient_name }}"
+                                                    placeholder="Nama lengkap penerima"
+                                                    required
+                                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                                                    Nomor Telepon <span class="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="recipient_phone"
+                                                    value="{{ $address->recipient_phone }}"
+                                                    placeholder="08xxxxxxxxxx"
+                                                    required
+                                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                                />
+                                            </div>
                                         </div>
 
-                                        <flux:textarea name="address_line" label="Alamat Lengkap" rows="3" required>{{ $address->address_line }}</flux:textarea>
+                                        <!-- Dropdown Bertingkat Wilayah Indonesia (Provinsi -> Kota/Kabupaten -> Kecamatan -> Kode Pos) -->
+                                        <x-storefront.region-select
+                                            :province="$address->province_name"
+                                            :city="$address->city_name"
+                                            :district="$address->district_name"
+                                            :postal-code="$address->postal_code"
+                                        />
 
-                                        <div class="grid gap-4 sm:grid-cols-2">
-                                            <flux:input name="province_name" label="Provinsi" value="{{ $address->province_name }}" required />
-                                            <flux:input name="city_name" label="Kota / Kabupaten" value="{{ $address->city_name }}" required />
-                                            <flux:input name="district_name" label="Kecamatan" value="{{ $address->district_name }}" required />
-                                            <flux:input name="postal_code" label="Kode Pos" value="{{ $address->postal_code }}" />
+                                        <div>
+                                            <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                                                Alamat Lengkap <span class="text-red-500">*</span>
+                                            </label>
+                                            <textarea
+                                                name="address_line"
+                                                rows="3"
+                                                placeholder="Nama jalan, gedung, RT/RW, nomor rumah, patokan"
+                                                required
+                                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                            >{{ $address->address_line }}</textarea>
                                         </div>
 
-                                        <flux:field variant="inline">
-                                            <flux:checkbox name="is_default" value="1" label="Jadikan sebagai alamat utama" :checked="$address->is_default" />
-                                        </flux:field>
+                                        <label class="inline-flex items-center gap-2 text-xs sm:text-sm text-zinc-700 font-medium cursor-pointer">
+                                            <input type="checkbox" name="is_default" value="1" {{ $address->is_default ? 'checked' : '' }} class="size-4 rounded-md border-zinc-300 text-brand-black focus:ring-zinc-900">
+                                            <span>Jadikan sebagai alamat utama</span>
+                                        </label>
 
                                         <div class="flex items-center justify-end gap-3 pt-4 border-t border-zinc-100">
                                             <button
                                                 type="button"
                                                 @click="editAddressId = null"
-                                                class="rounded-xl border border-zinc-200/80 px-4 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition"
+                                                class="rounded-xl border border-zinc-200/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
                                             >
                                                 Batal
                                             </button>
-                                            <flux:button type="submit" variant="primary" class="rounded-xl">
+                                            <button
+                                                type="submit"
+                                                class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                                            >
                                                 Simpan Perubahan
-                                            </flux:button>
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -239,37 +288,86 @@
                     <form method="POST" action="{{ route('account.addresses.store') }}" class="p-6 space-y-4">
                         @csrf
 
-                        <flux:input name="label" label="Label Alamat" value="{{ old('label') }}" placeholder="Misal: Toko Pusat / Gudang Utama" />
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">Label Alamat</label>
+                            <input
+                                type="text"
+                                name="label"
+                                value="{{ old('label') }}"
+                                placeholder="Contoh: Toko Utama / Rumah / Gudang"
+                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                            />
+                        </div>
                         
                         <div class="grid gap-4 sm:grid-cols-2">
-                            <flux:input name="recipient_name" label="Nama Penerima" value="{{ old('recipient_name', $user->name) }}" required />
-                            <flux:input name="recipient_phone" label="Nomor Telepon Penerima" value="{{ old('recipient_phone', $user->phone) }}" required />
+                            <div>
+                                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                                    Nama Penerima <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="recipient_name"
+                                    value="{{ old('recipient_name', $user->name) }}"
+                                    placeholder="Nama lengkap penerima"
+                                    required
+                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                                    Nomor Telepon <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="recipient_phone"
+                                    value="{{ old('recipient_phone', $user->phone) }}"
+                                    placeholder="08xxxxxxxxxx"
+                                    required
+                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                />
+                            </div>
                         </div>
 
-                        <flux:textarea name="address_line" label="Alamat Lengkap" rows="3" placeholder="Nama jalan, nomor bangunan, patokan, RT/RW" required>{{ old('address_line') }}</flux:textarea>
+                        <!-- Dropdown Bertingkat Wilayah Indonesia (Provinsi -> Kota/Kabupaten -> Kecamatan -> Kode Pos) -->
+                        <x-storefront.region-select
+                            :province="old('province_name', '')"
+                            :city="old('city_name', '')"
+                            :district="old('district_name', '')"
+                            :postal-code="old('postal_code', '')"
+                        />
 
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <flux:input name="province_name" label="Provinsi" value="{{ old('province_name') }}" required />
-                            <flux:input name="city_name" label="Kota / Kabupaten" value="{{ old('city_name') }}" required />
-                            <flux:input name="district_name" label="Kecamatan" value="{{ old('district_name') }}" required />
-                            <flux:input name="postal_code" label="Kode Pos" value="{{ old('postal_code') }}" />
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                                Alamat Lengkap <span class="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                name="address_line"
+                                rows="3"
+                                placeholder="Nama jalan, gedung, RT/RW, nomor rumah, patokan"
+                                required
+                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                            >{{ old('address_line') }}</textarea>
                         </div>
 
-                        <flux:field variant="inline">
-                            <flux:checkbox name="is_default" value="1" label="Jadikan sebagai alamat utama" />
-                        </flux:field>
+                        <label class="inline-flex items-center gap-2 text-xs sm:text-sm text-zinc-700 font-medium cursor-pointer">
+                            <input type="checkbox" name="is_default" value="1" class="size-4 rounded-md border-zinc-300 text-brand-black focus:ring-zinc-900">
+                            <span>Jadikan sebagai alamat utama</span>
+                        </label>
 
                         <div class="flex items-center justify-end gap-3 pt-4 border-t border-zinc-100">
                             <button
                                 type="button"
                                 @click="addModalOpen = false"
-                                class="rounded-xl border border-zinc-200/80 px-4 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition"
+                                class="rounded-xl border border-zinc-200/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
                             >
                                 Batal
                             </button>
-                            <flux:button type="submit" variant="primary" class="rounded-xl">
+                            <button
+                                type="submit"
+                                class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                            >
                                 Simpan Alamat
-                            </flux:button>
+                            </button>
                         </div>
                     </form>
                 </div>

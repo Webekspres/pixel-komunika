@@ -69,6 +69,23 @@
                                 @if (empty($shippingRates))
                                     <p class="text-sm text-zinc-500">Pilih alamat untuk melihat opsi ekspedisi.</p>
                                 @else
+                                    @php
+                                        $hasStoreCourier = collect($shippingRates)->contains(fn ($r) => ($r['provider'] ?? '') === 'STORE_COURIER');
+                                        $hasBiteshipRates = collect($shippingRates)->contains(fn ($r) => ($r['provider'] ?? '') === 'BITESHIP');
+                                        $usingBiteshipDriver = config('store.shipping.driver') === 'biteship';
+                                        $showFallbackNotice = $usingBiteshipDriver && ! $hasBiteshipRates && $hasStoreCourier;
+                                    @endphp
+
+                                    @if ($showFallbackNotice)
+                                        <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 flex items-start gap-3">
+                                            <svg class="mt-0.5 h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                                            <div>
+                                                <p class="font-semibold">Ongkir otomatis tidak tersedia</p>
+                                                <p class="mt-1">Tidak dapat menghitung ongkir dari Biteship. Silakan pilih <strong>Kurir Toko</strong> di bawah, atau hubungi admin via WhatsApp <a href="https://wa.me/6281546407702" target="_blank" class="underline font-bold">0815-4640-7702</a>.</p>
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     <div class="grid gap-3 sm:grid-cols-2">
                                         @foreach ($shippingRates as $rate)
                                             @php($key = $rate['code'] . ':' . $rate['service'])

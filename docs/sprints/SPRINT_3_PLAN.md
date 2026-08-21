@@ -10,7 +10,7 @@ Sprint 3 hampir selesai. Yang tersisa hanya 3 item:
 
 | ID | Item | Blocker | Status |
 |---|---|---|---|
-| A | Integrasi Biteship live (Maps & Rates) + fallback | Keputusan klien & API key | ⏳ Menunggu |
+| A | Integrasi Biteship live (Maps & Rates) + fallback | `BITESHIP_ORIGIN_AREA_ID` (client provides) | 🔄 **Core implemented** |
 | B | Provider WhatsApp produksi | Keputusan klien (provider, nomor, template) | ⏳ Menunggu |
 | C | Verifikasi ledger retur + cakupan test | Tidak ada | ✅ **Selesai** |
 
@@ -49,46 +49,38 @@ php artisan test                                   # 111 tests, 490 assertions �
 - Kontrak Biteship masih *partial* (BRD `OPN-016`/`OPN-021`, SRS TD-008). Perlu
   persetujuan klien untuk memakai Maps (`areas`) + Rates (`couriers`) — **tanpa**
   order/label/tracking/webhook (di luar baseline).
-- API key Biteship (env: `BITESHIP_API_KEY`), origin area ID, dan daftar kurir yang
-  diaktifkan.
+- **Sudah tersedia:** `BITESHIP_API_KEY`, `BITESHIP_BASE_URL` di `.env`
+- **Dibutuhkan dari klien:** `BITESHIP_ORIGIN_AREA_ID` (area ID asal toko di Biteship) + daftar kurir yang diaktifkan.
 
-### Langkah
-1. **Konfigurasi**
-   - Buat `config/biteship.php`: `base_url` (`https://api.biteship.com`), `api_key`
-     (env), `origin` (alamat toko dari `config('store.address')` + `origin_area_id`),
-     `timeout` (mis. 5 detik).
-   - Tambahkan env keys ke `.env.example`: `BITESHIP_API_KEY`, `BITESHIP_ORIGIN_AREA_ID`.
-2. **Service live**
-   - Buat `app/Services/Shipping/BiteshipShippingService.php` mengimplementasikan
-     `ShippingCalculatorInterface` (kontrak yang sama dengan mock, dipakai `Checkout`):
-     - **Maps areas:** `GET /v1/maps/areas` (pencarian area tujuan, debounced) untuk
-       standardisasi kecamatan tujuan.
-     - **Rates:** `POST /v1/rates/couriers` dengan origin area + destination area +
-       berat; mapping respons ke format rate yang dikonsumsi Checkout
-       (`provider`, `code`, `service`, `name`, `cost`, `etd`).
-     - Snapshot ongkir terpilih tetap masuk ke `shipments.shipping_amount`
-       (tidak berubah).
-3. **Fallback error**
-   - Jika Biteship timeout/gagal/tidak ada tarif: **jangan set Rp0**.
-   - Tampilkan notice di `resources/views/livewire/storefront/checkout.blade.php`:
-     "Ongkir tidak dapat dihitung otomatis, silakan hubungi admin (WhatsApp
-     `081546407702`)" + tetap tampilkan opsi Kurir Toko.
-4. **Wiring driver**
-   - `app/Providers/AppServiceProvider.php`: bind `ShippingCalculatorInterface`
-     berdasarkan `config('store.shipping.driver')` — `mock` (default, untuk
-     dev/test/UAT) vs `biteship` (staging/production).
-5. **Test**
-   - `tests/Feature/ShippingBiteshipTest.php` dengan `Http::fake()`:
-     - sukses: rates ter-mapping benar (harga, etd, provider);
-     - timeout/5xx: fallback notice, bukan Rp0;
-     - area tidak ditemukan: fallback.
-   - Pastikan `CheckoutAndOrderTest` tetap hijau dengan driver mock.
+### Progress implementasi ✅
+1. **Konfigurasi** — `config/biteship.php` dibuat, env keys ditambah ke `.env.example`
+2. **Service live** — `app/Services/Shipping/BiteshipShippingService.php` implementasi `ShippingCalculatorInterface`:
+   - Maps areas: `GET /v1/maps/areas` dengan cache 24 jam
+   - Rates: `POST /v1/rates/couriers` dengan origin + destination area + berat
+   - Mapping respons ke format Checkout (`provider`, `code`, `service`, `name`, `cost`, `etd`)
+3. **Fallback error** — Checkout view menampilkan notice "hubungi admin" saat Biteship gagal/tidak ada tarif, tetap tampilkan Kurir Toko
+4. **Wiring driver** — `AppServiceProvider.php` bind berdasarkan `config('store.shipping.driver')`: `mock` (default) vs `biteship`
+5. **Test** — `tests/Feature/ShippingBiteshipTest.php` (6 test, 26 assertions):
+   - Sukses mapping rates
+   - Timeout/5xx → empty array (graceful)
+   - Area tidak ditemukan → empty array
+   - API key/origin tidak konfigurasi → empty array
+   - Filter zero-cost rates
+
+### Verifikasi
+```bash
+php artisan test --filter="ShippingBiteshipTest"       # 6 tests, 26 assertions ✅
+php artisan test --filter="Checkout"                    # 6 tests, 28 assertions ✅
+SHIPPING_DRIVER=biteship php artisan test --filter="Checkout"  # 6 tests ✅
+php artisan test                                        # 117 tests, 516 assertions ✅
+```
 
 ### DoD
-- Tarif live Biteship muncul di checkout saat `driver=biteship`.
-- API gagal/timeout → pelanggan melihat notice "hubungi admin", tidak pernah Rp0.
-- Test baru hijau + test checkout lama hijau.
-- Konfigurasi via env, tanpa hardcode.
+- [x] Tarif live Biteship muncul di checkout saat `driver=biteship` (service ready)
+- [x] API gagal/timeout → pelanggan melihat notice "hubungi admin", tidak pernah Rp0
+- [x] Test baru hijau + test checkout lama hijau (both drivers)
+- [x] Konfigurasi via env, tanpa hardcode
+- [ ] **Waiting:** `BITESHIP_ORIGIN_AREA_ID` dari klien untuk aktivasi penuh di staging/production
 
 ---
 
@@ -131,25 +123,23 @@ php artisan test                                   # 111 tests, 490 assertions �
 ```text
 [C verifikasi ledger retur]  ✅ SELESAI
         │
-        ├──> [A Biteship live]  ── butuh: keputusan klien + BITESHIP_API_KEY
+        ├──> [A Biteship live]  ✅ Core implemented — butuh: BITESHIP_ORIGIN_AREA_ID dari klien
         │
         └──> [B WhatsApp prod]  ── butuh: keputusan klien + provider + approval
 ```
 
 - A dan B **tidak saling bergantung** — bisa dikerjakan paralel setelah keputusan klien.
-- Keduanya **diblokir keputusan klien**; selama belum turun, sprint dapat ditutup dengan
-  status "menunggu keputusan klien" atau A/B dikerjakan parsial (mis. service Biteship
-  dibangun dengan mode mock + siap-switch).
+- A sudah siap pakai (service + test + fallback), tinggal menunggu `BITESHIP_ORIGIN_AREA_ID` dari klien.
+- B **diblokir keputusan klien** penuh.
 
 ## 6. Keputusan yang Dibutuhkan Klien
 
-1. **Biteship:** setuju memakai Maps & Rates live? Sediakan API key + daftar kurir?
-   (PIC POS: Kak Rio.)
+1. **Biteship:** `BITESHIP_ORIGIN_AREA_ID` (area ID asal toko di Biteship) — service sudah ready.
 2. **WhatsApp:** pilih provider, nomor tujuan produksi, dan template pesan.
 3. **Prioritas:** mana yang didahulukan — Biteship atau WhatsApp?
 
 ## 7. Definition of Done Sprint (final)
 
-1. Item C: test retur + ledger `ORDER_RETURNED` hijau. ✅ target awal sprint ini.
-2. Item A & B: selesai **hanya jika** keputusan klien sudah turun; jika tidak, sprint
-   ditutup dengan catatan blocker dan backlog diteruskan ke sprint berikutnya.
+1. Item C: test retur + ledger `ORDER_RETURNED` hijau. ✅
+2. Item A: Core service + test + fallback ✅ — tinggal set `BITESHIP_ORIGIN_AREA_ID` di env staging/production.
+3. Item B: selesai **hanya jika** keputusan klien sudah turun; jika tidak, sprint ditutup dengan catatan blocker dan backlog diteruskan ke sprint berikutnya.

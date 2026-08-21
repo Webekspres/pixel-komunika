@@ -11,6 +11,7 @@ use App\Models\PaymentProof;
 use App\Policies\CustomerProfilePolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\PaymentProofPolicy;
+use App\Services\Shipping\BiteshipShippingService;
 use App\Services\Shipping\MockBiteshipShippingService;
 use App\Services\Shipping\ShippingCalculatorInterface;
 use Illuminate\Database\Events\DatabaseRefreshed;
@@ -23,10 +24,14 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(
-            ShippingCalculatorInterface::class,
-            MockBiteshipShippingService::class
-        );
+        $this->app->bind(ShippingCalculatorInterface::class, function () {
+            $driver = config('store.shipping.driver', 'mock');
+
+            return match ($driver) {
+                'biteship' => new BiteshipShippingService(),
+                default => new MockBiteshipShippingService(),
+            };
+        });
 
         $this->app->singleton(WhatsAppNotifierInterface::class, function () {
             return config('store.whatsapp.driver') === 'fake'

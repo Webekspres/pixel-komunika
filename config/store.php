@@ -30,6 +30,10 @@ return [
         'auto_complete_workdays' => (int) env('ORDER_AUTO_COMPLETE_WORKDAYS', 5),
     ],
 
+    'shipping' => [
+        'driver' => env('SHIPPING_DRIVER', 'mock'), // mock|biteship
+    ],
+
     'holidays' => [], // YYYY-MM-DD list; ponytail: replace with calendar when OPN-020 lands
 
 ];

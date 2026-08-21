@@ -89,10 +89,13 @@ terverifikasi oleh test.**
     + `MockBiteshipShippingService.php` (Kurir Toko untuk Bandung, Grab/Gojek Same-day,
     JNE Reguler). Origin: `config('store.address')` = *Jl. Sawahkurung IV No. 18B, Bandung*.
     Ongkir terpilih di-snapshot ke `shipments.shipping_amount`.
-  - **Sisa pekerjaan:** koneksi API Biteship **live** (Maps `areas` + Rates `couriers`)
-    belum ada; kontrak Biteship masih *partial* di `BRD.md` (OPN-016/OPN-021) dan
-    `SRS.md`. Fallback "notifikasi pelanggan hubungi admin" saat Biteship tidak merespons
-    juga belum ada (mock selalu mengembalikan tarif). **Butuh keputusan klien.**
+  - **Progress live API (siap pakai, menunggu origin_area_id):**
+    - `config/biteship.php` — konfigurasi base_url, api_key, origin_area_id, timeout
+    - `app/Services/Shipping/BiteshipShippingService.php` — Maps `areas` (cached 24h) + Rates `couriers`
+    - Fallback error di checkout view: notice "hubungi admin" + tampilkan Kurir Toko
+    - Driver switch: `config('store.shipping.driver')` = `mock` (default) | `biteship`
+    - Test: `tests/Feature/ShippingBiteshipTest.php` (6 tests)
+  - **Sisa pekerjaan:** `BITESHIP_ORIGIN_AREA_ID` dari klien untuk aktivasi di staging/production.
 
 - [x] **Task 8: Penggabungan Pengiriman (Order Grouping)**
   - **Implementasi aktual:** otomatis saat order dibuat —
@@ -161,7 +164,7 @@ terverifikasi oleh test.**
 | 4. Upload bukti bayar | ✅ Selesai | `OrderDetail::uploadPaymentProof` | — |
 | 5. Verifikasi pembayaran | ✅ Selesai | `AdminOrders`, `PaymentService` | — |
 | 6. Tarif kurir toko | ✅ Selesai | `StoreCourierRate` + settings | — |
-| 7. Biteship live | ⏳ Sebagian | `MockBiteshipShippingService` | API live + fallback; butuh keputusan klien |
+| 7. Biteship live | 🔄 Core ready | `BiteshipShippingService`, `config/biteship.php`, fallback notice, tests | `BITESHIP_ORIGIN_AREA_ID` dari klien |
 | 8. Penggabungan pengiriman | ✅ Selesai | `OrderService::shipmentGroupCode` | — |
 | 9. Fulfillment + resi | ✅ Selesai | `FulfillmentService` | — |
 | 10. Konfirmasi & TERKENDALA | ✅ Selesai | `confirmReceipt`, `AutoCompleteShippedOrders` | — |

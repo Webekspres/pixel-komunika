@@ -1,0 +1,58 @@
+---
+deployment:
+  tasks:
+    - |
+      set -euo pipefail
+
+      BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+      REPOSITORY="$(git rev-parse --show-toplevel)"
+      PHP=/usr/local/bin/ea-php83
+      COMPOSER=/home/pixelkom/bin/composer
+
+      case "$BRANCH" in
+        main)
+          EXPECTED_REPOSITORY=/home/pixelkom/repositories/store.pixelkomunika.com
+          DEPLOYPATH=/home/pixelkom/public_html/store.pixelkomunika.com
+          RUN_MIGRATIONS=false
+          ;;
+        staging)
+          EXPECTED_REPOSITORY=/home/pixelkom/repositories/dev.store.pixelkomunika.com
+          DEPLOYPATH=/home/pixelkom/public_html/dev.store.pixelkomunika.com
+          RUN_MIGRATIONS=true
+          ;;
+        *)
+          echo "Deployment ditolak: branch '$BRANCH' bukan main atau staging." >&2
+          exit 1
+          ;;
+      esac
+
+      if [ "$REPOSITORY" != "$EXPECTED_REPOSITORY" ]; then
+        echo "Deployment ditolak: branch '$BRANCH' harus berasal dari '$EXPECTED_REPOSITORY', bukan '$REPOSITORY'." >&2
+        exit 1
+      fi
+
+      if [ ! -f "$DEPLOYPATH/.env" ]; then
+        echo "Deployment ditolak: '$DEPLOYPATH/.env' tidak ditemukan." >&2
+        exit 1
+      fi
+
+      [ -x "$PHP" ] || { echo "PHP 8.3 tidak ditemukan di '$PHP'." >&2; exit 1; }
+      [ -f "$COMPOSER" ] || { echo "Composer tidak ditemukan di '$COMPOSER'." >&2; exit 1; }
+      command -v npm >/dev/null 2>&1 || { echo "npm tidak ditemukan pada PATH deployment cPanel." >&2; exit 1; }
+
+      echo "Deploying branch '$BRANCH' ke '$DEPLOYPATH'..."
+      git archive --format=tar HEAD | tar -xf - -C "$DEPLOYPATH"
+
+      cd "$DEPLOYPATH"
+      "$PHP" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+      npm ci --no-audit --no-fund
+      npm run build
+      "$PHP" artisan optimize:clear
+      "$PHP" artisan storage:link
+
+      if [ "$RUN_MIGRATIONS" = true ]; then
+        "$PHP" artisan migrate --force
+      fi
+
+      "$PHP" artisan optimize
+      echo "Deployment branch '$BRANCH' selesai."

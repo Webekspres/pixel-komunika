@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
                 'company_npwp' => config('store.npwp'),
                 'partai_minimum_quantity' => 5,
                 'origin_biteship_area_id' => config('biteship.origin_area_id') ?: 'IDNP9IDNC22IDND2043IDZ40132', // Coblong 40132 (Sawahkurung) fallback
+                'origin_biteship_label' => 'Coblong, Bandung, Jawa Barat (40132)',
                 'origin_postal_code' => '40132',
                 'is_active' => true,
             ],

@@ -86,17 +86,23 @@
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->company_npwp }}</dd>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Gudang Biteship Area ID</dt>
-                    <dd class="mt-0.5 font-mono text-sm font-semibold text-zinc-900">
-                        @if($store->origin_biteship_area_id)
-                            {{ $store->origin_biteship_area_id }} <span class="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">DB</span>
+                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Lokasi Gudang</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-zinc-900">
+                        @if($store->origin_biteship_label)
+                            {{ $store->origin_biteship_label }}
+                            <span class="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">DB</span>
+                            <span class="block mt-1 font-mono text-xs font-normal text-zinc-500">{{ $store->origin_biteship_area_id }} · {{ $store->origin_postal_code }}</span>
+                        @elseif($store->origin_biteship_area_id)
+                            <span class="font-mono">{{ $store->origin_biteship_area_id }}</span> <span class="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">DB</span>
+                            <span class="block mt-1 text-xs font-normal text-zinc-500">{{ $store->origin_postal_code }}</span>
                         @elseif(config('biteship.origin_area_id'))
-                            {{ config('biteship.origin_area_id') }} <span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">fallback .env</span>
+                            <span class="font-mono">{{ config('biteship.origin_area_id') }}</span> <span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">fallback .env</span>
+                            <span class="block mt-1 text-xs font-normal text-zinc-500">Coblong, Bandung, Jawa Barat (40132)</span>
                         @else
                             —
                         @endif
                     </dd>
-                    <p class="mt-1 text-[11px] text-zinc-400">Dipakai Biteship Rates — DB prioritas, .env fallback</p>
+                    <p class="mt-1 text-[11px] text-zinc-400">Dipakai untuk kalkulasi ongkir Biteship — DB prioritas, .env fallback</p>
                 </div>
                 <div class="sm:col-span-2">
                     <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Kode pos asal</dt>
@@ -139,12 +145,12 @@
                 <!-- Lokasi Gudang Biteship (origin) — DB primary, .env fallback -->
                 <div
                     x-data="{
-                        query: '',
+                        query: '{{ old('origin_biteship_label', $store->origin_biteship_label ?? '') }}',
                         results: [],
                         isLoading: false,
                         isOpen: false,
                         selectedId: '{{ old('origin_biteship_area_id', $store->origin_biteship_area_id ?? '') }}',
-                        selectedLabel: '',
+                        selectedLabel: '{{ addslashes(old('origin_biteship_label', $store->origin_biteship_label ?? '')) }}',
                         postalCode: '{{ old('origin_postal_code', $store->origin_postal_code ?? '') }}',
                         async search() {
                             if (this.query.length < 2) { this.results = []; this.isOpen = false; return; }
@@ -163,9 +169,10 @@
                             this.query = item.label || '';
                             this.results = [];
                             this.isOpen = false;
-                            // update hidden inputs
                             const idInput = document.getElementById('origin_biteship_area_id');
                             if (idInput) idInput.value = this.selectedId;
+                            const labelInput = document.getElementById('origin_biteship_label');
+                            if (labelInput) labelInput.value = this.selectedLabel;
                             const pcInput = document.getElementById('origin_postal_code');
                             if (pcInput && item.postal_code) pcInput.value = item.postal_code;
                         },
@@ -177,6 +184,8 @@
                             this.isOpen = false;
                             const idInput = document.getElementById('origin_biteship_area_id');
                             if (idInput) idInput.value = '';
+                            const labelInput = document.getElementById('origin_biteship_label');
+                            if (labelInput) labelInput.value = '';
                         }
                     }"
                     class="grid gap-3 rounded-xl border border-neutral-200 bg-neutral-50/50 p-3.5"
@@ -185,6 +194,7 @@
                     <div>
                         <label class="mb-1.5 block text-xs font-semibold text-zinc-700">Lokasi Gudang (Biteship Area) <span class="text-zinc-400 font-normal">— untuk kalkulasi ongkir, fallback .env jika kosong</span></label>
                         <input type="hidden" name="origin_biteship_area_id" id="origin_biteship_area_id" :value="selectedId" value="{{ old('origin_biteship_area_id', $store->origin_biteship_area_id ?? '') }}">
+                        <input type="hidden" name="origin_biteship_label" id="origin_biteship_label" :value="selectedLabel" value="{{ old('origin_biteship_label', $store->origin_biteship_label ?? '') }}">
                         <div class="flex items-center gap-2">
                             <div class="relative flex-1">
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
@@ -206,15 +216,23 @@
                         </div>
                         <!-- Selected preview -->
                         <div x-show="selectedId" x-cloak class="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
-                            <p class="font-semibold text-emerald-900">Terpilih: <span x-text="selectedLabel || selectedId"></span></p>
+                            <p class="font-semibold text-emerald-900" x-text="selectedLabel || 'Lokasi terpilih'"></p>
                             <p class="mt-0.5 font-mono text-[11px] text-emerald-700" x-text="selectedId"></p>
+                            <p class="mt-0.5 text-[11px] text-emerald-600">Kode pos: <span x-text="postalCode || '—'"></span></p>
                         </div>
                         <!-- Fallback info -->
                         <p class="mt-1.5 text-[11px] leading-snug text-zinc-500">
-                            Efektif: <span class="font-mono font-semibold text-zinc-700">{{ $store->origin_biteship_area_id ?: config('biteship.origin_area_id') ?: '— (akan pakai .env)' }}</span>
-                            @if(! $store->origin_biteship_area_id && config('biteship.origin_area_id'))
-                                <span class="text-amber-600">· fallback .env ({{ config('biteship.origin_area_id') }})</span>
-                            @endif
+                            Efektif: <span class="font-semibold text-zinc-700">
+                                @if($store->origin_biteship_label)
+                                    {{ $store->origin_biteship_label }} ({{ $store->origin_biteship_area_id }})
+                                @elseif($store->origin_biteship_area_id)
+                                    {{ $store->origin_biteship_area_id }}
+                                @elseif(config('biteship.origin_area_id'))
+                                    Coblong, Bandung, Jawa Barat ({{ config('biteship.origin_area_id') }}) <span class="text-amber-600">· fallback .env</span>
+                                @else
+                                    — (akan pakai .env)
+                                @endif
+                            </span>
                             <span class="text-zinc-400">· kosongkan untuk pakai .env</span>
                         </p>
                         <!-- Dropdown -->
@@ -232,9 +250,12 @@
                         <p x-show="isOpen && !isLoading && results.length===0 && query.length>=2" x-cloak class="mt-1 text-xs text-zinc-500">Tidak ada hasil — coba kata kunci lain atau isi manual ID di bawah.</p>
                     </div>
                     <details class="group">
-                        <summary class="cursor-pointer text-[11px] font-semibold text-zinc-500 hover:text-zinc-700">Isi manual Area ID</summary>
-                        <input type="text" placeholder="IDNP9IDNC22IDND2043IDZ40132" x-model="selectedId" @input="document.getElementById('origin_biteship_area_id').value = selectedId" class="mt-2 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 font-mono text-xs text-zinc-700 focus:border-brand-yellow focus:outline-none">
-                        <p class="mt-1 text-[11px] text-zinc-400">Gunakan jika sudah tahu ID dari Biteship Maps API (contoh Coblong 40132).</p>
+                        <summary class="cursor-pointer text-[11px] font-semibold text-zinc-500 hover:text-zinc-700">Isi manual</summary>
+                        <div class="mt-2 grid gap-2">
+                            <input type="text" placeholder="Label: Coblong, Bandung, Jawa Barat (40132)" x-model="selectedLabel" @input="document.getElementById('origin_biteship_label').value = selectedLabel" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs text-zinc-700 focus:border-brand-yellow focus:outline-none">
+                            <input type="text" placeholder="ID: IDNP9IDNC22IDND2043IDZ40132" x-model="selectedId" @input="document.getElementById('origin_biteship_area_id').value = selectedId" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 font-mono text-xs text-zinc-700 focus:border-brand-yellow focus:outline-none">
+                        </div>
+                        <p class="mt-1 text-[11px] text-zinc-400">Label readable untuk admin awam, ID dari Biteship Maps API (contoh Coblong 40132).</p>
                     </details>
                 </div>
 

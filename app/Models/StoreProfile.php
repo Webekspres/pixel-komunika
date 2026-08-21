@@ -15,6 +15,7 @@ class StoreProfile extends Model
         'company_npwp',
         'partai_minimum_quantity',
         'origin_biteship_area_id',
+        'origin_biteship_label',
         'origin_postal_code',
         'is_active',
     ];

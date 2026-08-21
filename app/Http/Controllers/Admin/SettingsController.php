@@ -58,12 +58,13 @@ class SettingsController extends Controller
             'company_npwp' => ['sometimes', 'required', 'string', 'max:32'],
             'partai_minimum_quantity' => ['sometimes', 'required', 'integer', 'min:1', 'max:100000'],
             'origin_biteship_area_id' => ['nullable', 'string', 'max:191'],
+            'origin_biteship_label' => ['nullable', 'string', 'max:255'],
             'origin_postal_code' => ['nullable', 'string', 'max:16'],
         ]);
 
         $store = StoreProfile::active() ?? new StoreProfile;
         $oldValues = $store->exists
-            ? $store->only(['store_name', 'address', 'contact_number', 'company_name', 'company_npwp', 'partai_minimum_quantity', 'origin_biteship_area_id', 'origin_postal_code'])
+            ? $store->only(['store_name', 'address', 'contact_number', 'company_name', 'company_npwp', 'partai_minimum_quantity', 'origin_biteship_area_id', 'origin_biteship_label', 'origin_postal_code'])
             : [];
 
         $store->fill([...$validated, 'is_active' => true])->save();

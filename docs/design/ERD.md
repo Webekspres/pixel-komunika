@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.6 - Klarifikasi Klien 12 Agustus 2026 |
-| Tanggal | Rabu, 12 Agustus 2026 |
+| Versi | 0.7 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Status | Internal - siap menjadi dasar migration MVP |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Detail field | [Data Dictionary](DATA_DICTIONARY.md) |
@@ -23,7 +23,7 @@ ERD ini sudah cukup untuk implementasi MVP. Bagian berikut masih
   ([OPN-022](../requirements/BRD.md#opn-022));
 - provider, credential, dan retry/fallback WhatsApp
   ([OPN-023](../requirements/BRD.md#opn-023));
-- tarif kurir toko, fallback berat/dimensi, kode layanan, akun, dan biaya
+- nilai tarif kurir toko per area, fallback berat/dimensi, kode layanan, akun, dan biaya
   provider ([OPN-010](../requirements/BRD.md#opn-010) dan
   [OPN-021](../requirements/BRD.md#opn-021)).
 

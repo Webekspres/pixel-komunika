@@ -4,8 +4,8 @@
 
 | Metadata | Nilai                                                                                                                          |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Versi    | 0.7 - Klarifikasi Klien 12 Agustus 2026                                                                                         |
-| Tanggal  | Rabu, 12 Agustus 2026                                                                                                           |
+| Versi    | 0.8 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026                                                                        |
+| Tanggal  | Jumat, 21 Agustus 2026                                                                                                           |
 | Status   | Internal - siap menjadi dasar migration MVP                                                                                    |
 | ERD      | [Entity Relationship Diagram](ERD.md)                                                                                          |
 | Sumber   | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
@@ -479,8 +479,9 @@ legal/reseller mengikuti OPN-008 dan [OPN-022](../requirements/BRD.md#opn-022).
 | updated_at  | DATETIME(6)     | Tidak | —           | Waktu perubahan.     |
 
 Seluruh kecamatan Kota Bandung dan Kabupaten Bandung dapat diaktifkan. ETA
-default H+1 hari kerja dan dapat menjadi H+2 bila kurir tidak tersedia; Minggu
-dan tanggal merah tidak dihitung. Tarif per area masih OPN-010.
+kurir toko adalah H+1 hari kerja. Jika `orders.subtotal_amount +
+orders.pph22_amount >= 1000000`, ongkir kurir toko menjadi Rp0; jika kurang,
+sistem memakai `rate_amount` area tujuan. Nilai tarif per area masih OPN-010.
 
 ### 6.2 `shipments`
 

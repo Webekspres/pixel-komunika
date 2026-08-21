@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.13 - Klarifikasi Klien 7-11 Agustus 2026 |
-| Tanggal | Selasa, 11 Agustus 2026 |
+| Versi | 0.14 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Target delivery | 45 hari kerja |
 | Product Owner / klien | Sylvi |
 | System Analyst | Sultan - Webekspres |
@@ -48,7 +48,7 @@ serta diproses admin.
 | MVP-009 | Order, invoice, riwayat, dan expiry | BR-014, BR-016 - BR-017, BR-030, BR-034; FR-POS-017, FR-ORD-001 - FR-ORD-005, FR-ORD-009 - FR-ORD-013 | Invoice tampil di website, dapat diunduh PDF, dan dikirim melalui WhatsApp/email; identitas toko di atas serta perusahaan/NPWP/akun reseller di bawah. Resi wajib hanya bila tersedia; tautan WhatsApp atau scheduler lima hari kerja menyelesaikan order, sedangkan `TERKENDALA` menahan scheduler. |
 | MVP-010 | Pembayaran transfer manual | BR-018 - BR-020; FR-PAY-001 - FR-PAY-007 | Pelanggan mengunggah bukti secara privat; admin menerima/menolak; status dan audit tercatat. |
 | MVP-011 | Pembatalan, retur, dan rekonsiliasi stok | BR-021 - BR-022; FR-ORD-006 - FR-ORD-008; FR-POS-012, FR-POS-018 | Pembatalan yang valid memakai satu status `CANCELLED`, menyimpan sumber `ADMIN`/`SYSTEM`, pelaku admin jika ada, alasan, dan waktu; kemudian membuat retur website, mengembalikan stok efektif, serta melaporkan retur ke POS setelah laporan penjualan asal diterima tanpa membuat retur ganda. |
-| MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025, BR-033; FR-SHP-001 - FR-SHP-008 | Kurir toko melayani seluruh kecamatan Kota/Kabupaten Bandung dengan SLA hari kerja. Biteship memakai origin toko, berat produk, dimensi produk besar, dan Grab/Gojek same-day; kegagalan meminta pelanggan menghubungi admin. Order beralamat sama dapat digrup untuk pengiriman. |
+| MVP-012 | Pengiriman kurir toko dan Biteship | BR-023 - BR-025, BR-033; FR-SHP-001 - FR-SHP-008 | Kurir toko melayani seluruh kecamatan Kota/Kabupaten Bandung dengan SLA H+1 hari kerja. Subtotal barang + PPh 22 sedikitnya Rp1.000.000 mendapat ongkir Rp0; nilai di bawahnya memakai tarif area. Biteship memakai origin toko, berat produk, dimensi produk besar, dan Grab/Gojek same-day; kegagalan meminta pelanggan menghubungi admin. Order beralamat sama dapat digrup untuk pengiriman. |
 | MVP-013 | Laporan dasar | BR-026; FR-RPT-001 - FR-RPT-003, FR-RPT-005 | Admin melihat transaksi, omzet, dan PPh 22 berdasarkan periode/area; omzet mulai saat `SHIPPED` dan tidak dihitung ganda saat `COMPLETED`. |
 | MVP-014 | Audit dan penanganan gangguan | BR-027 - BR-028; FR-POS-020; FR-AUD-001, FR-AUD-004; FRD Bagian 15 | Pelaporan penjualan/retur ke POS dan gangguan sinkronisasi tercatat; percobaan ulang tidak membuat laporan atau perubahan stok ganda. |
 | MVP-015 | Security dan authorization | SRS Bagian 12.3 | CSRF, validation, policy, rate limit, secure session, private upload, dan secret management lulus test relevan. |

@@ -60,12 +60,15 @@ Governance utama berada pada:
 
 ## Current Change Notice
 
-Jawaban tertulis klien pada 7-11 Agustus 2026 menetapkan formula PPh 22,
+Jawaban tertulis klien sampai 21 Agustus 2026 menetapkan formula PPh 22,
 penerapan harga partai, invoice website/PDF/WhatsApp/email, omzet saat dikirim,
 wilayah/SLA kurir toko, fallback Biteship, retensi bukti pembayaran, notifikasi
 admin, reseller versi pertama, pengiriman gabungan untuk alamat sama, serta
 konfirmasi penerimaan dan auto-complete lima hari kerja. Rincian dan sisa
 keputusan berada pada [BRD Bagian 15](requirements/BRD.md#15-keputusan-terbuka).
+Khusus kurir toko, subtotal barang ditambah PPh 22 sedikitnya Rp1.000.000
+mendapat gratis ongkir; nilai di bawahnya memakai tarif area dan dikirim H+1
+hari kerja.
 
 Production menggunakan shared hosting milik klien. Klien akan memberikan akses
 yang diperlukan kepada developer Webekspres untuk setup dan deployment;

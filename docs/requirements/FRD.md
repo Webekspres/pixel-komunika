@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.15 - Klarifikasi Klien 12 Agustus 2026 |
-| Tanggal | Rabu, 12 Agustus 2026 |
+| Versi | 0.16 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Dokumen induk | `BRD.md` |
@@ -239,10 +239,10 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-SHP-001 | Admin | Admin dapat mengelola tarif kurir toko untuk seluruh kecamatan di Kota Bandung dan Kabupaten Bandung. | Area aktif memiliki tarif; ETA H+1 hari kerja dan dapat menjadi H+2 jika kurir tidak tersedia; Minggu dan tanggal merah dikecualikan. | Baseline; tariff data open |
+| FR-SHP-001 | Admin | Admin dapat mengelola tarif kurir toko untuk seluruh kecamatan di Kota Bandung dan Kabupaten Bandung. | Area aktif memiliki tarif untuk transaksi di bawah ambang gratis ongkir; ETA kurir toko H+1 hari kerja. | Baseline; area-rate values open |
 | FR-SHP-002 | Sistem | Sistem menstandardisasi alamat melalui Biteship Maps API dan meminta pilihan layanan/estimasi ongkir melalui Rates API dari backend. | Credential tidak pernah dikirim ke browser; origin memakai Jl. Sawahkurung IV No. 18B, Bandung; berat berasal dari tiap produk; dimensi dikirim untuk produk berkapasitas besar; Grab/Gojek same-day memakai lokasi yang didukung provider. Detail fallback data mengikuti [OPN-021](BRD.md#opn-021). | Baseline; provider details partial |
 | FR-SHP-003 | Pelanggan | Pelanggan dapat memilih layanan pengiriman dari respons rate yang valid. | Layanan menampilkan nama kurir, nama/kode layanan, estimasi durasi, dan harga final. | Baseline |
-| FR-SHP-004 | Sistem | Ongkir terpilih masuk ke total dan invoice. | Snapshot menyimpan provider, kode/nama kurir, kode/nama layanan, estimasi, mata uang, harga final, area origin/destination, dan waktu quote; website tetap menjadi pemilik transaksi. | Baseline |
+| FR-SHP-004 | Sistem | Ongkir terpilih masuk ke total dan invoice. | Khusus kurir toko, server menghitung dasar dari subtotal barang + PPh 22: sedikitnya Rp1.000.000 menghasilkan ongkir Rp0, sedangkan nilai di bawahnya memakai tarif aktif area tujuan. Snapshot menyimpan provider, kode/nama kurir, kode/nama layanan, estimasi, mata uang, harga final, area origin/destination, dan waktu quote; website tetap menjadi pemilik transaksi. | Baseline |
 | FR-SHP-005 | Sistem | Kegagalan Biteship tidak menghasilkan ongkir Rp0 otomatis. | Checkout menampilkan instruksi agar pelanggan menghubungi admin. | Baseline |
 | FR-SHP-006 | Sistem | Website hanya memakai Biteship Maps dan Rates pada baseline. | Tidak ada request Biteship untuk draft order/order, booking/pickup, label, tracking, webhook, atau location management. | Baseline |
 | FR-SHP-007 | Sistem | Request Biteship memiliki timeout, validasi respons, dan retry terbatas. | Gangguan jaringan/5xx dapat dicoba ulang secara terbatas; 4xx autentikasi/validasi tidak diulang tanpa koreksi; request dan error teredaksi dapat ditelusuri melalui correlation ID. | Proposed |

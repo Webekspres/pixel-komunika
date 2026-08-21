@@ -4,8 +4,8 @@
 
 | Atribut | Nilai |
 |---|---|
-| Versi | 0.19 - Penyederhanaan Pertanyaan Terbuka 12 Agustus 2026 |
-| Tanggal | Rabu, 12 Agustus 2026 |
+| Versi | 0.20 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Status | Revised Working Baseline - klarifikasi klien diterapkan bertahap |
 | Persetujuan | Sylvi, Sultan, dan Pak Endang - 27 Juli 2026 |
 | Kebutuhan bisnis | `BRD.md` |
@@ -53,7 +53,7 @@ implementasi dilakukan iteratif per sprint.
 - Perubahan tetap harus menjaga backward compatibility, migration safety, test,
   observability, dan rollback.
 
-### 2.2 Change Notice dan Klarifikasi 27 Juli-12 Agustus 2026
+### 2.2 Change Notice dan Klarifikasi 27 Juli-21 Agustus 2026
 
 Klarifikasi klien pada 28 Juli 2026 menetapkan:
 
@@ -103,8 +103,8 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - omzet mulai diakui saat order berstatus `SHIPPED`;
 - bukti pembayaran disimpan lima tahun;
 - kurir toko mencakup seluruh kecamatan Kota/Kabupaten Bandung dengan target
-  H+1 hari kerja atau H+2 jika kurir tidak tersedia; Minggu/tanggal merah tidak
-  dihitung;
+  H+1 hari kerja; gratis ongkir berlaku ketika subtotal barang ditambah PPh 22
+  sedikitnya Rp1.000.000, sedangkan nilai di bawahnya memakai tarif area;
 - development memakai data contoh sampai akses POS dibuka setelah alur website
   berjalan; koordinasi akses dilakukan dengan Kak Rio sebagai PIC POS;
 - pesanan `WAITING_PAYMENT` otomatis dibatalkan pada hari kalender berikutnya;
@@ -606,6 +606,17 @@ keputusan terbuka diberi label `Provisional` dan diperbarui melalui migration
 serta change control setelah keputusan disetujui.
 
 ## 10. Transaction and Concurrency
+
+Perhitungan ongkir kurir toko dilakukan server-side sebelum total final dibuat:
+
+1. `dasar_gratis_ongkir = subtotal_amount + pph22_amount`;
+2. jika dasar sedikitnya `1000000`, `shipping_amount = 0`;
+3. jika dasar kurang dari `1000000`, `shipping_amount` memakai tarif aktif area
+   tujuan;
+4. `grand_total = subtotal_amount + pph22_amount + shipping_amount`.
+
+Ongkir tidak dimasukkan kembali ke dasar gratis ongkir. Nilai yang dipakai
+order dan invoice wajib berasal dari hasil perhitungan server yang sama.
 
 Operasi berikut harus atomik:
 

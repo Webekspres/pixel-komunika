@@ -7,8 +7,8 @@
 | Proyek | Website E-Commerce Custom Pixel Komunika |
 | Klien | Sylvi / pihak pemilik usaha |
 | Pengembang | PT Webekspres Teknologi Indonesia |
-| Versi | 0.18 - Penyederhanaan Pertanyaan Terbuka 12 Agustus 2026 |
-| Tanggal | Rabu, 12 Agustus 2026 |
+| Versi | 0.19 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Status | Approved Working Baseline - klarifikasi klien diterapkan bertahap |
 | Dokumen sumber | `../references/proposal-klien-sylvi-update-1.pdf` |
 | MVP delivery | `MVP.md` |
@@ -60,6 +60,7 @@ Status requirement:
 | CR-017 | Jumat-Selasa, 7-11 Agustus 2026 | Jawaban tertulis klien melalui WhatsApp | Klien memperjelas ownership nama produk, formula PPh 22, harga partai/grosir, isi dan channel invoice, omzet, kurir toko/Biteship, retensi bukti pembayaran, notifikasi admin, reseller, penggabungan pengiriman, serta penyelesaian order. | Requirement bisnis, fungsi, model data, user flow, dan keputusan terbuka diperbarui. Detail tarif multi-klasifikasi, penomoran akun reseller, nama legal perusahaan, ongkir/invoice order gabungan, provider WhatsApp, dan aturan poin tetap membutuhkan keputusan. | Partially resolved; baseline updated |
 | CR-018 | Rabu, 12 Agustus 2026 | Klarifikasi klien | Nama legal perusahaan yang digunakan saat ini adalah `Pixel Komunika` dan dapat diubah melalui panel admin. | Nilai awal identitas perusahaan ditetapkan dan tidak lagi menjadi pertanyaan terbuka. | Resolved |
 | CR-019 | Rabu, 12 Agustus 2026 | Arahan dokumentasi klien | Daftar pertanyaan hanya menampilkan hal yang belum terjawab; pertanyaan selesai dihapus dan keputusannya tetap berada pada requirement atau riwayat perubahan. | Bagian pertanyaan BRD, dokumen review klien, dan open technical items diringkas. | Documentation baseline updated |
+| CR-020 | Jumat, 21 Agustus 2026 | Klarifikasi klien Sylvi melalui WhatsApp | Khusus kurir toko, gratis ongkir berlaku ketika subtotal barang ditambah PPh 22 mencapai sedikitnya Rp1.000.000. Nilai di bawah ambang memakai tarif kurir toko, dan pengiriman dilakukan H+1. | BR-023, RULE-030, OPN-010, serta requirement dan desain turunannya diperbarui. Nilai tarif per area tetap menunggu data klien. | Threshold and H+1 resolved; area rates open |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -192,8 +193,9 @@ Proses penjualan membutuhkan kanal digital yang:
   WhatsApp ([keputusan parsial: lihat OPN-023](#opn-023)).
 - Pembatalan transaksi oleh admin pada hari kalender yang sama.
 - Pengiriman kurir toko ke seluruh kecamatan di Kota Bandung dan Kabupaten
-  Bandung dengan target H+1 hari kerja atau H+2 apabila kurir tidak tersedia;
-  Minggu dan tanggal merah tidak dihitung ([tarif masih terbuka: OPN-010](#opn-010)).
+  Bandung dengan target H+1 hari kerja. Ongkir menjadi Rp0 apabila subtotal
+  barang ditambah PPh 22 mencapai sedikitnya Rp1.000.000; transaksi di bawah
+  ambang memakai tarif per area ([nilai tarif masih terbuka: OPN-010](#opn-010)).
 - Estimasi ongkir melalui Biteship.
 - Laporan transaksi dan omzet berdasarkan periode dan wilayah; order mulai
   dihitung sebagai omzet ketika berstatus `SHIPPED`.
@@ -283,7 +285,7 @@ flowchart LR
 | BR-020 | Admin harus dapat menerima atau menolak bukti pembayaran. | Baseline |
 | BR-021 | Admin dapat membatalkan transaksi hanya pada tanggal kalender yang sama dengan transaksi; website menyimpan sumber `ADMIN`, admin pelaksana, alasan, dan waktu pembatalan, lalu mencatat retur dan mengembalikan stok efektif secara atomik. | Baseline |
 | BR-022 | Setiap retur website harus dilaporkan ke POS untuk mencatat retur dan menambah stok POS. Laporan retur tidak boleh diterapkan di POS sebelum laporan penjualan asal berhasil diterima atau direkonsiliasi, dan retry tidak boleh membuat retur ganda. | Baseline; API contract partially open |
-| BR-023 | Sistem harus mendukung kurir toko untuk seluruh kecamatan di Kota Bandung dan Kabupaten Bandung. Tarif dikelola per area. Target pengiriman H+1 hari kerja dan dapat menjadi H+2 jika kurir tidak tersedia; Minggu dan tanggal merah tidak dihitung. | Baseline; tarif area open |
+| BR-023 | Sistem harus mendukung kurir toko untuk seluruh kecamatan di Kota Bandung dan Kabupaten Bandung dengan target pengiriman H+1 hari kerja. Dasar gratis ongkir adalah subtotal barang ditambah PPh 22. Jika dasar tersebut sedikitnya Rp1.000.000, ongkir kurir toko menjadi Rp0; jika kurang, sistem memakai tarif per area. | Baseline; nilai tarif area open |
 | BR-024 | Biteship digunakan sebagai provider eksternal untuk standardisasi area melalui Maps API dan pilihan layanan/estimasi ongkir melalui Rates API; origin adalah Jl. Sawahkurung IV No. 18B, Bandung; berat berasal dari masing-masing produk; dimensi dipakai untuk produk berkapasitas besar; Grab dan Gojek ditawarkan untuk layanan same-day. Biteship bukan sumber order, stok, invoice, atau pembayaran website ([lihat OPN-021](#opn-021)). | Baseline; akun provider dan kriteria dimensi open |
 | BR-025 | Ongkir terpilih harus masuk ke total transaksi dan invoice. | Baseline |
 | BR-026 | Sistem harus menyediakan laporan transaksi dan omzet per periode dan wilayah, dengan nilai PPh 22 ditampilkan sebagai komponen terpisah. Order mulai dihitung sebagai omzet ketika berstatus `SHIPPED`. | Baseline |
@@ -329,6 +331,7 @@ flowchart LR
 | RULE-027 | Pembatalan admin dan pembatalan otomatis memakai satu status `CANCELLED`. Perbedaannya disimpan sebagai `cancellation_source` bernilai `ADMIN` atau `SYSTEM`, dilengkapi alasan, waktu, dan `cancelled_by_user_id` untuk sumber `ADMIN`; rincian order menampilkan keterangan sumber pembatalan. |
 | RULE-028 | Penggabungan pengiriman hanya boleh untuk order dengan alamat tujuan yang sama dan tidak menggabungkan nomor order atau invoice. Aturan pembebanan ongkir serta sinkronisasi status tetap mengikuti OPN-014. |
 | RULE-029 | Bukti pembayaran disimpan lima tahun sejak diunggah, kecuali kewajiban hukum mengharuskan lebih lama. |
+| RULE-030 | Khusus kurir toko, `dasar_gratis_ongkir = subtotal_amount + pph22_amount`. Jika dasar sedikitnya Rp1.000.000, `shipping_amount = 0`; jika kurang, `shipping_amount` memakai tarif aktif area tujuan. Ongkir tidak ikut dihitung ke dalam dasar gratis ongkir. |
 
 ## 11. Proses Bisnis Utama
 
@@ -593,10 +596,11 @@ ditetapkan sebagai validasi teknis tanpa mengurangi retensi tersebut.~~
 ### OPN-010
 
 Kurir toko melayani seluruh kecamatan di Kota Bandung dan Kabupaten Bandung.
-Target pengiriman H+1 hari kerja, dapat menjadi H+2 jika kurir tidak tersedia;
-Minggu dan tanggal merah tidak dihitung. Tarif per area masih dievaluasi.
+Target pengiriman H+1 hari kerja. Gratis ongkir berlaku jika subtotal barang
+ditambah PPh 22 sedikitnya Rp1.000.000; di bawah ambang tersebut, ongkir
+mengikuti tarif area tujuan. Nilai tarif per area masih dievaluasi.
 
-**Pemilik:** Klien · **Target:** Sebelum Sprint 3 · **Status:** Partially resolved - tariff open
+**Pemilik:** Klien · **Target:** Sebelum Sprint 3 · **Status:** Partially resolved - threshold/H+1 resolved; area-rate values open
 
 ### OPN-011
 
@@ -795,7 +799,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | PRE-001 | Keputusan scope PPh 22, ambang nilai klasifikasi, dan dampak scope. | Klien | G0 | Parsial - formula dasar gabungan `/1,11 × tarif` selesai; tarif multi-klasifikasi dan pembulatan tetap OPN-006 |
 | PRE-002 | Definisi tiga jenis harga, expiry pesanan, dan lifecycle order yang dapat diuji. | Klien / System Analyst | G1 Sprint 2 | Parsial - harga partai, expiry, dan lifecycle selesai; provider/calendar/poin pada OPN-020 tetap open |
 | PRE-003 | Kontrak POS atau dataset seeder tervalidasi beserta pemilik data. | Klien / Kak Rio / Webekspres | G1 integrasi | Parsial - operasi, cadence, PIC, dan trigger akses tersedia; payload, auth, idempotency, pembukaan koneksi aktual, dan contract test pada OPN-005/OPN-019 tetap blocker |
-| PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Parsial - origin, berat, dimensi produk besar, Grab/Gojek, fallback, area, dan SLA tersedia; tarif, fallback data, kode layanan, akun/biaya tetap OPN-010/OPN-021 |
+| PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Parsial - origin, berat, dimensi produk besar, Grab/Gojek, fallback, area, ambang gratis ongkir, dan SLA H+1 tersedia; nilai tarif per area, fallback data, kode layanan, serta akun/biaya tetap OPN-010/OPN-021 |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - nama legal, layout, sumber website, preview/PDF/channel, penerima, isi, dan read behavior selesai; format NPWP/akun reseller/nomor invoice serta provider/credential/retry tetap OPN-022/OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Parsial - shared hosting milik klien dan komitmen pemberian akses developer resolved pada OPN-001/CR-016; kredensial aktual, domain/DNS, akun layanan, kemampuan runtime, cron, log, backup, dan jadwal handoff masih perlu disediakan atau diverifikasi |
 | PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |

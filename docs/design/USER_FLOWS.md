@@ -4,8 +4,8 @@
 
 | Metadata | Nilai |
 |---|---|
-| Versi | 0.8 - Klarifikasi Klien 12 Agustus 2026 |
-| Tanggal | Rabu, 12 Agustus 2026 |
+| Versi | 0.9 - Klarifikasi Gratis Ongkir Kurir Toko 21 Agustus 2026 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Status | Internal - granular MVP flow |
 | Sumber | [BRD](../requirements/BRD.md), [FRD](../requirements/FRD.md), [SRS](../requirements/SRS.md), dan [MVP](../requirements/MVP.md) |
 | Model data | [ERD](ERD.md) dan [Data Dictionary](DATA_DICTIONARY.md) |
@@ -253,7 +253,10 @@ flowchart TD
     E -->|Kurir toko| F{"Tarif aktif tersedia untuk area?"}
     F -->|Tidak| G[/"Tampilkan kurir toko tidak tersedia"/]
     G --> E
-    F -->|Ya| H[/"Pilih tarif; ETA H+1 hari kerja<br/>atau H+2 bila kurir tidak tersedia"/]
+    F -->|Ya| H["Hitung subtotal barang + PPh 22"]
+    H --> H1{"Sedikitnya Rp1.000.000?"}
+    H1 -->|Ya| H2[/"Set ongkir Rp0;<br/>ETA H+1 hari kerja"/]
+    H1 -->|Tidak| H3[/"Pakai tarif area;<br/>ETA H+1 hari kerja"/]
     E -->|Biteship| I["Validasi origin toko, destination, kurir,<br/>nama, nilai, kuantitas, dan berat tiap item"]
     I --> J{"Data quote lengkap?"}
     J -->|Tidak| K[/"Tampilkan data quote yang belum lengkap"/]
@@ -263,7 +266,8 @@ flowchart TD
     M -->|Ya| N[/"Pilih kurir/layanan, durasi,<br/>mata uang, dan harga final"/]
     M -->|Tidak| P[/"Tampilkan checkout tertunda;<br/>minta pelanggan hubungi admin"/]
     P --> E
-    H --> Q[("Pilihan pengiriman sementara tersimpan")]
+    H2 --> Q[("Pilihan pengiriman sementara tersimpan")]
+    H3 --> Q
     N --> R[("Snapshot provider, kurir, layanan,<br/>area ID, price, hash request, dan waktu quote")]
     R --> Q
     Q --> C_UF08((UF-08))
@@ -271,8 +275,8 @@ flowchart TD
     click C_UF08 "#uf-08-validasi-checkout"
 ```
 
-Tarif kurir toko, definisi produk besar, fallback berat/dimensi, kode layanan,
-dan akun provider mengikuti
+Nilai tarif per area kurir toko, definisi produk besar, fallback berat/dimensi,
+kode layanan, dan akun provider mengikuti
 [OPN-010](../requirements/BRD.md#opn-010),
 [OPN-021](../requirements/BRD.md#opn-021).
 Biteship di flow ini adalah external Maps/Rates provider; flow tidak membuat
@@ -703,7 +707,7 @@ Provider, credential, dan retry/fallback mengikuti
 | [OPN-005](../requirements/BRD.md#opn-005) | Nama operasi laporan, payload, acknowledgement/lookup, autentikasi, error, idempotency, dan cutoff snapshot stok pada UF-09, UF-13, UF-14, UF-15. |
 | [OPN-002](../requirements/BRD.md#opn-002) | Cara order WhatsApp dicatat pada stok, invoice, dan laporan POS dari UF-05. |
 | [OPN-006](../requirements/BRD.md#opn-006) | Tarif multi-klasifikasi dan pembulatan PPh 22 pada UF-06/UF-17. |
-| [OPN-010](../requirements/BRD.md#opn-010) | Tarif per kecamatan kurir toko pada UF-07/UF-17. |
+| [OPN-010](../requirements/BRD.md#opn-010) | Nilai tarif per kecamatan kurir toko untuk transaksi di bawah ambang pada UF-07/UF-17. |
 | [OPN-014](../requirements/BRD.md#opn-014) | Pembebanan ongkir dan propagasi resi/status order gabungan. |
 | [OPN-021](../requirements/BRD.md#opn-021) | Definisi produk besar, fallback berat/dimensi, kode layanan, akun production, dan biaya provider pada UF-07. |
 | [OPN-022](../requirements/BRD.md#opn-022) | Format NPWP/akun reseller, nomor invoice, dan kontrak channel pada UF-09. |

@@ -11,9 +11,9 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-19
-- Fase aktif: UI/wiring frontend terhadap service selesai untuk alur inti; menuju Fase 6 (release readiness)
-- Status umum: alur end-to-end registrasi s/d verifikasi pembayaran + fulfillment aktif; status order kini mengikuti FRD (`PROCESSING` setelah bayar diterima, `payment_rejected` saat ditolak); branch `staging` dibuat; Pest 109/109
+- Tanggal update terakhir: 2026-08-21
+- Fase aktif: Backend MVP P0 (services/schema/jobs/seed) siap untuk wiring frontend
+- Status umum: skema ERD gap ditutup; service domain + adapter POS/WA stub + scheduler aktif; Pest 52/52
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -189,7 +189,7 @@ Dokumen ini dipakai untuk mencatat:
 - Konfirmasi parameter operasional Biteship
 - Provider / template / fallback WhatsApp
 - Verifikasi shared hosting: cron, log, backup, worker bounded
-- Tarif kurir toko per kecamatan dan kalender hari kerja/libur
+- Nilai tarif kurir toko per kecamatan untuk transaksi di bawah ambang gratis ongkir
 - Aturan nomor invoice serta nomor akun reseller
 - Aturan PPh 22 multi-kategori dan pembulatan
 - Aturan ongkir/status untuk penggabungan pesanan serta skema poin loyalitas
@@ -199,6 +199,8 @@ Dokumen ini dipakai untuk mencatat:
 - UI storefront memakai Blade + Livewire, bukan SPA.
 - Baseline production memakai shared hosting.
 - Data contoh dipakai sampai koneksi POS production siap.
+- Kurir toko gratis untuk subtotal barang + PPh 22 sedikitnya Rp1.000.000;
+  transaksi di bawah ambang memakai tarif area dan dikirim H+1 hari kerja.
 - Auth dibangun dengan fitur native Laravel session tanpa package auth tambahan.
 - Fondasi data katalog mengikuti jalur import/upsert yang sama dengan adapter POS.
 - POS menjadi sumber SKU dan data dasar produk; nama tampilan, media, berat, dan

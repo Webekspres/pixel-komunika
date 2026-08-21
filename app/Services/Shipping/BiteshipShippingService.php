@@ -18,8 +18,22 @@ class BiteshipShippingService implements ShippingCalculatorInterface
     {
         $this->baseUrl = rtrim(config('biteship.base_url'), '/');
         $this->apiKey = config('biteship.api_key');
-        $this->originAreaId = config('biteship.origin_area_id') ?? '';
+        $this->originAreaId = $this->resolveOriginAreaId();
         $this->timeout = config('biteship.timeout', 5);
+    }
+
+    protected function resolveOriginAreaId(): string
+    {
+        try {
+            $storeOrigin = \App\Models\StoreProfile::active()?->origin_biteship_area_id;
+            if (! empty($storeOrigin)) {
+                return $storeOrigin;
+            }
+        } catch (\Throwable $e) {
+            // fallback to env when DB not ready (migrations, testing)
+        }
+
+        return config('biteship.origin_area_id') ?? '';
     }
 
     public function calculateRates(string $destinationCity, int $weightGrams): array

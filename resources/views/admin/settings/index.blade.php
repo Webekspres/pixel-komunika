@@ -86,6 +86,19 @@
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->company_npwp }}</dd>
                 </div>
                 <div class="sm:col-span-2">
+                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Gudang Biteship Area ID</dt>
+                    <dd class="mt-0.5 font-mono text-sm font-semibold text-zinc-900">
+                        @if($store->origin_biteship_area_id)
+                            {{ $store->origin_biteship_area_id }} <span class="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">DB</span>
+                        @elseif(config('biteship.origin_area_id'))
+                            {{ config('biteship.origin_area_id') }} <span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">fallback .env</span>
+                        @else
+                            —
+                        @endif
+                    </dd>
+                    <p class="mt-1 text-[11px] text-zinc-400">Dipakai Biteship Rates — DB prioritas, .env fallback</p>
+                </div>
+                <div class="sm:col-span-2">
                     <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Kode pos asal</dt>
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->origin_postal_code ?: '—' }}</dd>
                 </div>
@@ -123,9 +136,112 @@
                     </div>
                 </div>
 
+                <!-- Lokasi Gudang Biteship (origin) — DB primary, .env fallback -->
+                <div
+                    x-data="{
+                        query: '',
+                        results: [],
+                        isLoading: false,
+                        isOpen: false,
+                        selectedId: '{{ old('origin_biteship_area_id', $store->origin_biteship_area_id ?? '') }}',
+                        selectedLabel: '',
+                        postalCode: '{{ old('origin_postal_code', $store->origin_postal_code ?? '') }}',
+                        async search() {
+                            if (this.query.length < 2) { this.results = []; this.isOpen = false; return; }
+                            this.isLoading = true;
+                            this.isOpen = true;
+                            try {
+                                const res = await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`);
+                                this.results = res.ok ? await res.json() : [];
+                            } catch(e) { this.results = []; }
+                            this.isLoading = false;
+                        },
+                        select(item) {
+                            this.selectedId = item.biteship_area_id || item.id || '';
+                            this.selectedLabel = item.label || '';
+                            this.postalCode = item.postal_code || this.postalCode;
+                            this.query = item.label || '';
+                            this.results = [];
+                            this.isOpen = false;
+                            // update hidden inputs
+                            const idInput = document.getElementById('origin_biteship_area_id');
+                            if (idInput) idInput.value = this.selectedId;
+                            const pcInput = document.getElementById('origin_postal_code');
+                            if (pcInput && item.postal_code) pcInput.value = item.postal_code;
+                        },
+                        clear() {
+                            this.selectedId = '';
+                            this.selectedLabel = '';
+                            this.query = '';
+                            this.results = [];
+                            this.isOpen = false;
+                            const idInput = document.getElementById('origin_biteship_area_id');
+                            if (idInput) idInput.value = '';
+                        }
+                    }"
+                    class="grid gap-3 rounded-xl border border-neutral-200 bg-neutral-50/50 p-3.5"
+                    @click.away="isOpen = false"
+                >
+                    <div>
+                        <label class="mb-1.5 block text-xs font-semibold text-zinc-700">Lokasi Gudang (Biteship Area) <span class="text-zinc-400 font-normal">— untuk kalkulasi ongkir, fallback .env jika kosong</span></label>
+                        <input type="hidden" name="origin_biteship_area_id" id="origin_biteship_area_id" :value="selectedId" value="{{ old('origin_biteship_area_id', $store->origin_biteship_area_id ?? '') }}">
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
+                                    <x-icon name="search" class="size-4" />
+                                </div>
+                                <input
+                                    type="text"
+                                    x-model="query"
+                                    @input.debounce.300ms="search()"
+                                    @focus="if(query.length>=2) isOpen = true"
+                                    placeholder="Ketik kecamatan/kota/kode pos gudang (mis. Coblong 40132)..."
+                                    class="w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-9 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                >
+                                <div x-show="isLoading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                </div>
+                            </div>
+                            <button type="button" x-show="selectedId" @click="clear()" class="shrink-0 rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-xs font-bold text-zinc-600 hover:bg-neutral-50">Hapus</button>
+                        </div>
+                        <!-- Selected preview -->
+                        <div x-show="selectedId" x-cloak class="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
+                            <p class="font-semibold text-emerald-900">Terpilih: <span x-text="selectedLabel || selectedId"></span></p>
+                            <p class="mt-0.5 font-mono text-[11px] text-emerald-700" x-text="selectedId"></p>
+                        </div>
+                        <!-- Fallback info -->
+                        <p class="mt-1.5 text-[11px] leading-snug text-zinc-500">
+                            Efektif: <span class="font-mono font-semibold text-zinc-700">{{ $store->origin_biteship_area_id ?: config('biteship.origin_area_id') ?: '— (akan pakai .env)' }}</span>
+                            @if(! $store->origin_biteship_area_id && config('biteship.origin_area_id'))
+                                <span class="text-amber-600">· fallback .env ({{ config('biteship.origin_area_id') }})</span>
+                            @endif
+                            <span class="text-zinc-400">· kosongkan untuk pakai .env</span>
+                        </p>
+                        <!-- Dropdown -->
+                        <div x-show="isOpen && results.length > 0" x-cloak class="relative">
+                            <div class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-neutral-200 bg-white py-1 shadow-lg">
+                                <template x-for="item in results" :key="item.id">
+                                    <button type="button" @click="select(item)" class="w-full text-left px-3.5 py-2.5 text-xs hover:bg-amber-50/80 transition border-b border-zinc-50 last:border-0">
+                                        <p class="font-bold text-zinc-900" x-text="item.label"></p>
+                                        <p class="text-[11px] text-zinc-500 mt-0.5"><span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span> <span x-show="item.postal_code" x-text="'('+item.postal_code+')'"></span></p>
+                                        <p class="font-mono text-[10px] text-zinc-400" x-text="item.biteship_area_id || item.id"></p>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                        <p x-show="isOpen && !isLoading && results.length===0 && query.length>=2" x-cloak class="mt-1 text-xs text-zinc-500">Tidak ada hasil — coba kata kunci lain atau isi manual ID di bawah.</p>
+                    </div>
+                    <details class="group">
+                        <summary class="cursor-pointer text-[11px] font-semibold text-zinc-500 hover:text-zinc-700">Isi manual Area ID</summary>
+                        <input type="text" placeholder="IDNP9IDNC22IDND2043IDZ40132" x-model="selectedId" @input="document.getElementById('origin_biteship_area_id').value = selectedId" class="mt-2 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 font-mono text-xs text-zinc-700 focus:border-brand-yellow focus:outline-none">
+                        <p class="mt-1 text-[11px] text-zinc-400">Gunakan jika sudah tahu ID dari Biteship Maps API (contoh Coblong 40132).</p>
+                    </details>
+                </div>
+
                 <div>
                     <label for="origin_postal_code" class="mb-1.5 block text-xs font-semibold text-zinc-700">Kode pos asal</label>
-                    <input id="origin_postal_code" name="origin_postal_code" type="text" maxlength="16" value="{{ old('origin_postal_code', $store->origin_postal_code) }}" placeholder="mis. 40111" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">
+                    <input id="origin_postal_code" name="origin_postal_code" type="text" maxlength="16" x-model="postalCode" value="{{ old('origin_postal_code', $store->origin_postal_code) }}" placeholder="mis. 40132" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">
+                    <p class="mt-1 text-[11px] text-zinc-400">Otomatis terisi saat pilih gudang di atas.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 border-t border-neutral-100 pt-4">

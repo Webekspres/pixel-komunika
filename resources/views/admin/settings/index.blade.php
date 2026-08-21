@@ -541,7 +541,7 @@
                             <tr class="border-b border-neutral-100">
                                 <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
                                 <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kecamatan</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kode Area</th>
+                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kode Pos</th>
                                 <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tarif</th>
                                 <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Estimasi</th>
                                 <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Aksi</th>
@@ -577,7 +577,7 @@
                                             <div x-show="editing" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="editing = false" @keydown.escape.window="editing = false">
                                                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
                                                     <h3 class="text-sm font-bold text-zinc-900">Edit Tarif — {{ $rate->area_name }}</h3>
-                                                    <form method="POST" action="{{ route('admin.settings.courier-rates.update', $rate) }}" class="mt-4 grid gap-3" x-data="{ query: '{{ addslashes($rate->area_name) }}', areaName: '{{ addslashes($rate->area_name) }}', areaCode: '{{ addslashes($rate->area_code ?? '') }}', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.biteship_area_id||item.id||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
+                                                    <form method="POST" action="{{ route('admin.settings.courier-rates.update', $rate) }}" class="mt-4 grid gap-3" x-data="{ query: '{{ addslashes($rate->area_name) }}', areaName: '{{ addslashes($rate->area_name) }}', areaCode: '{{ addslashes($rate->area_code ?? '') }}', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.postal_code||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="tab" value="kurir">
@@ -601,7 +601,7 @@
                                                                 <span class="text-zinc-500">Kecamatan:</span> <span class="font-semibold text-zinc-900" x-text="areaName||'—'"></span>
                                                             </div>
                                                             <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-mono">
-                                                                <span class="text-zinc-500">Kode:</span> <span class="text-zinc-700" x-text="areaCode||'—'"></span>
+                                                                <span class="text-zinc-500">Kode Pos:</span> <span class="text-zinc-700" x-text="areaCode||'—'"></span>
                                                             </div>
                                                         </div>
                                                         <input type="number" name="rate_amount" value="{{ $rate->rate_amount }}" required min="0" step="1" placeholder="Tarif (Rp)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
@@ -635,7 +635,7 @@
             <div x-show="addOpen" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="addOpen = false" @keydown.escape.window="addOpen = false">
                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
                     <h3 class="text-sm font-bold text-zinc-900">Tambah Tarif Kurir</h3>
-                    <form method="POST" action="{{ route('admin.settings.courier-rates.store') }}" class="mt-4 grid gap-3" x-data="{ query: '', areaName: '', areaCode: '', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.biteship_area_id||item.id||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
+                    <form method="POST" action="{{ route('admin.settings.courier-rates.store') }}" class="mt-4 grid gap-3" x-data="{ query: '', areaName: '', areaCode: '', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.postal_code||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
                         @csrf
                         <input type="hidden" name="tab" value="kurir">
                         <input type="hidden" name="area_name" :value="areaName" :required="!areaName">
@@ -658,7 +658,7 @@
                                 <span class="text-zinc-500">Kecamatan terpilih:</span> <span class="font-semibold text-zinc-900" x-text="areaName||'—'"></span>
                             </div>
                             <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-mono">
-                                <span class="text-zinc-500">Kode Biteship:</span> <span class="text-zinc-700" x-text="areaCode||'— (opsional)'"></span>
+                                <span class="text-zinc-500">Kode Pos:</span> <span class="text-zinc-700" x-text="areaCode||'— (opsional)'"></span>
                             </div>
                         </div>
                         <div class="grid gap-3 sm:grid-cols-2">

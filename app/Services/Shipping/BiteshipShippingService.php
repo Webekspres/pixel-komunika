@@ -74,15 +74,18 @@ class BiteshipShippingService implements ShippingCalculatorInterface
     protected function getStoreCourierRates(string $destinationCity, ?string $destinationDistrict = null): array
     {
         $city = mb_strtolower(trim($destinationCity));
+        $district = $destinationDistrict ? trim($destinationDistrict) : null;
 
-        if (! str_contains($city, 'bandung')) {
+        // If district supplied, match any district regardless of city (supports Karawang etc).
+        // If no district, only show store courier for Bandung (legacy fallback).
+        if ($district) {
+            // proceed to filter by district
+        } elseif (! str_contains($city, 'bandung')) {
             return [];
         }
 
         try {
             $query = \App\Models\StoreCourierRate::query()->where('is_active', true)->orderBy('rate_amount');
-
-            $district = $destinationDistrict ? trim($destinationDistrict) : null;
 
             if ($district) {
                 $normalizedDistrict = mb_strtolower($district);

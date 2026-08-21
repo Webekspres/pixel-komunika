@@ -14,35 +14,35 @@ class MockBiteshipShippingService implements ShippingCalculatorInterface
 
         $rates = [];
 
-        // Store courier for Bandung city/regency — filtered by district/kecamatan
-        if (str_contains($city, 'bandung')) {
+        // Store courier — filtered by district/kecamatan (any city). Fallback Bandung when no district.
+        $storeRates = collect();
+        if (! empty($destinationDistrict)) {
             $storeRates = $this->getFilteredStoreRates($destinationCity, $destinationDistrict);
-            foreach ($storeRates as $rate) {
-                $rates[] = [
-                    'provider' => Shipment::PROVIDER_STORE,
-                    'code' => 'store',
-                    'service' => 'Kurir Toko',
-                    'name' => 'Kurir Toko — '.$rate->area_name,
-                    'cost' => (float) $rate->rate_amount,
-                    'etd' => $rate->eta_text ?? 'H+1 hari kerja',
-                    'store_courier_rate_id' => $rate->id,
-                ];
-            }
+        } elseif (str_contains($city, 'bandung')) {
+            $storeRates = $this->getFilteredStoreRates($destinationCity, $destinationDistrict);
+        }
 
-            if ($storeRates->isEmpty() && empty($destinationDistrict)) {
-                // No district supplied and no rates at all — fallback generic (should not happen when seeded)
-                $all = StoreCourierRate::query()->where('is_active', true)->exists();
-                if (! $all) {
-                    $rates[] = [
-                        'provider' => Shipment::PROVIDER_STORE,
-                        'code' => 'store',
-                        'service' => 'Kurir Toko',
-                        'name' => 'Kurir Toko Bandung',
-                        'cost' => 10000.0,
-                        'etd' => 'H+1 hari kerja',
-                    ];
-                }
-            }
+        foreach ($storeRates as $rate) {
+            $rates[] = [
+                'provider' => Shipment::PROVIDER_STORE,
+                'code' => 'store',
+                'service' => 'Kurir Toko',
+                'name' => 'Kurir Toko — '.$rate->area_name,
+                'cost' => (float) $rate->rate_amount,
+                'etd' => $rate->eta_text ?? 'H+1 hari kerja',
+                'store_courier_rate_id' => $rate->id,
+            ];
+        }
+
+        if ($storeRates->isEmpty() && empty($destinationDistrict) && ! StoreCourierRate::query()->where('is_active', true)->exists()) {
+            $rates[] = [
+                'provider' => Shipment::PROVIDER_STORE,
+                'code' => 'store',
+                'service' => 'Kurir Toko',
+                'name' => 'Kurir Toko Bandung',
+                'cost' => 10000.0,
+                'etd' => 'H+1 hari kerja',
+            ];
         }
 
         $baseRate = 12000;

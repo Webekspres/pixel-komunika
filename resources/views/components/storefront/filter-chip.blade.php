@@ -3,7 +3,7 @@
     'onRemove' => null,
 ])
 
-<span {{ $attributes->class('inline-flex items-center gap-1.5 rounded-full bg-zinc-100 border border-zinc-200/80 px-3 py-1 text-xs font-semibold text-zinc-800') }}>
+<span {{ $attributes->class('inline-flex items-center gap-1.5 rounded-md bg-zinc-100 border border-zinc-200/80 px-3 py-1 text-xs font-semibold text-zinc-800') }}>
     <span>{{ $label }}</span>
     @if ($onRemove)
         <button

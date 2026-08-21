@@ -10,7 +10,7 @@
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="app-shell min-h-screen bg-neutral-50 font-sans text-zinc-950 antialiased">
+    <body class="app-shell min-h-screen bg-surface-2 font-sans text-zinc-950 antialiased">
         <div
             class="flex min-h-screen"
             x-data="{ sidebarOpen: false }"

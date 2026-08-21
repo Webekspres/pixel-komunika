@@ -9,7 +9,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-brand-white font-sans text-brand-black antialiased">
+    <body class="min-h-screen bg-surface-2 font-sans text-brand-black antialiased">
         <div class="min-h-screen bg-linear-to-b from-brand-yellow-muted/65 via-brand-white to-zinc-50">
             <header class="sticky top-0 z-30 border-b border-brand-black/8 bg-brand-white/88 backdrop-blur-xl">
                 <div class="container-2xl">

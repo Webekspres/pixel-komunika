@@ -67,7 +67,7 @@
                 <button
                     wire:click="$set('selectedBrand', 'all')"
                     type="button"
-                    class="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors {{ $selectedBrand === 'all' ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
+                    class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors {{ $selectedBrand === 'all' ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100 border border-zinc-200/80' }}"
                 >
                     Semua
                 </button>
@@ -75,7 +75,7 @@
                     <button
                         wire:click="$set('selectedBrand', '{{ $brand->id }}')"
                         type="button"
-                        class="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors {{ (string)$selectedBrand === (string)$brand->id ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100' }}"
+                        class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors {{ (string)$selectedBrand === (string)$brand->id ? 'bg-brand-black text-white' : 'bg-white text-brand-black/72 hover:bg-zinc-100 border border-zinc-200/80' }}"
                     >
                         {{ $brand->name }}
                     </button>
@@ -108,7 +108,7 @@
                     type="number"
                     wire:model.live.debounce.400ms="minPrice"
                     placeholder="0"
-                    class="w-full rounded-2xl border border-brand-black/10 bg-white px-3 py-2.5 text-xs text-brand-black focus:outline-none focus:ring-1 focus:ring-amber-400"
+                    class="w-full rounded-md border border-brand-black/10 bg-white px-3 py-2 text-xs text-brand-black focus:outline-none focus:ring-1 focus:ring-amber-400"
                 />
             </div>
             <div>
@@ -117,7 +117,7 @@
                     type="number"
                     wire:model.live.debounce.400ms="maxPrice"
                     placeholder="Tanpa batas"
-                    class="w-full rounded-2xl border border-brand-black/10 bg-white px-3 py-2.5 text-xs text-brand-black focus:outline-none focus:ring-1 focus:ring-amber-400"
+                    class="w-full rounded-md border border-brand-black/10 bg-white px-3 py-2 text-xs text-brand-black focus:outline-none focus:ring-1 focus:ring-amber-400"
                 />
             </div>
         </div>

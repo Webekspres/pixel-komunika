@@ -60,14 +60,14 @@
 
         {{-- Badge --}}
         @if ($badge)
-            <span class="absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeClasses }}">
+            <span class="absolute top-3 left-3 inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold {{ $badgeClasses }}">
                 {{ $badge }}
             </span>
         @endif
 
         {{-- Category badge --}}
         @if ($category)
-            <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-brand-black/70 backdrop-blur-sm">
+            <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md bg-white/90 px-2.5 py-1 text-xs font-medium text-brand-black/70 backdrop-blur-sm">
                 @if ($icon)
                     <x-icon :name="$icon" class="size-3" />
                 @endif
@@ -89,7 +89,7 @@
             </div>
 
             @if ($stockLabel)
-                <span class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold {{ $stockClasses }}">
+                <span class="shrink-0 rounded-md px-2.5 py-1 text-[10px] font-bold {{ $stockClasses }}">
                     {{ $stockLabel }}
                 </span>
             @endif
@@ -115,7 +115,7 @@
             </div>
 
             @if ($href)
-                <span class="inline-flex size-9 items-center justify-center rounded-full bg-brand-yellow transition duration-200 group-hover:translate-x-0.5">
+                <span class="inline-flex size-8 items-center justify-center rounded-md bg-brand-yellow transition duration-200 group-hover:translate-x-0.5">
                     <x-icon name="arrow-right" class="size-4 text-brand-black" />
                 </span>
             @endif
@@ -129,7 +129,7 @@
             <div class="mt-4 grid gap-2 sm:grid-cols-2">
                 <a
                     href="{{ $ctaHref }}"
-                    class="inline-flex items-center justify-center rounded-2xl px-4 py-3 text-xs font-bold transition {{ $ctaClasses }}"
+                    class="inline-flex items-center justify-center rounded-md px-4 py-2.5 text-xs font-bold transition {{ $ctaClasses }}"
                 >
                     {{ $ctaLabel }}
                 </a>

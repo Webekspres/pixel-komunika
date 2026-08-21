@@ -9,13 +9,13 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-brand-white font-sans text-brand-black antialiased">
+    <body class="min-h-screen bg-surface-2 font-sans text-brand-black antialiased">
         @php
             // Brand assets: public/assets/brand-logo.png + public/assets/mascot/Maskot-base.webp (not Figma SVG)
             $navCategories = \App\Models\Category::query()->orderBy('name')->limit(8)->get();
         @endphp
 
-        <div class="flex min-h-screen flex-col bg-white">
+        <div class="flex min-h-screen flex-col bg-surface-2">
             <x-storefront.navbar :categories="$navCategories" />
 
             <main class="flex-1">

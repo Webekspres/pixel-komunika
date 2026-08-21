@@ -65,7 +65,7 @@
                                 type="search"
                                 wire:model.live.debounce.300ms="search"
                                 placeholder="Cari nama produk atau SKU..."
-                            class="w-full rounded-2xl border border-brand-black/10 bg-white py-3 pr-4 pl-10 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                class="w-full rounded-md border border-brand-black/10 bg-white py-2.5 pr-4 pl-10 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-amber-400"
                             />
                         </div>
 
@@ -73,7 +73,7 @@
                         <button
                             @click="mobileFilterOpen = true"
                             type="button"
-                            class="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand-black/10 bg-white px-3.5 py-3 text-xs font-bold text-zinc-800 hover:bg-zinc-100 lg:hidden"
+                            class="inline-flex shrink-0 items-center gap-2 rounded-md border border-brand-black/10 bg-white px-3.5 py-2.5 text-xs font-bold text-zinc-800 hover:bg-zinc-100 lg:hidden"
                         >
                             <x-icon name="sliders-horizontal" class="size-4" />
                             <span>Filter</span>
@@ -90,7 +90,7 @@
                             <span class="text-xs text-zinc-400 hidden xl:inline">Urutkan:</span>
                             <select
                                 wire:model.live="sort"
-                                class="rounded-2xl border border-brand-black/10 bg-white px-3 py-2.5 text-xs font-semibold text-zinc-800 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                class="rounded-md border border-brand-black/10 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 focus:outline-none focus:ring-1 focus:ring-amber-400"
                             >
                                 <option value="newest">Terbaru</option>
                                 <option value="name_asc">Nama (A - Z)</option>
@@ -168,7 +168,7 @@
                                         <a
                                             href="{{ route('products.show', $product) }}"
                                             wire:navigate
-                                            class="inline-flex shrink-0 items-center justify-center rounded-2xl bg-zinc-100 px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
+                                            class="inline-flex shrink-0 items-center justify-center rounded-md bg-zinc-100 px-4 py-2.5 text-xs font-bold text-brand-black transition hover:bg-zinc-200"
                                         >
                                             Detail
                                         </a>
@@ -176,7 +176,7 @@
                                         <button
                                             wire:click="addToCart({{ $product->id }})"
                                             type="button"
-                                            class="inline-flex flex-1 items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-4 py-3 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
+                                            class="inline-flex flex-1 items-center justify-center gap-1 rounded-md bg-brand-yellow px-4 py-2.5 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                         >
                                             <x-icon name="shopping-cart" class="size-3.5" />
                                             <span>+ Keranjang</span>
@@ -210,7 +210,7 @@
     >
         <div
             @click.outside="mobileFilterOpen = false"
-            class="fixed inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl space-y-6"
+            class="fixed inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-xl bg-white p-6 shadow-2xl space-y-6"
         >
             <div class="flex items-center justify-between border-b border-zinc-200 pb-4">
                 <h3 class="font-bold text-zinc-900 text-lg">Filter Katalog</h3>
@@ -235,14 +235,14 @@
                     wire:click="resetFilters"
                     @click="mobileFilterOpen = false"
                     type="button"
-                    class="flex-1 py-3 rounded-2xl border border-zinc-200 text-xs font-bold text-zinc-700 text-center"
+                    class="flex-1 py-2.5 rounded-md border border-zinc-200 text-xs font-bold text-zinc-700 text-center"
                 >
                     Reset
                 </button>
                 <button
                     @click="mobileFilterOpen = false"
                     type="button"
-                    class="flex-1 py-3 rounded-2xl bg-amber-400 text-xs font-bold text-brand-black text-center shadow-xs"
+                    class="flex-1 py-2.5 rounded-md bg-amber-400 text-xs font-bold text-brand-black text-center shadow-xs"
                 >
                     Terapkan
                 </button>

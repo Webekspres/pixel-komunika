@@ -170,7 +170,7 @@
                                         <div class="grid gap-4 sm:grid-cols-2">
                                             <div>
                                                 <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
-                                                    Nama Penerima <span class="text-red-500">*</span>
+                                                    Nama Penerima <span class="text-red-500"></span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -183,7 +183,7 @@
                                             </div>
                                             <div>
                                                 <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
-                                                    Nomor Telepon <span class="text-red-500">*</span>
+                                                    Nomor Telepon <span class="text-red-500"></span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -196,17 +196,18 @@
                                             </div>
                                         </div>
 
-                                        <!-- Dropdown Bertingkat Wilayah Indonesia (Provinsi -> Kota/Kabupaten -> Kecamatan -> Kode Pos) -->
-                                        <x-storefront.region-select
+                                        <!-- Hybrid Autocomplete Wilayah Indonesia (Biteship & Fallback) -->
+                                        <x-storefront.area-autocomplete
                                             :province="$address->province_name"
                                             :city="$address->city_name"
                                             :district="$address->district_name"
                                             :postal-code="$address->postal_code"
+                                            :area-id="$address->biteship_area_id"
                                         />
 
                                         <div>
                                             <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
-                                                Alamat Lengkap <span class="text-red-500">*</span>
+                                                Alamat Lengkap <span class="text-red-500"></span>
                                             </label>
                                             <textarea
                                                 name="address_line"
@@ -302,7 +303,7 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
-                                    Nama Penerima <span class="text-red-500">*</span>
+                                    Nama Penerima <span class="text-red-500"></span>
                                 </label>
                                 <input
                                     type="text"
@@ -315,7 +316,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
-                                    Nomor Telepon <span class="text-red-500">*</span>
+                                    Nomor Telepon <span class="text-red-500"></span>
                                 </label>
                                 <input
                                     type="text"
@@ -328,17 +329,18 @@
                             </div>
                         </div>
 
-                        <!-- Dropdown Bertingkat Wilayah Indonesia (Provinsi -> Kota/Kabupaten -> Kecamatan -> Kode Pos) -->
-                        <x-storefront.region-select
+                        <!-- Hybrid Autocomplete Wilayah Indonesia (Biteship & Fallback) -->
+                        <x-storefront.area-autocomplete
                             :province="old('province_name', '')"
                             :city="old('city_name', '')"
                             :district="old('district_name', '')"
                             :postal-code="old('postal_code', '')"
+                            :area-id="old('biteship_area_id', '')"
                         />
 
                         <div>
                             <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
-                                Alamat Lengkap <span class="text-red-500">*</span>
+                                Alamat Lengkap <span class="text-red-500"></span>
                             </label>
                             <textarea
                                 name="address_line"

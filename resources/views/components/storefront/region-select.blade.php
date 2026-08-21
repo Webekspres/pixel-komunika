@@ -23,7 +23,6 @@
         selectedDistrict: '{{ addslashes($district) }}',
         availableDistricts: {{ json_encode($initialDistricts) }},
         isLoadingDistricts: false,
-        hasDistrictData: {{ json_encode(!empty($initialDistricts)) }},
         
         get availableCities() {
             if (!this.selectedProvince || !this.regionsData[this.selectedProvince]) {
@@ -37,14 +36,12 @@
                 this.selectedCity = '';
                 this.selectedDistrict = '';
                 this.availableDistricts = [];
-                this.hasDistrictData = false;
             }
         },
 
         async onCityChange() {
             this.selectedDistrict = '';
             this.availableDistricts = [];
-            this.hasDistrictData = false;
 
             if (!this.selectedCity) {
                 return;
@@ -57,7 +54,6 @@
                 if (response.ok) {
                     const data = await response.json();
                     this.availableDistricts = Array.isArray(data) ? data : [];
-                    this.hasDistrictData = this.availableDistricts.length > 0;
                 }
             } catch (e) {
                 console.error('Gagal memuat daftar kecamatan:', e);
@@ -133,17 +129,15 @@
 
     <!-- Baris 2: Kecamatan (Dropdown A-Z) & Kode Pos (Teks Opsional) -->
     <div class="grid gap-4 sm:grid-cols-2">
-        <!-- Field 3: Kecamatan (Dropdown Bertingkat A-Z) -->
+        <!-- Field 3: Kecamatan (Dropdown Bertingkat A-Z - Always Visible) -->
         <div>
             <label class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
                 Kecamatan <span class="text-red-500">*</span>
             </label>
-            <div class="relative" x-data="{ hasDistricts: {{ json_encode(!empty($initialDistricts)) }} }">
-                <!-- Dropdown: when district data is available -->
+            <div class="relative">
                 <select
                     name="district_name"
                     x-model="selectedDistrict"
-                    x-show="hasDistricts && (availableDistricts.length > 0 || selectedDistrict)"
                     :disabled="!selectedCity || isLoadingDistricts"
                     required
                     class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8 disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
@@ -152,33 +146,20 @@
                     <template x-for="districtItem in availableDistricts" :key="districtItem">
                         <option :value="districtItem" x-text="districtItem" :selected="districtItem === selectedDistrict"></option>
                     </template>
-                    <!-- Fallback if current saved district is not in list -->
                     <template x-if="selectedDistrict && !availableDistricts.includes(selectedDistrict)">
                         <option :value="selectedDistrict" x-text="selectedDistrict" selected></option>
                     </template>
                 </select>
-
-                <!-- Text Input: when no district data available for selected city -->
-                <input
-                    type="text"
-                    name="district_name"
-                    x-model="selectedDistrict"
-                    x-show="!hasDistricts && selectedCity && !isLoadingDistricts"
-                    :disabled="!selectedCity || isLoadingDistricts"
-                    required
-                    placeholder="Ketik nama kecamatan"
-                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
-                >
-
-                <!-- Loading indicator / Helper text -->
-                <div x-show="isLoadingDistricts" class="absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
-                    <svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                </div>
-                <div x-show="!isLoadingDistricts && !hasDistricts && selectedCity" class="absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
-                    <x-icon name="chevron-down" class="size-4" />
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
+                    <template x-if="isLoadingDistricts">
+                        <svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                    </template>
+                    <template x-if="!isLoadingDistricts">
+                        <x-icon name="chevron-down" class="size-4" />
+                    </template>
                 </div>
             </div>
         </div>

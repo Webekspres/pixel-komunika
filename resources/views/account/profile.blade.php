@@ -11,45 +11,74 @@
                 @method('PATCH')
 
                 <div class="grid gap-5 sm:grid-cols-2">
-                    <flux:input
-                        id="name"
-                        name="name"
-                        label="Nama Lengkap"
-                        value="{{ old('name', $user->name) }}"
-                        required
-                    />
+                    <div>
+                        <label for="name" class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                            Nama Lengkap <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            id="name"
+                            name="name"
+                            type="text"
+                            value="{{ old('name', $user->name) }}"
+                            placeholder="Nama lengkap Anda"
+                            required
+                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                        />
+                    </div>
 
-                    <flux:input
-                        id="phone"
-                        name="phone"
-                        label="Nomor Telepon (WhatsApp)"
-                        value="{{ old('phone', $user->phone) }}"
-                        required
-                    />
+                    <div>
+                        <label for="phone" class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                            Nomor Telepon (WhatsApp) <span class="text-red-500"></span>
+                        </label>
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="text"
+                            value="{{ old('phone', $user->phone) }}"
+                            placeholder="08xxxxxxxxxx"
+                            required
+                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                        />
+                    </div>
                 </div>
 
                 <div class="grid gap-5 sm:grid-cols-2">
-                    <flux:input
-                        id="business_name"
-                        name="business_name"
-                        label="Nama Usaha / Toko"
-                        placeholder="Misal: Toko Berkah Abadi"
-                        value="{{ old('business_name', $user->customerProfile?->business_name) }}"
-                    />
+                    <div>
+                        <label for="business_name" class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                            Nama Usaha / Toko
+                        </label>
+                        <input
+                            id="business_name"
+                            name="business_name"
+                            type="text"
+                            value="{{ old('business_name', $user->customerProfile?->business_name) }}"
+                            placeholder="Contoh: Toko Berkah Abadi"
+                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                        />
+                    </div>
 
-                    <flux:input
-                        id="email"
-                        label="Alamat Email"
-                        value="{{ $user->email }}"
-                        disabled
-                        readonly
-                    />
+                    <div>
+                        <label for="email" class="block text-xs sm:text-sm font-semibold text-zinc-700 mb-1.5">
+                            Alamat Email
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            value="{{ $user->email }}"
+                            disabled
+                            readonly
+                            class="w-full rounded-xl border border-zinc-200/80 bg-zinc-100 px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-500 cursor-not-allowed shadow-2xs"
+                        />
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-end pt-4 border-t border-zinc-100">
-                    <flux:button type="submit" variant="primary" class="rounded-xl">
+                    <button
+                        type="submit"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                    >
                         Simpan Perubahan
-                    </flux:button>
+                    </button>
                 </div>
             </form>
         </div>

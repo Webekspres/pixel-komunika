@@ -7,16 +7,16 @@ use App\Models\StoreCourierRate;
 
 class MockBiteshipShippingService implements ShippingCalculatorInterface
 {
-    public function calculateRates(string $destinationCity, int $weightGrams): array
+    public function calculateRates(string $destinationCity, int $weightGrams, ?string $destinationDistrict = null): array
     {
         $weightKg = max(1, (int) ceil($weightGrams / 1000));
         $city = strtolower($destinationCity);
 
         $rates = [];
 
-        // Store courier for Bandung city/regency (MVP-012)
+        // Store courier for Bandung city/regency — filtered by district/kecamatan
         if (str_contains($city, 'bandung')) {
-            $storeRates = StoreCourierRate::query()->where('is_active', true)->orderBy('rate_amount')->get();
+            $storeRates = $this->getFilteredStoreRates($destinationCity, $destinationDistrict);
             foreach ($storeRates as $rate) {
                 $rates[] = [
                     'provider' => Shipment::PROVIDER_STORE,
@@ -29,15 +29,19 @@ class MockBiteshipShippingService implements ShippingCalculatorInterface
                 ];
             }
 
-            if ($storeRates->isEmpty()) {
-                $rates[] = [
-                    'provider' => Shipment::PROVIDER_STORE,
-                    'code' => 'store',
-                    'service' => 'Kurir Toko',
-                    'name' => 'Kurir Toko Bandung',
-                    'cost' => 10000.0,
-                    'etd' => 'H+1 hari kerja',
-                ];
+            if ($storeRates->isEmpty() && empty($destinationDistrict)) {
+                // No district supplied and no rates at all — fallback generic (should not happen when seeded)
+                $all = StoreCourierRate::query()->where('is_active', true)->exists();
+                if (! $all) {
+                    $rates[] = [
+                        'provider' => Shipment::PROVIDER_STORE,
+                        'code' => 'store',
+                        'service' => 'Kurir Toko',
+                        'name' => 'Kurir Toko Bandung',
+                        'cost' => 10000.0,
+                        'etd' => 'H+1 hari kerja',
+                    ];
+                }
             }
         }
 
@@ -76,5 +80,29 @@ class MockBiteshipShippingService implements ShippingCalculatorInterface
         ]);
 
         return $rates;
+    }
+
+    protected function getFilteredStoreRates(string $city, ?string $district): \Illuminate\Support\Collection
+    {
+        $query = StoreCourierRate::query()->where('is_active', true)->orderBy('rate_amount');
+
+        $district = $district ? trim($district) : null;
+
+        if ($district) {
+            $normalizedDistrict = mb_strtolower($district);
+            $normalizedCity = mb_strtolower(trim($city));
+
+            return $query->get()->filter(function ($rate) use ($normalizedDistrict, $normalizedCity) {
+                $area = mb_strtolower(trim($rate->area_name));
+                $code = $rate->area_code ? mb_strtolower(trim($rate->area_code)) : null;
+
+                // Exact match on district/kecamatan or city or area_code
+                return $area === $normalizedDistrict
+                    || $area === $normalizedCity
+                    || ($code && ($code === $normalizedDistrict || $code === $normalizedCity));
+            })->values();
+        }
+
+        return $query->get();
     }
 }

@@ -44,7 +44,7 @@ class Checkout extends Component
         $cart = $cartService->getOrCreateCart($user, session()->getId());
         $summary = $cartService->getCartSummary($cart);
 
-        $availableRates = $shippingService->calculateRates($address->city_name, $summary['total_weight_grams']);
+        $availableRates = $shippingService->calculateRates($address->city_name, $summary['total_weight_grams'], $address->district_name);
         $selectedRate = collect($availableRates)->first(function ($rate) {
             return ($rate['code'].':'.$rate['service']) === $this->selectedCourierKey;
         });
@@ -73,16 +73,28 @@ class Checkout extends Component
         $summary = $cartService->getCartSummary($cart);
 
         $shippingRates = [];
+        $storeRates = [];
+        $biteshipRates = [];
         $selectedAddress = $addresses->firstWhere('id', $this->selectedAddressId);
 
         if ($selectedAddress) {
             $shippingRates = $shippingService->calculateRates(
                 $selectedAddress->city_name,
-                $summary['total_weight_grams']
+                $summary['total_weight_grams'],
+                $selectedAddress->district_name
             );
-            if (empty($this->selectedCourierKey) && ! empty($shippingRates)) {
-                $first = $shippingRates[0];
-                $this->selectedCourierKey = $first['code'].':'.$first['service'];
+
+            $storeRates = collect($shippingRates)->where('provider', \App\Models\Shipment::PROVIDER_STORE)->values()->all();
+            $biteshipRates = collect($shippingRates)->where('provider', \App\Models\Shipment::PROVIDER_BITESHIP)->values()->all();
+
+            $validKeys = collect($shippingRates)->map(fn ($r) => $r['code'].':'.$r['service'])->all();
+            if (empty($this->selectedCourierKey) || ! in_array($this->selectedCourierKey, $validKeys, true)) {
+                if (! empty($shippingRates)) {
+                    $first = $shippingRates[0];
+                    $this->selectedCourierKey = $first['code'].':'.$first['service'];
+                } else {
+                    $this->selectedCourierKey = null;
+                }
             }
         }
 
@@ -97,6 +109,9 @@ class Checkout extends Component
             'addresses' => $addresses,
             'summary' => $summary,
             'shippingRates' => $shippingRates,
+            'storeRates' => $storeRates,
+            'biteshipRates' => $biteshipRates,
+            'selectedAddress' => $selectedAddress,
             'shippingCost' => $shippingCost,
             'grandTotal' => $grandTotal,
         ])->layout('layouts.storefront');

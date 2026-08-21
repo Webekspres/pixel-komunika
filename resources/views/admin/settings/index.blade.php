@@ -577,13 +577,32 @@
                                             <div x-show="editing" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="editing = false" @keydown.escape.window="editing = false">
                                                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
                                                     <h3 class="text-sm font-bold text-zinc-900">Edit Tarif — {{ $rate->area_name }}</h3>
-                                                    <form method="POST" action="{{ route('admin.settings.courier-rates.update', $rate) }}" class="mt-4 grid gap-3">
+                                                    <form method="POST" action="{{ route('admin.settings.courier-rates.update', $rate) }}" class="mt-4 grid gap-3" x-data="{ query: '{{ addslashes($rate->area_name) }}', areaName: '{{ addslashes($rate->area_name) }}', areaCode: '{{ addslashes($rate->area_code ?? '') }}', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.biteship_area_id||item.id||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="tab" value="kurir">
-                                                        <div class="grid gap-3 sm:grid-cols-2">
-                                                            <input type="text" name="area_name" value="{{ $rate->area_name }}" required maxlength="191" placeholder="* Kecamatan" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
-                                                            <input type="text" name="area_code" value="{{ $rate->area_code }}" maxlength="32" placeholder="Kode area (opsional)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                                                        <input type="hidden" name="area_name" :value="areaName">
+                                                        <input type="hidden" name="area_code" :value="areaCode">
+                                                        <div class="relative">
+                                                            <input type="text" x-model="query" @input.debounce.300ms="areaName=query; search()" @focus="if(query.length>=2) open=true" placeholder="* Kecamatan — ketik & pilih dari Biteship" required maxlength="191" class="w-full rounded-xl border border-neutral-200 pl-3 pr-9 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                                                            <div x-show="loading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg></div>
+                                                            <div x-show="open && results.length>0" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+                                                                <template x-for="item in results" :key="item.id">
+                                                                    <button type="button" @click="select(item)" class="w-full text-left px-3.5 py-2.5 text-xs hover:bg-amber-50/80 transition border-b border-zinc-50 last:border-0">
+                                                                        <p class="font-bold text-zinc-900" x-text="item.label"></p>
+                                                                        <p class="text-[11px] text-zinc-500"><span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span> <span x-show="item.postal_code" x-text="'('+item.postal_code+')'"></span></p>
+                                                                        <p class="font-mono text-[10px] text-zinc-400" x-text="item.biteship_area_id||item.id"></p>
+                                                                    </button>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid gap-2 sm:grid-cols-2">
+                                                            <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs">
+                                                                <span class="text-zinc-500">Kecamatan:</span> <span class="font-semibold text-zinc-900" x-text="areaName||'—'"></span>
+                                                            </div>
+                                                            <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-mono">
+                                                                <span class="text-zinc-500">Kode:</span> <span class="text-zinc-700" x-text="areaCode||'—'"></span>
+                                                            </div>
                                                         </div>
                                                         <input type="number" name="rate_amount" value="{{ $rate->rate_amount }}" required min="0" step="1" placeholder="Tarif (Rp)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                                                         <input type="text" name="eta_text" value="{{ $rate->eta_text }}" maxlength="100" placeholder="Estimasi (opsional)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
@@ -616,12 +635,31 @@
             <div x-show="addOpen" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="addOpen = false" @keydown.escape.window="addOpen = false">
                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
                     <h3 class="text-sm font-bold text-zinc-900">Tambah Tarif Kurir</h3>
-                    <form method="POST" action="{{ route('admin.settings.courier-rates.store') }}" class="mt-4 grid gap-3">
+                    <form method="POST" action="{{ route('admin.settings.courier-rates.store') }}" class="mt-4 grid gap-3" x-data="{ query: '', areaName: '', areaCode: '', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.biteship_area_id||item.id||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
                         @csrf
                         <input type="hidden" name="tab" value="kurir">
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <input type="text" name="area_name" placeholder="* Kecamatan (mis. Coblong)" required maxlength="191" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
-                            <input type="text" name="area_code" placeholder="Kode area (opsional)" maxlength="32" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                        <input type="hidden" name="area_name" :value="areaName" :required="!areaName">
+                        <input type="hidden" name="area_code" :value="areaCode">
+                        <div class="relative">
+                            <input type="text" x-model="query" @input.debounce.300ms="areaName=query; search()" @focus="if(query.length>=2) open=true" placeholder="* Kecamatan — ketik & pilih dari Biteship (mis. Coblong)" required maxlength="191" class="w-full rounded-xl border border-neutral-200 pl-3 pr-9 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                            <div x-show="loading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg></div>
+                            <div x-show="open && results.length>0" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+                                <template x-for="item in results" :key="item.id">
+                                    <button type="button" @click="select(item)" class="w-full text-left px-3.5 py-2.5 text-xs hover:bg-amber-50/80 transition border-b border-zinc-50 last:border-0">
+                                        <p class="font-bold text-zinc-900" x-text="item.label"></p>
+                                        <p class="text-[11px] text-zinc-500"><span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span> <span x-show="item.postal_code" x-text="'('+item.postal_code+')'"></span></p>
+                                        <p class="font-mono text-[10px] text-zinc-400" x-text="item.biteship_area_id||item.id"></p>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="grid gap-2 sm:grid-cols-2">
+                            <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs">
+                                <span class="text-zinc-500">Kecamatan terpilih:</span> <span class="font-semibold text-zinc-900" x-text="areaName||'—'"></span>
+                            </div>
+                            <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-mono">
+                                <span class="text-zinc-500">Kode Biteship:</span> <span class="text-zinc-700" x-text="areaCode||'— (opsional)'"></span>
+                            </div>
                         </div>
                         <div class="grid gap-3 sm:grid-cols-2">
                             <input type="number" name="rate_amount" placeholder="* Tarif (Rp)" required min="0" step="1" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">

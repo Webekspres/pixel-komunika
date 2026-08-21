@@ -129,6 +129,9 @@ it('rejects payment with audit and retain_until on upload', function () {
         ->and(AuditLog::where('action', 'PAYMENT_REJECTED')->exists())->toBeTrue();
 });
 
+use App\Models\InventoryLedger;
+use App\Models\InventorySnapshot;
+
 it('processes return approve into sales_return outbox', function () {
     ['customer' => $customer, 'admin' => $admin, 'address' => $address] = mvpCustomer();
 
@@ -144,12 +147,26 @@ it('processes return approve into sales_return outbox', function () {
     $order->update(['status' => 'shipped']);
     $order->shipment->update(['status' => 'SHIPPED', 'shipped_at' => now()]);
 
+    $snapshotBeforeReturn = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
+
     $return = app(OrderService::class)->requestReturn($order, $customer, 'Barang rusak');
     app(OrderService::class)->processReturn($return, 'approve', null, $admin, 'OK');
 
+    $snapshotAfterReturn = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
+    expect($snapshotAfterReturn)->toBe($snapshotBeforeReturn + 1);
+
+    $ledgerEntry = InventoryLedger::where('product_id', $product->id)
+        ->where('source', 'ORDER_RETURNED')
+        ->where('external_reference', $order->order_number)
+        ->latest('occurred_at')
+        ->first();
+
     expect($return->fresh()->status)->toBe('approved')
         ->and(SalesReturn::where('order_id', $order->id)->exists())->toBeTrue()
-        ->and(PosIntegrationOperation::where('operation', 'WEB_RETURN_REPORT')->where('order_id', $order->id)->exists())->toBeTrue();
+        ->and(PosIntegrationOperation::where('operation', 'WEB_RETURN_REPORT')->where('order_id', $order->id)->exists())->toBeTrue()
+        ->and($ledgerEntry)->not->toBeNull()
+        ->and($ledgerEntry->quantity_delta)->toBe(1)
+        ->and($ledgerEntry->quantity_after)->toBe($snapshotBeforeReturn + 1);
 });
 
 it('holds auto-complete when shipment is TERKENDALA and completes otherwise', function () {

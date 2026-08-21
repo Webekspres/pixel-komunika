@@ -168,6 +168,7 @@ terverifikasi oleh test.**
 | 11. Notifikasi + WhatsApp | ✅ Selesai (log/fake) | `NotificationService`, dispatch command | Provider WhatsApp produksi |
 | 12. Laporan omzet/PPh 22 | ✅ Selesai | Reports admin + `AdminReportTest` | — |
 | 13. Audit & hardening | ✅ Selesai | `AuditLogger`, transaksi + locking | — |
+| C. Verifikasi ledger retur | ✅ Selesai | `PaymentAndReturnTest` + `BackendMvpReadyTest` assert `source = ORDER_RETURNED` | — |
 
 ---
 
@@ -189,6 +190,5 @@ terverifikasi oleh test.**
    flow konfirmasi token & auto-complete siap diuji).
 
 **Sisa pekerjaan sprint yang perlu direncanakan:** (1) Biteship live + fallback,
-(2) provider WhatsApp produksi — keduanya menunggu keputusan klien. Verifikasi
-ledger retur sudah ditutup: retur memakai `source = ORDER_RETURNED`
-(`OrderService::restoreStock`). Rincian langkah: `SPRINT_3_PLAN.md`.
+(2) provider WhatsApp produksi — keduanya menunggu keputusan klien.
+Verifikasi ledger retur **sudah selesai** (test `PaymentAndReturnTest` + `BackendMvpReadyTest` memvalidasi `source = ORDER_RETURNED`). Rincian langkah: `SPRINT_3_PLAN.md`.

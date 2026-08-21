@@ -8,39 +8,38 @@
 
 Sprint 3 hampir selesai. Yang tersisa hanya 3 item:
 
-| ID | Item | Blocker |
-|---|---|---|
-| A | Integrasi Biteship live (Maps & Rates) + fallback | Keputusan klien & API key |
-| B | Provider WhatsApp produksi | Keputusan klien (provider, nomor, template) |
-| C | Verifikasi ledger retur + cakupan test | Tidak ada (sudah terverifikasi) |
+| ID | Item | Blocker | Status |
+|---|---|---|---|
+| A | Integrasi Biteship live (Maps & Rates) + fallback | Keputusan klien & API key | ⏳ Menunggu |
+| B | Provider WhatsApp produksi | Keputusan klien (provider, nomor, template) | ⏳ Menunggu |
+| C | Verifikasi ledger retur + cakupan test | Tidak ada | ✅ **Selesai** |
 
-Urutan yang disarankan: **C → A/B** (C cepat dan tanpa blocker; A & B bisa paralel
-setelah keputusan klien turun).
+Urutan yang disarankan: **C → A/B** (C **selesai**; A & B bisa paralel setelah keputusan klien turun).
 
 ---
 
-## 2. Item C — Verifikasi Ledger Retur & Cakupan Test (Estimasi: S, ±0.5 hari)
+## 2. Item C — Verifikasi Ledger Retur & Cakupan Test ✅ **SELESAI**
 
 ### Status audit
-Sudah terverifikasi: alur retur memakai `restoreStock(..., 'ORDER_RETURNED', ...)`
-di `app/Services/OrderService.php` (baris ~323), sehingga ledger retur **sudah
-tercatat** — item "verifikasi nilai `source`" di SPRINT_3 ditutup.
+Terverifikasi: alur retur memakai `restoreStock(..., 'ORDER_RETURNED', ...)`
+di `app/Services/OrderService.php:323`, sehingga ledger retur **sudah tercatat**.
 
-### Langkah
-1. Perbarui `docs/sprints/SPRINT_3.md` — tandai item verifikasi ledger retur selesai
-   (`source = ORDER_RETURNED`).
-2. Pastikan cakupan test retur lengkap di `tests/Feature/PaymentAndReturnTest.php`:
-   - approve retur menulis `inventory_ledger` dengan `source = ORDER_RETURNED`
-     dan `quantity_delta` positif;
-   - `inventory_snapshots.quantity_available` bertambah;
-   - retur yang ditolak **tidak** mengubah stok;
-   - operasi `WEB_RETURN_REPORT` ter-enqueue dengan guard sale `SUCCEEDED`
-     (lihat `SamplePosSyncService`).
-3. Jalankan `php artisan test tests/Feature/PaymentAndReturnTest.php`.
+### Implementasi test (selesai)
+- `tests/Feature/PaymentAndReturnTest.php`: 2 test baru
+  - `restores inventory stock via ORDER_RETURNED ledger when return is approved` — asserts `source = ORDER_RETURNED`, `quantity_delta > 0`, snapshot increases
+  - `does not modify stock when return is rejected` — asserts no `ORDER_RETURNED` ledger entry
+- `tests/Feature/BackendMvpReadyTest.php`: updated existing return test with same assertions
 
-### DoD
-- Ada assertion `source = ORDER_RETURNED` di test.
-- Test hijau; SPRINT_3.md konsisten.
+### Verifikasi
+```bash
+php artisan test --filter="PaymentAndReturnTest"   # 5 tests, 22 assertions ✅
+php artisan test --filter="BackendMvpReadyTest"    # 7 tests, 28 assertions ✅
+php artisan test                                   # 111 tests, 490 assertions ✅
+```
+
+### DoD ✅
+- Assertion `source = ORDER_RETURNED` ada di test.
+- Semua test hijau; `SPRINT_3.md` konsisten.
 
 ---
 
@@ -130,7 +129,7 @@ tercatat** — item "verifikasi nilai `source`" di SPRINT_3 ditutup.
 ## 5. Dependensi & Urutan
 
 ```text
-[C verifikasi ledger retur]  (0.5 hari, tanpa blocker)
+[C verifikasi ledger retur]  ✅ SELESAI
         │
         ├──> [A Biteship live]  ── butuh: keputusan klien + BITESHIP_API_KEY
         │

@@ -5,6 +5,7 @@ use App\Livewire\Customer\OrderDetail;
 use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\CustomerProfile;
+use App\Models\InventoryLedger;
 use App\Models\InventorySnapshot;
 use App\Models\Order;
 use App\Models\Product;
@@ -180,4 +181,116 @@ it('restores inventory stock when an order is cancelled', function () {
     expect($snapshotAfterCancel)->toBe($snapshotBefore);
     expect($order->fresh()->status)->toBe('cancelled');
     expect($order->fresh()->cancellation_source)->toBe('SYSTEM');
+});
+
+it('restores inventory stock via ORDER_RETURNED ledger when return is approved', function () {
+    $customerRole = Role::firstOrCreate(['code' => Role::CUSTOMER], ['name' => Role::CUSTOMER]);
+    $adminRole = Role::firstOrCreate(['code' => Role::ADMIN], ['name' => Role::ADMIN]);
+
+    $customer = User::factory()->create(['role_id' => $customerRole->id]);
+    CustomerProfile::create([
+        'user_id' => $customer->id,
+        'verification_status' => 'approved',
+    ]);
+
+    $admin = User::factory()->create(['role_id' => $adminRole->id]);
+
+    $address = Address::create([
+        'user_id' => $customer->id,
+        'recipient_name' => 'Toko Komunika',
+        'recipient_phone' => '08123456789',
+        'address_line' => 'Jl. Merdeka No 123',
+        'province_name' => 'DKI Jakarta',
+        'city_name' => 'Jakarta Selatan',
+        'district_name' => 'Kebayoran Baru',
+        'postal_code' => '12110',
+        'is_default' => true,
+    ]);
+
+    $product = Product::first();
+    $cartService = app(CartService::class);
+    $cart = $cartService->getOrCreateCart($customer);
+    $cartService->addItem($cart, $product->id, 2);
+
+    $orderService = app(OrderService::class);
+    $order = $orderService->createOrderFromCart($customer, $cart, $address, [
+        'code' => 'jne',
+        'service' => 'REG',
+        'cost' => 15000,
+    ]);
+
+    $order->update(['status' => 'shipped']);
+    $order->shipment->update(['status' => 'SHIPPED', 'shipped_at' => now()]);
+
+    $snapshotBeforeReturn = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
+
+    $return = $orderService->requestReturn($order, $customer, 'Barang rusak');
+    $orderService->processReturn($return, 'approve', null, $admin, 'OK');
+
+    $snapshotAfterReturn = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
+    expect($snapshotAfterReturn)->toBe($snapshotBeforeReturn + 2);
+
+    $ledgerEntry = InventoryLedger::where('product_id', $product->id)
+        ->where('source', 'ORDER_RETURNED')
+        ->where('external_reference', $order->order_number)
+        ->latest('occurred_at')
+        ->first();
+
+    expect($ledgerEntry)->not->toBeNull()
+        ->and($ledgerEntry->quantity_delta)->toBe(2)
+        ->and($ledgerEntry->quantity_after)->toBe($snapshotBeforeReturn + 2);
+});
+
+it('does not modify stock when return is rejected', function () {
+    $customerRole = Role::firstOrCreate(['code' => Role::CUSTOMER], ['name' => Role::CUSTOMER]);
+    $adminRole = Role::firstOrCreate(['code' => Role::ADMIN], ['name' => Role::ADMIN]);
+
+    $customer = User::factory()->create(['role_id' => $customerRole->id]);
+    CustomerProfile::create([
+        'user_id' => $customer->id,
+        'verification_status' => 'approved',
+    ]);
+
+    $admin = User::factory()->create(['role_id' => $adminRole->id]);
+
+    $address = Address::create([
+        'user_id' => $customer->id,
+        'recipient_name' => 'Toko Komunika',
+        'recipient_phone' => '08123456789',
+        'address_line' => 'Jl. Merdeka No 123',
+        'province_name' => 'DKI Jakarta',
+        'city_name' => 'Jakarta Selatan',
+        'district_name' => 'Kebayoran Baru',
+        'postal_code' => '12110',
+        'is_default' => true,
+    ]);
+
+    $product = Product::first();
+    $cartService = app(CartService::class);
+    $cart = $cartService->getOrCreateCart($customer);
+    $cartService->addItem($cart, $product->id, 2);
+
+    $orderService = app(OrderService::class);
+    $order = $orderService->createOrderFromCart($customer, $cart, $address, [
+        'code' => 'jne',
+        'service' => 'REG',
+        'cost' => 15000,
+    ]);
+
+    $order->update(['status' => 'shipped']);
+    $order->shipment->update(['status' => 'SHIPPED', 'shipped_at' => now()]);
+
+    $snapshotBeforeReject = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
+
+    $return = $orderService->requestReturn($order, $customer, 'Barang rusak');
+    $orderService->processReturn($return, 'reject', 0, $admin, 'Tidak valid');
+
+    $snapshotAfterReject = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
+    expect($snapshotAfterReject)->toBe($snapshotBeforeReject);
+
+    $ledgerEntry = InventoryLedger::where('product_id', $product->id)
+        ->where('source', 'ORDER_RETURNED')
+        ->where('external_reference', $order->order_number)
+        ->exists();
+    expect($ledgerEntry)->toBeFalse();
 });

@@ -1,142 +1,198 @@
-<x-layouts.customer :title="'Akun - Pixel Komunika'">
-    @php($status = $user->customerStatus())
+<x-layouts.customer :title="'Ringkasan Akun - Pixel Komunika'">
+    <!-- 1. Stat Cards Berorientasi Transaksi (4 Kolom Grid) -->
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- 1. Menunggu Pembayaran -->
+        <a href="{{ route('orders.index', ['status' => 'unpaid']) }}" class="group block rounded-2xl border p-5 transition-all duration-200 shadow-2xs hover:shadow-xs {{ $waitingPaymentCount > 0 ? 'bg-amber-50/70 border-amber-200 hover:border-amber-300' : 'bg-white border-zinc-200/80 hover:border-zinc-300' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Menunggu Pembayaran</span>
+                <div class="flex size-9 items-center justify-center rounded-xl {{ $waitingPaymentCount > 0 ? 'bg-amber-100 text-amber-800' : 'bg-zinc-100 text-zinc-500' }}">
+                    <x-icon name="credit-card" class="size-4.5" />
+                </div>
+            </div>
+            <p class="mt-3 text-2xl font-black text-zinc-900">{{ $waitingPaymentCount }}</p>
+            <p class="mt-1 text-xs font-medium {{ $waitingPaymentCount > 0 ? 'text-amber-800 font-semibold' : 'text-zinc-500' }}">
+                {{ $waitingPaymentCount > 0 ? 'Perlu unggah bukti bayar' : 'Tidak ada tagihan aktif' }}
+            </p>
+        </a>
 
-    <x-layout.app-page>
-        <x-storefront.breadcrumb :items="[['label' => 'Akun Saya', 'href' => null]]" />
+        <!-- 2. Sedang Diproses -->
+        <a href="{{ route('orders.index', ['status' => 'processing']) }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-all duration-200 shadow-2xs hover:border-zinc-300 hover:shadow-xs">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Pesanan Diproses</span>
+                <div class="flex size-9 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
+                    <x-icon name="package" class="size-4.5" />
+                </div>
+            </div>
+            <p class="mt-3 text-2xl font-black text-zinc-900">{{ $processingCount }}</p>
+            <p class="mt-1 text-xs font-medium text-zinc-500">Dalam penyiapan toko</p>
+        </a>
 
-        <x-ui.page-header
-            eyebrow="Akun"
-            :title="$user->name"
-            :description="$user->email.' • '.($user->phone ?? 'No phone')"
-        />
+        <!-- 3. Sedang Dikirim -->
+        <a href="{{ route('orders.index', ['status' => 'shipped']) }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-all duration-200 shadow-2xs hover:border-zinc-300 hover:shadow-xs">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Sedang Dikirim</span>
+                <div class="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <x-icon name="truck" class="size-4.5" />
+                </div>
+            </div>
+            <p class="mt-3 text-2xl font-black text-zinc-900">{{ $shippedCount }}</p>
+            <p class="mt-1 text-xs font-medium text-zinc-500">
+                {{ $shippedCount > 0 ? 'Lacak resi pengiriman' : 'Belum ada pengiriman' }}
+            </p>
+        </a>
 
-        <div class="grid gap-4 md:grid-cols-3">
-            <x-ui.stat-card label="Role" :value="$user->isAdmin() ? 'Admin' : 'Customer'" icon="shield-check" />
-            <x-ui.stat-card label="Status" :value="$user->isAdmin() ? 'ADMIN_ACCESS' : ($status ?: 'PENDING_VERIFICATION')" icon="badge-check" />
-            <x-ui.stat-card label="Alamat" :value="(string) $user->addresses->count()" description="Default address dipakai lebih dulu saat checkout." icon="map-pin" />
+        <!-- 4. Alamat Tersimpan -->
+        <a href="{{ route('account.addresses.index') }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-all duration-200 shadow-2xs hover:border-zinc-300 hover:shadow-xs">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Alamat Tersimpan</span>
+                <div class="flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700">
+                    <x-icon name="map-pin" class="size-4.5" />
+                </div>
+            </div>
+            <p class="mt-3 text-2xl font-black text-zinc-900">{{ $user->addresses->count() }} <span class="text-sm font-semibold text-zinc-500">Alamat</span></p>
+            <p class="mt-1 text-xs font-medium text-zinc-500 truncate">
+                {{ $primaryAddress ? 'Utama: ' . ($primaryAddress->label ?: $primaryAddress->recipient_name) : 'Belum ada alamat default' }}
+            </p>
+        </a>
+    </div>
+
+    <!-- 2. Layout 2 Kolom (Pesanan Terbaru & Ringkasan Akun) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- KOLOM KIRI (8 Kolom / ~65%): Card Pesanan Terkini -->
+        <div class="lg:col-span-8 space-y-6">
+            <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-2xs">
+                <div class="flex items-center justify-between border-b border-zinc-100 pb-4 mb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-zinc-900">Pesanan Terbaru</h2>
+                        <p class="text-xs text-zinc-500">Transaksi belanja terkini Anda di Pixel Komunika</p>
+                    </div>
+                    <a href="{{ route('orders.index') }}" class="text-xs font-bold text-brand-black hover:text-amber-600 transition-colors inline-flex items-center gap-1">
+                        <span>Lihat Semua Pesanan</span>
+                        <x-icon name="arrow-right" class="size-3.5" />
+                    </a>
+                </div>
+
+                @forelse ($recentOrders as $order)
+                    @php
+                        $firstItem = $order->items->first();
+                        $isWaiting = in_array($order->status, ['unpaid', 'payment_pending', 'payment_rejected'], true);
+                    @endphp
+                    <div class="py-4 first:pt-0 last:pb-0 border-b border-zinc-100 last:border-b-0">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-xs font-bold text-zinc-900">#{{ $order->order_number }}</span>
+                                    <span class="text-xs text-zinc-400">•</span>
+                                    <span class="text-xs text-zinc-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
+                                    <x-ui.status-badge :status="$order->status" />
+                                </div>
+                                <p class="mt-1.5 text-sm font-semibold text-zinc-800 line-clamp-1">
+                                    {{ $firstItem?->product_name ?? 'Pesanan Produk' }}
+                                    @if ($order->items->count() > 1)
+                                        <span class="text-xs font-normal text-zinc-500">(+{{ $order->items->count() - 1 }} produk lainnya)</span>
+                                    @endif
+                                </p>
+                                @if ($order->status === 'shipped' && $order->shipment && $order->shipment->tracking_number)
+                                    <p class="mt-1 text-xs text-zinc-500">
+                                        Resi: <span class="font-mono font-semibold text-zinc-700">{{ $order->shipment->tracking_number }}</span> ({{ strtoupper($order->courier_code) }})
+                                    </p>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between sm:flex-col sm:items-end gap-2 shrink-0">
+                                <span class="text-sm font-extrabold text-zinc-900">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
+                                @if ($isWaiting)
+                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-1 rounded-xl bg-brand-yellow px-3.5 py-1.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs">
+                                        <x-icon name="upload" class="size-3.5" />
+                                        <span>Unggah Bukti Bayar</span>
+                                    </a>
+                                @else
+                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-1 rounded-xl bg-zinc-100 border border-zinc-200/80 px-3.5 py-1.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-200 transition">
+                                        <span>Detail Pesanan</span>
+                                        <x-icon name="chevron-right" class="size-3.5" />
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-8 text-center">
+                        <x-icon name="shopping-bag" class="size-12 mx-auto text-zinc-300" />
+                        <h3 class="mt-3 text-sm font-bold text-zinc-800">Belum Ada Transaksi</h3>
+                        <p class="mt-1 text-xs text-zinc-500 max-w-sm mx-auto">Jelajahi katalog produk Pixel Komunika dan mulai berbelanja kebutuhan toko Anda.</p>
+                        <a href="{{ route('products.index') }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition">
+                            <x-icon name="store" class="size-4" />
+                            <span>Mulai Belanja</span>
+                        </a>
+                    </div>
+                @endforelse
+            </div>
         </div>
 
-        <x-ui.section-card class="overflow-hidden">
-            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-                <div class="space-y-4">
-                    <div class="flex flex-wrap gap-2">
-                        <span class="storefront-pill">
-                            <x-icon name="user-circle" class="size-3.5" />
-                            <span>Portal pelanggan</span>
-                        </span>
-                        @if (! $user->isAdmin())
-                            <x-ui.status-badge :status="$status ?: \App\Models\CustomerProfile::PENDING" />
-                        @endif
-                    </div>
-
-                    <h2 class="text-xl font-bold tracking-tight text-brand-black">
-                        @if ($user->isAdmin())
-                            Akses admin aktif
-                        @elseif ($status === \App\Models\CustomerProfile::ACTIVE)
-                            Akun aktif
-                        @elseif ($status === \App\Models\CustomerProfile::REJECTED)
-                            Pendaftaran ditolak
-                        @elseif ($status === \App\Models\CustomerProfile::SUSPENDED)
-                            Akun ditangguhkan
-                        @else
-                            Menunggu verifikasi
-                        @endif
-                    </h2>
-
-                    <p class="mt-2 text-sm leading-relaxed text-brand-black/60">
-                        @if ($user->isAdmin())
-                            Gunakan halaman customer management untuk approval dan perubahan status akun pelanggan.
-                        @elseif ($status === \App\Models\CustomerProfile::ACTIVE)
-                            Anda dapat melihat harga, membuka checkout, dan mengakses riwayat order.
-                        @elseif ($status === \App\Models\CustomerProfile::REJECTED)
-                            {{ $user->customerProfile?->rejection_reason ?: 'Silakan hubungi admin untuk informasi lebih lanjut.' }}
-                        @elseif ($status === \App\Models\CustomerProfile::SUSPENDED)
-                            {{ $user->customerProfile?->rejection_reason ?: 'Akses checkout dan harga ditutup sementara.' }}
-                        @else
-                            Anda tetap dapat melihat katalog publik, tetapi harga, checkout, dan riwayat order belum tersedia.
-                        @endif
-                    </p>
-                </div>
-
-                <div class="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
-                    <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-full bg-brand-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-black/88">
-                        Kembali ke Storefront
+        <!-- KOLOM KANAN (4 Kolom / ~35%): Profil & Alamat Utama -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Card Profil Toko & Usaha -->
+            <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-2xs">
+                <div class="flex items-center justify-between border-b border-zinc-100 pb-3 mb-3">
+                    <h3 class="text-sm font-bold text-zinc-900">Profil Toko & Usaha</h3>
+                    <a href="{{ route('account.profile') }}" class="text-xs font-semibold text-brand-black hover:underline inline-flex items-center gap-1">
+                        <x-icon name="pencil" class="size-3" />
+                        <span>Ubah Profil</span>
                     </a>
-                    @if ($status === \App\Models\CustomerProfile::ACTIVE)
-                        <a href="{{ route('orders.index') }}" class="inline-flex items-center justify-center rounded-full bg-brand-yellow px-4 py-3 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-soft">
-                            Riwayat Pesanan
-                        </a>
-                        <a href="{{ route('checkout.index') }}" class="inline-flex items-center justify-center rounded-full border border-brand-black/10 bg-white px-4 py-3 text-sm font-semibold text-brand-black transition hover:border-brand-black/20">
-                            Checkout
-                        </a>
-                    @endif
+                </div>
+
+                <div class="space-y-2.5 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="text-zinc-500">Nama Lengkap</span>
+                        <span class="font-semibold text-zinc-900">{{ $user->name }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-zinc-500">Nama Usaha</span>
+                        <span class="font-semibold text-zinc-900">{{ $user->customerProfile?->business_name ?: '-' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-zinc-500">Email</span>
+                        <span class="font-semibold text-zinc-900 truncate max-w-[160px]" title="{{ $user->email }}">{{ $user->email }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-zinc-500">No. Telepon</span>
+                        <span class="font-semibold text-zinc-900">{{ $user->phone ?: '-' }}</span>
+                    </div>
                 </div>
             </div>
-        </x-ui.section-card>
 
-        @if (! $user->isAdmin())
-            <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                <x-ui.section-card
-                    title="Langkah berikutnya"
-                    description="Pisahkan aktivitas akun berdasarkan context agar portal pelanggan tetap terasa seperti storefront."
-                >
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <a href="{{ route('account.profile') }}" class="storefront-panel-soft rounded-[1.5rem] p-4 transition hover:-translate-y-0.5">
-                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-black/35">Profil</p>
-                            <h3 class="mt-2 text-base font-bold text-brand-black">Kelola identitas akun</h3>
-                            <p class="mt-1 text-sm text-brand-black/55">Perbarui nama, telepon, dan nama usaha untuk kebutuhan order.</p>
-                        </a>
-
-                        <a href="{{ route('account.addresses.index') }}" class="storefront-panel-soft rounded-[1.5rem] p-4 transition hover:-translate-y-0.5">
-                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-black/35">Alamat</p>
-                            <h3 class="mt-2 text-base font-bold text-brand-black">Rapikan address book</h3>
-                            <p class="mt-1 text-sm text-brand-black/55">Simpan alamat default agar checkout berikutnya lebih cepat.</p>
-                        </a>
-
-                        @if ($status === \App\Models\CustomerProfile::ACTIVE)
-                            <a href="{{ route('orders.index') }}" class="storefront-panel-soft rounded-[1.5rem] p-4 transition hover:-translate-y-0.5">
-                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-black/35">Pesanan</p>
-                                <h3 class="mt-2 text-base font-bold text-brand-black">Pantau order aktif</h3>
-                                <p class="mt-1 text-sm text-brand-black/55">Lihat status pembayaran dan histori transaksi Anda.</p>
-                            </a>
-
-                            <a href="{{ route('checkout.index') }}" class="storefront-panel-soft rounded-[1.5rem] p-4 transition hover:-translate-y-0.5">
-                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-black/35">Checkout</p>
-                                <h3 class="mt-2 text-base font-bold text-brand-black">Lanjutkan pembelian</h3>
-                                <p class="mt-1 text-sm text-brand-black/55">Tetap gunakan flow ecommerce tanpa keluar dari shell storefront.</p>
-                            </a>
+            <!-- Card Alamat Pengiriman Utama -->
+            <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-2xs">
+                <div class="flex items-center justify-between border-b border-zinc-100 pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-zinc-900">Alamat Utama</h3>
+                        @if ($primaryAddress && $primaryAddress->is_default)
+                            <span class="inline-flex rounded-md bg-brand-yellow/30 px-2 py-0.5 text-[10px] font-bold text-brand-black">Utama</span>
                         @endif
                     </div>
-                </x-ui.section-card>
+                    <a href="{{ route('account.addresses.index') }}" class="text-xs font-semibold text-brand-black hover:underline inline-flex items-center gap-1">
+                        <x-icon name="map-pin" class="size-3" />
+                        <span>Kelola Alamat</span>
+                    </a>
+                </div>
 
-                <x-ui.section-card
-                    title="Address snapshot"
-                    description="Ringkasan alamat terbaru untuk memastikan default shipping tidak salah context."
-                >
-                    <div class="grid gap-4">
-                        @forelse ($user->addresses->take(2) as $address)
-                            <div class="rounded-[1.5rem] border border-brand-black/8 bg-zinc-50/80 p-4">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <h3 class="text-sm font-bold text-brand-black">{{ $address->label ?: 'Alamat pelanggan' }}</h3>
-                                    @if ($address->is_default)
-                                        <span class="inline-flex rounded-full bg-brand-yellow px-2.5 py-1 text-[10px] font-bold text-brand-black">Default</span>
-                                    @endif
-                                </div>
-                                <p class="mt-2 text-sm font-medium text-zinc-800">{{ $address->recipient_name }} • {{ $address->recipient_phone }}</p>
-                                <p class="mt-1 text-sm leading-relaxed text-zinc-600">
-                                    {{ $address->address_line }}, {{ $address->district_name }}, {{ $address->city_name }}, {{ $address->province_name }} {{ $address->postal_code }}
-                                </p>
-                            </div>
-                        @empty
-                            <x-ui.empty-state
-                                title="Belum ada alamat pelanggan"
-                                description="Tambahkan minimal satu alamat untuk mempersiapkan checkout."
-                                icon="map-pin"
-                            />
-                        @endforelse
+                @if ($primaryAddress)
+                    <div class="text-xs space-y-1">
+                        <p class="font-bold text-zinc-900">{{ $primaryAddress->recipient_name }}</p>
+                        <p class="text-zinc-500">{{ $primaryAddress->recipient_phone }}</p>
+                        <p class="text-zinc-600 leading-relaxed pt-1">
+                            {{ $primaryAddress->address_line }}, {{ $primaryAddress->district_name }}, {{ $primaryAddress->city_name }}, {{ $primaryAddress->province_name }} {{ $primaryAddress->postal_code }}
+                        </p>
                     </div>
-                </x-ui.section-card>
+                @else
+                    <div class="py-4 text-center">
+                        <p class="text-xs text-zinc-500">Belum ada alamat tersimpan.</p>
+                        <a href="{{ route('account.addresses.index') }}" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-brand-black hover:underline">
+                            <span>+ Tambah Alamat Utama</span>
+                        </a>
+                    </div>
+                @endif
             </div>
-        @endif
-    </x-layout.app-page>
+        </div>
+    </div>
 </x-layouts.customer>

@@ -7,6 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+use App\Models\Order;
+
 class AccountController extends Controller
 {
     private function loadUser(Request $request)
@@ -29,8 +31,33 @@ class AccountController extends Controller
 
         $user = $this->loadUser($request);
 
+        $waitingPaymentCount = Order::where('user_id', $user->id)
+            ->whereIn('status', ['unpaid', 'payment_pending', 'payment_rejected'])
+            ->count();
+
+        $processingCount = Order::where('user_id', $user->id)
+            ->whereIn('status', ['paid', 'processing', 'packed'])
+            ->count();
+
+        $shippedCount = Order::where('user_id', $user->id)
+            ->where('status', 'shipped')
+            ->count();
+
+        $recentOrders = Order::where('user_id', $user->id)
+            ->with(['items.product', 'shipment'])
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $primaryAddress = $user->addresses->firstWhere('is_default', true) ?? $user->addresses->first();
+
         return view('account.dashboard', [
             'user' => $user,
+            'waitingPaymentCount' => $waitingPaymentCount,
+            'processingCount' => $processingCount,
+            'shippedCount' => $shippedCount,
+            'recentOrders' => $recentOrders,
+            'primaryAddress' => $primaryAddress,
         ]);
     }
 

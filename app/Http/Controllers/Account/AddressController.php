@@ -66,6 +66,16 @@ class AddressController extends Controller
         return back();
     }
 
+    public function setDefault(Request $request, Address $address): RedirectResponse
+    {
+        abort_unless($address->user_id === $request->user()->id, 403);
+
+        $request->user()->addresses()->update(['is_default' => false]);
+        $address->update(['is_default' => true]);
+
+        return back();
+    }
+
     private function validated(Request $request): array
     {
         return $request->validate([

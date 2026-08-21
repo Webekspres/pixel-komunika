@@ -23,8 +23,8 @@
         ? 'mt-3 max-w-3xl text-sm leading-relaxed text-zinc-500 sm:text-base'
         : 'mt-3 max-w-3xl text-sm leading-relaxed text-brand-black/62 sm:text-base';
     $backClass = $isAdmin
-        ? 'inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950'
-        : 'inline-flex items-center gap-2 rounded-full border border-brand-black/10 bg-white/80 px-4 py-2 text-sm font-semibold text-brand-black/72 transition hover:border-brand-black/20 hover:text-brand-black';
+        ? 'inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950'
+        : 'inline-flex items-center gap-2 rounded-md border border-brand-black/10 bg-white/80 px-4 py-2 text-sm font-semibold text-brand-black/72 transition hover:border-brand-black/20 hover:text-brand-black';
 @endphp
 
 <div {{ $attributes->class($wrapperClass) }}>

@@ -85,12 +85,12 @@
                 description="{{ $order->created_at->format('d M Y') }} • Batas bayar: {{ $order->expires_at ? $order->expires_at->format('d M Y H:i') : '-' }}"
             >
                 @if ($isPaidOrLater && $order->invoice)
-                    <x-slot:name="actions">
-                        <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
+                    <x-slot:actions>
+                        <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
                             <x-icon name="download" class="size-4" />
                             Unduh Invoice
                         </a>
-                    </x-slot>
+                    </x-slot:actions>
                 @endif
             </x-ui.page-header>
         </div>

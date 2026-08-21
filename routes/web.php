@@ -43,19 +43,27 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::get('/akun', [AccountController::class, 'show'])->name('account.dashboard');
     Route::get('/akun/profil', [AccountController::class, 'profile'])->name('account.profile');
+    Route::get('/profil', [AccountController::class, 'profile']);
     Route::patch('/akun/profil', [AccountController::class, 'update'])->name('account.update');
     Route::get('/akun/alamat', [AccountController::class, 'addresses'])->name('account.addresses.index');
+    Route::get('/alamat', [AccountController::class, 'addresses']);
     Route::post('/akun/alamat', [AddressController::class, 'store'])->name('account.addresses.store');
     Route::patch('/akun/alamat/{address}', [AddressController::class, 'update'])->name('account.addresses.update');
+    Route::patch('/akun/alamat/{address}/utama', [AddressController::class, 'setDefault'])->name('account.addresses.default');
     Route::delete('/akun/alamat/{address}', [AddressController::class, 'destroy'])->name('account.addresses.destroy');
     Route::get('/akun/pesanan/{order}', OrderDetail::class)->name('orders.show');
     Route::get('/orders/{order}', OrderDetail::class);
+    Route::get('/pesanan/{order}', OrderDetail::class);
+    Route::get('/akun/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show'])->name('orders.invoice');
+    Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
+    Route::get('/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
 });
 
 Route::middleware(['auth', 'active.customer'])->group(function () {
     Route::get('/checkout', Checkout::class)->name('checkout.index');
     Route::get('/akun/pesanan', CustomerOrders::class)->name('orders.index');
     Route::get('/orders', CustomerOrders::class);
+    Route::get('/pesanan', CustomerOrders::class);
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

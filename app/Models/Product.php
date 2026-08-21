@@ -36,6 +36,11 @@ class Product extends Model
         ];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'sku';
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

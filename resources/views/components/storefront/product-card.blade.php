@@ -33,7 +33,11 @@
         : 'bg-zinc-100 text-brand-black hover:bg-zinc-200';
 @endphp
 
-<{{ $tag }} {{ $href ? "href=\"{$href}\"" : '' }}
+<{{ $tag }}
+    @if ($href)
+        href="{{ $href }}"
+        wire:navigate
+    @endif
     {{ $attributes->class([
         'product-card product-card-hover group block',
         'cursor-pointer' => $href,

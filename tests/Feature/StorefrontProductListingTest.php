@@ -97,3 +97,18 @@ it('shows wholesale prices on PDP to active verified customer', function () {
         ->assertSee($product->name)
         ->assertSee(number_format($product->listPriceAmount() ?? 0, 0, ',', '.'));
 });
+
+it('renders clean related products links on PDP without escaped quotes', function () {
+    $product = Product::first();
+    $related = Product::where('id', '!=', $product->id)->first();
+
+    if ($related) {
+        $expectedUrl = route('products.show', $related);
+
+        $this->get(route('products.show', $product))
+            ->assertOk()
+            ->assertSee('href="' . $expectedUrl . '"', false)
+            ->assertDontSee('href="&quot;' . $expectedUrl, false);
+    }
+});
+

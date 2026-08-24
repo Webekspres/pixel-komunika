@@ -17,8 +17,7 @@ jobs:
     environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
     env:
       REPOSITORY_PATH: ${{ github.ref_name == 'main' && '/home/pixelkom/repositories/store.pixelkomunika.com' || '/home/pixelkom/repositories/dev.store.pixelkomunika.com' }}
-      CPANEL_SSH_HOST: ${{ secrets.CPANEL_SSH_HOST }}
-      CPANEL_SSH_USER: ${{ secrets.CPANEL_SSH_USER }}
+      CPANEL_USER: pixelkom
 
     steps:
       - uses: actions/checkout@v4
@@ -31,18 +30,13 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: php artisan test
 
-      - uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.CPANEL_SSH_KEY }}
-
-      - name: Trust the cPanel host key
+      - name: Update and deploy through cPanel API
+        env:
+          CPANEL_API_BASE_URL: ${{ secrets.CPANEL_API_BASE_URL }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "${{ secrets.CPANEL_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
-      - name: Update and deploy on cPanel
-        run: |
-          ssh -p 22 -o BatchMode=yes -o StrictHostKeyChecking=yes \
-            "$CPANEL_SSH_USER@$CPANEL_SSH_HOST" \
-            "/usr/local/cpanel/bin/uapi VersionControlDeployment create repository_root='$REPOSITORY_PATH'"
+          curl --fail-with-body --silent --show-error --get \
+            -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
+            --data-urlencode "repository_root=$REPOSITORY_PATH" \
+            "$CPANEL_API_BASE_URL/execute/VersionControlDeployment/create" \
+            | jq -e '.result.status == 1'

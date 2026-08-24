@@ -191,7 +191,6 @@ class DatabaseSeeder extends Seeder
             'amount' => $paid->grand_total,
         ], $file2);
         $paymentService->approvePayment($proof, $admin);
-        app(FulfillmentService::class)->transition($paid->fresh(), 'processing', $admin);
 
         $shipped = $makeOrder(1);
         $file3 = UploadedFile::fake()->image('proof3.jpg');
@@ -202,7 +201,6 @@ class DatabaseSeeder extends Seeder
         ], $file3);
         $paymentService->approvePayment($proof3, $admin);
         $fulfillment = app(FulfillmentService::class);
-        $fulfillment->transition($shipped->fresh(), 'processing', $admin);
         $fulfillment->transition($shipped->fresh(), 'packed', $admin);
         $fulfillment->transition($shipped->fresh(), 'shipped', $admin, 'RESI-SEED-001');
 

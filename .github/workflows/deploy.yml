@@ -1,0 +1,48 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [staging, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpanel-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    env:
+      REPOSITORY_PATH: ${{ github.ref_name == 'main' && '/home/pixelkom/repositories/store.pixelkomunika.com' || '/home/pixelkom/repositories/dev.store.pixelkomunika.com' }}
+      CPANEL_SSH_HOST: ${{ secrets.CPANEL_SSH_HOST }}
+      CPANEL_SSH_USER: ${{ secrets.CPANEL_SSH_USER }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, mbstring, pdo_sqlite, zip
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan test
+
+      - uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.CPANEL_SSH_KEY }}
+
+      - name: Trust the cPanel host key
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CPANEL_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Update and deploy on cPanel
+        run: |
+          ssh -p 22 -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$CPANEL_SSH_USER@$CPANEL_SSH_HOST" \
+            "/usr/local/cpanel/bin/uapi VersionControlDeployment create repository_root='$REPOSITORY_PATH'"

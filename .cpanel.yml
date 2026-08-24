@@ -6,7 +6,7 @@ deployment:
 
       BRANCH="$(git rev-parse --abbrev-ref HEAD)"
       REPOSITORY="$(git rev-parse --show-toplevel)"
-      PHP=/usr/local/bin/ea-php83
+      PHP=/usr/local/bin/php
       COMPOSER=/home/pixelkom/bin/composer
       NODE_BIN=/home/pixelkom/.nvm/versions/node/v24.19.0/bin
       export PATH="$NODE_BIN:$PATH"
@@ -39,23 +39,31 @@ deployment:
         exit 1
       fi
 
-      [ -x "$PHP" ] || { echo "PHP 8.3 tidak ditemukan di '$PHP'." >&2; exit 1; }
+      [ -x "$PHP" ] || { echo "PHP CLI cPanel tidak ditemukan di '$PHP'." >&2; exit 1; }
       [ -f "$COMPOSER" ] || { echo "Composer tidak ditemukan di '$COMPOSER'." >&2; exit 1; }
       [ -x "$NPM" ] || { echo "npm tidak ditemukan di '$NPM'." >&2; exit 1; }
+
+      PHP_MODULES="$("$PHP" --ea-reference-dir="$DEPLOYPATH" -m)"
+      for EXTENSION in curl fileinfo iconv pdo_mysql zip; do
+        printf '%s\n' "$PHP_MODULES" | grep -qx "$EXTENSION" || {
+          echo "Extension PHP '$EXTENSION' tidak aktif untuk '$DEPLOYPATH'." >&2
+          exit 1
+        }
+      done
 
       echo "Deploying branch '$BRANCH' ke '$DEPLOYPATH'..."
       git archive --format=tar HEAD | tar -xf - -C "$DEPLOYPATH"
 
       cd "$DEPLOYPATH"
-      "$PHP" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+      "$PHP" --ea-reference-dir="$DEPLOYPATH" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
       "$NPM" ci --no-audit --no-fund
       "$NPM" run build
-      "$PHP" artisan optimize:clear
-      "$PHP" artisan storage:link
+      "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan optimize:clear
+      "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan storage:link
 
       if [ "$RUN_MIGRATIONS" = true ]; then
-        "$PHP" artisan migrate --force
+        "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan migrate --force
       fi
 
-      "$PHP" artisan optimize
+      "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan optimize
       echo "Deployment branch '$BRANCH' selesai."

@@ -5,8 +5,8 @@
 | Keterangan | Isi |
 |---|---|
 | Dokumen | Ringkasan untuk pemeriksaan dan persetujuan klien |
-| Versi | 1.15 |
-| Tanggal | Jumat, 14 Agustus 2026 |
+| Versi | 1.16 |
+| Tanggal | Jumat, 21 Agustus 2026 |
 | Klien | Pixel Komunika |
 | Perwakilan klien | Sylvi |
 | Pengembang | PT Webekspres Teknologi Indonesia |
@@ -144,7 +144,7 @@ website. Nama tampilan produk dapat diperbarui mandiri melalui website.
 | Masa berlaku pesanan | Pesanan yang belum dibayar hanya berlaku pada tanggal pembuatannya dan otomatis dibatalkan pada hari berikutnya. |
 | Pemrosesan pesanan | Setelah pembayaran diterima, statusnya Diproses, Dikemas, Dikirim, lalu Selesai. Pelanggan dapat mengonfirmasi penerimaan melalui tautan WhatsApp. Sistem menyelesaikan otomatis setelah lima hari kerja sejak dikirim jika tidak ada kendala. |
 | Nomor resi | Resi wajib diisi sebelum Dikirim hanya untuk metode yang memiliki resi; kurir toko tidak memerlukan resi. |
-| Pengiriman | Kurir toko melayani seluruh kecamatan Kota/Kabupaten Bandung dengan target H+1 hari kerja atau H+2 bila kurir tidak tersedia. Biteship menyediakan pilihan termasuk Grab/Gojek same-day. |
+| Pengiriman | Kurir toko melayani seluruh kecamatan Kota/Kabupaten Bandung dengan target H+1 hari kerja. Jika subtotal barang ditambah PPh 22 mencapai sedikitnya Rp1.000.000, ongkir kurir toko gratis; jika kurang, ongkir mengikuti tarif area tujuan. Biteship menyediakan pilihan termasuk Grab/Gojek same-day. |
 | Penggabungan pengiriman | Beberapa pesanan dapat digabung jika alamat tujuannya sama; nomor pesanan dan invoice tetap terpisah. |
 | Pembatalan dan retur | Admin dapat membatalkan pesanan secara manual hanya pada tanggal transaksi. Pesanan yang belum dibayar dibatalkan otomatis oleh sistem pada hari berikutnya. Keduanya memakai status `Dibatalkan`, disertai keterangan apakah pembatalan dilakukan oleh admin atau sistem. Pembatalan mengembalikan stok website dan dilaporkan ke POS sebagai retur. |
 | Notifikasi admin | Order baru menampilkan tanda merah dan mengirim pesan `Cek Order masuk` ke `081546407702`. Tanda dibaca saat admin membuka daftar pesanan yang akan diproses. |
@@ -196,6 +196,9 @@ website. Nama tampilan produk dapat diperbarui mandiri melalui website.
 19. Pesanan dengan alamat tujuan sama dapat digabung menjadi satu pengiriman.
 20. Pesanan mulai dihitung sebagai omzet ketika berstatus Dikirim.
 21. Bukti pembayaran disimpan selama lima tahun.
+22. Khusus kurir toko, gratis ongkir berlaku jika subtotal barang ditambah PPh
+    22 mencapai sedikitnya Rp1.000.000. Nilai di bawah ambang memakai tarif
+    area tujuan, dan pengiriman dilakukan H+1 hari kerja.
 
 ## 5. Alur Utama
 
@@ -421,7 +424,9 @@ Versi pertama dapat diterima apabila:
 - data produk, harga, dan stok dapat dipertukarkan dengan POS tanpa
   menggandakan transaksi;
 - penjualan dan retur dari website tercatat pada POS;
-- pilihan dan ongkir pengiriman berjalan sesuai keputusan final;
+- kurir toko menerapkan ongkir Rp0 saat subtotal barang ditambah PPh 22
+  sedikitnya Rp1.000.000, memakai tarif area jika kurang, dan menampilkan ETA
+  H+1 hari kerja;
 - order dengan alamat sama dapat digabung sesuai aturan ongkir/resi/status yang
   disepakati;
 - laporan transaksi, omzet sejak status Dikirim, dan PPh 22 dapat dilihat admin;

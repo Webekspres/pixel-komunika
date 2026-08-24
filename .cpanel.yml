@@ -39,11 +39,13 @@ deployment:
         exit 1
       fi
 
+      PHP_REFERENCE_DIR="$DEPLOYPATH/public"
+
       [ -x "$PHP" ] || { echo "PHP CLI cPanel tidak ditemukan di '$PHP'." >&2; exit 1; }
       [ -f "$COMPOSER" ] || { echo "Composer tidak ditemukan di '$COMPOSER'." >&2; exit 1; }
       [ -x "$NPM" ] || { echo "npm tidak ditemukan di '$NPM'." >&2; exit 1; }
 
-      PHP_MODULES="$("$PHP" --ea-reference-dir="$DEPLOYPATH" -m)"
+      PHP_MODULES="$("$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" -m)"
       for EXTENSION in curl fileinfo iconv pdo_mysql zip; do
         printf '%s\n' "$PHP_MODULES" | grep -qx "$EXTENSION" || {
           echo "Extension PHP '$EXTENSION' tidak aktif untuk '$DEPLOYPATH'." >&2
@@ -55,15 +57,15 @@ deployment:
       git archive --format=tar HEAD | tar -xf - -C "$DEPLOYPATH"
 
       cd "$DEPLOYPATH"
-      "$PHP" --ea-reference-dir="$DEPLOYPATH" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+      "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
       "$NPM" ci --no-audit --no-fund
       "$NPM" run build
-      "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan optimize:clear
-      "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan storage:link
+      "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan optimize:clear
+      "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan storage:link
 
       if [ "$RUN_MIGRATIONS" = true ]; then
-        "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan migrate --force
+        "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan migrate --force
       fi
 
-      "$PHP" --ea-reference-dir="$DEPLOYPATH" artisan optimize
+      "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan optimize
       echo "Deployment branch '$BRANCH' selesai."

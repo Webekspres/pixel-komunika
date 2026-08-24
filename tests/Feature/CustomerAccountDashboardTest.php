@@ -3,7 +3,6 @@
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
 use App\Models\Address;
 use App\Models\CustomerProfile;
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
@@ -64,7 +63,7 @@ it('renders customer account dashboard overview with user greeting and transacti
         ->assertSee('Sedang Dikirim')
         ->assertSee('Alamat Tersimpan')
         ->assertSee('Pesanan Terbaru')
-        ->assertSee('#' . $order->order_number)
+        ->assertSee('#'.$order->order_number)
         ->assertSee('Unggah Bukti Bayar')
         ->assertSee('Profil Toko')
         ->assertSee('Alamat Utama')
@@ -132,4 +131,3 @@ it('renders printable order invoice page for the order owner', function () {
         ->assertSee('FAKTUR PENJUALAN')
         ->assertSee($order->order_number);
 });
-

@@ -28,8 +28,8 @@ class AppServiceProvider extends ServiceProvider
             $driver = config('store.shipping.driver', 'mock');
 
             return match ($driver) {
-                'biteship' => new BiteshipShippingService(),
-                default => new MockBiteshipShippingService(),
+                'biteship' => new BiteshipShippingService,
+                default => new MockBiteshipShippingService,
             };
         });
 

@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 class BiteshipAreaSearchService
 {
     protected string $baseUrl;
+
     protected ?string $apiKey;
+
     protected int $timeout;
 
     public function __construct()
@@ -22,7 +24,6 @@ class BiteshipAreaSearchService
     /**
      * Search areas in Indonesia matching the query keyword.
      *
-     * @param string $query
      * @return array<int, array{id: ?string, label: string, province_name: string, city_name: string, district_name: string, postal_code: ?string, biteship_area_id: ?string}>
      */
     public function search(string $query): array
@@ -32,7 +33,7 @@ class BiteshipAreaSearchService
             return [];
         }
 
-        $cacheKey = 'biteship_area_search_' . md5(mb_strtolower($trimmed));
+        $cacheKey = 'biteship_area_search_'.md5(mb_strtolower($trimmed));
 
         return Cache::remember($cacheKey, 86400, function () use ($trimmed) {
             if (! empty($this->apiKey)) {
@@ -49,7 +50,6 @@ class BiteshipAreaSearchService
     /**
      * Get list of districts for a city, sorted A-Z.
      *
-     * @param string $city
      * @return array<int, string>
      */
     public function getDistrictsForCity(string $city): array
@@ -59,13 +59,14 @@ class BiteshipAreaSearchService
             return [];
         }
 
-        $cacheKey = 'city_districts_sorted_' . md5(mb_strtolower($trimmedCity));
+        $cacheKey = 'city_districts_sorted_'.md5(mb_strtolower($trimmedCity));
 
         return Cache::remember($cacheKey, 86400, function () use ($trimmedCity) {
             $districts = IndonesiaRegionService::getDistrictsByCity($trimmedCity);
 
             if (! empty($districts)) {
                 sort($districts, SORT_NATURAL | SORT_FLAG_CASE);
+
                 return array_values(array_unique($districts));
             }
 
@@ -91,11 +92,12 @@ class BiteshipAreaSearchService
 
                         if (! empty($found)) {
                             sort($found, SORT_NATURAL | SORT_FLAG_CASE);
+
                             return array_values(array_unique($found));
                         }
                     }
                 } catch (\Throwable $e) {
-                    Log::warning('Failed fetching districts from Biteship: ' . $e->getMessage());
+                    Log::warning('Failed fetching districts from Biteship: '.$e->getMessage());
                 }
             }
 
@@ -122,6 +124,7 @@ class BiteshipAreaSearchService
                     'status' => $response->status(),
                     'body' => $response->json(),
                 ]);
+
                 return [];
             }
 
@@ -141,7 +144,7 @@ class BiteshipAreaSearchService
                 }
 
                 $parts = array_filter([$district, $city, $province]);
-                $label = implode(', ', $parts) . ($postalCode ? " ({$postalCode})" : '');
+                $label = implode(', ', $parts).($postalCode ? " ({$postalCode})" : '');
 
                 $formatted[] = [
                     'id' => $areaId,
@@ -156,7 +159,8 @@ class BiteshipAreaSearchService
 
             return $formatted;
         } catch (\Throwable $e) {
-            Log::warning('Biteship area search exception: ' . $e->getMessage());
+            Log::warning('Biteship area search exception: '.$e->getMessage());
+
             return [];
         }
     }

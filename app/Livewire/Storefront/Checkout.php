@@ -3,6 +3,7 @@
 namespace App\Livewire\Storefront;
 
 use App\Models\Address;
+use App\Models\Shipment;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\Shipping\ShippingCalculatorInterface;
@@ -84,8 +85,8 @@ class Checkout extends Component
                 $selectedAddress->district_name
             );
 
-            $storeRates = collect($shippingRates)->where('provider', \App\Models\Shipment::PROVIDER_STORE)->values()->all();
-            $biteshipRates = collect($shippingRates)->where('provider', \App\Models\Shipment::PROVIDER_BITESHIP)->values()->all();
+            $storeRates = collect($shippingRates)->where('provider', Shipment::PROVIDER_STORE)->values()->all();
+            $biteshipRates = collect($shippingRates)->where('provider', Shipment::PROVIDER_BITESHIP)->values()->all();
 
             $validKeys = collect($shippingRates)->map(fn ($r) => $r['code'].':'.$r['service'])->all();
             if (empty($this->selectedCourierKey) || ! in_array($this->selectedCourierKey, $validKeys, true)) {

@@ -4,6 +4,7 @@ namespace App\Services\Shipping;
 
 use App\Models\Shipment;
 use App\Models\StoreCourierRate;
+use Illuminate\Support\Collection;
 
 class MockBiteshipShippingService implements ShippingCalculatorInterface
 {
@@ -82,7 +83,7 @@ class MockBiteshipShippingService implements ShippingCalculatorInterface
         return $rates;
     }
 
-    protected function getFilteredStoreRates(string $city, ?string $district): \Illuminate\Support\Collection
+    protected function getFilteredStoreRates(string $city, ?string $district): Collection
     {
         $query = StoreCourierRate::query()->where('is_active', true)->orderBy('rate_amount');
 

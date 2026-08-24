@@ -10,8 +10,10 @@ use App\Http\Controllers\Admin\PaymentReviewController;
 use App\Http\Controllers\Admin\ProductEnrichmentController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Api\AreaSearchController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\OrderInvoiceController;
 use App\Livewire\Admin\AdminOrders;
 use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\CustomerReviewDetail;
@@ -54,11 +56,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/akun/pesanan/{order}', OrderDetail::class)->name('orders.show');
     Route::get('/orders/{order}', OrderDetail::class);
     Route::get('/pesanan/{order}', OrderDetail::class);
-    Route::get('/akun/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show'])->name('orders.invoice');
-    Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
-    Route::get('/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
-    Route::get('/api/areas/search', [\App\Http\Controllers\Api\AreaSearchController::class, 'search'])->name('api.areas.search');
-    Route::get('/api/areas/districts', [\App\Http\Controllers\Api\AreaSearchController::class, 'districts'])->name('api.areas.districts');
+    Route::get('/akun/pesanan/{order}/invoice', [OrderInvoiceController::class, 'show'])->name('orders.invoice');
+    Route::get('/orders/{order}/invoice', [OrderInvoiceController::class, 'show']);
+    Route::get('/pesanan/{order}/invoice', [OrderInvoiceController::class, 'show']);
+    Route::get('/api/areas/search', [AreaSearchController::class, 'search'])->name('api.areas.search');
+    Route::get('/api/areas/districts', [AreaSearchController::class, 'districts'])->name('api.areas.districts');
 });
 
 Route::middleware(['auth', 'active.customer'])->group(function () {

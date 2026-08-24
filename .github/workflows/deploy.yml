@@ -18,6 +18,9 @@ jobs:
     env:
       REPOSITORY_PATH: ${{ github.ref_name == 'main' && '/home/pixelkom/repositories/store.pixelkomunika.com' || '/home/pixelkom/repositories/dev.store.pixelkomunika.com' }}
       CPANEL_USER: pixelkom
+      GIT_CONFIG_COUNT: 1
+      GIT_CONFIG_KEY_0: init.defaultBranch
+      GIT_CONFIG_VALUE_0: main
 
     steps:
       - uses: actions/checkout@v7

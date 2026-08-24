@@ -8,6 +8,9 @@ deployment:
       REPOSITORY="$(git rev-parse --show-toplevel)"
       PHP=/usr/local/bin/ea-php83
       COMPOSER=/home/pixelkom/bin/composer
+      NODE_BIN=/home/pixelkom/.nvm/versions/node/v24.19.0/bin
+      export PATH="$NODE_BIN:$PATH"
+      NPM="$NODE_BIN/npm"
 
       case "$BRANCH" in
         main)
@@ -38,15 +41,15 @@ deployment:
 
       [ -x "$PHP" ] || { echo "PHP 8.3 tidak ditemukan di '$PHP'." >&2; exit 1; }
       [ -f "$COMPOSER" ] || { echo "Composer tidak ditemukan di '$COMPOSER'." >&2; exit 1; }
-      command -v npm >/dev/null 2>&1 || { echo "npm tidak ditemukan pada PATH deployment cPanel." >&2; exit 1; }
+      [ -x "$NPM" ] || { echo "npm tidak ditemukan di '$NPM'." >&2; exit 1; }
 
       echo "Deploying branch '$BRANCH' ke '$DEPLOYPATH'..."
       git archive --format=tar HEAD | tar -xf - -C "$DEPLOYPATH"
 
       cd "$DEPLOYPATH"
       "$PHP" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-      npm ci --no-audit --no-fund
-      npm run build
+      "$NPM" ci --no-audit --no-fund
+      "$NPM" run build
       "$PHP" artisan optimize:clear
       "$PHP" artisan storage:link
 

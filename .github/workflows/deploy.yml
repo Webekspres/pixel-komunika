@@ -40,4 +40,4 @@ jobs:
             --data-urlencode "repository_root=$REPOSITORY_PATH" \
             "$CPANEL_API_BASE_URL/execute/VersionControlDeployment/create")"
           printf '%s\n' "$response" | jq .
-          printf '%s\n' "$response" | jq -e '.result.status == 1'
+          printf '%s\n' "$response" | jq -e '(.result.status // .status) == 1'

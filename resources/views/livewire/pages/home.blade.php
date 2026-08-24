@@ -310,14 +310,7 @@
     {{-- Guest registration CTA --}}
     @guest
         <x-storefront.cta
-            theme="yellow"
-            align="left"
-            background-image="{{ asset('assets/hero/cta-bergabung.webp') }}"
-            title="Siap Bergabung?"
-            description="Daftarkan usahamu sekarang dan dapatkan akses ke harga grosir dan partai eksklusif. Proses verifikasi cepat dan mudah."
-            primary-label="Daftar Sekarang"
             :primary-href="route('register')"
-            secondary-label="Sudah punya akun? Masuk"
             :secondary-href="route('login')"
         />
     @endguest

@@ -49,6 +49,20 @@ it('logs in with valid credentials and logs out safely', function () {
     $this->assertGuest();
 });
 
+it('rate limits repeated failed logins', function () {
+    foreach (range(1, 5) as $attempt) {
+        $this->post(route('login.store'), [
+            'email' => 'nobody@example.com',
+            'password' => 'wrong-password',
+        ]);
+    }
+
+    $this->post(route('login.store'), [
+        'email' => 'nobody@example.com',
+        'password' => 'wrong-password',
+    ])->assertStatus(429);
+});
+
 it('rejects invalid login with a generic message', function () {
     $user = User::factory()->create([
         'password' => Hash::make('secret123'),

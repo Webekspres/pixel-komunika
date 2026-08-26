@@ -36,9 +36,9 @@ Route::get('/cart', CartIndex::class)->name('cart.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/daftar', [RegisteredUserController::class, 'store'])->name('register.store');
+    Route::post('/daftar', [RegisteredUserController::class, 'store'])->name('register.store')->middleware('throttle:5,1');
     Route::get('/masuk', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/masuk', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::post('/masuk', [AuthenticatedSessionController::class, 'store'])->name('login.store')->middleware('throttle:5,1');
 });
 
 Route::middleware('auth')->group(function () {

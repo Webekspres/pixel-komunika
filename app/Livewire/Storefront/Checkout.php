@@ -7,7 +7,10 @@ use App\Models\Shipment;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\Shipping\ShippingCalculatorInterface;
+use App\Services\Shipping\StoreCourierFreeShipping;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -33,6 +36,15 @@ class Checkout extends Component
         ShippingCalculatorInterface $shippingService
     ) {
         $user = Auth::user();
+
+        $rateKey = 'checkout-order:'.$user->id;
+        if (RateLimiter::tooManyAttempts($rateKey, 10)) {
+            throw ValidationException::withMessages([
+                'selectedCourierKey' => 'Terlalu banyak percobaan checkout. Coba lagi nanti.',
+            ]);
+        }
+        RateLimiter::hit($rateKey, 60);
+
         $this->validate([
             'selectedAddressId' => ['required', 'exists:addresses,id'],
             'selectedCourierKey' => ['required', 'string'],
@@ -45,7 +57,11 @@ class Checkout extends Component
         $cart = $cartService->getOrCreateCart($user, session()->getId());
         $summary = $cartService->getCartSummary($cart);
 
-        $availableRates = $shippingService->calculateRates($address->city_name, $summary['total_weight_grams'], $address->district_name);
+        $availableRates = StoreCourierFreeShipping::applyToRates(
+            $shippingService->calculateRates($address->city_name, $summary['total_weight_grams'], $address->district_name),
+            (float) $summary['subtotal'],
+            (float) $summary['pph22'],
+        );
         $selectedRate = collect($availableRates)->first(function ($rate) {
             return ($rate['code'].':'.$rate['service']) === $this->selectedCourierKey;
         });
@@ -79,10 +95,14 @@ class Checkout extends Component
         $selectedAddress = $addresses->firstWhere('id', $this->selectedAddressId);
 
         if ($selectedAddress) {
-            $shippingRates = $shippingService->calculateRates(
-                $selectedAddress->city_name,
-                $summary['total_weight_grams'],
-                $selectedAddress->district_name
+            $shippingRates = StoreCourierFreeShipping::applyToRates(
+                $shippingService->calculateRates(
+                    $selectedAddress->city_name,
+                    $summary['total_weight_grams'],
+                    $selectedAddress->district_name
+                ),
+                (float) $summary['subtotal'],
+                (float) $summary['pph22'],
             );
 
             $storeRates = collect($shippingRates)->where('provider', Shipment::PROVIDER_STORE)->values()->all();

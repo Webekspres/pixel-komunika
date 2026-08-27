@@ -86,9 +86,9 @@
             >
                 @if ($isPaidOrLater && $order->invoice)
                     <x-slot:actions>
-                        <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
+                        <a href="{{ route('orders.invoice.download', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
                             <x-icon name="download" class="size-4" />
-                            Unduh Invoice
+                            Unduh Invoice (PDF)
                         </a>
                     </x-slot:actions>
                 @endif

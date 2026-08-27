@@ -28,13 +28,20 @@
             </a>
 
             <div class="flex items-center gap-2">
+                <a
+                    href="{{ route('orders.invoice.download', $order) }}"
+                    class="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-100 transition"
+                >
+                    <x-icon name="document-arrow-down" class="size-4" />
+                    <span>Unduh PDF</span>
+                </a>
                 <button
                     type="button"
                     onclick="window.print()"
                     class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                 >
                     <x-icon name="printer" class="size-4" />
-                    <span>Cetak / Simpan PDF</span>
+                    <span>Cetak</span>
                 </button>
             </div>
         </div>

@@ -32,6 +32,8 @@ return [
 
     'shipping' => [
         'driver' => env('SHIPPING_DRIVER', 'mock'), // mock|biteship
+        // RULE-030: store courier free when subtotal + pph22 >= threshold
+        'free_store_courier_threshold' => (int) env('STORE_FREE_SHIPPING_THRESHOLD', 1_000_000),
     ],
 
     'holidays' => [], // YYYY-MM-DD list; ponytail: replace with calendar when OPN-020 lands

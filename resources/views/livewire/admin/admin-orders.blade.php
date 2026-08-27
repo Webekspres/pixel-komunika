@@ -111,7 +111,7 @@
                                         <flux:button variant="ghost" size="sm" icon="ellipsis-horizontal" aria-label="Aksi lainnya" />
                                         <flux:menu>
                                             <flux:menu.item icon="eye" href="{{ route('admin.orders.show', $order) }}">Lihat Detail Pesanan</flux:menu.item>
-                                            <flux:menu.item icon="document-arrow-down" disabled suffix="Segera">Unduh Invoice (PDF)</flux:menu.item>
+                                            <flux:menu.item icon="document-arrow-down" href="{{ route('orders.invoice.download', $order) }}">Unduh Invoice (PDF)</flux:menu.item>
 
                                             @if ($this->canCancelToday($order))
                                                 <flux:menu.separator />

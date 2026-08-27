@@ -8,6 +8,8 @@ use App\Services\OrderService;
 use App\Services\PaymentService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -80,6 +82,14 @@ class OrderDetail extends Component
 
     public function uploadPaymentProof(PaymentService $paymentService): void
     {
+        $key = 'payment-proof-upload:'.Auth::id();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw ValidationException::withMessages([
+                'proof_file' => 'Terlalu banyak unggahan bukti. Coba lagi nanti.',
+            ]);
+        }
+        RateLimiter::hit($key, 60);
+
         $this->validate([
             'bank_name' => 'required|string|max:100',
             'account_name' => 'required|string|max:150',

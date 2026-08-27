@@ -20,6 +20,7 @@ use App\Models\SalesReturn;
 use App\Models\Shipment;
 use App\Models\StoreProfile;
 use App\Models\User;
+use App\Services\Shipping\StoreCourierFreeShipping;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -52,6 +53,12 @@ class OrderService
                 return $existing;
             }
         }
+
+        $shippingOption = StoreCourierFreeShipping::applyToOption(
+            $shippingOption,
+            (float) $summary['subtotal'],
+            (float) $summary['pph22'],
+        );
 
         $shippingCost = (float) ($shippingOption['cost'] ?? 0);
         $subtotal = (float) $summary['subtotal'];

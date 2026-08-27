@@ -12,8 +12,8 @@ Dokumen ini dipakai untuk mencatat:
 ## Ringkasan status
 
 - Tanggal update terakhir: 2026-08-27
-- Fase aktif: Sprint 3 hampir selesai; Fase 6 (release) dimulai; blocker utama POS production
-- Status umum: alur web end-to-end (storefront + admin) usable dengan data contoh; ±70% MVP; integrasi POS/WA/Biteship live masih stub atau menunggu klien
+- Fase aktif: Gap MVP tanpa POS ditutup; Fase 6 (release) berikutnya; blocker utama POS production
+- Status umum: alur web end-to-end usable dengan data contoh; ±75% MVP; sisa utama integrasi eksternal (POS/WA/Biteship live)
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -55,7 +55,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: backend + wiring UI inti selesai; sisa: PDF invoice, tautan konfirmasi penerimaan, gratis ongkir Rp1jt
+- Status: selesai untuk scope tanpa POS (PDF, gratis ongkir, konfirmasi penerimaan)
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
@@ -67,10 +67,11 @@ Dokumen ini dipakai untuk mencatat:
   - Endpoint POS `GET /api/pos/orders/{order_number}` tetap satu-satunya HTTP POS.
   - Detail pesanan pelanggan menampilkan rekening tujuan pembayaran (dari `BankAccount` aktif).
   - Nomor resi tampil di detail order pelanggan/admin; `shipment_group_code` otomatis saat checkout.
-  - Preview invoice web (`/akun/pesanan/{order}/invoice`) ada; unduh PDF admin masih disabled ("Segera").
-  - `FulfillmentService::confirmReceipt` + token ada; route/tautan publik (WhatsApp) ke pelanggan belum.
-  - Aturan gratis ongkir Kurir Toko (subtotal barang + PPh 22 ≥ Rp1.000.000) belum di kalkulasi ongkir.
+  - Invoice HTML + unduh PDF (`barryvdh/laravel-dompdf`, `orders.invoice.download`).
+  - Konfirmasi penerimaan: route publik `/konfirmasi-penerimaan/{order}?token=…` + notifikasi WA stub saat `shipped`.
+  - Gratis ongkir Kurir Toko bila subtotal + PPh 22 ≥ Rp1.000.000 (`StoreCourierFreeShipping`).
   - Biteship live: `BiteshipShippingService` + config siap; default driver `mock`; butuh `BITESHIP_ORIGIN_AREA_ID`.
+  - Kirim invoice via WhatsApp/email channel masih menunggu provider (OPN).
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
@@ -85,7 +86,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 5 — Reporting, audit, sync resilience, security
 
-- Status: Sprint 3 Task 13 (audit + locking) selesai; UI cari audit log & sisa NFR-SEC belum
+- Status: fondasi + UI audit search + throttle checkout/upload selesai; CI dependency scan belum
 - Target hasil:
   - laporan dasar
   - audit trail
@@ -93,11 +94,12 @@ Dokumen ini dipakai untuk mencatat:
   - security checks
 - Catatan:
   - `ReportingService` omzet dari status `shipped`/`completed` (satu snapshot, tanpa double-count logika terpisah); UI `/admin/reports` filter periode + kecamatan.
-  - `AuditLogger` + `audit_logs`; aksi kritis (payment, order, shipment, customer, store profile) tercatat; transaksi + `lockForUpdate` pada mutasi stok/order.
-  - Policies Order/PaymentProof/CustomerProfile; bukti privat + signed URL; throttle login/register/POS API.
-  - UI pencarian audit log (FR-AUD-002: filter actor/action/entity/periode) belum ada — Settings hanya riwayat `STORE_PROFILE_UPDATED`.
-  - Belum: throttle upload/checkout; dependency vulnerability scan di CI (NFR-SEC-010).
-  - Sample POS sync + ack simulator (success/fail/timeout); WhatsApp stub (`log`/`fake`).
+  - `AuditLogger` + `audit_logs`; aksi kritis tercatat; transaksi + `lockForUpdate` pada mutasi stok/order.
+  - UI `/admin/audit-logs` (FR-AUD-002): filter actor, action, entity, periode.
+  - Policies Order/PaymentProof/CustomerProfile; bukti privat + signed URL.
+  - Throttle: login/register/POS API; checkout `placeOrder` (10/menit); upload bukti (5/menit); konfirmasi penerimaan publik (10/menit).
+  - Belum: dependency vulnerability scan di CI (NFR-SEC-010).
+  - Sample POS sync + ack simulator; WhatsApp stub (`log`/`fake`).
   - Scheduler: `pos:sync-*`, `pos:dispatch-*-reports`, `notifications:dispatch-pending`.
 
 ### Fase 6 — Release readiness
@@ -109,18 +111,28 @@ Dokumen ini dipakai untuk mencatat:
   - shared-hosting readiness
   - UAT, training, sign-off
 - Catatan:
-  - Estimasi keseluruhan ±70% MVP.
-  - Gap fungsional yang masih terbuka: invoice PDF, tautan konfirmasi penerimaan, gratis ongkir Rp1jt, UI audit search.
-  - Blocker eksternal utama: akses POS production (Kak Rio). Lainnya: Biteship origin ID, WhatsApp produksi, format invoice/akun reseller, PPh 22 final.
+  - Estimasi keseluruhan ±75% MVP.
+  - Gap fungsional tanpa POS sudah ditutup (PDF, gratis ongkir, konfirmasi penerimaan, audit UI, throttle).
+  - Blocker eksternal utama: akses POS production (Kak Rio). Lainnya: Biteship origin ID, WhatsApp produksi, format invoice/akun reseller, PPh 22 final, channel kirim invoice.
 
 ## Log progres
+
+### 2026-08-27 (lanjutan)
+
+- Selesai gap MVP tanpa menunggu POS:
+  - Gratis ongkir Kurir Toko ≥ Rp1jt (`StoreCourierFreeShipping` + Checkout/OrderService).
+  - Tautan konfirmasi penerimaan publik + notifikasi stub saat shipped.
+  - Unduh invoice PDF (`barryvdh/laravel-dompdf`).
+  - UI audit log admin `/admin/audit-logs`.
+  - Rate limit checkout & upload bukti bayar.
+- Next: smoke/UAT staging; tunggu POS/Biteship origin/WhatsApp produksi.
 
 ### 2026-08-27
 
 - Review status vs kode + `docs/sprints/SPRINT_3.md`:
   - Sprint 3 Task 1–6, 8–13 selesai; Task 7 Biteship core ready (menunggu `BITESHIP_ORIGIN_AREA_ID`); WA masih log/fake.
   - Sudah ada (PROGRESS sebelumnya usang): tampilan nomor resi, penggabungan pengiriman (`shipment_group_code`).
-  - Belum: invoice PDF, tautan konfirmasi penerimaan, gratis ongkir Kurir Toko ≥ Rp1jt, UI cari audit log, throttle upload/checkout, CI dependency scan.
+  - Belum (saat review pagi): invoice PDF, tautan konfirmasi penerimaan, gratis ongkir Kurir Toko ≥ Rp1jt, UI cari audit log, throttle upload/checkout, CI dependency scan.
 - Blocker utama dikonfirmasi: koneksi POS production dari klien; web tetap jalan dengan data contoh.
 - Next (tanpa menunggu POS): invoice PDF, tautan konfirmasi, gratis ongkir, UI audit search; lanjut smoke/UAT staging.
 

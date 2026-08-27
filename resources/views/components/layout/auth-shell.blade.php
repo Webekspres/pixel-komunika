@@ -32,7 +32,7 @@
         <div class="relative z-10">
             <a href="{{ route('home') }}" aria-label="Pixel Komunika beranda">
                 <img
-                    src="{{ asset('assets/brand-logo.png') }}"
+                    src="{{ asset('assets/brand-logo-white.png') }}"
                     alt="Pixel Komunika"
                     class="h-10 w-auto"
                     width="160"

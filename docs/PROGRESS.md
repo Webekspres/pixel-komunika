@@ -11,9 +11,9 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-21
-- Fase aktif: Backend MVP P0 (services/schema/jobs/seed) siap untuk wiring frontend
-- Status umum: skema ERD gap ditutup; service domain + adapter POS/WA stub + scheduler aktif; Pest 52/52
+- Tanggal update terakhir: 2026-08-27
+- Fase aktif: Sprint 3 hampir selesai; Fase 6 (release) dimulai; blocker utama POS production
+- Status umum: alur web end-to-end (storefront + admin) usable dengan data contoh; ±70% MVP; integrasi POS/WA/Biteship live masih stub atau menunggu klien
 - PIC update: AI agent
 
 ## Roadmap ringkas
@@ -55,18 +55,22 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 3 — Cart, checkout, shipping, order, invoice
 
-- Status: backend + wiring UI inti selesai; invoice PDF, nomor resi, dan tautan konfirmasi WhatsApp masih berikutnya
+- Status: backend + wiring UI inti selesai; sisa: PDF invoice, tautan konfirmasi penerimaan, gratis ongkir Rp1jt
 - Target hasil:
   - cart aktif tunggal
   - alamat customer
-  - ongkir Biteship (mock) + kurir toko Bandung
+  - ongkir Biteship (mock/live siap) + kurir toko Bandung
   - order + invoice + expiry unpaid + shipment/payment rows
 - Catatan:
   - Checkout menulis `order_charge_components`, `shipments`, `payments`, outbox POS sale, notifikasi NEW_ORDER.
   - Scheduler `orders:auto-cancel-unpaid` + `orders:auto-complete-shipped` (skip `TERKENDALA`).
   - Endpoint POS `GET /api/pos/orders/{order_number}` tetap satu-satunya HTTP POS.
   - Detail pesanan pelanggan menampilkan rekening tujuan pembayaran (dari `BankAccount` aktif).
-  - Belum ada: generator PDF invoice (tombol admin sengaja disabled "Segera"), tampilan nomor resi di detail order, tautan konfirmasi penerimaan.
+  - Nomor resi tampil di detail order pelanggan/admin; `shipment_group_code` otomatis saat checkout.
+  - Preview invoice web (`/akun/pesanan/{order}/invoice`) ada; unduh PDF admin masih disabled ("Segera").
+  - `FulfillmentService::confirmReceipt` + token ada; route/tautan publik (WhatsApp) ke pelanggan belum.
+  - Aturan gratis ongkir Kurir Toko (subtotal barang + PPh 22 ≥ Rp1.000.000) belum di kalkulasi ongkir.
+  - Biteship live: `BiteshipShippingService` + config siap; default driver `mock`; butuh `BITESHIP_ORIGIN_AREA_ID`.
 
 ### Fase 4 — Payment, pembatalan/retur, admin workflow
 
@@ -81,7 +85,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ### Fase 5 — Reporting, audit, sync resilience, security
 
-- Status: fondasi backend + laporan UI dasar selesai; audit search UI belum
+- Status: Sprint 3 Task 13 (audit + locking) selesai; UI cari audit log & sisa NFR-SEC belum
 - Target hasil:
   - laporan dasar
   - audit trail
@@ -89,22 +93,36 @@ Dokumen ini dipakai untuk mencatat:
   - security checks
 - Catatan:
   - `ReportingService` omzet dari status `shipped`/`completed` (satu snapshot, tanpa double-count logika terpisah); UI `/admin/reports` filter periode + kecamatan.
-  - `AuditLogger` + policies Order/PaymentProof/CustomerProfile; UI pencarian audit log belum ada.
+  - `AuditLogger` + `audit_logs`; aksi kritis (payment, order, shipment, customer, store profile) tercatat; transaksi + `lockForUpdate` pada mutasi stok/order.
+  - Policies Order/PaymentProof/CustomerProfile; bukti privat + signed URL; throttle login/register/POS API.
+  - UI pencarian audit log (FR-AUD-002: filter actor/action/entity/periode) belum ada — Settings hanya riwayat `STORE_PROFILE_UPDATED`.
+  - Belum: throttle upload/checkout; dependency vulnerability scan di CI (NFR-SEC-010).
   - Sample POS sync + ack simulator (success/fail/timeout); WhatsApp stub (`log`/`fake`).
   - Scheduler: `pos:sync-*`, `pos:dispatch-*-reports`, `notifications:dispatch-pending`.
 
 ### Fase 6 — Release readiness
 
-- Status: persiapan dimulai (branch `staging` dibuat & dipush dari `dev`); smoke test/UAT/contract test belum
+- Status: persiapan berjalan (staging + skrip deploy shared hosting); smoke/UAT/contract test belum
 - Target hasil:
   - contract test POS/Biteship
   - staging smoke test
   - shared-hosting readiness
   - UAT, training, sign-off
 - Catatan:
-  - Estimasi keseluruhan ±70% MVP; gap utama fungsional: invoice PDF, tautan konfirmasi WhatsApp, nomor resi, penggabungan order, UI audit search; sisanya blocker eksternal (POS, Biteship, WhatsApp, format invoice/akun, PPh 22 final).
+  - Estimasi keseluruhan ±70% MVP.
+  - Gap fungsional yang masih terbuka: invoice PDF, tautan konfirmasi penerimaan, gratis ongkir Rp1jt, UI audit search.
+  - Blocker eksternal utama: akses POS production (Kak Rio). Lainnya: Biteship origin ID, WhatsApp produksi, format invoice/akun reseller, PPh 22 final.
 
 ## Log progres
+
+### 2026-08-27
+
+- Review status vs kode + `docs/sprints/SPRINT_3.md`:
+  - Sprint 3 Task 1–6, 8–13 selesai; Task 7 Biteship core ready (menunggu `BITESHIP_ORIGIN_AREA_ID`); WA masih log/fake.
+  - Sudah ada (PROGRESS sebelumnya usang): tampilan nomor resi, penggabungan pengiriman (`shipment_group_code`).
+  - Belum: invoice PDF, tautan konfirmasi penerimaan, gratis ongkir Kurir Toko ≥ Rp1jt, UI cari audit log, throttle upload/checkout, CI dependency scan.
+- Blocker utama dikonfirmasi: koneksi POS production dari klien; web tetap jalan dengan data contoh.
+- Next (tanpa menunggu POS): invoice PDF, tautan konfirmasi, gratis ongkir, UI audit search; lanjut smoke/UAT staging.
 
 ### 2026-08-19
 
@@ -185,14 +203,14 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Blocker dan dependency eksternal
 
-- Akses POS production / PIC Kak Rio
-- Konfirmasi parameter operasional Biteship
-- Provider / template / fallback WhatsApp
+- **Utama:** akses POS production / PIC Kak Rio (master, stok live, sale/return report, contract test go-live)
+- `BITESHIP_ORIGIN_AREA_ID` + parameter operasional Biteship untuk driver live
+- Provider / template / fallback WhatsApp produksi
 - Verifikasi shared hosting: cron, log, backup, worker bounded
 - Nilai tarif kurir toko per kecamatan untuk transaksi di bawah ambang gratis ongkir
 - Aturan nomor invoice serta nomor akun reseller
 - Aturan PPh 22 multi-kategori dan pembulatan
-- Aturan ongkir/status untuk penggabungan pesanan serta skema poin loyalitas
+- Skema poin loyalitas (OPN-020); pencatatan order channel WhatsApp
 
 ## Keputusan penting
 

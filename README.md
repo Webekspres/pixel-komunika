@@ -59,6 +59,7 @@ Health check: `GET /health`
 
 ## Dokumentasi
 
+- **Handover proyek (status, gap, operasional):** [docs/HANDOVER.md](docs/HANDOVER.md)
 - Brand UI (produk, color tokens & font): [DESIGN.md](DESIGN.md)
 - Requirement, design sistem, dan deliverable klien di branch `dev`:
   - Di lokal setelah `git checkout dev`: buka `docs/README.md`

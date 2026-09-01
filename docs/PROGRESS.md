@@ -11,10 +11,11 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-08-27
-- Fase aktif: Gap MVP tanpa POS ditutup; Fase 6 (release) berikutnya; blocker utama POS production
-- Status umum: alur web end-to-end usable dengan data contoh; ±75% MVP; sisa utama integrasi eksternal (POS/WA/Biteship live)
-- PIC update: AI agent
+- Tanggal update terakhir: 2026-09-01
+- Fase aktif: Fase 6 (release readiness); blocker utama integrasi eksternal (POS/WA/Biteship live)
+- Status umum: alur web end-to-end usable dengan data contoh; ±75% MVP; test suite 146/146 lulus
+- Handover lengkap: [`docs/HANDOVER.md`](HANDOVER.md)
+- PIC update: Kris Adiwinata (handover)
 
 ## Roadmap ringkas
 
@@ -116,6 +117,13 @@ Dokumen ini dipakai untuk mencatat:
   - Blocker eksternal utama: akses POS production (Kak Rio). Lainnya: Biteship origin ID, WhatsApp produksi, format invoice/akun reseller, PPh 22 final, channel kirim invoice.
 
 ## Log progres
+
+### 2026-09-01
+
+- Dokumen handover terpadu [`docs/HANDOVER.md`](HANDOVER.md) dibuat:
+  matriks MVP P0, fitur belum/ditunda, arsitektur, setup, testing, blocker OPN.
+- Verifikasi test suite: **146/146** lulus (706 assertions).
+- Pointer handover ditambahkan ke [`docs/README.md`](README.md).
 
 ### 2026-08-27 (lanjutan)
 

@@ -113,8 +113,9 @@ alias kompatibilitas, tetapi bukan path utama navigasi.
 | ADM-011 | Aturan PPh 22 | `/admin/tax-rules` | Route tersedia | Daftar ambang dan tarif per klasifikasi | [UF-17](USER_FLOWS.md#uf-17-konfigurasi-operasional) |
 | ADM-012 | Edit aturan PPh 22 | `/admin/tax-rules/{category}/edit` | Route tersedia | Perubahan ambang dan tarif | UF-17 |
 | ADM-013 | Pembayaran | `/admin/payments` | Route tersedia | Antrean dan verifikasi bukti pembayaran | [UF-11](USER_FLOWS.md#uf-11-verifikasi-pembayaran) |
-| ADM-014 | Laporan | `/admin/reports` | Route tersedia | Transaksi, omzet, PPh 22, dan audit | [UF-18](USER_FLOWS.md#uf-18-laporan-dan-audit) |
-| ADM-015 | Konfigurasi | `/admin/settings` | Route tersedia | Pengiriman, identitas Pixel Komunika, rekening, POS, dan notifikasi | UF-17 |
+| ADM-014 | Laporan | `/admin/reports` | Route tersedia | Transaksi, omzet, PPh 22 | [UF-18](USER_FLOWS.md#uf-18-laporan-dan-audit) |
+| ADM-015 | Audit log | `/admin/audit-logs` | Route tersedia | Pencarian jejak audit aksi kritis | UF-18; FR-AUD-002 |
+| ADM-016 | Konfigurasi | `/admin/settings` | Route tersedia | Pengiriman, identitas Pixel Komunika, rekening, POS, dan notifikasi | UF-17 |
 
 ## 6. Halaman yang Ditunda
 

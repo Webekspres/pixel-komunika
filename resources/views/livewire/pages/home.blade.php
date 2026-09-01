@@ -77,12 +77,14 @@
                         Belanja Sekarang
                         <x-icon name="arrow-right" class="size-4.5" />
                     </a>
-                    <a
-                        href="{{ route('register') }}"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 bg-white/15 px-7 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25"
-                    >
-                        Daftar Pelanggan
-                    </a>
+                    @guest
+                        <a
+                            href="{{ route('register') }}"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 bg-white/15 px-7 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25"
+                        >
+                            Daftar Pelanggan
+                        </a>
+                    @endguest
                 </div>
             </div>
         </div>
@@ -226,7 +228,8 @@
         </div>
     </section>
 
-    {{-- Promo dark banner — Figma: copy left + 2x2 trust cards right --}}
+    {{-- Promo + why-us: guest acquisition only --}}
+    @guest
     <x-storefront.banner
         theme="dark"
         background-image="{{ asset('assets/hero/cta-partai.webp') }}"
@@ -307,18 +310,9 @@
         </div>
     </section>
 
-    {{-- Guest registration CTA --}}
-    @guest
-        <x-storefront.cta
-            theme="yellow"
-            align="left"
-            background-image="{{ asset('assets/hero/cta-bergabung.webp') }}"
-            title="Siap Bergabung?"
-            description="Daftarkan usahamu sekarang dan dapatkan akses ke harga grosir dan partai eksklusif. Proses verifikasi cepat dan mudah."
-            primary-label="Daftar Sekarang"
-            :primary-href="route('register')"
-            secondary-label="Sudah punya akun? Masuk"
-            :secondary-href="route('login')"
-        />
+    <x-storefront.cta
+        :primary-href="route('register')"
+        :secondary-href="route('login')"
+    />
     @endguest
 </div>

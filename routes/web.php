@@ -10,8 +10,12 @@ use App\Http\Controllers\Admin\PaymentReviewController;
 use App\Http\Controllers\Admin\ProductEnrichmentController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Api\AreaSearchController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\OrderInvoiceController;
+use App\Http\Controllers\ReceiptConfirmationController;
+use App\Livewire\Admin\AdminAuditLog;
 use App\Livewire\Admin\AdminOrders;
 use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\CustomerReviewDetail;
@@ -32,11 +36,15 @@ Route::get('/produk', ProductIndex::class)->name('products.index');
 Route::get('/produk/{product}', ProductShow::class)->name('products.show');
 Route::get('/cart', CartIndex::class)->name('cart.index');
 
+Route::get('/konfirmasi-penerimaan/{order}', ReceiptConfirmationController::class)
+    ->middleware('throttle:10,1')
+    ->name('orders.confirm-receipt');
+
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/daftar', [RegisteredUserController::class, 'store'])->name('register.store');
+    Route::post('/daftar', [RegisteredUserController::class, 'store'])->name('register.store')->middleware('throttle:5,1');
     Route::get('/masuk', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/masuk', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::post('/masuk', [AuthenticatedSessionController::class, 'store'])->name('login.store')->middleware('throttle:5,1');
 });
 
 Route::middleware('auth')->group(function () {
@@ -54,11 +62,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/akun/pesanan/{order}', OrderDetail::class)->name('orders.show');
     Route::get('/orders/{order}', OrderDetail::class);
     Route::get('/pesanan/{order}', OrderDetail::class);
-    Route::get('/akun/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show'])->name('orders.invoice');
-    Route::get('/orders/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
-    Route::get('/pesanan/{order}/invoice', [\App\Http\Controllers\OrderInvoiceController::class, 'show']);
-    Route::get('/api/areas/search', [\App\Http\Controllers\Api\AreaSearchController::class, 'search'])->name('api.areas.search');
-    Route::get('/api/areas/districts', [\App\Http\Controllers\Api\AreaSearchController::class, 'districts'])->name('api.areas.districts');
+    Route::get('/akun/pesanan/{order}/invoice', [OrderInvoiceController::class, 'show'])->name('orders.invoice');
+    Route::get('/akun/pesanan/{order}/invoice/download', [OrderInvoiceController::class, 'download'])->name('orders.invoice.download');
+    Route::get('/orders/{order}/invoice', [OrderInvoiceController::class, 'show']);
+    Route::get('/pesanan/{order}/invoice', [OrderInvoiceController::class, 'show']);
+    Route::get('/orders/{order}/invoice/download', [OrderInvoiceController::class, 'download']);
+    Route::get('/pesanan/{order}/invoice/download', [OrderInvoiceController::class, 'download']);
+    Route::get('/api/areas/search', [AreaSearchController::class, 'search'])->name('api.areas.search');
+    Route::get('/api/areas/districts', [AreaSearchController::class, 'districts'])->name('api.areas.districts');
 });
 
 Route::middleware(['auth', 'active.customer'])->group(function () {
@@ -99,6 +110,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/brands/{brand}', [CatalogController::class, 'toggleBrand'])->name('brands.toggle');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/audit-logs', AdminAuditLog::class)->name('audit-logs.index');
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::patch('/settings/store-profile', [SettingsController::class, 'updateStoreProfile'])->name('settings.store-profile.update');

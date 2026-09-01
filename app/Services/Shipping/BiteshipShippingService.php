@@ -3,6 +3,8 @@
 namespace App\Services\Shipping;
 
 use App\Models\Shipment;
+use App\Models\StoreCourierRate;
+use App\Models\StoreProfile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -10,8 +12,11 @@ use Illuminate\Support\Facades\Log;
 class BiteshipShippingService implements ShippingCalculatorInterface
 {
     protected string $baseUrl;
+
     protected string $apiKey;
+
     protected string $originAreaId;
+
     protected int $timeout;
 
     public function __construct()
@@ -25,7 +30,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
     protected function resolveOriginAreaId(): string
     {
         try {
-            $storeOrigin = \App\Models\StoreProfile::active()?->origin_biteship_area_id;
+            $storeOrigin = StoreProfile::active()?->origin_biteship_area_id;
             if (! empty($storeOrigin)) {
                 return $storeOrigin;
             }
@@ -42,6 +47,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
 
         if (empty($this->apiKey) || empty($this->originAreaId)) {
             Log::warning('Biteship API key or origin_area_id not configured');
+
             return $storeRates;
         }
 
@@ -49,6 +55,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
             $destinationAreaId = $this->resolveDestinationAreaId($destinationCity);
             if (! $destinationAreaId) {
                 Log::warning("Biteship: no area found for city: {$destinationCity}");
+
                 return $storeRates;
             }
 
@@ -85,7 +92,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
         }
 
         try {
-            $query = \App\Models\StoreCourierRate::query()->where('is_active', true)->orderBy('rate_amount');
+            $query = StoreCourierRate::query()->where('is_active', true)->orderBy('rate_amount');
 
             if ($district) {
                 $normalizedDistrict = mb_strtolower($district);
@@ -119,7 +126,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
             }
 
             if (empty($rates) && empty($district)) {
-                $hasAny = \App\Models\StoreCourierRate::query()->where('is_active', true)->exists();
+                $hasAny = StoreCourierRate::query()->where('is_active', true)->exists();
                 if (! $hasAny) {
                     $rates[] = [
                         'provider' => Shipment::PROVIDER_STORE,
@@ -172,6 +179,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
                 return $areas[0]['area_id'] ?? null;
             } catch (\Throwable $e) {
                 Log::error('Biteship maps/areas exception: '.$e->getMessage());
+
                 return null;
             }
         });
@@ -203,6 +211,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
             return $data['rates'] ?? [];
         } catch (\Throwable $e) {
             Log::error('Biteship rates/couriers exception: '.$e->getMessage());
+
             return [];
         }
     }

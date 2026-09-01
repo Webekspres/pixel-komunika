@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\StoreCourierRate;
 use App\Services\Shipping\BiteshipShippingService;
 use Illuminate\Support\Facades\Http;
 
@@ -37,7 +36,7 @@ it('maps Biteship rates to correct format', function () {
 
     config(['biteship.api_key' => 'test-key', 'biteship.origin_area_id' => 'ORIGIN123']);
 
-    $service = new BiteshipShippingService();
+    $service = new BiteshipShippingService;
     $rates = $service->calculateRates('Jakarta', 500);
 
     expect($rates)->toHaveCount(2)
@@ -66,7 +65,7 @@ it('returns empty array on timeout and logs warning', function () {
     config(['biteship.api_key' => 'test-key', 'biteship.origin_area_id' => 'ORIGIN123']);
 
     // Simulate timeout by not having the request complete
-    $service = new BiteshipShippingService();
+    $service = new BiteshipShippingService;
     $rates = $service->calculateRates('Jakarta', 500);
 
     // The service should handle timeout gracefully (Http::timeout is set in service)
@@ -82,7 +81,7 @@ it('returns empty array on 5xx error and logs warning', function () {
 
     config(['biteship.api_key' => 'test-key', 'biteship.origin_area_id' => 'ORIGIN123']);
 
-    $service = new BiteshipShippingService();
+    $service = new BiteshipShippingService;
     $rates = $service->calculateRates('Jakarta', 500);
 
     expect($rates)->toBeEmpty();
@@ -95,7 +94,7 @@ it('returns empty array when area not found', function () {
 
     config(['biteship.api_key' => 'test-key', 'biteship.origin_area_id' => 'ORIGIN123']);
 
-    $service = new BiteshipShippingService();
+    $service = new BiteshipShippingService;
     $rates = $service->calculateRates('UnknownCity', 500);
 
     expect($rates)->toBeEmpty();
@@ -104,7 +103,7 @@ it('returns empty array when area not found', function () {
 it('returns empty array when API key or origin not configured', function () {
     config(['biteship.api_key' => '', 'biteship.origin_area_id' => '']);
 
-    $service = new BiteshipShippingService();
+    $service = new BiteshipShippingService;
     $rates = $service->calculateRates('Jakarta', 500);
 
     expect($rates)->toBeEmpty();
@@ -130,7 +129,7 @@ it('filters out zero cost rates', function () {
 
     config(['biteship.api_key' => 'test-key', 'biteship.origin_area_id' => 'ORIGIN123']);
 
-    $service = new BiteshipShippingService();
+    $service = new BiteshipShippingService;
     $rates = $service->calculateRates('Jakarta', 500);
 
     expect($rates)->toBeEmpty();

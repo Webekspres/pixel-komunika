@@ -5,7 +5,6 @@ use App\Livewire\Customer\OrderDetail;
 use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\CustomerProfile;
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
@@ -169,4 +168,3 @@ it('allows customer to cancel an unpaid order with reason', function () {
 
     expect($order->fresh()->status)->toBe('cancelled');
 });
-

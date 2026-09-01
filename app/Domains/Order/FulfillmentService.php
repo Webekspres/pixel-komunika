@@ -3,6 +3,7 @@
 namespace App\Domains\Order;
 
 use App\Domains\Audit\AuditLogger;
+use App\Domains\Notifications\NotificationService;
 use App\Models\Order;
 use App\Models\Shipment;
 use App\Models\User;
@@ -14,6 +15,7 @@ class FulfillmentService
 {
     public function __construct(
         protected AuditLogger $audit,
+        protected NotificationService $notifications,
     ) {}
 
     public function transition(Order $order, string $status, ?User $actor = null, ?string $trackingNumber = null): Order
@@ -30,11 +32,14 @@ class FulfillmentService
             throw new InvalidArgumentException("Transisi status dari {$from} ke {$status} tidak diizinkan.");
         }
 
-        return DB::transaction(function () use ($order, $status, $actor, $trackingNumber, $from) {
+        $receiptToken = null;
+
+        $result = DB::transaction(function () use ($order, $status, $actor, $trackingNumber, $from, &$receiptToken) {
             $payload = ['status' => $status];
 
             if ($status === 'shipped') {
-                $payload = array_merge($payload, $this->markShipped($order, $trackingNumber));
+                [$shippedPayload, $receiptToken] = $this->markShipped($order, $trackingNumber);
+                $payload = array_merge($payload, $shippedPayload);
             }
 
             if ($status === 'completed') {
@@ -56,6 +61,12 @@ class FulfillmentService
 
             return $order->fresh(['shipment']);
         });
+
+        if ($receiptToken) {
+            $this->notifications->notifyReceiptConfirmation($result, $receiptToken);
+        }
+
+        return $result;
     }
 
     public function markTerkendala(Order $order, string $reason, User $admin): Shipment
@@ -140,6 +151,9 @@ class FulfillmentService
         return $token;
     }
 
+    /**
+     * @return array{0: array<string, mixed>, 1: ?string}
+     */
     protected function markShipped(Order $order, ?string $trackingNumber): array
     {
         $order->shipment?->update([
@@ -148,10 +162,11 @@ class FulfillmentService
             'shipped_at' => now(),
         ]);
 
+        $token = null;
         if (! $order->receipt_token_hash) {
-            $this->issueReceiptToken($order);
+            $token = $this->issueReceiptToken($order);
         }
 
-        return [];
+        return [[], $token];
     }
 }

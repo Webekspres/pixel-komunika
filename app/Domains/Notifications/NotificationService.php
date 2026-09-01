@@ -53,6 +53,27 @@ class NotificationService
         ]);
     }
 
+    public function notifyReceiptConfirmation(Order $order, string $token): void
+    {
+        $url = route('orders.confirm-receipt', ['order' => $order, 'token' => $token]);
+        $message = 'Konfirmasi penerimaan pesanan '.$order->order_number.': '.$url;
+        $phone = $order->recipient_phone ?: config('store.whatsapp.admin_order_phone');
+
+        AppNotification::query()->create([
+            'user_id' => $order->user_id,
+            'order_id' => $order->id,
+            'channel' => AppNotification::CHANNEL_WHATSAPP,
+            'type' => AppNotification::TYPE_RECEIPT_CONFIRMATION,
+            'data' => [
+                'phone' => $phone,
+                'message' => $message,
+                'order_number' => $order->order_number,
+                'url' => $url,
+            ],
+            'status' => AppNotification::PENDING,
+        ]);
+    }
+
     public function markOrderNotificationsRead(User $admin): int
     {
         return AppNotification::query()

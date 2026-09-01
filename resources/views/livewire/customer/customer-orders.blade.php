@@ -125,12 +125,11 @@
                         <div class="flex items-center gap-2">
                             @if ($order->invoice && in_array($order->status, ['paid', 'processing', 'packed', 'shipped', 'completed']))
                                 <a
-                                    href="{{ route('orders.invoice', $order) }}"
-                                    target="_blank"
+                                    href="{{ route('orders.invoice.download', $order) }}"
                                     class="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition shadow-2xs"
                                 >
                                     <x-icon name="download" class="size-3.5" />
-                                    <span>Invoice</span>
+                                    <span>Invoice PDF</span>
                                 </a>
                             @endif
 

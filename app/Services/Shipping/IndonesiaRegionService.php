@@ -274,7 +274,6 @@ class IndonesiaRegionService
     /**
      * Get cities/regencies in a given province (Sorted A-Z).
      *
-     * @param string $province
      * @return array<int, string>
      */
     public static function getCitiesByProvince(string $province): array
@@ -284,12 +283,14 @@ class IndonesiaRegionService
         if (isset($all[$province])) {
             $cities = $all[$province];
             sort($cities, SORT_NATURAL | SORT_FLAG_CASE);
+
             return $cities;
         }
 
         foreach ($all as $prov => $cities) {
             if (strcasecmp($prov, $province) === 0) {
                 sort($cities, SORT_NATURAL | SORT_FLAG_CASE);
+
                 return $cities;
             }
         }
@@ -300,7 +301,6 @@ class IndonesiaRegionService
     /**
      * Curated list of districts (Kecamatan) for Indonesian cities & regencies (Sorted A-Z).
      *
-     * @param string $city
      * @return array<int, string>
      */
     public static function getDistrictsByCity(string $city): array
@@ -748,6 +748,7 @@ class IndonesiaRegionService
         foreach ($districtsMap as $cityName => $districts) {
             if ($c === $cityName || str_contains($c, $cityName) || str_contains($cityName, $c)) {
                 sort($districts, SORT_NATURAL | SORT_FLAG_CASE);
+
                 return $districts;
             }
         }

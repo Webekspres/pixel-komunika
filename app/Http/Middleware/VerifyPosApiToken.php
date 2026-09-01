@@ -12,7 +12,7 @@ class VerifyPosApiToken
     {
         $token = config('services.pos.api_token');
 
-        if (! $token || $request->bearerToken() !== $token) {
+        if (! $token || ! hash_equals($token, (string) $request->bearerToken())) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 

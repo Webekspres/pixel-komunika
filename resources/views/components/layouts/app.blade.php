@@ -90,6 +90,10 @@
                         <x-icon name="bar-chart-3" class="size-4 shrink-0" />
                         <span>Laporan</span>
                     </a>
+                    <a href="{{ route('admin.audit-logs.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+                        <x-icon name="scroll-text" class="size-4 shrink-0" />
+                        <span>Audit Log</span>
+                    </a>
 
                     <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Sistem</p>
                     <a href="{{ route('admin.tax-rules.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.tax-rules.*') ? 'active' : '' }}">

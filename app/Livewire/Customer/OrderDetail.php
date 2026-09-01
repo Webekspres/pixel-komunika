@@ -6,7 +6,10 @@ use App\Models\BankAccount;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\PaymentService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -20,8 +23,11 @@ class OrderDetail extends Component
 
     // Payment proof upload fields
     public $bank_name = '';
+
     public $account_name = '';
+
     public $amount = '';
+
     public $proof_file;
 
     // Return request fields
@@ -29,7 +35,9 @@ class OrderDetail extends Component
 
     // UI state
     public bool $showCancelModal = false;
+
     public string $cancelReason = '';
+
     public ?string $proofPreviewUrl = null;
 
     public function mount(Order $order): void
@@ -74,6 +82,14 @@ class OrderDetail extends Component
 
     public function uploadPaymentProof(PaymentService $paymentService): void
     {
+        $key = 'payment-proof-upload:'.Auth::id();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw ValidationException::withMessages([
+                'proof_file' => 'Terlalu banyak unggahan bukti. Coba lagi nanti.',
+            ]);
+        }
+        RateLimiter::hit($key, 60);
+
         $this->validate([
             'bank_name' => 'required|string|max:100',
             'account_name' => 'required|string|max:150',
@@ -110,7 +126,7 @@ class OrderDetail extends Component
             return;
         }
 
-        $orderService->cancelOrder($this->order, 'Dibatalkan oleh pelanggan: ' . $this->cancelReason, 'CUSTOMER');
+        $orderService->cancelOrder($this->order, 'Dibatalkan oleh pelanggan: '.$this->cancelReason, 'CUSTOMER');
 
         session()->flash('success', 'Pesanan berhasil dibatalkan dan stok produk telah dikembalikan.');
         $this->showCancelModal = false;
@@ -136,7 +152,7 @@ class OrderDetail extends Component
         $this->dispatch('copy-to-clipboard', text: $text);
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function render(): View
     {
         $bankAccounts = BankAccount::query()
             ->where('is_active', true)

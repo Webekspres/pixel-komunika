@@ -107,8 +107,7 @@ it('renders clean related products links on PDP without escaped quotes', functio
 
         $this->get(route('products.show', $product))
             ->assertOk()
-            ->assertSee('href="' . $expectedUrl . '"', false)
-            ->assertDontSee('href="&quot;' . $expectedUrl, false);
+            ->assertSee('href="'.$expectedUrl.'"', false)
+            ->assertDontSee('href="&quot;'.$expectedUrl, false);
     }
 });
-

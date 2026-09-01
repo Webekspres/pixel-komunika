@@ -8,6 +8,7 @@
 | Repo | [Webekspres/pixel-komunika](https://github.com/Webekspres/pixel-komunika) |
 | Branch aktif pengembangan | `dev` |
 | Alur promosi | `dev` → `staging` → `main` |
+| Versi PDF | [HANDOVER.pdf](HANDOVER.pdf) (diagram sudah di-render) |
 
 ---
 

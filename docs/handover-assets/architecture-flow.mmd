@@ -1,0 +1,15 @@
+flowchart TB
+    subgraph storefront [Storefront]
+        Home --> Catalog --> Cart --> Checkout
+    end
+    subgraph admin [Admin Panel]
+        AdminOrders --> AdminPayments --> Reports
+    end
+    Checkout --> OrderService
+    OrderService --> InventoryLedger[inventory_ledger]
+    OrderService --> PosOutbox[pos_integration_operations]
+    PosOutbox --> SampleAdapter[SamplePosSyncService]
+    Checkout --> ShippingCalc[ShippingCalculator]
+    ShippingCalc --> MockOrBiteship[Mock_atau_Biteship]
+    OrderService --> NotificationService
+    NotificationService --> WhatsAppStub[WhatsApp_stub]

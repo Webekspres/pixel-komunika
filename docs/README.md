@@ -5,6 +5,8 @@
 - [Dokumen Handover Proyek](HANDOVER.md) — snapshot status implementasi,
   matriks MVP, arsitektur, panduan operasional, blocker go-live, dan checklist
   serah terima (Bahasa Indonesia; per 1 September 2026).
+- [PDF Handover](HANDOVER.pdf) — versi cetak/share untuk klien (diagram Mermaid
+  sudah di-render sebagai gambar).
 
 ## Client Deliverable
 

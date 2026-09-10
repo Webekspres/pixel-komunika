@@ -119,7 +119,7 @@
                                             @endif
 
                                             @if ($order->status === 'shipped')
-                                                <flux:menu.item icon="triangle-alert" wire:click="openTerkendalaModal({{ $order->id }})">Tandai Terkendala</flux:menu.item>
+                                                <flux:menu.item icon="exclamation-triangle" wire:click="openTerkendalaModal({{ $order->id }})">Tandai Terkendala</flux:menu.item>
                                             @endif
                                         </flux:menu>
                                     </flux:dropdown>

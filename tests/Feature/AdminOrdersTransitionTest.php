@@ -158,3 +158,15 @@ it('exposes cancel option on the list only for same-day unpaid/payment_pending o
         ->test(AdminOrders::class)
         ->assertDontSee('Batalkan Pesanan');
 });
+
+it('renders shipped orders with terkendala action in order list', function () {
+    $admin = User::factory()->admin()->create();
+    $order = ordersFixtureOrder();
+    $order->update(['status' => 'shipped']);
+
+    Livewire::actingAs($admin)
+        ->test(AdminOrders::class)
+        ->assertSee('Tandai Terkendala')
+        ->assertSee($order->order_number)
+        ->assertOk();
+});

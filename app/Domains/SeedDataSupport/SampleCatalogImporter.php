@@ -18,6 +18,10 @@ class SampleCatalogImporter
 {
     public function import(): void
     {
+        if (app()->isProduction()) {
+            throw new \RuntimeException('Sample catalog data must never be imported in production (FR-POS-016).');
+        }
+
         DB::transaction(function (): void {
             foreach ($this->dataset() as $categoryData) {
                 $category = Category::query()->updateOrCreate(

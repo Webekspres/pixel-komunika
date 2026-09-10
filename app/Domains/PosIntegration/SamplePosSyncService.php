@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 /**
  * Sample/stub POS adapter until OPN-005/019 HTTP contract lands.
  */
-class SamplePosSyncService
+class SamplePosSyncService implements PosMasterSyncInterface
 {
     public function __construct(
         protected SampleCatalogImporter $catalogImporter,

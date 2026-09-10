@@ -38,6 +38,15 @@ class AppServiceProvider extends ServiceProvider
                 ? new FakeWhatsAppNotifier
                 : new LogWhatsAppNotifier;
         });
+
+        $this->app->bind(\App\Domains\PosIntegration\PosMasterSyncInterface::class, function ($app) {
+            $driver = config('pos.driver', 'sample');
+
+            return match ($driver) {
+                'sandbox' => $app->make(\App\Domains\PosIntegration\SandboxPosMasterSyncService::class),
+                default => $app->make(\App\Domains\PosIntegration\SamplePosSyncService::class),
+            };
+        });
     }
 
     public function boot(): void

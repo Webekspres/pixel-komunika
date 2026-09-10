@@ -2,6 +2,21 @@
 
 Daftar follow-up integrasi POS setelah flow website berbasis data contoh stabil.
 
+## Status Fase 1 (Sandbox Master Data Sync)
+
+- Empat endpoint master data sudah tersedia dan terhubung via adapter sandbox (`PosApiClient` & `SandboxPosMasterSyncService`):
+  1. `GET /master/category`
+  2. `GET /master/product`
+  3. `GET /master/pricelist`
+  4. `POST /master/product_detail` (targeted on-demand lookup).
+- Adapter sandbox telah menerapkan validasi pra-tulis ketat (fail-fast) agar snapshot katalog terlindungi dari anomali data sandbox.
+- **Integrasi POS production BELUM selesai dan masih DIBLOKIR** oleh:
+  1. Ketiadaan endpoint stock read/sync live.
+  2. Ketiadaan kontrak live untuk report sale, report return, dan acknowledgement/reconciliation.
+  3. Kualitas identifier POS (duplikasi `item_id` dan pricelist pada data sandbox).
+  4. Belum adanya skema dan kesepakatan pemetaan tier harga `Grosir 2` serta tipe asing.
+  5. Keputusan final pemetaan dan perlakuan pajak (`ppn` dan `pph`) dari POS.
+
 ## Tujuan
 
 Menyiapkan kontrak endpoint dan data POS untuk fase setelah Sprint 1 tanpa memblokir auth dan katalog dasar.

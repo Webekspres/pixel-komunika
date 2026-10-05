@@ -802,7 +802,7 @@ berstatus blocker tidak boleh dianggap selesai hanya karena ada asumsi lisan.
 | PRE-004 | Data Biteship dan kurir toko: origin, berat, dimensi bila digunakan, area ID/koordinat, daftar kurir, tarif, SLA, serta akun production. | Klien | G1 pengiriman | Parsial - origin, berat, dimensi produk besar, Grab/Gojek, fallback, area, ambang gratis ongkir, dan SLA H+1 tersedia; nilai tarif per area, fallback data, kode layanan, serta akun/biaya tetap OPN-010/OPN-021 |
 | PRE-005 | Keputusan invoice dan notifikasi, termasuk channel serta template jika dipilih. | Klien | G1 Sprint 2 | Parsial - nama legal, layout, sumber website, preview/PDF/channel, penerima, isi, dan read behavior selesai; format NPWP/akun reseller/nomor invoice serta provider/credential/retry tetap OPN-022/OPN-023 |
 | PRE-006 | Hosting, domain/DNS, akun layanan, dan akses environment ditetapkan. | Klien / Webekspres | Sebelum staging | Parsial - shared hosting milik klien dan komitmen pemberian akses developer resolved pada OPN-001/CR-016; kredensial aktual, domain/DNS, akun layanan, kemampuan runtime, cron, log, backup, dan jadwal handoff masih perlu disediakan atau diverifikasi |
-| PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Open |
+| PRE-007 | Skenario UAT, data uji, perwakilan uji, dan proses sign-off disepakati. | Klien / Webekspres | Sebelum UAT | Parsial - skenario, data uji, dan format sign-off tersedia di [UAT_SCENARIOS.md](../UAT_SCENARIOS.md); penguji klien + tim IT klien; nama perwakilan dan penandatangan masih menunggu klien |
 
 ## 16. Persetujuan
 

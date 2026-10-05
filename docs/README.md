@@ -7,6 +7,11 @@
   serah terima (Bahasa Indonesia; per 1 September 2026).
 - [PDF Handover](HANDOVER.pdf) — versi cetak/share untuk klien (diagram Mermaid
   sudah di-render sebagai gambar).
+- [Skenario UAT](UAT_SCENARIOS.md) / [PDF](UAT_SCENARIOS.pdf) — panduan UAT
+  15 Oktober 2026 untuk klien dan tim IT klien (PRE-007). PDF dibuat ulang dengan
+  `pandoc UAT_SCENARIOS.md -s --columns=10000 --embed-resources --css
+  handover-assets/print.css -o uat.html` lalu cetak `uat.html` lewat Chrome
+  headless (`--print-to-pdf`).
 
 ## Client Deliverable
 

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
+    public const MAX_WHATSAPP_ATTEMPTS = 5;
+
     public function __construct(
         protected WhatsAppNotifierInterface $whatsApp,
     ) {}
@@ -137,6 +139,9 @@ class NotificationService
         $pending = AppNotification::query()
             ->where('channel', AppNotification::CHANNEL_WHATSAPP)
             ->where('status', AppNotification::PENDING)
+            // Yang baru gagal ter-update -> pindah ke belakang antrean.
+            ->orderBy('updated_at')
+            ->orderBy('id')
             ->limit($limit)
             ->get();
 
@@ -164,8 +169,12 @@ class NotificationService
                     'error' => $e->getMessage(),
                 ]);
 
+                // Batasi percobaan agar baris yang gagal permanen (nomor salah, token
+                // kosong) tidak terus memenuhi batch dan menahan notifikasi baru.
+                $attempts = (int) ($notification->data['attempts'] ?? 0) + 1;
                 $notification->update([
-                    'data' => array_merge($notification->data ?? [], ['last_error' => $e->getMessage()]),
+                    'status' => $attempts >= self::MAX_WHATSAPP_ATTEMPTS ? AppNotification::FAILED : AppNotification::PENDING,
+                    'data' => array_merge($notification->data ?? [], ['last_error' => $e->getMessage(), 'attempts' => $attempts]),
                 ]);
             }
         }

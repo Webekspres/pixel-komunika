@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -88,9 +89,11 @@ class AccountController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $request->merge(['phone' => User::normalizePhone($request->input('phone'))]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'phone' => ['required', 'string', 'max:32', 'unique:users,phone,'.$request->user()->id],
+            'phone' => ['required', 'string', 'regex:/^08\d{8,12}$/', 'unique:users,phone,'.$request->user()->id],
             'business_name' => ['nullable', 'string', 'max:191'],
         ]);
 

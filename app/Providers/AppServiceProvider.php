@@ -6,6 +6,11 @@ use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
 use App\Domains\Notifications\FakeWhatsAppNotifier;
 use App\Domains\Notifications\FonnteWhatsAppNotifier;
 use App\Domains\Notifications\LogWhatsAppNotifier;
+use App\Domains\PosIntegration\PosMasterSyncInterface;
+use App\Domains\PosIntegration\SamplePosSyncService;
+use App\Domains\PosIntegration\SandboxPosMasterSyncService;
+use App\Http\Middleware\EnsureActiveCustomer;
+use App\Http\Middleware\EnsureAdmin;
 use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\PaymentProof;
@@ -20,6 +25,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,12 +48,12 @@ class AppServiceProvider extends ServiceProvider
             };
         });
 
-        $this->app->bind(\App\Domains\PosIntegration\PosMasterSyncInterface::class, function ($app) {
+        $this->app->bind(PosMasterSyncInterface::class, function ($app) {
             $driver = config('pos.driver', 'sample');
 
             return match ($driver) {
-                'sandbox' => $app->make(\App\Domains\PosIntegration\SandboxPosMasterSyncService::class),
-                default => $app->make(\App\Domains\PosIntegration\SamplePosSyncService::class),
+                'sandbox' => $app->make(SandboxPosMasterSyncService::class),
+                default => $app->make(SamplePosSyncService::class),
             };
         });
     }
@@ -57,6 +63,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(PaymentProof::class, PaymentProofPolicy::class);
         Gate::policy(CustomerProfile::class, CustomerProfilePolicy::class);
+
+        // Aksi Livewire (/livewire/update) ikut menjalankan ulang middleware route asal,
+        // jadi admin yang diturunkan / pelanggan yang ditangguhkan saat tab terbuka tertolak.
+        Livewire::addPersistentMiddleware([EnsureAdmin::class, EnsureActiveCustomer::class]);
 
         // Saat DB di-reset (migrate:fresh), media unggahan lokal ikut dibersihkan
         // agar konsisten dengan tabel media_library yang ter-wipe. Khusus dev/staging,

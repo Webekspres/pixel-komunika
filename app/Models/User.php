@@ -35,6 +35,14 @@ class User extends Authenticatable
         return $this->hasMany(Address::class);
     }
 
+    /** 0812-3456-7890, +6281234567890, 6281234567890 -> 081234567890 (FR-AUTH-001: nomor unik). */
+    public static function normalizePhone(?string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone);
+
+        return str_starts_with($digits, '62') ? '0'.substr($digits, 2) : $digits;
+    }
+
     public function isAdmin(): bool
     {
         return $this->role?->code === Role::ADMIN;

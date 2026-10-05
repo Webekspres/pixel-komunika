@@ -21,10 +21,12 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->merge(['phone' => User::normalizePhone($request->input('phone'))]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'business_name' => ['nullable', 'string', 'max:191'],
-            'phone' => ['required', 'string', 'max:32', 'unique:users,phone'],
+            'phone' => ['required', 'string', 'regex:/^08\d{8,12}$/', 'unique:users,phone'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:191', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);

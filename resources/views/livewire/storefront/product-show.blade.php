@@ -134,7 +134,7 @@
                                             <span class="font-semibold text-zinc-700">
                                                 Rp {{ number_format($product->partaiPriceAmount(), 0, ',', '.') }}
                                             </span>
-                                            (min. 5 unit/SKU)
+                                            (min. {{ app(\App\Domains\Pricing\PriceCalculator::class)->partaiMinimumQuantity() }} unit/SKU)
                                             @if ($product->grosirMinimumQuantity())
                                                 · Grosir min. {{ $product->grosirMinimumQuantity() }} unit
                                             @endif

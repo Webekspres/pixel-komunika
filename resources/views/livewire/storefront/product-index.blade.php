@@ -95,8 +95,10 @@
                                 <option value="newest">Terbaru</option>
                                 <option value="name_asc">Nama (A - Z)</option>
                                 <option value="name_desc">Nama (Z - A)</option>
+                                @if (auth()->user()?->canViewPrices())
                                 <option value="price_low">Harga: Terendah → Tertinggi</option>
                                 <option value="price_high">Harga: Tertinggi → Terendah</option>
+                                @endif
                             </select>
                         </div>
                     </div>

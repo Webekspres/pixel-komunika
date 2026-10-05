@@ -47,7 +47,7 @@ it('applies updated tax rule to cart summary', function () {
             'is_active' => '1',
         ]);
 
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($user);
 

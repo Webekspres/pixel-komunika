@@ -99,6 +99,7 @@
     </div>
 
     {{-- Price Range Filter --}}
+    @if (auth()->user()?->canViewPrices())
     <div class="space-y-3">
         <h4 class="text-xs font-bold uppercase tracking-wider text-brand-black">Kisaran Harga (Rp)</h4>
         <div class="grid grid-cols-2 gap-2">
@@ -122,4 +123,5 @@
             </div>
         </div>
     </div>
+    @endif
 </aside>

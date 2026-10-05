@@ -15,6 +15,9 @@ class ProductShow extends Component
 
     public function mount(Product $product)
     {
+        // Produk nonaktif/tersembunyi tidak bisa dibuka pelanggan; admin tetap bisa pratinjau.
+        abort_unless($product->isStorefrontVisible() || Auth::user()?->isAdmin(), 404);
+
         $this->product = $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
     }
 
@@ -64,7 +67,7 @@ class ProductShow extends Component
         $cartSummary = $cartService->getCartSummary($cart);
 
         // Fetch related products in same category
-        $relatedProducts = Product::with(['category', 'enrichment', 'prices', 'inventorySnapshot', 'media.library'])
+        $relatedProducts = Product::query()->storefrontVisible()->with(['category', 'enrichment', 'prices', 'inventorySnapshot', 'media.library'])
             ->where('category_id', $this->product->category_id)
             ->where('id', '!=', $this->product->id)
             ->take(4)

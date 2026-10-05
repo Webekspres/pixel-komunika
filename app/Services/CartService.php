@@ -49,7 +49,20 @@ class CartService
             throw new InvalidArgumentException('Silakan masuk untuk menambahkan produk ke keranjang.');
         }
 
+        // Pending/ditolak/ditangguhkan tidak boleh belanja maupun melihat harga lewat keranjang.
+        if (! $cart->user?->isActiveCustomer()) {
+            throw new InvalidArgumentException('Akun Anda belum aktif untuk berbelanja. Tunggu verifikasi admin.');
+        }
+
+        if ($quantity < 1) {
+            throw new InvalidArgumentException('Jumlah minimal 1.');
+        }
+
         $product = Product::with('inventorySnapshot')->findOrFail($productId);
+
+        if (! $product->isStorefrontVisible()) {
+            throw new InvalidArgumentException('Produk tidak tersedia.');
+        }
 
         $stockAvailable = $product->inventorySnapshot ? $product->inventorySnapshot->quantity_available : 0;
 
@@ -104,10 +117,12 @@ class CartService
 
     public function getCartSummary(Cart $cart): array
     {
-        $cart->load(['items.product.category', 'items.product.prices']);
+        $cart->load(['user', 'items.product.category', 'items.product.prices']);
 
         $items = $cart->items;
-        if ($items->isEmpty()) {
+        // Harga hanya untuk admin/pelanggan aktif: akun yang ditangguhkan setelah
+        // mengisi keranjang melihat keranjang kosong, bukan harga grosir.
+        if ($items->isEmpty() || ($cart->user && ! $cart->user->canViewPrices())) {
             return [
                 'items' => collect(),
                 'subtotal' => 0,

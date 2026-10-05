@@ -87,7 +87,7 @@
                         <tr class="border-b border-neutral-100">
                             <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">No. Order</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tanggal</th>
+                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tgl Kirim</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Pelanggan</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kecamatan</th>
                             <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Subtotal</th>
@@ -106,7 +106,7 @@
                                     </a>
                                 </td>
                                 <td class="px-5 py-3.5 text-xs whitespace-nowrap text-zinc-500">
-                                    {{ $order->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}
+                                    {{ ($order->shipment?->shipped_at ?? $order->created_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}
                                 </td>
                                 <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->recipient_name }}</td>
                                 <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->shipping_district ?: '—' }}</td>

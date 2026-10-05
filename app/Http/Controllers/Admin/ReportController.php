@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Domains\Reporting\ReportingService;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Shipment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,21 +20,17 @@ class ReportController extends Controller
         $tz = 'Asia/Jakarta';
         $now = Carbon::now($tz);
         [$from, $to] = match ($period) {
-            '7d' => [$now->copy()->subDays(7)->startOfDay(), null],
-            '30d' => [$now->copy()->subDays(30)->startOfDay(), null],
+            '7d' => [$now->copy()->subDays(6)->startOfDay(), null],
+            '30d' => [$now->copy()->subDays(29)->startOfDay(), null],
             'month' => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
             default => [null, null],
         };
 
         $summary = $reporting->salesSummary($from, $to, $district !== '' ? $district : null);
 
-        $transactions = Order::query()
-            ->with(['user', 'latestPaymentProof'])
-            ->whereIn('status', ['shipped', 'completed'])
-            ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
-            ->when($to, fn ($q) => $q->where('created_at', '<=', $to))
-            ->when($district !== '', fn ($q) => $q->where('shipping_district', $district))
-            ->orderByDesc('created_at')
+        $transactions = $reporting->shippedOrders($from, $to, $district !== '' ? $district : null)
+            ->with(['user', 'latestPaymentProof', 'shipment'])
+            ->orderByDesc(Shipment::query()->select('shipped_at')->whereColumn('order_id', 'orders.id')->limit(1))
             ->paginate(15)
             ->withQueryString();
 

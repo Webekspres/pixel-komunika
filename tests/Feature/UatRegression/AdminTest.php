@@ -123,7 +123,13 @@ it('probe: dashboard total omzet equals report omzet', function () {
 it('probe: dashboard last-month revenue includes orders on the last day of the month', function () {
     Carbon::setTestNow(Carbon::parse('2026-10-05 12:00:00', 'Asia/Jakarta'));
     $order = Order::factory()->create(['status' => 'shipped', 'grand_total' => 116000]);
-    $order->forceFill(['created_at' => Carbon::parse('2026-09-30 10:00:00', 'Asia/Jakarta')])->saveQuietly();
+    // Periode omzet = tanggal kirim (FR-RPT-001): dikirim malam hari terakhir bulan lalu.
+    $order->shipment()->create([
+        'rate_provider' => 'STORE_COURIER', 'service_name_snapshot' => 'Kurir Toko',
+        'recipient_name_snapshot' => 'X', 'recipient_phone_snapshot' => '081', 'address_snapshot' => 'X',
+        'province_snapshot' => 'Jawa Barat', 'city_snapshot' => 'Bandung', 'district_snapshot' => 'Coblong', 'postal_code_snapshot' => '40132', 'shipping_amount' => 0,
+        'shipped_at' => Carbon::parse('2026-09-30 22:00:00', 'Asia/Jakarta'),
+    ]);
 
     // Nothing this month, 116000 last month => -100%.
     expect(app(AdminDashboardService::class)->build()['revenueGrowthPercent'])->toBe(-100.0);
@@ -147,4 +153,18 @@ it('re-runs admin and active-customer middleware on Livewire updates', function 
     expect(app('livewire')->getPersistentMiddleware())
         ->toContain(EnsureAdmin::class)
         ->toContain(EnsureActiveCustomer::class);
+});
+
+it('ADM-01 counts omzet in the month the order was shipped, not created (FR-RPT-001)', function () {
+    $order = Order::factory()->create(['status' => 'shipped', 'subtotal' => 100000, 'shipping_cost' => 0, 'created_at' => Carbon::parse('2026-09-30 10:00:00')]);
+    $order->shipment()->create([
+        'rate_provider' => 'STORE_COURIER', 'service_name_snapshot' => 'Kurir Toko',
+        'recipient_name_snapshot' => 'X', 'recipient_phone_snapshot' => '081', 'address_snapshot' => 'X',
+        'province_snapshot' => 'Jawa Barat', 'city_snapshot' => 'Bandung', 'district_snapshot' => 'Coblong', 'postal_code_snapshot' => '40132', 'shipping_amount' => 0,
+        'shipped_at' => Carbon::parse('2026-10-02 09:00:00'),
+    ]);
+    $reporting = app(ReportingService::class);
+
+    expect($reporting->salesSummary(Carbon::parse('2026-09-01'), Carbon::parse('2026-09-30 23:59:59'))['omzet'])->toBe(0.0)
+        ->and($reporting->salesSummary(Carbon::parse('2026-10-01'), Carbon::parse('2026-10-31 23:59:59'))['omzet'])->toBe(100000.0);
 });

@@ -4,6 +4,7 @@ namespace App\Domains\Reporting;
 
 use App\Models\Order;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -16,11 +17,7 @@ class ReportingService
      */
     public function salesSummary(?CarbonInterface $from = null, ?CarbonInterface $to = null, ?string $district = null): array
     {
-        $query = Order::query()
-            ->whereIn('status', ['shipped', 'completed'])
-            ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
-            ->when($to, fn ($q) => $q->where('created_at', '<=', $to))
-            ->when($district, fn ($q) => $q->where('shipping_district', $district));
+        $query = $this->shippedOrders($from, $to, $district);
 
         // Use subtotal+shipping as omzet base from shipped moment; completed shares same snapshot.
         $omzet = (float) (clone $query)->sum(DB::raw('subtotal + shipping_cost'));
@@ -38,5 +35,20 @@ class ReportingService
             'order_count' => $count,
             'by_district' => $byDistrict,
         ];
+    }
+
+    /**
+     * FR-RPT-001: periode omzet mengikuti tanggal pesanan dikirim (SHIPPED), bukan tanggal dibuat.
+     *
+     * @return Builder<Order>
+     */
+    public function shippedOrders(?CarbonInterface $from = null, ?CarbonInterface $to = null, ?string $district = null): Builder
+    {
+        return Order::query()
+            ->whereIn('status', ['shipped', 'completed'])
+            ->when($from || $to, fn ($q) => $q->whereHas('shipment', fn ($s) => $s
+                ->when($from, fn ($s) => $s->where('shipped_at', '>=', $from))
+                ->when($to, fn ($s) => $s->where('shipped_at', '<=', $to))))
+            ->when($district, fn ($q) => $q->where('shipping_district', $district));
     }
 }

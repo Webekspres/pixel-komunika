@@ -37,6 +37,17 @@ return [
         'free_store_courier_threshold' => (int) env('STORE_FREE_SHIPPING_THRESHOLD', 1_000_000),
     ],
 
-    'holidays' => [], // YYYY-MM-DD list; ponytail: replace with calendar when OPN-020 lands
+    // Libur nasional + cuti bersama (SKB 3 Menteri), dipakai WorkdayCalculator.
+    // ponytail: update manual tiap SKB tahunan terbit (biasanya Sep); pindah ke admin bila klien ingin kelola sendiri.
+    'holidays' => [
+        // 2026 (sisa)
+        '2026-12-24', '2026-12-25',
+        // 2027
+        '2027-01-01', '2027-01-05', '2027-02-05', '2027-02-06', '2027-03-08', '2027-03-09',
+        '2027-03-10', '2027-03-11', '2027-03-12', '2027-03-15', '2027-03-25', '2027-03-26',
+        '2027-03-28', '2027-05-01', '2027-05-06', '2027-05-17', '2027-05-18', '2027-05-19',
+        '2027-05-20', '2027-06-01', '2027-06-06', '2027-08-15', '2027-08-17', '2027-12-24',
+        '2027-12-25', '2027-12-26',
+    ],
 
 ];

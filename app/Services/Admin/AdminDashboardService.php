@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Domains\Reporting\ReportingService;
 use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\PaymentProof;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 class AdminDashboardService
 {
+    public function __construct(
+        protected ReportingService $reporting,
+    ) {}
+
     public function build(): array
     {
         $tz = 'Asia/Jakarta';
@@ -19,9 +24,6 @@ class AdminDashboardService
         $today = $now->toDateString();
         $yesterday = $now->copy()->subDay()->toDateString();
         $weekStart = $now->copy()->startOfWeek()->toDateString();
-        $monthStart = $now->copy()->startOfMonth()->toDateString();
-        $lastMonthStart = $now->copy()->subMonth()->startOfMonth()->toDateString();
-        $lastMonthEnd = $now->copy()->subMonth()->endOfMonth()->toDateString();
 
         $ordersToday = Order::query()->whereDate('created_at', $today)->count();
         $ordersYesterday = Order::query()->whereDate('created_at', $yesterday)->count();
@@ -47,23 +49,15 @@ class AdminDashboardService
             ->whereDate('reviewed_at', '>=', $weekStart)
             ->count();
 
-        $totalRevenue = (float) Order::query()
-            ->whereIn('status', ['shipped', 'completed'])
-            ->sum('grand_total');
-
-        $revenueThisMonth = (float) Order::query()
-            ->whereIn('status', ['shipped', 'completed'])
-            ->whereDate('created_at', '>=', $monthStart)
-            ->sum('grand_total');
-
-        $revenueLastMonth = (float) Order::query()
-            ->whereIn('status', ['shipped', 'completed'])
-            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
-            ->sum('grand_total');
+        // Omzet = definisi laporan (subtotal + ongkir, status shipped/completed) agar angka sama.
+        $totalRevenue = $this->reporting->salesSummary()['omzet'];
+        $revenueThisMonth = $this->reporting->salesSummary($now->copy()->startOfMonth(), $now)['omzet'];
+        $lastMonth = $now->copy()->subMonthNoOverflow();
+        $revenueLastMonth = $this->reporting->salesSummary($lastMonth->copy()->startOfMonth(), $lastMonth->copy()->endOfMonth())['omzet'];
 
         $revenueGrowthPercent = $revenueLastMonth > 0
             ? round((($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100, 1)
-            : 12.4;
+            : null;
 
         $recentOrders = Order::query()
             ->with(['user.customerProfile', 'items.product'])
@@ -87,7 +81,7 @@ class AdminDashboardService
         $lastSync = SyncRun::query()->latest('started_at')->first();
         $lastSyncTimeFormatted = $lastSync?->started_at
             ? Carbon::parse($lastSync->started_at)->timezone($tz)->diffForHumans()
-            : '10 menit yang lalu';
+            : 'Belum pernah';
 
         $chartDays = [];
         $chartDates = [];
@@ -100,10 +94,7 @@ class AdminDashboardService
             $chartDays[] = $day->translatedFormat('D');
             $chartDates[] = $day->translatedFormat('d M');
 
-            $dayRev = (float) Order::query()
-                ->whereDate('created_at', $dayStr)
-                ->whereIn('status', ['shipped', 'completed', 'paid', 'processing'])
-                ->sum('grand_total');
+            $dayRev = $this->reporting->salesSummary($day->copy()->startOfDay(), $day->copy()->endOfDay())['omzet'];
 
             $dayOrders = Order::query()
                 ->whereDate('created_at', $dayStr)
@@ -116,7 +107,7 @@ class AdminDashboardService
         // Top Selling SKUs
         $topSellingItems = DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->whereNotIn('orders.status', ['cancelled', 'returned'])
+            ->whereIn('orders.status', ['shipped', 'completed'])
             ->select(
                 'order_items.product_id',
                 'order_items.product_name',
@@ -146,25 +137,6 @@ class AdminDashboardService
             }
         }
 
-        if (empty($topSellingProducts)) {
-            $catalogProducts = Product::with('media.library')->where('is_active', true)->latest()->limit(3)->get();
-            if ($catalogProducts->isEmpty()) {
-                $catalogProducts = Product::with('media.library')->latest()->limit(3)->get();
-            }
-            foreach ($catalogProducts as $idx => $prod) {
-                $mockUnits = [48, 36, 24];
-                $unitSold = $mockUnits[$idx] ?? 12;
-                $price = $prod->listPriceAmount() ?? 125000;
-                $topSellingProducts[] = [
-                    'name' => $prod->displayName(),
-                    'sku' => $prod->sku,
-                    'sold' => $unitSold,
-                    'revenue' => (float) ($unitSold * $price),
-                    'image_url' => $prod->media->first()?->url(),
-                ];
-            }
-        }
-
         return [
             'ordersToday' => $ordersToday,
             'ordersTodayTrend' => $ordersTodayDelta === 0
@@ -177,8 +149,8 @@ class AdminDashboardService
             'activeCustomers' => $activeCustomers,
             'activeCustomersTrend' => $activeThisWeek > 0
                 ? '+'.$activeThisWeek.' minggu ini'
-                : '+5 registrasi baru minggu ini',
-            'activeCustomersTrendUp' => true,
+                : 'Belum ada aktivasi minggu ini',
+            'activeCustomersTrendUp' => $activeThisWeek > 0,
             'totalRevenue' => $totalRevenue,
             'revenueGrowthPercent' => $revenueGrowthPercent,
             'recentOrders' => $recentOrders,

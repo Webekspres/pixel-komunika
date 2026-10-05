@@ -78,7 +78,7 @@ it('saves identitas and partai tabs independently', function () {
 
     expect(StoreProfile::active()->partai_minimum_quantity)->toBe(25)
         ->and(StoreProfile::active()->store_name)->toBe('Toko Baru')
-        ->and(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->where('auditable_type', StoreProfile::class)->count())->toBe(1);
+        ->and(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->where('auditable_type', StoreProfile::class)->count())->toBe(2); // identitas + partai masing-masing diaudit
 });
 
 it('manages bank account CRUD', function () {

@@ -565,14 +565,22 @@
                                             <button type="button" @click="editing = !editing" class="rounded-xl bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-700 transition hover:bg-zinc-200">
                                                 {{ 'Edit' }}
                                             </button>
-                                            <form method="POST" action="{{ route('admin.settings.courier-rates.destroy', $rate) }}">
-                                                @csrf
-                                                @method('DELETE')
+                                            <x-ui.confirm-dialog
+                                                title="Hapus tarif kurir"
+                                                :description="'Yakin ingin menghapus tarif kurir toko untuk ' . $rate->area_name . '? Tindakan ini tidak bisa dibatalkan.'"
+                                                confirm-label="Ya, hapus"
+                                                cancel-label="Batal"
+                                                confirm-variant="danger"
+                                                action="{{ route('admin.settings.courier-rates.destroy', $rate) }}"
+                                                method="DELETE"
+                                            >
+                                                <x-slot:trigger>
+                                                    <button type="button" aria-label="Hapus tarif {{ $rate->area_name }}" class="inline-flex items-center gap-1 rounded-xl bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100">
+                                                        <x-icon name="trash-2" class="size-3.5" />
+                                                    </button>
+                                                </x-slot:trigger>
                                                 <input type="hidden" name="tab" value="kurir">
-                                                <button type="submit" class="inline-flex items-center gap-1 rounded-xl bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100">
-                                                    <x-icon name="trash-2" class="size-3.5" />
-                                                </button>
-                                            </form>
+                                            </x-ui.confirm-dialog>
 
                                             <div x-show="editing" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="editing = false" @keydown.escape.window="editing = false">
                                                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">

@@ -138,10 +138,18 @@
                             Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                         </p>
                         <div class="mt-2.5 flex items-center gap-1.5">
-                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-600/20 ring-inset">
-                                <x-icon name="trending-up" class="size-3" />
-                                +{{ $revenueGrowthPercent }}% vs bulan lalu
-                            </span>
+                            @if ($revenueGrowthPercent === null)
+                                <span class="text-xs font-medium text-zinc-400">Belum ada omzet bulan lalu</span>
+                            @else
+                                <span @class([
+                                    'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold ring-1 ring-inset',
+                                    'bg-emerald-50 text-emerald-700 ring-emerald-600/20' => $revenueGrowthPercent >= 0,
+                                    'bg-rose-50 text-rose-700 ring-rose-600/20' => $revenueGrowthPercent < 0,
+                                ])>
+                                    <x-icon :name="$revenueGrowthPercent >= 0 ? 'trending-up' : 'trending-down'" class="size-3" />
+                                    {{ $revenueGrowthPercent > 0 ? '+' : '' }}{{ $revenueGrowthPercent }}% vs bulan lalu
+                                </span>
+                            @endif
                         </div>
                     </div>
                     <div class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 ring-1 ring-amber-500/20">
@@ -388,13 +396,13 @@
                         <div>
                             <p class="text-[11px] font-semibold text-zinc-400">Rata-rata Harian</p>
                             <p class="mt-0.5 text-sm font-bold text-zinc-900 sm:text-base">
-                                Rp {{ number_format($totalRevenue > 0 ? $totalRevenue / 7 : 3550000, 0, ',', '.') }}
+                                Rp {{ number_format(array_sum($chartRevenue) / 7, 0, ',', '.') }}
                             </p>
                         </div>
                         <div class="border-x border-zinc-100">
                             <p class="text-[11px] font-semibold text-zinc-400">Puncak Omzet</p>
                             <p class="mt-0.5 text-sm font-bold text-amber-600 sm:text-base">
-                                Rp {{ number_format($totalRevenue > 0 ? $totalRevenue * 0.45 : 7250000, 0, ',', '.') }}
+                                Rp {{ number_format(max($chartRevenue), 0, ',', '.') }}
                             </p>
                         </div>
                         <div>
@@ -709,7 +717,7 @@
                     </div>
 
                     <div class="mt-4 space-y-3">
-                        @foreach ($topSellingProducts as $index => $prod)
+                        @forelse ($topSellingProducts as $index => $prod)
                             <div class="flex items-center gap-3 rounded-xl border border-zinc-100 p-2.5 transition hover:border-zinc-200 hover:bg-zinc-50">
                                 {{-- Thumbnail / Icon --}}
                                 <div class="size-10 shrink-0 overflow-hidden rounded-xl bg-zinc-100 border border-zinc-200/60 flex items-center justify-center">
@@ -739,7 +747,9 @@
                                     </p>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <p class="rounded-xl border border-dashed border-zinc-200 p-4 text-center text-xs text-zinc-400">Belum ada penjualan terkirim.</p>
+                        @endforelse
                     </div>
                 </div>
 

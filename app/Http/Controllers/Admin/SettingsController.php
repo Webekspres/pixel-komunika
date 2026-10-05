@@ -69,14 +69,13 @@ class SettingsController extends Controller
 
         $store->fill([...$validated, 'is_active' => true])->save();
 
-        if (array_key_exists('partai_minimum_quantity', $validated)) {
-            $audit->log('STORE_PROFILE_UPDATED', $store, $request->user(), $oldValues, $store->only(['partai_minimum_quantity']));
-        }
+        // Identitas/NPWP tercetak di invoice, jadi setiap tab yang disimpan diaudit.
+        $audit->log('STORE_PROFILE_UPDATED', $store, $request->user(), $oldValues, $store->only(array_keys($validated)));
 
         return $this->backToTab($request, 'Pengaturan toko berhasil disimpan.');
     }
 
-    public function storeBankAccount(Request $request): RedirectResponse
+    public function storeBankAccount(Request $request, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
             'bank_name' => ['required', 'string', 'max:100'],
@@ -86,15 +85,16 @@ class SettingsController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        BankAccount::query()->create([
+        $account = BankAccount::query()->create([
             ...$validated,
             'is_active' => $request->boolean('is_active'),
         ]);
+        $audit->log('BANK_ACCOUNT_CREATED', $account, $request->user(), null, $account->only(array_keys($validated)));
 
         return $this->backToTab($request, 'Rekening bank berhasil ditambahkan.');
     }
 
-    public function updateBankAccount(Request $request, BankAccount $bankAccount): RedirectResponse
+    public function updateBankAccount(Request $request, BankAccount $bankAccount, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
             'bank_name' => ['required', 'string', 'max:100'],
@@ -104,26 +104,29 @@ class SettingsController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
+        $oldValues = $bankAccount->only([...array_keys($validated), 'is_active']);
         $bankAccount->update([
             ...$validated,
             'is_active' => $request->boolean('is_active'),
         ]);
+        $audit->log('BANK_ACCOUNT_UPDATED', $bankAccount, $request->user(), $oldValues, $bankAccount->only(array_keys($oldValues)));
 
         return $this->backToTab($request, 'Rekening bank berhasil diperbarui.');
     }
 
-    public function destroyBankAccount(Request $request, BankAccount $bankAccount): RedirectResponse
+    public function destroyBankAccount(Request $request, BankAccount $bankAccount, AuditLogger $audit): RedirectResponse
     {
         if ($bankAccount->payments()->exists()) {
             return back()->withErrors(['bank_account' => 'Rekening sudah dipakai transaksi dan tidak dapat dihapus.']);
         }
 
+        $audit->log('BANK_ACCOUNT_DELETED', $bankAccount, $request->user(), $bankAccount->only(['bank_name', 'account_number', 'account_holder']));
         $bankAccount->delete();
 
         return $this->backToTab($request, 'Rekening bank berhasil dihapus.');
     }
 
-    public function storeCourierRate(Request $request): RedirectResponse
+    public function storeCourierRate(Request $request, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
             'area_code' => ['nullable', 'string', 'max:32'],
@@ -133,15 +136,17 @@ class SettingsController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        StoreCourierRate::query()->create([
+        $rate = StoreCourierRate::query()->create([
             ...$validated,
             'is_active' => $request->boolean('is_active'),
         ]);
+        // SRS §15: perubahan konfigurasi kurir wajib diaudit.
+        $audit->log('COURIER_RATE_CREATED', $rate, $request->user(), null, $rate->only([...array_keys($validated), 'is_active']));
 
         return $this->backToTab($request, 'Tarif kurir toko berhasil ditambahkan.');
     }
 
-    public function updateCourierRate(Request $request, StoreCourierRate $courierRate): RedirectResponse
+    public function updateCourierRate(Request $request, StoreCourierRate $courierRate, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
             'area_code' => ['nullable', 'string', 'max:32'],
@@ -151,16 +156,19 @@ class SettingsController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
+        $oldValues = $courierRate->only([...array_keys($validated), 'is_active']);
         $courierRate->update([
             ...$validated,
             'is_active' => $request->boolean('is_active'),
         ]);
+        $audit->log('COURIER_RATE_UPDATED', $courierRate, $request->user(), $oldValues, $courierRate->only(array_keys($oldValues)));
 
         return $this->backToTab($request, 'Tarif kurir toko berhasil diperbarui.');
     }
 
-    public function destroyCourierRate(Request $request, StoreCourierRate $courierRate): RedirectResponse
+    public function destroyCourierRate(Request $request, StoreCourierRate $courierRate, AuditLogger $audit): RedirectResponse
     {
+        $audit->log('COURIER_RATE_DELETED', $courierRate, $request->user(), $courierRate->only(['area_code', 'area_name', 'rate_amount']));
         $courierRate->delete();
 
         return $this->backToTab($request, 'Tarif kurir toko berhasil dihapus.');

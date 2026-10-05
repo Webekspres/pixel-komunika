@@ -503,17 +503,6 @@
                             </flux:button>
                         </form>
 
-                        <!-- 5. Tombol Batalkan Pesanan -->
-                        <div class="pt-3 mt-3 border-t border-zinc-100">
-                            <button
-                                type="button"
-                                wire:click="confirmCancelOrder"
-                                class="group w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-red-600 bg-transparent hover:bg-red-50 border border-transparent hover:border-red-200 transition-all duration-150"
-                            >
-                                <x-icon name="x-circle" class="size-4 text-zinc-400 group-hover:text-red-500 transition-colors" />
-                                <span>Batalkan Pesanan Ini</span>
-                            </button>
-                        </div>
                     </div>
 
                 @elseif ($isPaymentSubmitted && $latestProof)
@@ -568,6 +557,19 @@
                                 <p class="mt-2 text-sm text-zinc-600">Informasi pembayaran akan muncul setelah diverifikasi admin.</p>
                             </div>
                         @endif
+
+                        @if (in_array($order->status, ['shipped', 'completed'], true))
+                            {{-- Retur ditangani admin lewat WhatsApp; belum ada alur retur di website (MVP). --}}
+                            <a
+                                href="https://wa.me/6281546407702?text={{ rawurlencode('Halo admin Pixel Komunika, saya ingin mengajukan retur untuk pesanan '.$order->order_number.'.') }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-700 bg-white border border-zinc-200 hover:bg-zinc-50 transition-colors"
+                            >
+                                <x-icon name="message-circle" class="size-4 text-emerald-600" />
+                                <span>Ajukan Retur via WhatsApp</span>
+                            </a>
+                        @endif
                     </div>
 
                 @else
@@ -608,53 +610,6 @@
         <span x-text="toastMessage">Tersalin ke clipboard!</span>
     </div>
 
-    <!-- Modal Konfirmasi Batal Pesanan (Alpine.js) -->
-    <div
-        x-data="{ open: @entangle('showCancelModal') }"
-        x-show="open"
-        x-cloak
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
-        style="display: none;"
-        @keydown.escape.window="open = false"
-        @click.self="open = false"
-    >
-        <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden border border-zinc-200">
-            <div class="flex items-start gap-4 p-5 border-b border-zinc-100 bg-zinc-50/50">
-                <div class="inline-flex size-11 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 border border-rose-100">
-                    <x-icon name="alert-triangle" class="size-5" />
-                </div>
-                <div class="min-w-0 flex-1">
-                    <flux:heading size="lg">Batalkan Pesanan?</flux:heading>
-                    <flux:subheading>Pesanan #{{ $order->order_number }} akan dibatalkan dan stok produk dikembalikan. Tindakan ini tidak dapat dibatalkan.</flux:subheading>
-                </div>
-            </div>
-
-            <form wire:submit.prevent="cancelOrder" class="p-5 space-y-4">
-                <div>
-                    <flux:label>Alasan Pembatalan <span class="text-red-500">*</span></flux:label>
-                    <flux:textarea wire:model="cancelReason" placeholder="Tuliskan alasan pembatalan (min. 5 karakter)" rows="3" required />
-                    @error('cancelReason')
-                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-2 flex justify-end gap-2">
-                    <flux:button type="button" wire:click="$set('showCancelModal', false)" variant="ghost">
-                        Tidak, Kembali
-                    </flux:button>
-                    <flux:button type="submit" variant="danger" wire:loading.attr="disabled">
-                        Ya, Batalkan Pesanan
-                    </flux:button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 
 @push('scripts')

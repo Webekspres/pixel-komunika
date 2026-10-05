@@ -66,7 +66,6 @@ it('renders customer order detail page with unified cards, stepper, and bank acc
         ->assertSee('Total Tagihan')
         ->assertSee('Upload Bukti Pembayaran')
         ->assertSee('Kirim Bukti Pembayaran')
-        ->assertSee('Batalkan Pesanan Ini')
         ->assertSee('BCA')
         ->assertSee('1234567890')
         ->assertSee('Pixel Komunika')
@@ -124,7 +123,7 @@ it('handles payment proof upload and preview safely for images and pdfs', functi
     expect($order->fresh()->status)->toBe('payment_pending');
 });
 
-it('allows customer to cancel an unpaid order with reason', function () {
+it('hides customer cancel and offers whatsapp return only after shipping', function () {
     $customerRole = Role::firstOrCreate(['code' => Role::CUSTOMER], ['name' => Role::CUSTOMER]);
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
@@ -156,15 +155,17 @@ it('allows customer to cancel an unpaid order with reason', function () {
         'cost' => 15000,
     ]);
 
+    // Pembatalan hanya oleh admin/sistem (FR-ORD-006/007).
     Livewire::actingAs($customer)
         ->test(OrderDetail::class, ['order' => $order])
-        ->assertSet('amount', (string) (int) $order->grand_total)
-        ->call('confirmCancelOrder')
-        ->assertSet('showCancelModal', true)
-        ->set('cancelReason', 'Salah memilih varian produk')
-        ->call('cancelOrder')
-        ->assertHasNoErrors()
-        ->assertSet('showCancelModal', false);
+        ->assertDontSee('Batalkan Pesanan')
+        ->assertDontSee('Ajukan Retur via WhatsApp');
 
-    expect($order->fresh()->status)->toBe('cancelled');
+    $order->update(['status' => 'shipped']);
+
+    Livewire::actingAs($customer)
+        ->test(OrderDetail::class, ['order' => $order->fresh()])
+        ->assertSee('Ajukan Retur via WhatsApp')
+        ->assertSeeHtml('https://wa.me/6281546407702?text=')
+        ->assertSee($order->order_number);
 });

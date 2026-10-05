@@ -40,6 +40,8 @@ terverifikasi oleh test.**
   - **Idempotency:** `orders.idempotency_key` + `pos_integration_operations.external_reference`
     mencegah pencatatan ganda saat retry.
   - **Scheduler:** `pos:dispatch-sale-reports` tiap 5 menit (`routes/console.php`).
+  - **Catatan:** dispatcher masih ke `SamplePosAckSimulator`, belum ke API POS;
+    menunggu kontrak report sale dari vendor POS (OPN-005/OPN-019).
 
 - [x] **Task 2: Background Worker Pelaporan Retur ke POS (`WEB_RETURN_REPORT`)**
   - **Implementasi aktual:** `PosOutboxService` menulis `WEB_RETURN_REPORT`;
@@ -47,6 +49,7 @@ terverifikasi oleh test.**
   - **Guard retur:** retur hanya dikirim jika `WEB_SALE_REPORT` asal berstatus
     `SUCCEEDED` atau `RECONCILIATION_REQUIRED` (`SamplePosSyncService.php`).
   - **Scheduler:** `pos:dispatch-return-reports` tiap 5 menit.
+  - **Catatan:** sama seperti Task 1, masih simulator; kontrak report return POS belum ada.
 
 - [x] **Task 3: Ledger Stok & Sinkronisasi Stok Efektif**
   - **Implementasi aktual:** tabel `inventory_ledger`
@@ -130,10 +133,10 @@ terverifikasi oleh test.**
     model `app_notifications`; badge merah `<livewire:admin.notifications>`; auto-mark
     read saat admin membuka daftar pesanan (`AdminOrders::mount`).
   - **WhatsApp:** `config('store.whatsapp')` — pesan `Cek Order masuk` ke
-    `081546407702`, driver saat ini `log|fake` (`LogWhatsAppNotifier` /
-    `FakeWhatsAppNotifier`); `notifications:dispatch-pending` tiap 5 menit.
-  - **Sisa pekerjaan:** provider WhatsApp produksi (masih keputusan klien — lihat dokumen
-    klien: "template WhatsApp belum tersedia").
+    `081546407702`, driver `log|fake|fonnte` (`FonnteWhatsAppNotifier` via
+    `WA_DRIVER=fonnte` + `FONNTE_TOKEN`); `notifications:dispatch-pending` tiap 5 menit.
+  - **Sisa pekerjaan:** klien mendaftarkan nomor pengirim di Fonnte (scan QR). Fonnte
+    dipakai sementara (OPN-023, risiko banned).
 
 - [x] **Task 12: Laporan Transaksi, Omzet, dan PPh 22**
   - **Implementasi aktual:** halaman laporan admin (`AdminReportTest`) +
@@ -158,8 +161,8 @@ terverifikasi oleh test.**
 
 | Task | Status | Bukti utama | Sisa pekerjaan |
 |---|---|---|---|
-| 1. WEB_SALE_REPORT | ✅ Selesai | `PosOutboxService`, `PosDispatchSaleReports` | — |
-| 2. WEB_RETURN_REPORT | ✅ Selesai | `PosOutboxService`, `PosDispatchReturnReports`, guard sale ack | — |
+| 1. WEB_SALE_REPORT | 🔄 Outbox ready (simulator) | `PosOutboxService`, `PosDispatchSaleReports` | Kontrak + client API report sale POS |
+| 2. WEB_RETURN_REPORT | 🔄 Outbox ready (simulator) | `PosOutboxService`, `PosDispatchReturnReports`, guard sale ack | Kontrak + client API report return POS |
 | 3. Ledger stok | ✅ Selesai | `inventory_ledger`, `lockForUpdate` | — (retur: `ORDER_RETURNED`, sudah diverifikasi) |
 | 4. Upload bukti bayar | ✅ Selesai | `OrderDetail::uploadPaymentProof` | — |
 | 5. Verifikasi pembayaran | ✅ Selesai | `AdminOrders`, `PaymentService` | — |
@@ -168,7 +171,7 @@ terverifikasi oleh test.**
 | 8. Penggabungan pengiriman | ✅ Selesai | `OrderService::shipmentGroupCode` | — |
 | 9. Fulfillment + resi | ✅ Selesai | `FulfillmentService` | — |
 | 10. Konfirmasi & TERKENDALA | ✅ Selesai | `confirmReceipt`, `AutoCompleteShippedOrders` | — |
-| 11. Notifikasi + WhatsApp | ✅ Selesai (log/fake) | `NotificationService`, dispatch command | Provider WhatsApp produksi |
+| 11. Notifikasi + WhatsApp | ✅ Selesai (driver Fonnte) | `NotificationService`, `FonnteWhatsAppNotifier` | Nomor pengirim Fonnte dari klien |
 | 12. Laporan omzet/PPh 22 | ✅ Selesai | Reports admin + `AdminReportTest` | — |
 | 13. Audit & hardening | ✅ Selesai | `AuditLogger`, transaksi + locking | — |
 | C. Verifikasi ledger retur | ✅ Selesai | `PaymentAndReturnTest` + `BackendMvpReadyTest` assert `source = ORDER_RETURNED` | — |

@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
                 'company_name' => config('store.company_name'),
                 'company_npwp' => config('store.npwp'),
                 'partai_minimum_quantity' => 5,
+                'minimum_order_quantity' => 5,
                 'origin_biteship_area_id' => config('biteship.origin_area_id') ?: 'IDNP9IDNC22IDND2066IDZ40252', // Regol 40252 (Jl Sawahkurung) fallback
                 'origin_biteship_label' => 'Regol, Bandung, Jawa Barat (40252)',
                 'origin_postal_code' => '40252',
@@ -173,9 +174,9 @@ class DatabaseSeeder extends Seeder
             ]);
         };
 
-        $unpaid = $makeOrder(1);
+        $unpaid = $makeOrder(5);
 
-        $pending = $makeOrder(1);
+        $pending = $makeOrder(5);
         $file = UploadedFile::fake()->image('proof.jpg');
         $paymentService->uploadPaymentProof($pending, $customer, [
             'bank_name' => 'BCA',
@@ -183,7 +184,7 @@ class DatabaseSeeder extends Seeder
             'amount' => $pending->grand_total,
         ], $file);
 
-        $paid = $makeOrder(2);
+        $paid = $makeOrder(6);
         $file2 = UploadedFile::fake()->image('proof2.jpg');
         $proof = $paymentService->uploadPaymentProof($paid, $customer, [
             'bank_name' => 'BCA',
@@ -192,7 +193,7 @@ class DatabaseSeeder extends Seeder
         ], $file2);
         $paymentService->approvePayment($proof, $admin);
 
-        $shipped = $makeOrder(1);
+        $shipped = $makeOrder(5);
         $file3 = UploadedFile::fake()->image('proof3.jpg');
         $proof3 = $paymentService->uploadPaymentProof($shipped, $customer, [
             'bank_name' => 'BCA',
@@ -204,7 +205,7 @@ class DatabaseSeeder extends Seeder
         $fulfillment->transition($shipped->fresh(), 'packed', $admin);
         $fulfillment->transition($shipped->fresh(), 'shipped', $admin, 'RESI-SEED-001');
 
-        $cancelled = $makeOrder(1);
+        $cancelled = $makeOrder(5);
         $orderService->cancelOrder($cancelled, 'Contoh order dibatalkan', 'ADMIN', $admin);
 
         unset($unpaid);

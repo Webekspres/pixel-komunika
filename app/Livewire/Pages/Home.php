@@ -31,7 +31,7 @@ class Home extends Component
         $cart = $cartService->getOrCreateCart($user, $sessionId);
 
         try {
-            $cartService->addItem($cart, $productId, 1);
+            $cartService->addItem($cart, $productId);
             $productName = Product::query()->with('enrichment')->find($productId)?->displayName() ?? 'Produk';
             $this->dispatch('cart-updated');
             $this->dispatch('cart-item-added', name: $productName);

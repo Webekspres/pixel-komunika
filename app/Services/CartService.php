@@ -42,7 +42,8 @@ class CartService
         throw new InvalidArgumentException('User or Session ID required to resolve cart.');
     }
 
-    public function addItem(Cart $cart, int $productId, int $quantity = 1): CartItem
+    /** $quantity null = tombol tambah cepat: minimal pembelian bila produk baru, +1 bila sudah ada. */
+    public function addItem(Cart $cart, int $productId, ?int $quantity = null): CartItem
     {
         // FR-CART-001: hanya pelanggan aktif (terautentikasi) yang dapat menambahkan ke keranjang.
         if ($cart->user_id === null) {
@@ -53,6 +54,10 @@ class CartService
         if (! $cart->user?->isActiveCustomer()) {
             throw new InvalidArgumentException('Akun Anda belum aktif untuk berbelanja. Tunggu verifikasi admin.');
         }
+
+        $existingItem = $cart->items()->where('product_id', $productId)->first();
+        $minimum = $this->priceCalculator->minimumOrderQuantity();
+        $quantity ??= $existingItem ? 1 : $minimum;
 
         if ($quantity < 1) {
             throw new InvalidArgumentException('Jumlah minimal 1.');
@@ -66,8 +71,11 @@ class CartService
 
         $stockAvailable = $product->inventorySnapshot ? $product->inventorySnapshot->quantity_available : 0;
 
-        $existingItem = $cart->items()->where('product_id', $productId)->first();
         $newQuantity = $existingItem ? ($existingItem->quantity + $quantity) : $quantity;
+
+        if ($newQuantity < $minimum) {
+            throw new InvalidArgumentException("Minimal pembelian {$minimum} unit per produk.");
+        }
 
         if ($newQuantity > $stockAvailable) {
             throw new InvalidArgumentException("Stok tidak mencukupi. Stok tersedia: {$stockAvailable}");
@@ -93,6 +101,11 @@ class CartService
             $cartItem->delete();
 
             return null;
+        }
+
+        $minimum = $this->priceCalculator->minimumOrderQuantity();
+        if ($quantity < $minimum) {
+            throw new InvalidArgumentException("Minimal pembelian {$minimum} unit per produk. Hapus produk bila tidak jadi membeli.");
         }
 
         $stockAvailable = $cartItem->product->inventorySnapshot ? $cartItem->product->inventorySnapshot->quantity_available : 0;

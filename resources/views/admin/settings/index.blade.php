@@ -453,6 +453,11 @@
                     {{ $store->partai_minimum_quantity ?? 5 }}
                     <span class="text-sm font-semibold text-zinc-500">per SKU</span>
                 </p>
+                <p class="mt-4 text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Minimal pembelian</p>
+                <p class="mt-1 text-2xl font-black text-zinc-900">
+                    {{ $store->minimum_order_quantity ?? 1 }}
+                    <span class="text-sm font-semibold text-zinc-500">unit per SKU</span>
+                </p>
                 <p class="mt-1.5 text-xs text-zinc-400">Perubahan dicatat ke audit trail.</p>
             </div>
 
@@ -473,7 +478,21 @@
                         value="{{ old('partai_minimum_quantity', $store->partai_minimum_quantity ?? 5) }}"
                         class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
                     >
-                    <p class="mt-1.5 text-xs text-zinc-400">Perubahan dicatat ke audit trail.</p>
+                </div>
+
+                <div>
+                    <label for="minimum_order_quantity" class="mb-1.5 block text-xs font-semibold text-zinc-700">Minimal pembelian per SKU</label>
+                    <input
+                        id="minimum_order_quantity"
+                        name="minimum_order_quantity"
+                        type="number"
+                        min="1"
+                        max="100000"
+                        required
+                        value="{{ old('minimum_order_quantity', $store->minimum_order_quantity ?? 1) }}"
+                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                    >
+                    <p class="mt-1.5 text-xs text-zinc-400">Pelanggan tidak bisa membeli kurang dari jumlah ini per produk. Samakan dengan minimum partai agar harga eceran tidak pernah dipakai. Perubahan dicatat ke audit trail.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 border-t border-neutral-100 pt-4">
@@ -491,22 +510,21 @@
                 @else
                     <ol class="space-y-3">
                         @foreach ($auditTrail as $log)
-                            @php
-                                $newQty = data_get($log->new_values, 'partai_minimum_quantity');
-                                $oldQty = data_get($log->old_values, 'partai_minimum_quantity');
-                            @endphp
                             <li class="flex items-start gap-3 text-sm">
                                 <div class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-neutral-100">
                                     <x-icon name="history" class="size-3 text-zinc-500" />
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-zinc-800">
-                                        Minimum partai diubah
-                                        @if ($oldQty !== null)
-                                            dari <span class="font-bold">{{ $oldQty }}</span>
-                                        @endif
-                                        ke <span class="font-bold">{{ $newQty }}</span>
-                                    </p>
+                                    @foreach (['partai_minimum_quantity' => 'Minimum partai', 'minimum_order_quantity' => 'Minimal pembelian'] as $field => $label)
+                                        @continue(! array_key_exists($field, (array) $log->new_values))
+                                        <p class="text-zinc-800">
+                                            {{ $label }} diubah
+                                            @if (data_get($log->old_values, $field) !== null)
+                                                dari <span class="font-bold">{{ data_get($log->old_values, $field) }}</span>
+                                            @endif
+                                            ke <span class="font-bold">{{ data_get($log->new_values, $field) }}</span>
+                                        </p>
+                                    @endforeach
                                     <p class="text-xs text-zinc-400">
                                         {{ $log->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }}
                                         @if ($log->actor_user_id)

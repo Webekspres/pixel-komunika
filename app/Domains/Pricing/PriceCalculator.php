@@ -34,6 +34,12 @@ class PriceCalculator
         return $prices->get(ProductPrice::RETAIL, $bulk ?? $wholesale);
     }
 
+    /** Minimal pembelian per SKU (Pengaturan > Partai); mencegah reseller jatuh ke harga ECERAN. */
+    public function minimumOrderQuantity(): int
+    {
+        return max(1, (int) (StoreProfile::active()?->minimum_order_quantity ?? 1));
+    }
+
     public function partaiMinimumQuantity(): int
     {
         $fromStore = StoreProfile::active()?->partai_minimum_quantity;

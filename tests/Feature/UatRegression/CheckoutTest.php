@@ -138,15 +138,27 @@ it('PROBE-08 invoice keeps store NPWP snapshot after admin edits store profile (
         ->assertSee('11.111.111.1-111.000')->assertDontSee('99.999.999.9-999.000');
 });
 
-it('PROBE-09 active reseller buying 1 unit is never charged/shown ECERAN (FR-PRC-007, KAT-02)', function () {
+it('KAT-02/05 enforces the admin minimum purchase so resellers never fall back to ECERAN', function () {
+    StoreProfile::query()->update(['is_active' => false]);
+    StoreProfile::create(['store_name' => 'Pixel Komunika', 'address' => 'Bandung', 'contact_number' => '0815', 'company_npwp' => '11.111.111.1-111.000', 'partai_minimum_quantity' => 5, 'minimum_order_quantity' => 5, 'is_active' => true]);
+
     $user = checkoutCustomer();
-    $cart = app(CartService::class)->getOrCreateCart($user);
-    app(CartService::class)->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 1);
+    $cartService = app(CartService::class);
+    $cart = $cartService->getOrCreateCart($user);
+    $productId = Product::where('sku', 'PB-10000')->value('id');
 
-    $line = app(CartService::class)->getCartSummary($cart)['items']->first();
+    expect(fn () => $cartService->addItem($cart, $productId, 1))
+        ->toThrow(InvalidArgumentException::class, 'Minimal pembelian 5 unit');
 
-    expect($line['price_type'])->not->toBe(ProductPrice::RETAIL);
-})->skip('Menunggu keputusan klien: harga di bawah minimum grosir (ECERAN vs grosir).');
+    // Tombol tambah cepat langsung memasukkan jumlah minimal.
+    $cartService->addItem($cart, $productId);
+    $line = $cartService->getCartSummary($cart)['items']->first();
+
+    expect($line['quantity'])->toBe(5)
+        ->and($line['price_type'])->not->toBe(ProductPrice::RETAIL)
+        ->and(fn () => $cartService->updateQuantity($cart, $cart->items()->first()->id, 4))
+        ->toThrow(InvalidArgumentException::class, 'Minimal pembelian 5 unit');
+});
 
 it('PROBE-10 Biteship rates are parsed from the real /v1/rates/couriers schema (CHK-10)', function () {
     config(['biteship.api_key' => 'test-key', 'biteship.origin_area_id' => 'ORIGIN']);

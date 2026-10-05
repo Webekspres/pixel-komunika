@@ -41,6 +41,10 @@ class OrderService
         array $shippingOption,
         ?string $idempotencyKey = null,
     ): Order {
+        if (! $user->isActiveCustomer()) {
+            throw new InvalidArgumentException('Akun Anda tidak aktif untuk melakukan pemesanan.');
+        }
+
         $summary = $this->cartService->getCartSummary($cart);
 
         if ($summary['items']->isEmpty()) {
@@ -85,6 +89,12 @@ class OrderService
             $store,
             $bank,
         ) {
+            // Kunci keranjang: dua submit bersamaan (dua tab) tidak membuat dua order.
+            $lockedCart = Cart::query()->lockForUpdate()->find($cart->id);
+            if (! $lockedCart || $lockedCart->items()->doesntExist()) {
+                throw new InvalidArgumentException('Keranjang belanja kosong.');
+            }
+
             $datePrefix = now()->format('Ymd');
             $randomSuffix = strtoupper(Str::random(5));
             $orderNumber = "PK-{$datePrefix}-{$randomSuffix}";
@@ -117,6 +127,10 @@ class OrderService
             foreach ($summary['items'] as $itemData) {
                 $product = $itemData['product'];
                 $qty = $itemData['quantity'];
+
+                if ($qty < 1 || ! $product->isStorefrontVisible()) {
+                    throw new InvalidArgumentException("Produk {$product->displayName()} sudah tidak tersedia. Hapus dari keranjang untuk melanjutkan.");
+                }
                 $unitPrice = $itemData['unit_price'];
                 $lineSubtotal = $itemData['line_subtotal'];
 
@@ -137,7 +151,11 @@ class OrderService
                 $snapshot = InventorySnapshot::where('product_id', $product->id)->lockForUpdate()->first();
                 if ($snapshot) {
                     $qtyBefore = $snapshot->quantity_available;
-                    $qtyAfter = max(0, $qtyBefore - $qty);
+                    // FR-CART-004: stok berubah saat checkout -> checkout dihentikan (rollback).
+                    if ($qtyBefore < $qty) {
+                        throw new InvalidArgumentException("Stok {$product->displayName()} tidak mencukupi (tersisa {$qtyBefore}). Silakan perbarui keranjang.");
+                    }
+                    $qtyAfter = $qtyBefore - $qty;
 
                     $status = InventorySnapshot::AVAILABLE;
                     if ($qtyAfter == 0) {
@@ -247,15 +265,26 @@ class OrderService
         });
     }
 
-    public function cancelOrder(Order $order, string $reason, string $cancelledBy = 'SYSTEM', ?User $actor = null): void
-    {
-        if (in_array($order->status, ['cancelled', 'completed', 'returned'], true)) {
-            throw new InvalidArgumentException("Order #{$order->order_number} tidak dapat dibatalkan.");
-        }
-
+    /**
+     * @param  list<string>  $onlyFrom  status yang boleh dibatalkan, dicek ulang setelah lock
+     */
+    public function cancelOrder(
+        Order $order,
+        string $reason,
+        string $cancelledBy = 'SYSTEM',
+        ?User $actor = null,
+        array $onlyFrom = ['unpaid', 'payment_pending'],
+    ): void {
         $source = strtoupper($cancelledBy) === 'ADMIN' ? 'ADMIN' : 'SYSTEM';
 
-        DB::transaction(function () use ($order, $reason, $source, $actor) {
+        DB::transaction(function () use ($order, $reason, $source, $actor, $onlyFrom) {
+            // Lock + cek ulang agar admin cancel dan auto-cancel yang bersamaan
+            // tidak mengembalikan stok dua kali.
+            $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+            if (! in_array($order->status, $onlyFrom, true)) {
+                throw new InvalidArgumentException("Order #{$order->order_number} tidak dapat dibatalkan.");
+            }
+
             $order->update([
                 'status' => 'cancelled',
                 'cancellation_source' => $source,
@@ -267,6 +296,13 @@ class OrderService
             if ($order->invoice) {
                 $order->invoice->update(['status' => 'cancelled']);
             }
+
+            // Bukti yang masih menunggu review tidak boleh disetujui setelah batal (FR-ORD-008).
+            $order->paymentProofs()->where('status', 'pending')->update([
+                'status' => 'rejected',
+                'rejection_reason' => 'Pesanan dibatalkan.',
+                'is_active' => false,
+            ]);
 
             foreach ($order->items as $item) {
                 $this->restoreStock($item->product_id, $item->quantity, 'ORDER_CANCELLED', $order->order_number, [

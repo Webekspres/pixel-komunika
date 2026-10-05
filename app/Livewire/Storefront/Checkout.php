@@ -9,8 +9,10 @@ use App\Services\OrderService;
 use App\Services\Shipping\ShippingCalculatorInterface;
 use App\Services\Shipping\StoreCourierFreeShipping;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -77,8 +79,12 @@ class Checkout extends Component
             session()->flash('success', "Pesanan {$order->order_number} berhasil dibuat!");
 
             return redirect()->route('orders.show', $order);
-        } catch (\Exception $e) {
+        } catch (InvalidArgumentException $e) {
             session()->flash('error', 'Gagal membuat pesanan: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            // Jangan tampilkan pesan teknis (SQL dsb.) ke pelanggan.
+            Log::error('checkout.place_order.failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            session()->flash('error', 'Gagal membuat pesanan karena gangguan sistem. Silakan coba lagi.');
         }
     }
 

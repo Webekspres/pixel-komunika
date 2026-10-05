@@ -7,6 +7,7 @@ use App\Domains\Order\FulfillmentService;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -93,7 +94,14 @@ class AdminOrders extends Component
             'cancelReason' => 'required|string|min:5',
         ]);
 
-        $orderService->cancelOrder($order, $this->cancelReason, 'ADMIN', auth()->user());
+        try {
+            $orderService->cancelOrder($order, $this->cancelReason, 'ADMIN', auth()->user());
+        } catch (InvalidArgumentException $e) {
+            $this->resetCancelModal();
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         $this->resetCancelModal();
         session()->flash('success', "Order #{$order->order_number} berhasil dibatalkan dan stok telah direstore.");

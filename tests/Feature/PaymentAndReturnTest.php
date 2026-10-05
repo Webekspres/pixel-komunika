@@ -30,7 +30,7 @@ it('allows customer to upload payment proof and admin to approve it', function (
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $admin = User::factory()->create(['role_id' => $adminRole->id]);
@@ -87,7 +87,7 @@ it('shows active bank account as transfer destination on order detail page', fun
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $address = Address::create([
@@ -142,7 +142,7 @@ it('restores inventory stock when an order is cancelled', function () {
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $address = Address::create([
@@ -190,7 +190,7 @@ it('restores inventory stock via ORDER_RETURNED ledger when return is approved',
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $admin = User::factory()->create(['role_id' => $adminRole->id]);
@@ -248,7 +248,7 @@ it('does not modify stock when return is rejected', function () {
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $admin = User::factory()->create(['role_id' => $adminRole->id]);

@@ -1,7 +1,7 @@
 <?php
 
-use App\Domains\Notifications\FakeWhatsAppNotifier;
 use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
+use App\Domains\Notifications\FakeWhatsAppNotifier;
 use App\Domains\Order\FulfillmentService;
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
 use App\Models\Address;
@@ -106,9 +106,19 @@ function shippedOrderWithToken(): array
 it('confirms receipt via public link and completes order', function () {
     ['order' => $order, 'token' => $token] = shippedOrderWithToken();
 
+    // Membuka link (mis. pratinjau WhatsApp) tidak boleh langsung menyelesaikan pesanan.
     $this->get(route('orders.confirm-receipt', ['order' => $order, 'token' => $token]))
         ->assertOk()
+        ->assertSee('Ya, pesanan sudah saya terima');
+    expect($order->fresh()->status)->toBe('shipped');
+
+    $this->post(route('orders.confirm-receipt.store', $order), ['token' => $token])
+        ->assertOk()
         ->assertSee('pesanan selesai', false);
+
+    $this->get(route('orders.confirm-receipt', ['order' => $order, 'token' => $token]))
+        ->assertOk()
+        ->assertSee('sudah dikonfirmasi');
 
     expect($order->fresh()->status)->toBe('completed')
         ->and($order->fresh()->receipt_confirmed_at)->not->toBeNull();
@@ -118,6 +128,8 @@ it('rejects invalid receipt token', function () {
     ['order' => $order] = shippedOrderWithToken();
 
     $this->get(route('orders.confirm-receipt', ['order' => $order, 'token' => 'wrong-token']))
+        ->assertStatus(410);
+    $this->post(route('orders.confirm-receipt.store', $order), ['token' => 'wrong-token'])
         ->assertStatus(410);
 
     expect($order->fresh()->status)->toBe('shipped');

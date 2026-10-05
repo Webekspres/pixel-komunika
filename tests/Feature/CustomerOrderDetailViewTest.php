@@ -23,7 +23,7 @@ it('renders customer order detail page with unified cards, stepper, and bank acc
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $address = Address::create([
@@ -82,7 +82,7 @@ it('handles payment proof upload and preview safely for images and pdfs', functi
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $address = Address::create([
@@ -128,7 +128,7 @@ it('hides customer cancel and offers whatsapp return only after shipping', funct
     $customer = User::factory()->create(['role_id' => $customerRole->id]);
     CustomerProfile::create([
         'user_id' => $customer->id,
-        'verification_status' => 'approved',
+        'verification_status' => CustomerProfile::ACTIVE,
     ]);
 
     $address = Address::create([

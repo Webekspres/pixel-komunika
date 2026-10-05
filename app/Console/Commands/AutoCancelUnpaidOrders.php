@@ -29,6 +29,7 @@ class AutoCancelUnpaidOrders extends Command
                     $order,
                     'Pembayaran tidak diterima sebelum batas waktu (auto-cancel D+1).',
                     'SYSTEM',
+                    onlyFrom: ['unpaid'],
                 );
                 $cancelled++;
             } catch (\InvalidArgumentException) {

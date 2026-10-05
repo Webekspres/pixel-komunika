@@ -5,6 +5,7 @@ use App\Livewire\Admin\AdminPayments;
 use App\Livewire\Admin\OrderFulfillmentActions;
 use App\Livewire\Customer\OrderDetail;
 use App\Models\BankAccount;
+use App\Models\CustomerProfile;
 use App\Models\InventorySnapshot;
 use App\Models\Order;
 use App\Models\Product;
@@ -16,6 +17,7 @@ use App\Services\OrderService;
 use App\Services\PaymentService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -177,23 +179,48 @@ it('RISK: cancelOrder on a stale model restores stock twice (no row lock / re-ch
         ->toBe($stockBefore + $order->items->sum('quantity'));
 });
 
-it('FUL-01: shipping without a tracking number is accepted (resi optional)', function () {
+it('FUL-01 requires a tracking number for expedition but not for the store courier', function () {
     $admin = User::factory()->admin()->create();
     $order = lifecycleOrder();
     $order->update(['status' => 'packed']);
+    $order->shipment->update(['rate_provider' => Shipment::PROVIDER_BITESHIP]);
 
     Livewire::actingAs($admin)->test(OrderFulfillmentActions::class, ['order' => $order])
         ->set('trackingNumber', '')
         ->call('confirmShip');
+    expect($order->fresh()->status)->toBe('packed');
 
-    expect($order->fresh()->status)->not->toBe('shipped');
-})->skip('Menunggu keputusan: resi wajib untuk ekspedisi (FR-ORD-005).');
+    $order->shipment->update(['rate_provider' => Shipment::PROVIDER_STORE]);
+    Livewire::actingAs($admin)->test(OrderFulfillmentActions::class, ['order' => $order->fresh()])
+        ->set('trackingNumber', '')
+        ->call('confirmShip');
+    expect($order->fresh()->status)->toBe('shipped');
+});
 
-it('payment_rejected order from yesterday is neither auto-cancelled nor admin-cancellable', function () {
+it('auto-cancels payment_rejected orders after the rejection day, not on the same day', function () {
     $order = lifecycleOrder();
-    $order->update(['status' => 'payment_rejected', 'created_at' => now()->subDays(2), 'order_date_local' => now()->subDays(2)->toDateString()]);
+    $order->update(['status' => 'payment_rejected']);
 
+    // Ditolak hari ini: pelanggan masih boleh unggah ulang.
+    $this->artisan('orders:auto-cancel-unpaid')->assertSuccessful();
+    expect($order->fresh()->status)->toBe('payment_rejected');
+
+    $this->travel(1)->days();
     $this->artisan('orders:auto-cancel-unpaid')->assertSuccessful();
 
-    expect($order->fresh()->status)->toBe('cancelled');
-})->skip('Menunggu keputusan: nasib order payment_rejected lewat hari (FR-ORD-010).');
+    expect($order->fresh())
+        ->status->toBe('cancelled')
+        ->cancellation_source->toBe('SYSTEM');
+});
+
+it('lets a suspended customer view the order but not upload payment proof', function () {
+    $order = lifecycleOrder();
+    $order->user->customerProfile->update(['verification_status' => CustomerProfile::SUSPENDED]);
+
+    $this->actingAs($order->user)->get(route('orders.show', $order))->assertOk();
+    $this->actingAs($order->user)->get(route('orders.invoice', $order))->assertOk();
+
+    expect(fn () => lifecycleUpload($order->fresh()))
+        ->toThrow(ValidationException::class);
+    expect($order->fresh()->status)->toBe('unpaid');
+});

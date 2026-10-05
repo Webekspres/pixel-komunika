@@ -24,6 +24,14 @@ class PaymentService
         return DB::transaction(function () use ($order, $user, $data, $file) {
             // UF-10: unggah hanya saat menunggu pembayaran / setelah ditolak.
             $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+            // Keputusan 5 Okt: akun ditangguhkan tetap bisa melihat pesanan/invoice,
+            // tetapi tidak bisa membayar sampai diaktifkan kembali.
+            if (! $user->isActiveCustomer()) {
+                throw ValidationException::withMessages([
+                    'proof_file' => 'Akun Anda sedang tidak aktif. Hubungi admin untuk melanjutkan pembayaran.',
+                ]);
+            }
+
             if (! in_array($order->status, ['unpaid', 'payment_rejected'], true)) {
                 throw ValidationException::withMessages([
                     'proof_file' => 'Bukti pembayaran tidak dapat diunggah untuk status pesanan saat ini.',

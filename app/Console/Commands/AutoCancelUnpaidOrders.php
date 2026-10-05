@@ -16,9 +16,12 @@ class AutoCancelUnpaidOrders extends Command
     {
         $cutoff = now()->startOfDay();
 
+        // FR-ORD-010 + keputusan 5 Okt: order yang pembayarannya ditolak ikut batal
+        // setelah hari penolakan berakhir (pelanggan masih bisa unggah ulang hari itu),
+        // agar stoknya tidak tertahan selamanya.
         $orders = Order::query()
-            ->where('status', 'unpaid')
-            ->where('created_at', '<', $cutoff)
+            ->where(fn ($q) => $q->where('status', 'unpaid')->where('created_at', '<', $cutoff))
+            ->orWhere(fn ($q) => $q->where('status', 'payment_rejected')->where('updated_at', '<', $cutoff))
             ->get();
 
         $cancelled = 0;
@@ -27,9 +30,11 @@ class AutoCancelUnpaidOrders extends Command
             try {
                 $orderService->cancelOrder(
                     $order,
-                    'Pembayaran tidak diterima sebelum batas waktu (auto-cancel D+1).',
+                    $order->status === 'payment_rejected'
+                        ? 'Bukti pembayaran ditolak dan tidak diunggah ulang sebelum batas waktu.'
+                        : 'Pembayaran tidak diterima sebelum batas waktu (auto-cancel D+1).',
                     'SYSTEM',
-                    onlyFrom: ['unpaid'],
+                    onlyFrom: ['unpaid', 'payment_rejected'],
                 );
                 $cancelled++;
             } catch (\InvalidArgumentException) {

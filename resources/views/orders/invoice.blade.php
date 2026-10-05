@@ -51,11 +51,11 @@
             <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-zinc-200 pb-6">
                 <div>
-                    <h1 class="text-2xl font-black text-zinc-900 tracking-tight">PIXEL KOMUNIKA</h1>
+                    <h1 class="text-2xl font-black text-zinc-900 tracking-tight">{{ Str::upper($invoice?->store_name ?? $storeProfile?->store_name ?? 'Pixel Komunika') }}</h1>
                     <p class="text-xs text-zinc-500 mt-1">
-                        {{ $storeProfile?->company_name ?? 'PT Webekspres Teknologi Indonesia' }}<br>
-                        NPWP: {{ $storeProfile?->company_npwp ?? '0821.4146.0442.4000' }}<br>
-                        {{ $storeProfile?->address ?? 'Bandung, Jawa Barat' }} • Telp: {{ $storeProfile?->contact_number ?? '0821-4146-0442' }}
+                        {{ $invoice?->company_name_snapshot ?? $storeProfile?->company_name ?? config('store.company_name') }}<br>
+                        NPWP: {{ $invoice?->store_npwp ?? $storeProfile?->company_npwp ?? config('store.npwp') }}<br>
+                        {{ $invoice?->store_address ?? $storeProfile?->address ?? config('store.address') }} • Telp: {{ $invoice?->store_phone ?? $storeProfile?->contact_number ?? config('store.phone') }}
                     </p>
                 </div>
 
@@ -80,6 +80,9 @@
                     <p class="font-bold text-sm text-zinc-900 mt-1">{{ $order->user->name }}</p>
                     <p class="text-zinc-600">{{ $order->user->customerProfile?->business_name ?: 'Pelanggan Toko' }}</p>
                     <p class="text-zinc-600">{{ $order->user->email }} • {{ $order->user->phone ?? '-' }}</p>
+                    @if ($invoice?->reseller_account_number_snapshot)
+                        <p class="text-zinc-600">No. Akun Reseller: <span class="font-semibold text-zinc-900">{{ $invoice->reseller_account_number_snapshot }}</span></p>
+                    @endif
                 </div>
 
                 <div>

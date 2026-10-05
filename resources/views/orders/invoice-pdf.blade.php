@@ -25,12 +25,12 @@
     <table class="header">
         <tr>
             <td>
-                <h1>PIXEL KOMUNIKA</h1>
+                <h1>{{ Str::upper($invoice?->store_name ?? $storeProfile?->store_name ?? 'Pixel Komunika') }}</h1>
                 <div class="muted">
-                    {{ $storeProfile?->company_name ?? config('store.company_name') }}<br>
-                    NPWP: {{ $storeProfile?->company_npwp ?? config('store.npwp') }}<br>
-                    {{ $storeProfile?->address ?? config('store.address') }}
-                    • Telp: {{ $storeProfile?->contact_number ?? config('store.phone') }}
+                    {{ $invoice?->company_name_snapshot ?? $storeProfile?->company_name ?? config('store.company_name') }}<br>
+                    NPWP: {{ $invoice?->store_npwp ?? $storeProfile?->company_npwp ?? config('store.npwp') }}<br>
+                    {{ $invoice?->store_address ?? $storeProfile?->address ?? config('store.address') }}
+                    • Telp: {{ $invoice?->store_phone ?? $storeProfile?->contact_number ?? config('store.phone') }}
                 </div>
             </td>
             <td class="right">
@@ -53,6 +53,9 @@
                 <strong>{{ $order->user->name }}</strong><br>
                 {{ $order->user->customerProfile?->business_name ?: 'Pelanggan Toko' }}<br>
                 {{ $order->user->email }} • {{ $order->user->phone ?? '-' }}
+                @if ($invoice?->reseller_account_number_snapshot)
+                    <br>No. Akun Reseller: <strong>{{ $invoice->reseller_account_number_snapshot }}</strong>
+                @endif
             </td>
             <td width="50%">
                 <strong class="muted" style="font-size:9px;text-transform:uppercase;">Tujuan Pengiriman</strong><br>

@@ -28,6 +28,9 @@ jobs:
           extensions: gd, mbstring, pdo_sqlite, zip
 
       - run: composer install --no-interaction --prefer-dist --no-progress
+      # NFR-SEC-010: gagalkan deploy bila ada advisory dependency
+      - run: composer audit
+      - run: npm audit --audit-level=high
       - run: php artisan test
 
       - name: Update and deploy through cPanel API

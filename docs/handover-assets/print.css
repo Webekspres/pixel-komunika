@@ -1,0 +1,33 @@
+/* Print stylesheet for client-facing PDFs (pandoc HTML -> Chrome print). */
+@page { size: A4 landscape; margin: 14mm 12mm 16mm; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: "Segoe UI", "Noto Sans", Arial, sans-serif; font-size: 9.5pt; line-height: 1.45; color: #1f2937; max-width: none; margin: 0; padding: 0; background: #fff; }
+header#title-block-header { border-bottom: 3px solid #4338ca; padding-bottom: 8px; margin-bottom: 14px; }
+h1.title { font-size: 22pt; margin: 0; color: #1e1b4b; }
+p.subtitle { font-size: 12pt; margin: 4px 0 0; color: #4b5563; }
+h1 { font-size: 14pt; color: #1e1b4b; border-bottom: 1px solid #c7d2fe; padding-bottom: 3px; margin: 18px 0 8px; break-after: avoid; }
+p, ul { margin: 4px 0 8px; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 8.8pt; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th { background: #eef2ff; color: #1e1b4b; text-align: left; font-weight: 600; }
+th, td { border: 1px solid #cbd5e1; padding: 4px 6px; vertical-align: top; }
+tbody tr:nth-child(even) td { background: #f8fafc; }
+code { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 8.5pt; background: #f1f5f9; padding: 0 3px; border-radius: 3px; }
+ul.task-list { list-style: none; padding-left: 4px; }
+input[type=checkbox] { width: 12px; height: 12px; }
+/* Scenario tables: ID | Prioritas | Skenario | Langkah | Hasil diharapkan | Hasil | Catatan */
+table:has(th:nth-child(7)) { table-layout: fixed; }
+table:has(th:nth-child(7)) th:nth-child(1) { width: 6%; }
+table:has(th:nth-child(7)) th:nth-child(2) { width: 6.5%; }
+table:has(th:nth-child(7)) th:nth-child(3) { width: 13%; }
+table:has(th:nth-child(7)) th:nth-child(4) { width: 25%; }
+table:has(th:nth-child(7)) th:nth-child(5) { width: 27%; }
+table:has(th:nth-child(7)) th:nth-child(6) { width: 7.5%; }
+table:has(th:nth-child(7)) th:nth-child(7) { width: 15%; }
+/* Isian tangan: temuan & tanda tangan butuh ruang tulis */
+table:has(th:nth-child(5)):not(:has(th:nth-child(6))) td, table:has(th:nth-child(4)):not(:has(th:nth-child(5))) td { height: 26px; }
+body > table:last-of-type tbody td:nth-child(n) { height: 56px; }
+td:first-child { white-space: nowrap; }
+blockquote { margin: 8px 0 10px; padding: 8px 12px; border-left: 4px solid #f59e0b; background: #fffbeb; color: #78350f; }
+blockquote p { margin: 0; }

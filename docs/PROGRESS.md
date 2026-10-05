@@ -11,7 +11,7 @@ Dokumen ini dipakai untuk mencatat:
 
 ## Ringkasan status
 
-- Tanggal update terakhir: 2026-09-01
+- Tanggal update terakhir: 2026-10-05
 - Fase aktif: Fase 6 (release readiness); blocker utama integrasi eksternal (POS/WA/Biteship live)
 - Status umum: alur web end-to-end usable dengan data contoh; ±75% MVP; test suite 146/146 lulus
 - Handover lengkap: [`docs/HANDOVER.md`](HANDOVER.md)
@@ -117,6 +117,17 @@ Dokumen ini dipakai untuk mencatat:
   - Blocker eksternal utama: akses POS production (Kak Rio). Lainnya: Biteship origin ID, WhatsApp produksi, format invoice/akun reseller, PPh 22 final, channel kirim invoice.
 
 ## Log progres
+
+### 2026-10-05
+
+- Server POS down 17 Sep – 4 Okt 2026 (18 hari kalender / 12 hari kerja); target go-live digeser ke 16 Okt 2026 (ClickUp diperbarui).
+- Driver WhatsApp Fonnte (`WA_DRIVER=fonnte`) sebagai provider sementara OPN-023; menunggu klien mendaftarkan nomor pengirim.
+- CI: `composer audit` + `npm audit` (NFR-SEC-010); patch `laravel/framework`, `league/commonmark`, `league/flysystem` untuk advisory terbuka.
+- `store.holidays` diisi libur nasional + cuti bersama sisa 2026 dan 2027 (SKB 3 Menteri).
+- Keputusan: format nomor invoice/akun reseller dan PPh 22 memakai aturan saat ini, diubah bila ada komentar UAT; tombol "Selesai" admin dipertahankan.
+- Skenario UAT ([`UAT_SCENARIOS.md`](UAT_SCENARIOS.md) + PDF) untuk 15 Okt; penguji klien + tim IT klien.
+- Pembatalan oleh pelanggan dihapus (FR-ORD-006/007: hanya admin/sistem); retur pelanggan via tombol WhatsApp pada pesanan dikirim/selesai.
+- Test suite 171/171 lulus.
 
 ### 2026-09-01
 
@@ -230,7 +241,7 @@ Dokumen ini dipakai untuk mencatat:
 - Nilai tarif kurir toko per kecamatan untuk transaksi di bawah ambang gratis ongkir
 - Aturan nomor invoice serta nomor akun reseller
 - Aturan PPh 22 multi-kategori dan pembulatan
-- Skema poin loyalitas (OPN-020); pencatatan order channel WhatsApp
+- Skema poin loyalitas dan pencatatan order channel WhatsApp (Q-029)
 
 ## Keputusan penting
 

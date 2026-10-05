@@ -83,7 +83,7 @@ Alur penjualan website sudah **dapat dijalankan end-to-end** dengan data contoh:
 ### Rekomendasi prioritas next steps
 
 1. Koordinasi Kak Rio untuk kontrak POS + *contract test* (lihat [POS_FOLLOW_UP.md](POS_FOLLOW_UP.md)).
-2. Smoke test di staging (`dev.store.pixelkomunika.com`) dengan skenario UAT.
+2. Smoke test di staging (`dev.store.pixelkomunika.com`) dengan [skenario UAT](UAT_SCENARIOS.md).
 3. Dapatkan keputusan klien untuk provider WhatsApp, template, dan credential.
 4. Verifikasi origin area Biteship dengan alamat toko aktual.
 5. Finalisasi keputusan terbuka OPN-006 (tarif/pembulatan PPh 22) dan OPN-008/OPN-022 (format invoice/reseller).

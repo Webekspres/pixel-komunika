@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
 use App\Domains\Notifications\FakeWhatsAppNotifier;
+use App\Domains\Notifications\FonnteWhatsAppNotifier;
 use App\Domains\Notifications\LogWhatsAppNotifier;
 use App\Models\CustomerProfile;
 use App\Models\Order;
@@ -34,9 +35,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(WhatsAppNotifierInterface::class, function () {
-            return config('store.whatsapp.driver') === 'fake'
-                ? new FakeWhatsAppNotifier
-                : new LogWhatsAppNotifier;
+            return match (config('store.whatsapp.driver')) {
+                'fake' => new FakeWhatsAppNotifier,
+                'fonnte' => new FonnteWhatsAppNotifier,
+                default => new LogWhatsAppNotifier,
+            };
         });
 
         $this->app->bind(\App\Domains\PosIntegration\PosMasterSyncInterface::class, function ($app) {

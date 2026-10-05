@@ -21,7 +21,8 @@ return [
     'whatsapp' => [
         'admin_order_phone' => env('WA_ADMIN_ORDER_PHONE', '081546407702'),
         'new_order_message' => env('WA_NEW_ORDER_MESSAGE', 'Cek Order masuk'),
-        'driver' => env('WA_DRIVER', 'log'), // log|fake
+        'driver' => env('WA_DRIVER', 'log'), // log|fake|fonnte
+        'fonnte_token' => env('FONNTE_TOKEN'),
     ],
 
     'payment_proof_retain_years' => (int) env('PAYMENT_PROOF_RETAIN_YEARS', 5),

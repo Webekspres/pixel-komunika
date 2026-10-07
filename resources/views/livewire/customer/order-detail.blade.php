@@ -84,8 +84,12 @@
                 title="Detail Pesanan"
                 description="{{ $order->created_at->format('d M Y') }} • Batas bayar: {{ $order->expires_at ? $order->expires_at->format('d M Y H:i') : '-' }}"
             >
-                @if ($isPaidOrLater && $order->invoice)
+                @if ($order->invoice)
                     <x-slot:actions>
+                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
+                            <x-icon name="file-text" class="size-4" />
+                            Lihat Invoice
+                        </a>
                         <a href="{{ route('orders.invoice.download', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
                             <x-icon name="download" class="size-4" />
                             Unduh Invoice (PDF)

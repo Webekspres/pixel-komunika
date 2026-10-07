@@ -160,8 +160,8 @@
 
                                 @if ($stepKey === 'ordered')
                                     <p class="mt-0.5 text-xs text-zinc-500">{{ $order->created_at->format('d M Y, H:i') }} WIB</p>
-                                @elseif ($stepKey === 'payment_verified' && $latestProof)
-                                    <p class="mt-0.5 text-xs text-zinc-500">Diverifikasi: {{ $latestProof->verified_at?->format('d M Y, H:i') ?? '-' }} WIB</p>
+                                @elseif ($stepKey === 'payment_verified' && $latestProof?->verified_at)
+                                    <p class="mt-0.5 text-xs text-zinc-500">Diverifikasi: {{ $latestProof->verified_at->format('d M Y, H:i') }} WIB</p>
                                 @elseif ($stepKey === 'processing' && in_array($order->status, ['paid', 'processing', 'packed'], true))
                                     <p class="mt-0.5 text-xs text-zinc-500">Diproses sejak: {{ $order->updated_at->format('d M Y, H:i') }} WIB</p>
                                 @elseif ($stepKey === 'shipped' && $order->shipment && $order->shipment->shipped_at)
@@ -459,7 +459,11 @@
                                                 <div class="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
                                                     <span class="font-mono">{{ number_format($proof_file->getSize() / 1024, 0) }} KB</span>
                                                     <span>•</span>
-                                                    <span class="font-medium text-emerald-600">Siap dikirim</span>
+                                                    @error('proof_file')
+                                                        <span class="font-medium text-rose-600">File tidak valid</span>
+                                                    @else
+                                                        <span class="font-medium text-emerald-600">Siap dikirim</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 

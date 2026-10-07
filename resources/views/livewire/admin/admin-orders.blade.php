@@ -91,7 +91,7 @@
                                             {{ $order->latestPaymentProof->status === 'approved' ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                                 : ($order->latestPaymentProof->status === 'rejected' ? 'border-rose-200 bg-rose-50 text-rose-600'
                                                 : 'border-amber-200 bg-amber-50 text-amber-800') }}">
-                                            Bukti bayar: {{ $order->latestPaymentProof->bank_name }} ({{ strtoupper($order->latestPaymentProof->status) }})
+                                            Bukti bayar: {{ $order->latestPaymentProof->bank_name }} ({{ ['pending' => 'menunggu verifikasi', 'approved' => 'disetujui', 'rejected' => 'ditolak'][$order->latestPaymentProof->status] ?? $order->latestPaymentProof->status }})
                                         </span>
                                     @endif
                                     @if ($order->shipment && $order->shipment->issue_status === \App\Models\Shipment::ISSUE_TERKENDALA)

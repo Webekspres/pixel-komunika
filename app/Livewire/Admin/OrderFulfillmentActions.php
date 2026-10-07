@@ -122,7 +122,7 @@ class OrderFulfillmentActions extends Component
         }
 
         $this->order->refresh();
-        session()->flash('success', "Status pesanan {$this->order->order_number} diperbarui menjadi {$status}.");
+        session()->flash('success', "Status pesanan {$this->order->order_number} berhasil diperbarui.");
     }
 
     public function openShipModal(): void

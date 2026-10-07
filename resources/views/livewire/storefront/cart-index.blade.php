@@ -8,7 +8,7 @@
             <h1 class="text-xl font-black text-zinc-900 sm:text-2xl">
                 Keranjang Belanja
                 @if ($summary['items']->isNotEmpty())
-                    <span class="ml-2 text-sm font-semibold text-zinc-400">({{ $summary['total_items'] }} item)</span>
+                    <span class="ml-2 text-sm font-semibold text-zinc-400">({{ $summary['items']->count() }} produk, {{ $summary['total_items'] }} unit)</span>
                 @endif
             </h1>
             @if ($summary['items']->isNotEmpty())

@@ -1,7 +1,7 @@
 <x-layouts.app :title="'Detail Order Admin - Pixel Komunika'">
     <x-layout.admin-page
         :title="'Order '.$order->order_number"
-        description="Detail order tetap berada di application shell agar review admin, pembayaran, dan pengiriman tidak keluar context."
+        description="Ringkasan pesanan, pembayaran, dan pengiriman."
     >
         <x-slot name="actions">
             <flux:button href="{{ route('admin.orders.index') }}" variant="ghost" size="sm" icon="arrow-left">
@@ -12,7 +12,7 @@
         <div class="grid gap-6 md:grid-cols-3">
             <x-ui.stat-card label="Pelanggan" :value="$order->user->name" icon="users" variant="admin" />
             <x-ui.stat-card label="Status order" :value="\App\Services\Admin\AdminDashboardService::orderStatusLabel($order->status)" icon="clipboard-list" variant="admin" />
-            <x-ui.stat-card label="Status invoice" :value="strtoupper($order->invoice?->status ?? 'draft')" icon="badge-check" variant="admin" />
+            <x-ui.stat-card label="Status invoice" :value="match ($order->invoice?->status) { 'paid' => 'Lunas', 'cancelled' => 'Dibatalkan', default => 'Belum Lunas' }" icon="badge-check" variant="admin" />
         </div>
 
         <livewire:admin.order-fulfillment-actions :order="$order" />
@@ -78,7 +78,7 @@
                                 {{ $order->latestPaymentProof->bank_name }} • {{ $order->latestPaymentProof->account_name }}
                             </p>
                             <p class="mt-1 text-sm text-zinc-600">Rp {{ number_format($order->latestPaymentProof->amount, 0, ',', '.') }}</p>
-                            <p class="mt-2 text-xs font-semibold uppercase text-zinc-500">{{ $order->latestPaymentProof->status }}</p>
+                            <div class="mt-2"><x-ui.status-badge :status="$order->latestPaymentProof->status" /></div>
                         </div>
                     @endif
                 </div>

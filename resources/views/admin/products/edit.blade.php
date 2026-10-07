@@ -232,7 +232,7 @@
                         <x-icon name="info" class="mt-0.5 size-4 shrink-0 text-amber-600" />
                         <div class="text-xs leading-relaxed text-amber-900">
                             <p class="font-bold">Data katalog sumber POS</p>
-                            <p class="mt-1">SKU, kategori, merek, harga, dan stok dikelola di POS (FR-CAT-003). Halaman ini hanya mengelola presentasi tampilan website (FR-CAT-004/006).</p>
+                            <p class="mt-1">SKU, kategori, merek, harga, dan stok dikelola di POS. Halaman ini hanya mengelola presentasi tampilan website.</p>
                         </div>
                     </div>
                 </div>

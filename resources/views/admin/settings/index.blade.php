@@ -278,7 +278,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="text-sm font-bold text-zinc-900">Rekening Bank</h2>
-                    <p class="mt-0.5 text-xs text-zinc-500">Rekening tujuan transfer pelanggan. Rekening aktif dipakai pada checkout (FR-PAY-001).</p>
+                    <p class="mt-0.5 text-xs text-zinc-500">Rekening tujuan transfer pelanggan. Rekening aktif dipakai pada checkout.</p>
                 </div>
                 <button type="button" @click="addOpen = true" class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-dark">
                     <x-icon name="plus" class="size-4" />
@@ -433,7 +433,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <h2 class="text-sm font-bold text-zinc-900">Minimum Partai</h2>
-                    <p class="mt-0.5 text-xs text-zinc-500">Jumlah minimal per SKU agar harga partai (PARTAI) berlaku di keranjang (FR-PRC-008).</p>
+                    <p class="mt-0.5 text-xs text-zinc-500">Jumlah minimal per SKU agar harga partai berlaku di keranjang.</p>
                 </div>
                 <button
                     type="button"

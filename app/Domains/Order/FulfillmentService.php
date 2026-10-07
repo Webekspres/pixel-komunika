@@ -21,15 +21,25 @@ class FulfillmentService
     public function transition(Order $order, string $status, ?User $actor = null, ?string $trackingNumber = null): Order
     {
         $allowed = [
-            'paid' => ['processing', 'cancelled'],
-            'processing' => ['packed', 'cancelled'],
-            'packed' => ['shipped', 'cancelled'],
+            // Pembatalan lewat OrderService::cancelOrder (restore stok + retur POS), bukan di sini.
+            'paid' => ['processing'],
+            'processing' => ['packed'],
+            'packed' => ['shipped'],
             'shipped' => ['completed'],
         ];
 
         $from = $order->status;
         if (! in_array($status, $allowed[$from] ?? [], true)) {
             throw new InvalidArgumentException("Transisi status dari {$from} ke {$status} tidak diizinkan.");
+        }
+
+        // FR-ORD-005 + keputusan 5 Okt: resi wajib untuk ekspedisi, tidak untuk kurir toko.
+        if ($status === 'shipped' && blank($trackingNumber) && $order->shipment?->rate_provider !== Shipment::PROVIDER_STORE) {
+            throw new InvalidArgumentException('Nomor resi wajib diisi untuk pengiriman ekspedisi.');
+        }
+
+        if ($status === 'completed' && $order->shipment?->isHeld()) {
+            throw new InvalidArgumentException('Pesanan TERKENDALA tidak dapat diselesaikan sebelum kendala ditangani.');
         }
 
         $receiptToken = null;

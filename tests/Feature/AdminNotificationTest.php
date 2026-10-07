@@ -1,5 +1,6 @@
 <?php
 
+use App\Domains\Notifications\Contracts\WhatsAppNotifierInterface;
 use App\Domains\Notifications\NotificationService;
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
 use App\Livewire\Admin\AdminOrders;
@@ -158,4 +159,39 @@ it('does not leak notifications to non-admins', function () {
     Livewire::actingAs($customer)
         ->test(Notifications::class)
         ->assertSee('Belum ada notifikasi');
+});
+
+it('does not let permanently failing WhatsApp rows starve newer notifications', function () {
+    $admin = User::factory()->admin()->create();
+    app()->instance(WhatsAppNotifierInterface::class, new class implements WhatsAppNotifierInterface
+    {
+        public function send(string $phone, string $message): string
+        {
+            throw_if($phone === 'invalid', new RuntimeException('Fonnte: invalid target'));
+
+            return 'ok';
+        }
+    });
+
+    $order = Order::factory()->create();
+    $make = fn (string $phone) => AppNotification::query()->create([
+        'user_id' => $admin->id,
+        'order_id' => $order->id,
+        'channel' => AppNotification::CHANNEL_WHATSAPP,
+        'type' => AppNotification::TYPE_RECEIPT_CONFIRMATION,
+        'data' => ['phone' => $phone, 'message' => 'x'],
+        'status' => AppNotification::PENDING,
+    ]);
+    $bad = collect(range(1, 3))->map(fn () => $make('invalid'));
+    $good = $make('081546407702');
+
+    // Scheduler jalan tiap 5 menit; batch kecil memaksa antrean bergilir.
+    foreach (range(1, NotificationService::MAX_WHATSAPP_ATTEMPTS + 1) as $run) {
+        $this->travel(5)->minutes();
+        app(NotificationService::class)->dispatchPendingWhatsApp(limit: 3);
+    }
+
+    expect($good->fresh()->status)->toBe(AppNotification::SENT)
+        ->and($bad->first()->fresh()->status)->toBe(AppNotification::FAILED)
+        ->and($bad->first()->fresh()->data['attempts'])->toBe(NotificationService::MAX_WHATSAPP_ATTEMPTS);
 });

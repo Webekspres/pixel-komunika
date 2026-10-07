@@ -34,6 +34,12 @@ class PriceCalculator
         return $prices->get(ProductPrice::RETAIL, $bulk ?? $wholesale);
     }
 
+    /** Minimal pembelian per SKU (Pengaturan > Partai); mencegah reseller jatuh ke harga ECERAN. */
+    public function minimumOrderQuantity(): int
+    {
+        return max(1, (int) (StoreProfile::active()?->minimum_order_quantity ?? 1));
+    }
+
     public function partaiMinimumQuantity(): int
     {
         $fromStore = StoreProfile::active()?->partai_minimum_quantity;
@@ -134,10 +140,11 @@ class PriceCalculator
 
     protected function roundMoney(float $value): float
     {
+        // K-3: dibulatkan ke rupiah penuh agar nominal transfer = total tersimpan.
         return match (config('store.pph22.rounding', 'half_up')) {
-            'floor' => floor($value * 100) / 100,
-            'ceil' => ceil($value * 100) / 100,
-            default => round($value, 2),
+            'floor' => floor($value),
+            'ceil' => ceil($value),
+            default => round($value),
         };
     }
 }

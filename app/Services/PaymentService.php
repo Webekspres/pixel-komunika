@@ -10,6 +10,8 @@ use App\Models\PaymentProof;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class PaymentService
 {
@@ -20,6 +22,22 @@ class PaymentService
     public function uploadPaymentProof(Order $order, User $user, array $data, UploadedFile $file): PaymentProof
     {
         return DB::transaction(function () use ($order, $user, $data, $file) {
+            // UF-10: unggah hanya saat menunggu pembayaran / setelah ditolak.
+            $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+            // Keputusan 5 Okt: akun ditangguhkan tetap bisa melihat pesanan/invoice,
+            // tetapi tidak bisa membayar sampai diaktifkan kembali.
+            if (! $user->isActiveCustomer()) {
+                throw ValidationException::withMessages([
+                    'proof_file' => 'Akun Anda sedang tidak aktif. Hubungi admin untuk melanjutkan pembayaran.',
+                ]);
+            }
+
+            if (! in_array($order->status, ['unpaid', 'payment_rejected'], true)) {
+                throw ValidationException::withMessages([
+                    'proof_file' => 'Bukti pembayaran tidak dapat diunggah untuk status pesanan saat ini.',
+                ]);
+            }
+
             $path = $file->store('payment-proofs', 'local');
             $retainYears = (int) config('store.payment_proof_retain_years', 5);
 
@@ -70,6 +88,8 @@ class PaymentService
                 $order->invoice->update(['status' => 'payment_pending']);
             }
 
+            $this->audit->log('PAYMENT_PROOF_UPLOADED', $proof, $user);
+
             return $proof;
         });
     }
@@ -77,6 +97,8 @@ class PaymentService
     public function approvePayment(PaymentProof $proof, User $admin): void
     {
         DB::transaction(function () use ($proof, $admin) {
+            [$proof, $order] = $this->lockReviewable($proof);
+
             $proof->update([
                 'status' => 'approved',
                 'reviewed_by' => $admin->id,
@@ -89,7 +111,6 @@ class PaymentService
                 'verified_at' => now(),
             ]);
 
-            $order = $proof->order;
             $order->update(['status' => 'processing']);
 
             if ($order->invoice) {
@@ -103,6 +124,8 @@ class PaymentService
     public function rejectPayment(PaymentProof $proof, string $reason, User $admin): void
     {
         DB::transaction(function () use ($proof, $reason, $admin) {
+            [$proof, $order] = $this->lockReviewable($proof);
+
             $proof->update([
                 'status' => 'rejected',
                 'rejection_reason' => $reason,
@@ -118,7 +141,6 @@ class PaymentService
                 'rejection_reason' => $reason,
             ]);
 
-            $order = $proof->order;
             $order->update(['status' => 'payment_rejected']);
 
             if ($order->invoice) {
@@ -127,5 +149,24 @@ class PaymentService
 
             $this->audit->log('PAYMENT_REJECTED', $proof, $admin, null, ['reason' => $reason]);
         });
+    }
+
+    /**
+     * Kunci order + bukti dan pastikan masih bisa direview (FR-ORD-008): bukti aktif
+     * berstatus pending pada order payment_pending. Mencegah approve/reject ganda
+     * dan menghidupkan kembali order yang sudah dibatalkan.
+     *
+     * @return array{0: PaymentProof, 1: Order}
+     */
+    protected function lockReviewable(PaymentProof $proof): array
+    {
+        $order = Order::query()->lockForUpdate()->findOrFail($proof->order_id);
+        $proof = PaymentProof::query()->lockForUpdate()->findOrFail($proof->id);
+
+        if ($proof->status !== 'pending' || ! $proof->is_active || $order->status !== 'payment_pending') {
+            throw new InvalidArgumentException("Bukti pembayaran Order #{$order->order_number} sudah diproses atau pesanan tidak lagi menunggu verifikasi.");
+        }
+
+        return [$proof, $order];
     }
 }

@@ -56,8 +56,8 @@ it('calculates pph22 as (triggered subtotal / 1.11) × rate', function () {
         ['category_id' => $category->id, 'line_total' => 1500000],
     ]));
 
-    // (1500000 / 1.11) * 0.5% = 6756.756... → 6756.76
-    expect($result['total'])->toBe(6756.76)
+    // (1500000 / 1.11) * 0.5% = 6756.756... → 6757.0
+    expect($result['total'])->toBe(6757.0)
         ->and($result['aggregate']['basis_amount'])->toBe(1500000.0)
         ->and($result['aggregate']['divisor'])->toBe(1.11);
 });

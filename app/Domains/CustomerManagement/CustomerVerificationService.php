@@ -22,8 +22,23 @@ class CustomerVerificationService
             default => throw new \InvalidArgumentException("Aksi {$action} tidak dikenal."),
         };
 
-        return DB::transaction(function () use ($profile, $action, $admin, $status, $resolvedReason) {
+        // FRD 3.1: transisi yang sah per aksi. REJECTED -> ACTIVE dipertahankan karena UI
+        // menyediakan "Setujui" untuk pendaftar yang sebelumnya ditolak.
+        $allowedFrom = [
+            'approve' => [CustomerProfile::PENDING, CustomerProfile::REJECTED],
+            'reject' => [CustomerProfile::PENDING],
+            'suspend' => [CustomerProfile::ACTIVE],
+            'reactivate' => [CustomerProfile::SUSPENDED],
+        ][$action];
+
+        return DB::transaction(function () use ($profile, $action, $admin, $status, $resolvedReason, $allowedFrom) {
+            // Lock + cek ulang: dua admin di tab berbeda tidak saling menimpa keputusan.
+            $profile = CustomerProfile::query()->lockForUpdate()->findOrFail($profile->id);
             $old = $profile->verification_status;
+            if (! in_array($old, $allowedFrom, true)) {
+                throw new \InvalidArgumentException('Status akun sudah berubah. Muat ulang halaman lalu coba lagi.');
+            }
+
             $payload = [
                 'verification_status' => $status,
                 'rejection_reason' => $resolvedReason,

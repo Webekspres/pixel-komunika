@@ -87,7 +87,7 @@
                         <tr class="border-b border-neutral-100">
                             <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">No. Order</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tanggal</th>
+                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tgl Kirim</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Pelanggan</th>
                             <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kecamatan</th>
                             <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Subtotal</th>
@@ -106,7 +106,7 @@
                                     </a>
                                 </td>
                                 <td class="px-5 py-3.5 text-xs whitespace-nowrap text-zinc-500">
-                                    {{ $order->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}
+                                    {{ ($order->shipment?->shipped_at ?? $order->created_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}
                                 </td>
                                 <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->recipient_name }}</td>
                                 <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->shipping_district ?: '—' }}</td>
@@ -126,9 +126,13 @@
                     @if ($transactions->isNotEmpty())
                         <tfoot>
                             <tr class="border-t border-neutral-100 bg-neutral-50/70">
-                                <td colspan="7" class="px-5 py-3.5 text-right text-xs font-bold tracking-wide text-zinc-500 uppercase">Total omzet periode (subtotal + ongkir)</td>
+                                <td colspan="7" class="px-5 py-3.5 text-right text-xs font-bold tracking-wide text-zinc-500 uppercase">Total periode (semua halaman)</td>
                                 <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-800">Rp {{ number_format($pph22, 0, ',', '.') }}</td>
-                                <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-900">Rp {{ number_format($omzet, 0, ',', '.') }}</td>
+                                {{-- Kolom ini = grand total (omzet + PPh 22), sama seperti baris di atasnya. --}}
+                                <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-900">
+                                    Rp {{ number_format($omzet + $pph22, 0, ',', '.') }}
+                                    <span class="block text-[11px] font-medium text-zinc-500">Omzet (subtotal + ongkir): Rp {{ number_format($omzet, 0, ',', '.') }}</span>
+                                </td>
                             </tr>
                         </tfoot>
                     @endif

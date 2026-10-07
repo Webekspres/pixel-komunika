@@ -59,7 +59,13 @@ class OrderFulfillmentActions extends Component
             return;
         }
 
-        $paymentService->approvePayment($proof, auth()->user());
+        try {
+            $paymentService->approvePayment($proof, auth()->user());
+        } catch (InvalidArgumentException $e) {
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         $this->order->refresh();
         session()->flash('success', "Pembayaran untuk Order #{$this->order->order_number} telah disetujui.");
@@ -91,7 +97,14 @@ class OrderFulfillmentActions extends Component
             'rejectionReason' => 'required|string|min:5',
         ]);
 
-        $paymentService->rejectPayment($proof, $this->rejectionReason, auth()->user());
+        try {
+            $paymentService->rejectPayment($proof, $this->rejectionReason, auth()->user());
+        } catch (InvalidArgumentException $e) {
+            $this->resetRejectModal();
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         $this->resetRejectModal();
         $this->order->refresh();
@@ -165,7 +178,14 @@ class OrderFulfillmentActions extends Component
             'cancelReason' => 'required|string|min:5',
         ]);
 
-        $orderService->cancelOrder($this->order, $this->cancelReason, 'ADMIN', auth()->user());
+        try {
+            $orderService->cancelOrder($this->order, $this->cancelReason, 'ADMIN', auth()->user());
+        } catch (InvalidArgumentException $e) {
+            $this->resetCancelModal();
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         $this->resetCancelModal();
         $this->order->refresh();

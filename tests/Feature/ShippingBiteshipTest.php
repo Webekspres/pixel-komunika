@@ -9,27 +9,16 @@ beforeEach(function () {
 
 it('maps Biteship rates to correct format', function () {
     Http::fake([
+        // Skema resmi Biteship: areas[].id dan pricing[] (courier_code/courier_service_code/price).
         'api.biteship.com/v1/maps/areas*' => Http::response([
             'areas' => [
-                ['area_id' => 'DEST123', 'city' => 'Jakarta', 'province' => 'DKI Jakarta'],
+                ['id' => 'DEST123', 'name' => 'Jakarta', 'administrative_division_level_2_name' => 'Jakarta'],
             ],
         ], 200),
         'api.biteship.com/v1/rates/couriers*' => Http::response([
-            'rates' => [
-                [
-                    'courier_company' => ['name' => 'JNE'],
-                    'courier_type_code' => 'REG',
-                    'courier_type_name' => 'Reguler',
-                    'cost' => 15000,
-                    'etd' => '2-3',
-                ],
-                [
-                    'courier_company' => ['name' => 'J&T'],
-                    'courier_type_code' => 'REG',
-                    'courier_type_name' => 'Reguler',
-                    'cost' => 12000,
-                    'etd' => '2-3',
-                ],
+            'pricing' => [
+                ['courier_name' => 'JNE', 'courier_code' => 'jne', 'courier_service_name' => 'Reguler', 'courier_service_code' => 'reg', 'price' => 15000, 'shipment_duration_range' => '2 - 3'],
+                ['courier_name' => 'J&T', 'courier_code' => 'jnt', 'courier_service_name' => 'Reguler', 'courier_service_code' => 'ez', 'price' => 12000, 'shipment_duration_range' => '2 - 3'],
             ],
         ], 200),
     ]);
@@ -42,15 +31,15 @@ it('maps Biteship rates to correct format', function () {
     expect($rates)->toHaveCount(2)
         ->and($rates[0])->toMatchArray([
             'provider' => 'BITESHIP',
-            'code' => 'reg',
+            'code' => 'jne',
             'service' => 'REG',
             'name' => 'JNE Reguler',
             'cost' => 15000,
         ])
         ->and($rates[1])->toMatchArray([
             'provider' => 'BITESHIP',
-            'code' => 'reg',
-            'service' => 'REG',
+            'code' => 'jnt',
+            'service' => 'EZ',
             'name' => 'J&T Reguler',
             'cost' => 12000,
         ]);
@@ -112,17 +101,12 @@ it('returns empty array when API key or origin not configured', function () {
 it('filters out zero cost rates', function () {
     Http::fake([
         'api.biteship.com/v1/maps/areas*' => Http::response([
-            'areas' => [['area_id' => 'DEST123', 'city' => 'Jakarta']],
+            'areas' => [['id' => 'DEST123', 'name' => 'Jakarta']],
         ], 200),
         'api.biteship.com/v1/rates/couriers*' => Http::response([
-            'rates' => [
-                [
-                    'courier_company' => ['name' => 'JNE'],
-                    'courier_type_code' => 'REG',
-                    'courier_type_name' => 'Reguler',
-                    'cost' => 0,
-                    'etd' => '2-3',
-                ],
+            'pricing' => [
+                ['courier_name' => 'JNE', 'courier_code' => 'jne', 'courier_service_name' => 'Reguler', 'courier_service_code' => 'reg', 'price' => 0],
+                ['courier_name' => 'SiCepat', 'courier_code' => 'sicepat', 'courier_service_name' => 'Reguler', 'courier_service_code' => 'reg', 'price' => 12000],
             ],
         ], 200),
     ]);
@@ -132,5 +116,6 @@ it('filters out zero cost rates', function () {
     $service = new BiteshipShippingService;
     $rates = $service->calculateRates('Jakarta', 500);
 
-    expect($rates)->toBeEmpty();
+    expect($rates)->toHaveCount(1)
+        ->and($rates[0]['code'])->toBe('sicepat');
 });

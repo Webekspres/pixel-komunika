@@ -82,7 +82,7 @@ class ProductIndex extends Component
         $cart = $cartService->getOrCreateCart($user, $sessionId);
 
         try {
-            $cartService->addItem($cart, $productId, 1);
+            $cartService->addItem($cart, $productId);
             $productName = Product::query()->with('enrichment')->find($productId)?->displayName() ?? 'Produk';
             $this->dispatch('cart-updated');
             $this->dispatch('cart-item-added', name: $productName);
@@ -93,10 +93,10 @@ class ProductIndex extends Component
 
     public function render(CartService $cartService)
     {
-        $categories = Category::all();
+        $categories = Category::query()->where('is_active', true)->get();
         $brands = Brand::all();
 
-        $query = Product::with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
+        $query = Product::query()->storefrontVisible()->with(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);
@@ -109,7 +109,8 @@ class ProductIndex extends Component
         if (! empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('sku', 'like', "%{$this->search}%");
+                    ->orWhere('sku', 'like', "%{$this->search}%")
+                    ->orWhereHas('enrichment', fn ($e) => $e->where('display_name', 'like', "%{$this->search}%"));
             });
         }
 
@@ -119,14 +120,18 @@ class ProductIndex extends Component
             });
         }
 
-        if ($this->minPrice !== null && is_numeric($this->minPrice)) {
+        // FR-CAT-008: filter/urut harga hanya untuk yang boleh melihat harga,
+        // agar harga tidak bisa ditebak lewat binary search oleh guest/pending.
+        $canViewPrices = (bool) Auth::user()?->canViewPrices();
+
+        if ($canViewPrices && $this->minPrice !== null && is_numeric($this->minPrice)) {
             $query->whereHas('prices', function ($q) {
                 $q->where('price_type', ProductPrice::WHOLESALE)
                     ->where('amount', '>=', (float) $this->minPrice);
             });
         }
 
-        if ($this->maxPrice !== null && is_numeric($this->maxPrice)) {
+        if ($canViewPrices && $this->maxPrice !== null && is_numeric($this->maxPrice)) {
             $query->whereHas('prices', function ($q) {
                 $q->where('price_type', ProductPrice::WHOLESALE)
                     ->where('amount', '<=', (float) $this->maxPrice);
@@ -134,9 +139,9 @@ class ProductIndex extends Component
         }
 
         // Sorting
-        match ($this->sort) {
-            'name_asc' => $query->orderBy('name', 'asc'),
-            'name_desc' => $query->orderBy('name', 'desc'),
+        match ($canViewPrices ? $this->sort : str_replace(['price_low', 'price_high'], 'latest', $this->sort)) {
+            'name_asc' => $query->orderBy('products.name', 'asc'),
+            'name_desc' => $query->orderBy('products.name', 'desc'),
             'price_low' => $query->join('product_prices', function ($join) {
                 $join->on('products.id', '=', 'product_prices.product_id')
                     ->where('product_prices.price_type', '=', ProductPrice::WHOLESALE);

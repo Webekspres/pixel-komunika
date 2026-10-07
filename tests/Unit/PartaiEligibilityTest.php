@@ -12,7 +12,7 @@ beforeEach(function () {
 
 it('triggers partai pricing when one sku reaches minimum 5 units', function () {
     $cartService = app(CartService::class);
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
     $cart = $cartService->getOrCreateCart($user);
 
     $productA = Product::where('sku', 'PB-10000')->firstOrFail();
@@ -26,7 +26,7 @@ it('triggers partai pricing when one sku reaches minimum 5 units', function () {
 
 it('does not aggregate quantities across skus for partai eligibility', function () {
     $cartService = app(CartService::class);
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
     $cart = $cartService->getOrCreateCart($user);
 
     $productA = Product::where('sku', 'PB-10000')->firstOrFail();
@@ -44,7 +44,7 @@ it('does not aggregate quantities across skus for partai eligibility', function 
 
 it('applies partai cart-wide when any single sku qualifies', function () {
     $cartService = app(CartService::class);
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
     $cart = $cartService->getOrCreateCart($user);
 
     $productA = Product::where('sku', 'PB-10000')->firstOrFail();

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,20 @@ class Product extends Model
     public function getRouteKeyName(): string
     {
         return 'sku';
+    }
+
+    /** FR-CAT-006/007: hanya produk aktif, tidak disembunyikan admin, dan kategori aktif. */
+    public function scopeStorefrontVisible(Builder $query): void
+    {
+        $query->where('products.is_active', true)
+            ->whereDoesntHave('enrichment', fn (Builder $q) => $q->where('is_visible', false))
+            ->where(fn (Builder $q) => $q->whereNull('products.category_id')
+                ->orWhereHas('category', fn (Builder $c) => $c->where('is_active', true)));
+    }
+
+    public function isStorefrontVisible(): bool
+    {
+        return static::query()->storefrontVisible()->whereKey($this->getKey())->exists();
     }
 
     public function category(): BelongsTo

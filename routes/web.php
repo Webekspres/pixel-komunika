@@ -36,9 +36,12 @@ Route::get('/produk', ProductIndex::class)->name('products.index');
 Route::get('/produk/{product}', ProductShow::class)->name('products.show');
 Route::get('/cart', CartIndex::class)->name('cart.index');
 
-Route::get('/konfirmasi-penerimaan/{order}', ReceiptConfirmationController::class)
+Route::get('/konfirmasi-penerimaan/{order}', [ReceiptConfirmationController::class, 'show'])
     ->middleware('throttle:10,1')
     ->name('orders.confirm-receipt');
+Route::post('/konfirmasi-penerimaan/{order}', [ReceiptConfirmationController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('orders.confirm-receipt.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/daftar', [RegisteredUserController::class, 'create'])->name('register');

@@ -75,7 +75,7 @@ it('shows figma-style admin dashboard with live aggregates for admins', function
     $data = app(AdminDashboardService::class)->build();
     expect($data['activeCustomers'])->toBeGreaterThanOrEqual(2)
         ->and($data['pendingPayments'])->toBeGreaterThanOrEqual(1)
-        ->and((float) $data['totalRevenue'])->toBeGreaterThanOrEqual(150000)
+        ->and((float) $data['totalRevenue'])->toBe(100000.0) // omzet = subtotal + ongkir, sama dengan laporan
         ->and($data['pendingVerificationCount'])->toBeGreaterThanOrEqual(1);
 });
 

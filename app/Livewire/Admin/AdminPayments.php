@@ -6,6 +6,7 @@ use App\Models\BankAccount;
 use App\Models\PaymentProof;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\URL as UrlFacade;
+use InvalidArgumentException;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -68,7 +69,14 @@ class AdminPayments extends Component
             'adminNote' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $paymentService->approvePayment($proof, auth()->user());
+        try {
+            $paymentService->approvePayment($proof, auth()->user());
+        } catch (InvalidArgumentException $e) {
+            $this->resetReviewModal();
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         if ($this->adminNote !== '' && $proof->payment) {
             $proof->payment->update(['admin_note' => $this->adminNote]);
@@ -90,7 +98,14 @@ class AdminPayments extends Component
             'adminNote' => ['required', 'string', 'min:5'],
         ]);
 
-        $paymentService->rejectPayment($proof, $this->adminNote, auth()->user());
+        try {
+            $paymentService->rejectPayment($proof, $this->adminNote, auth()->user());
+        } catch (InvalidArgumentException $e) {
+            $this->resetReviewModal();
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         $this->resetReviewModal();
         session()->flash('success', "Pembayaran Order #{$proof->order->order_number} telah ditolak.");

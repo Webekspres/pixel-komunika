@@ -31,7 +31,7 @@ class Home extends Component
         $cart = $cartService->getOrCreateCart($user, $sessionId);
 
         try {
-            $cartService->addItem($cart, $productId, 1);
+            $cartService->addItem($cart, $productId);
             $productName = Product::query()->with('enrichment')->find($productId)?->displayName() ?? 'Produk';
             $this->dispatch('cart-updated');
             $this->dispatch('cart-item-added', name: $productName);
@@ -47,9 +47,9 @@ class Home extends Component
         $cart = $cartService->getOrCreateCart($user, $sessionId);
         $cartSummary = $cartService->getCartSummary($cart);
 
-        $categories = Category::all();
+        $categories = Category::query()->where('is_active', true)->get();
 
-        $query = Product::with(['category', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
+        $query = Product::query()->storefrontVisible()->with(['category', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);
@@ -58,7 +58,8 @@ class Home extends Component
         if (! empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('sku', 'like', "%{$this->search}%");
+                    ->orWhere('sku', 'like', "%{$this->search}%")
+                    ->orWhereHas('enrichment', fn ($e) => $e->where('display_name', 'like', "%{$this->search}%"));
             });
         }
 

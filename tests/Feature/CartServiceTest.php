@@ -11,7 +11,7 @@ beforeEach(function () {
 
 it('can add products to cart, update quantity, and get summary', function () {
     $cartService = app(CartService::class);
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
 
     $cart = $cartService->getOrCreateCart($user);
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
@@ -38,7 +38,7 @@ it('can add products to cart, update quantity, and get summary', function () {
 
 it('can clear all cart items at once', function () {
     $cartService = app(CartService::class);
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
     $cart = $cartService->getOrCreateCart($user);
 
     $products = Product::query()->take(2)->get();
@@ -58,7 +58,7 @@ it('can clear all cart items at once', function () {
 
 it('throws exception if quantity added exceeds available stock', function () {
     $cartService = app(CartService::class);
-    $user = User::factory()->create();
+    $user = User::factory()->activeCustomer()->create();
     $cart = $cartService->getOrCreateCart($user);
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
 

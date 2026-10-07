@@ -1,5 +1,5 @@
 @php
-    $isWaitingPayment = in_array($order->status, ['unpaid', 'payment_pending', 'payment_rejected'], true);
+    $isWaitingPayment = in_array($order->status, ['unpaid', 'payment_rejected'], true);
     $isPaymentSubmitted = $order->status === 'payment_pending';
     $isPaidOrLater = in_array($order->status, ['paid', 'processing', 'packed', 'shipped', 'completed'], true);
     $isCancelled = $order->status === 'cancelled';

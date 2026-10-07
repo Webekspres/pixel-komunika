@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Domains\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\CategoryTaxRule;
@@ -38,7 +39,7 @@ class CategoryTaxRuleController extends Controller
         ]);
     }
 
-    public function update(Request $request, Category $category): RedirectResponse
+    public function update(Request $request, Category $category, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
             'threshold_amount' => ['required', 'numeric', 'min:0'],
@@ -46,14 +47,21 @@ class CategoryTaxRuleController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        CategoryTaxRule::query()->updateOrCreate(
+        $fields = ['threshold_amount', 'rate_percent', 'is_active'];
+        $oldValues = $category->taxRule?->only($fields);
+
+        $rule = CategoryTaxRule::query()->updateOrCreate(
             ['category_id' => $category->id],
             [
                 'threshold_amount' => $validated['threshold_amount'],
                 'rate_percent' => $validated['rate_percent'],
                 'is_active' => $request->boolean('is_active'),
+                'updated_by' => $request->user()->id,
             ],
         );
+
+        // FR-PRC-003: perubahan aturan PPh 22 wajib diaudit.
+        $audit->log('TAX_RULE_UPDATED', $rule, $request->user(), $oldValues, $rule->only($fields));
 
         return redirect()
             ->route('admin.tax-rules.index')

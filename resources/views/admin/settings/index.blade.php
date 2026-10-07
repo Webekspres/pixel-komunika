@@ -453,6 +453,11 @@
                     {{ $store->partai_minimum_quantity ?? 5 }}
                     <span class="text-sm font-semibold text-zinc-500">per SKU</span>
                 </p>
+                <p class="mt-4 text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Minimal pembelian</p>
+                <p class="mt-1 text-2xl font-black text-zinc-900">
+                    {{ $store->minimum_order_quantity ?? 1 }}
+                    <span class="text-sm font-semibold text-zinc-500">unit per SKU</span>
+                </p>
                 <p class="mt-1.5 text-xs text-zinc-400">Perubahan dicatat ke audit trail.</p>
             </div>
 
@@ -473,7 +478,21 @@
                         value="{{ old('partai_minimum_quantity', $store->partai_minimum_quantity ?? 5) }}"
                         class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
                     >
-                    <p class="mt-1.5 text-xs text-zinc-400">Perubahan dicatat ke audit trail.</p>
+                </div>
+
+                <div>
+                    <label for="minimum_order_quantity" class="mb-1.5 block text-xs font-semibold text-zinc-700">Minimal pembelian per SKU</label>
+                    <input
+                        id="minimum_order_quantity"
+                        name="minimum_order_quantity"
+                        type="number"
+                        min="1"
+                        max="100000"
+                        required
+                        value="{{ old('minimum_order_quantity', $store->minimum_order_quantity ?? 1) }}"
+                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                    >
+                    <p class="mt-1.5 text-xs text-zinc-400">Pelanggan tidak bisa membeli kurang dari jumlah ini per produk. Samakan dengan minimum partai agar harga eceran tidak pernah dipakai. Perubahan dicatat ke audit trail.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 border-t border-neutral-100 pt-4">
@@ -491,22 +510,21 @@
                 @else
                     <ol class="space-y-3">
                         @foreach ($auditTrail as $log)
-                            @php
-                                $newQty = data_get($log->new_values, 'partai_minimum_quantity');
-                                $oldQty = data_get($log->old_values, 'partai_minimum_quantity');
-                            @endphp
                             <li class="flex items-start gap-3 text-sm">
                                 <div class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-neutral-100">
                                     <x-icon name="history" class="size-3 text-zinc-500" />
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-zinc-800">
-                                        Minimum partai diubah
-                                        @if ($oldQty !== null)
-                                            dari <span class="font-bold">{{ $oldQty }}</span>
-                                        @endif
-                                        ke <span class="font-bold">{{ $newQty }}</span>
-                                    </p>
+                                    @foreach (['partai_minimum_quantity' => 'Minimum partai', 'minimum_order_quantity' => 'Minimal pembelian'] as $field => $label)
+                                        @continue(! array_key_exists($field, (array) $log->new_values))
+                                        <p class="text-zinc-800">
+                                            {{ $label }} diubah
+                                            @if (data_get($log->old_values, $field) !== null)
+                                                dari <span class="font-bold">{{ data_get($log->old_values, $field) }}</span>
+                                            @endif
+                                            ke <span class="font-bold">{{ data_get($log->new_values, $field) }}</span>
+                                        </p>
+                                    @endforeach
                                     <p class="text-xs text-zinc-400">
                                         {{ $log->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }}
                                         @if ($log->actor_user_id)
@@ -565,14 +583,22 @@
                                             <button type="button" @click="editing = !editing" class="rounded-xl bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-700 transition hover:bg-zinc-200">
                                                 {{ 'Edit' }}
                                             </button>
-                                            <form method="POST" action="{{ route('admin.settings.courier-rates.destroy', $rate) }}">
-                                                @csrf
-                                                @method('DELETE')
+                                            <x-ui.confirm-dialog
+                                                title="Hapus tarif kurir"
+                                                :description="'Yakin ingin menghapus tarif kurir toko untuk ' . $rate->area_name . '? Tindakan ini tidak bisa dibatalkan.'"
+                                                confirm-label="Ya, hapus"
+                                                cancel-label="Batal"
+                                                confirm-variant="danger"
+                                                action="{{ route('admin.settings.courier-rates.destroy', $rate) }}"
+                                                method="DELETE"
+                                            >
+                                                <x-slot:trigger>
+                                                    <button type="button" aria-label="Hapus tarif {{ $rate->area_name }}" class="inline-flex items-center gap-1 rounded-xl bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100">
+                                                        <x-icon name="trash-2" class="size-3.5" />
+                                                    </button>
+                                                </x-slot:trigger>
                                                 <input type="hidden" name="tab" value="kurir">
-                                                <button type="submit" class="inline-flex items-center gap-1 rounded-xl bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100">
-                                                    <x-icon name="trash-2" class="size-3.5" />
-                                                </button>
-                                            </form>
+                                            </x-ui.confirm-dialog>
 
                                             <div x-show="editing" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="editing = false" @keydown.escape.window="editing = false">
                                                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">

@@ -52,7 +52,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
         }
 
         try {
-            $destinationAreaId = $this->resolveDestinationAreaId($destinationCity);
+            $destinationAreaId = $this->resolveDestinationAreaId($destinationCity, $destinationDistrict);
             if (! $destinationAreaId) {
                 Log::warning("Biteship: no area found for city: {$destinationCity}");
 
@@ -145,17 +145,20 @@ class BiteshipShippingService implements ShippingCalculatorInterface
         }
     }
 
-    protected function resolveDestinationAreaId(string $city): ?string
+    protected function resolveDestinationAreaId(string $city, ?string $district = null): ?string
     {
-        $cacheKey = 'biteship_area_'.strtolower(trim($city));
+        // Cari sampai kecamatan bila ada; nama kota saja terlalu kasar untuk tarif.
+        $input = trim(($district ? "{$district}, " : '').$city);
+        $cacheKey = 'biteship_area_'.md5(strtolower($input));
 
-        return Cache::remember($cacheKey, 86400, function () use ($city) {
+        return Cache::remember($cacheKey, 86400, function () use ($input) {
             try {
                 $response = Http::withToken($this->apiKey)
                     ->timeout($this->timeout)
                     ->get("{$this->baseUrl}/v1/maps/areas", [
-                        'search' => $city,
-                        'limit' => 10,
+                        'countries' => 'ID',
+                        'input' => $input,
+                        'type' => 'single',
                     ]);
 
                 if (! $response->successful()) {
@@ -167,16 +170,8 @@ class BiteshipShippingService implements ShippingCalculatorInterface
                     return null;
                 }
 
-                $data = $response->json();
-                $areas = $data['areas'] ?? [];
-
-                foreach ($areas as $area) {
-                    if (stripos($area['city'] ?? '', $city) !== false) {
-                        return $area['area_id'] ?? null;
-                    }
-                }
-
-                return $areas[0]['area_id'] ?? null;
+                // Skema Biteship: areas[].id (sama dengan BiteshipAreaSearchService).
+                return $response->json('areas.0.id');
             } catch (\Throwable $e) {
                 Log::error('Biteship maps/areas exception: '.$e->getMessage());
 
@@ -193,8 +188,13 @@ class BiteshipShippingService implements ShippingCalculatorInterface
                 ->post("{$this->baseUrl}/v1/rates/couriers", [
                     'origin_area_id' => $this->originAreaId,
                     'destination_area_id' => $destinationAreaId,
-                    'weight' => max(100, $weightGrams),
-                    'couriers' => ['jne', 'jnt', 'pos', 'sicepat', 'anteraja', 'ninja', 'lion', 'ide', 'grab', 'gojek'],
+                    'couriers' => 'jne,jnt,pos,sicepat,anteraja,ninja,lion,ide,grab,gojek',
+                    'items' => [[
+                        'name' => 'Paket Pixel Komunika',
+                        'value' => 0,
+                        'weight' => max(100, $weightGrams),
+                        'quantity' => 1,
+                    ]],
                 ]);
 
             if (! $response->successful()) {
@@ -208,7 +208,7 @@ class BiteshipShippingService implements ShippingCalculatorInterface
 
             $data = $response->json();
 
-            return $data['rates'] ?? [];
+            return $data['pricing'] ?? [];
         } catch (\Throwable $e) {
             Log::error('Biteship rates/couriers exception: '.$e->getMessage());
 
@@ -221,23 +221,24 @@ class BiteshipShippingService implements ShippingCalculatorInterface
         $mapped = [];
 
         foreach ($biteshipRates as $rate) {
-            $courier = $rate['courier_company']['name'] ?? 'Unknown';
-            $serviceCode = $rate['courier_type_code'] ?? '';
-            $serviceName = $rate['courier_type_name'] ?? '';
-            $cost = (float) ($rate['cost'] ?? 0);
-            $etd = $rate['etd'] ?? '';
+            // Skema Biteship: pricing[] dengan courier_code + courier_service_code.
+            $courierCode = strtolower($rate['courier_code'] ?? '');
+            $serviceCode = strtolower($rate['courier_service_code'] ?? '');
+            $cost = (float) ($rate['price'] ?? 0);
+            $duration = $rate['shipment_duration_range'] ?? $rate['duration'] ?? '';
 
-            if ($cost <= 0) {
+            if ($cost <= 0 || $courierCode === '' || $serviceCode === '') {
                 continue;
             }
 
             $mapped[] = [
                 'provider' => Shipment::PROVIDER_BITESHIP,
-                'code' => strtolower($serviceCode),
+                // Kunci pilihan = code:service, jadi kurir harus ikut agar JNE REG != SiCepat REG.
+                'code' => $courierCode,
                 'service' => strtoupper($serviceCode),
-                'name' => "{$courier} {$serviceName}",
+                'name' => trim(($rate['courier_name'] ?? strtoupper($courierCode)).' '.($rate['courier_service_name'] ?? '')),
                 'cost' => $cost,
-                'etd' => $etd ? "{$etd} hari" : 'N/A',
+                'etd' => $duration ? str_replace(' days', '', $duration).' hari' : 'N/A',
             ];
         }
 

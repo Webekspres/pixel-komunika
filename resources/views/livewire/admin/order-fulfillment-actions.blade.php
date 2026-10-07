@@ -113,7 +113,7 @@
             <div class="space-y-5">
                 <div>
                     <flux:heading size="lg">Kirim Pesanan</flux:heading>
-                    <flux:subheading class="mt-2">Order akan ditandai Dikirim. Nomor resi hanya wajib untuk kurir yang memilikinya.</flux:subheading>
+                    <flux:subheading class="mt-2">Order akan ditandai Dikirim. Nomor resi wajib untuk ekspedisi; kosongkan bila dikirim dengan Kurir Toko.</flux:subheading>
                 </div>
 
                 <flux:input

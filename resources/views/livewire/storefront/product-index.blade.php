@@ -175,6 +175,7 @@
                                             Detail
                                         </a>
 
+                                        @if (auth()->guest() || auth()->user()->canViewPrices())
                                         <button
                                             wire:click="addToCart({{ $product->id }})"
                                             type="button"
@@ -183,6 +184,7 @@
                                             <x-icon name="shopping-cart" class="size-3.5" />
                                             <span>+ Keranjang</span>
                                         </button>
+                                        @endif
                                     </div>
                                 </x-slot:actions>
                             </x-storefront.product-card>

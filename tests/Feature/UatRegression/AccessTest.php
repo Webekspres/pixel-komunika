@@ -63,6 +63,14 @@ it('blocks pending customer from adding to cart', function () {
     Livewire::test(ProductIndex::class)->call('addToCart', Product::query()->firstOrFail()->id);
 
     expect(CartItem::count())->toBe(0);
+
+    // Temuan L: tombol yang pasti ditolak tidak ditampilkan; pengunjung tetap melihatnya (diarahkan ke login).
+    $product = Product::where('sku', 'PB-10000')->firstOrFail();
+    $this->get(route('products.index'))->assertDontSee('+ Keranjang');
+    $this->get(route('products.show', $product))->assertSee('Akun sedang diverifikasi')->assertDontSee('Tambah ke Keranjang');
+
+    auth()->logout();
+    $this->get(route('products.show', $product))->assertSee('Tambah ke Keranjang');
 });
 
 // REG-04 / FR-AUTH-002: pending customer must never see prices, cart included.

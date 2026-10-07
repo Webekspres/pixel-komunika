@@ -392,23 +392,17 @@
                     </div>
 
                     {{-- Summary stats below chart --}}
-                    <div class="mt-6 grid grid-cols-3 gap-3 border-t border-zinc-100 pt-4 text-center">
+                    <div class="mt-6 grid grid-cols-2 gap-3 border-t border-zinc-100 pt-4 text-center">
                         <div>
                             <p class="text-[11px] font-semibold text-zinc-400">Rata-rata Harian</p>
                             <p class="mt-0.5 text-sm font-bold text-zinc-900 sm:text-base">
                                 Rp {{ number_format(array_sum($chartRevenue) / 7, 0, ',', '.') }}
                             </p>
                         </div>
-                        <div class="border-x border-zinc-100">
+                        <div class="border-l border-zinc-100">
                             <p class="text-[11px] font-semibold text-zinc-400">Puncak Omzet</p>
                             <p class="mt-0.5 text-sm font-bold text-amber-600 sm:text-base">
                                 Rp {{ number_format(max($chartRevenue), 0, ',', '.') }}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-[11px] font-semibold text-zinc-400">Tingkat Penyelesaian</p>
-                            <p class="mt-0.5 text-sm font-bold text-emerald-600 sm:text-base">
-                                98.4% Sukses
                             </p>
                         </div>
                     </div>
@@ -642,35 +636,29 @@
                 </div>
 
                 {{-- WIDGET 2: Status Integrasi & Sinkronisasi POS --}}
-                <div
-                    class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm"
-                    x-data="{
-                        syncing: false,
-                        syncSuccess: false,
-                        startManualSync() {
-                            this.syncing = true;
-                            setTimeout(() => {
-                                this.syncing = false;
-                                this.syncSuccess = true;
-                                setTimeout(() => this.syncSuccess = false, 3500);
-                            }, 1200);
-                        }
-                    }"
-                >
+                @php
+                    [$syncLabel, $syncBadge] = match (true) {
+                        $posDriver === 'sample' => ['Data contoh', 'bg-zinc-100 text-zinc-700 ring-zinc-500/20'],
+                        $lastSyncStatus === 'SUCCEEDED' => ['Sinkron', 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'],
+                        $lastSyncStatus === 'FAILED' => ['Sinkron gagal', 'bg-rose-50 text-rose-700 ring-rose-600/20'],
+                        $lastSyncStatus === 'RUNNING' => ['Sedang sinkron', 'bg-amber-50 text-amber-700 ring-amber-600/20'],
+                        default => ['Belum pernah sinkron', 'bg-zinc-100 text-zinc-700 ring-zinc-500/20'],
+                    };
+                @endphp
+                <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <x-icon name="database" class="size-4 text-zinc-500" />
                             <h2 class="text-sm font-bold text-zinc-950">Status Sinkronisasi POS</h2>
                         </div>
-                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-600/20 ring-inset">
-                            <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                            Terhubung & Sinkron
+                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ring-1 ring-inset {{ $syncBadge }}">
+                            {{ $syncLabel }}
                         </span>
                     </div>
 
                     <div class="mt-4 space-y-2.5 rounded-xl bg-zinc-50/80 p-3 text-xs border border-zinc-100">
                         <div class="flex items-center justify-between">
-                            <span class="text-zinc-500">Produk Ter-update</span>
+                            <span class="text-zinc-500">Jumlah Produk</span>
                             <span class="font-bold text-zinc-900">{{ number_format($productSkuCount) }} SKU</span>
                         </div>
                         <div class="flex items-center justify-between">
@@ -678,25 +666,9 @@
                             <span class="font-semibold text-zinc-700">{{ $lastSyncTimeFormatted }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-zinc-500">Metode</span>
-                            <span class="font-semibold text-zinc-700">Real-time Master POS</span>
+                            <span class="text-zinc-500">Jadwal</span>
+                            <span class="font-semibold text-zinc-700">Otomatis harian 01:00 WIB</span>
                         </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <button
-                            type="button"
-                            @click="startManualSync()"
-                            :disabled="syncing"
-                            class="flex w-full items-center justify-center gap-1.5 rounded-xl border border-zinc-200 bg-white py-2 text-xs font-bold text-zinc-700 shadow-xs transition hover:border-zinc-300 hover:bg-zinc-50 focus:outline-none"
-                        >
-                            <x-icon name="refresh-cw" class="size-3.5 text-zinc-500" x-bind:class="syncing ? 'animate-spin text-amber-600' : ''" />
-                            <span x-text="syncing ? 'Memproses Sinkronisasi...' : '🔄 Sinkron Manual'">🔄 Sinkron Manual</span>
-                        </button>
-
-                        <p x-show="syncSuccess" x-cloak class="mt-2 text-center text-xs font-semibold text-emerald-600">
-                            ✓ Master data POS berhasil disinkronkan!
-                        </p>
                     </div>
                 </div>
 

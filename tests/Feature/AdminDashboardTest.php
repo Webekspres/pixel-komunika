@@ -96,3 +96,19 @@ it('renders customer list tabs without inline approval forms', function () {
         ->assertSee('Detail')
         ->assertDontSee('name="action"');
 });
+
+// UAT: dashboard tidak boleh mengklaim POS tersambung atau menampilkan angka statis.
+it('shows real POS sync status instead of hardcoded claims', function () {
+    $admin = User::factory()->admin()->create();
+
+    config(['pos.driver' => 'sample']);
+    $this->actingAs($admin)->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertSee('Data contoh')
+        ->assertDontSee('Terhubung & Sinkron')
+        ->assertDontSee('98.4%')
+        ->assertDontSee('Sinkron Manual');
+
+    config(['pos.driver' => 'live']);
+    $this->actingAs($admin)->get(route('admin.dashboard'))->assertSee('Belum pernah sinkron');
+});

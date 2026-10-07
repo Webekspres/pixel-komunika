@@ -193,3 +193,10 @@ it('ignores mass-assigned verification_status on register and profile update', f
     expect($user->fresh()->customerStatus())->toBe(CustomerProfile::PENDING)
         ->and($user->fresh()->email)->toBe('budi@example.com');
 });
+
+// Temuan K: pesan konfirmasi kata sandi tampil di field konfirmasi, bukan di field kata sandi.
+it('reports password confirmation mismatch on the confirmation field', function () {
+    accessRegister($this, ['password_confirmation' => 'beda12345'])
+        ->assertSessionHasErrors(['password_confirmation' => 'Konfirmasi kata sandi tidak cocok.'])
+        ->assertSessionDoesntHaveErrors('password');
+});

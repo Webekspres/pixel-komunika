@@ -74,6 +74,8 @@ flowchart TD
 | PUB-004 | Keranjang | `/cart` | Semua; checkout untuk reseller aktif | Route tersedia | UF-05 - UF-06; FR-CART-001 - FR-CART-003 |
 | AUTH-001 | Daftar | `/daftar` | Guest | Route tersedia | [UF-02](USER_FLOWS.md#uf-02-registrasi-pelanggan) |
 | AUTH-002 | Masuk | `/masuk` | Guest | Route tersedia | [UF-04](USER_FLOWS.md#uf-04-login-dan-routing-akses) |
+| PUB-005 | Kebijakan Privasi | `/kebijakan-privasi` | Semua | Route tersedia | UU 27/2022 PDP; tautan di footer dan form daftar |
+| PUB-006 | Syarat dan Ketentuan | `/syarat-ketentuan` | Semua | Route tersedia | PP 80/2019 PMSE; tautan di footer dan form daftar |
 
 Pencarian, filter, kategori, dan merek ditempatkan di **PUB-002 Katalog** pada
 versi pertama. Halaman terpisah hanya dibuat jika kebutuhan URL, SEO, atau alur

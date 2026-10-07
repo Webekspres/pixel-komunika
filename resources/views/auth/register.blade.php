@@ -68,6 +68,12 @@
             </div>
 
             <div class="space-y-3 pt-1">
+                <p class="text-xs leading-relaxed text-zinc-600">
+                    Dengan mendaftar, Anda menyetujui
+                    <a href="{{ route('legal.terms') }}" target="_blank" class="font-semibold text-zinc-900 underline underline-offset-2">Syarat dan Ketentuan</a>
+                    dan
+                    <a href="{{ route('legal.privacy') }}" target="_blank" class="font-semibold text-zinc-900 underline underline-offset-2">Kebijakan Privasi</a>.
+                </p>
                 <flux:button type="submit" variant="primary" color="amber" class="w-full">
                     Kirim pendaftaran
                 </flux:button>

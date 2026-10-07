@@ -35,6 +35,8 @@ Route::get('/', Home::class)->name('home');
 Route::get('/produk', ProductIndex::class)->name('products.index');
 Route::get('/produk/{product}', ProductShow::class)->name('products.show');
 Route::get('/cart', CartIndex::class)->name('cart.index');
+Route::view('/kebijakan-privasi', 'legal.privacy')->name('legal.privacy');
+Route::view('/syarat-ketentuan', 'legal.terms')->name('legal.terms');
 
 Route::get('/konfirmasi-penerimaan/{order}', [ReceiptConfirmationController::class, 'show'])
     ->middleware('throttle:10,1')

@@ -1021,6 +1021,11 @@ Recommended duration:
 
 Use Lucide Icons.
 
+Reason (owner, 7 Oktober 2026): development speed. The audit found the
+AI-looking parts were decorative icons (stars, sparkles, emoji, icon tiles on
+every card), not the icon set itself, so Lucide stays. Pick each icon for what
+it means on that screen; when no icon fits, use none.
+
 `resources/js/app.js` imports only the icons the views use (named imports).
 A new icon name must be added there; an unknown name renders as
 `circle-alert` and logs a console warning.

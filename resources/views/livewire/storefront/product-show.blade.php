@@ -164,7 +164,7 @@
                         </div>
 
                         {{-- Qty + Add to cart --}}
-                        @if ($inStock)
+                        @if ($inStock && ($canViewPrices || auth()->guest()))
                             <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                                 <div class="flex items-center overflow-hidden rounded-xl border-2 border-zinc-200 bg-white">
                                     <button
@@ -301,7 +301,7 @@
         @endif
     </div>
 
-    @if ($inStock)
+    @if ($inStock && ($canViewPrices || auth()->guest()))
         <div class="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 p-4 shadow-2xl backdrop-blur-md lg:hidden">
             <div class="flex items-center gap-3">
                 <div class="flex shrink-0 items-center overflow-hidden rounded-xl border border-zinc-300 bg-white">

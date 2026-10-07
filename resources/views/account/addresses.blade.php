@@ -90,9 +90,8 @@
                                 </button>
 
                                 @php
-                                    $deleteDescription = $address->label
-                                        ? "Yakin ingin menghapus alamat \"{$address->label}\"? Tindakan ini tidak bisa dibatalkan."
-                                        : 'Yakin ingin menghapus alamat ini? Tindakan ini tidak bisa dibatalkan.';
+                                    $deleteName = $address->label ?: "{$address->recipient_name} – {$address->address_line}";
+                                    $deleteDescription = "Yakin ingin menghapus alamat \"{$deleteName}\"? Tindakan ini tidak bisa dibatalkan.";
                                 @endphp
                                 <x-ui.confirm-dialog
                                     title="Hapus Alamat"

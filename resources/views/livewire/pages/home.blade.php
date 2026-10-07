@@ -204,6 +204,7 @@
                                 >
                                     Detail
                                 </a>
+                                @if (auth()->guest() || auth()->user()->canViewPrices())
                                 <button
                                     wire:click="addToCart({{ $product->id }})"
                                     class="inline-flex flex-1 items-center justify-center gap-1 rounded-2xl bg-brand-yellow px-3 py-2.5 text-xs font-bold text-brand-black transition hover:bg-brand-yellow-soft"
@@ -211,6 +212,7 @@
                                     <x-icon name="shopping-cart" class="size-3.5" />
                                     + Keranjang
                                 </button>
+                                @endif
                             </div>
                         </x-slot:actions>
                     </x-storefront.product-card>

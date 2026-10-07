@@ -28,7 +28,12 @@ class RegisteredUserController extends Controller
             'business_name' => ['nullable', 'string', 'max:191'],
             'phone' => ['required', 'string', 'regex:/^08\d{8,12}$/', 'unique:users,phone'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:191', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'password' => ['required', Password::min(8)],
+            // Divalidasi di field konfirmasi agar pesan tampil di bawah field yang salah.
+            'password_confirmation' => ['required', 'same:password'],
+        ], [
+            'password_confirmation.required' => 'Konfirmasi kata sandi wajib diisi.',
+            'password_confirmation.same' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
         $user = User::query()->create([

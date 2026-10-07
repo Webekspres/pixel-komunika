@@ -1,19 +1,13 @@
 <x-layouts.auth title="Daftar - Pixel Komunika">
     <x-layout.auth-shell
         title="Daftar pelanggan"
-        description="Akun baru akan masuk status pending verification sampai direview admin."
-        eyebrow="Pendaftaran customer"
+        description="Akun baru menunggu verifikasi admin sebelum bisa melihat harga dan berbelanja."
+        eyebrow="Pendaftaran pelanggan"
         panel-title="Gabung jadi reseller terverifikasi"
         panel-description="Daftar usaha kamu. Admin review cepat, lalu akses harga partai."
     >
         <form method="POST" action="{{ route('register.store') }}" class="space-y-5">
             @csrf
-
-            @if ($errors->any())
-                <div class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">
-                    {{ $errors->first() }}
-                </div>
-            @endif
 
             <flux:input
                 id="name"

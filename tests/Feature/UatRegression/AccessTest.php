@@ -63,6 +63,14 @@ it('blocks pending customer from adding to cart', function () {
     Livewire::test(ProductIndex::class)->call('addToCart', Product::query()->firstOrFail()->id);
 
     expect(CartItem::count())->toBe(0);
+
+    // Temuan L: tombol yang pasti ditolak tidak ditampilkan; pengunjung tetap melihatnya (diarahkan ke login).
+    $product = Product::where('sku', 'PB-10000')->firstOrFail();
+    $this->get(route('products.index'))->assertDontSee('+ Keranjang');
+    $this->get(route('products.show', $product))->assertSee('Akun sedang diverifikasi')->assertDontSee('Tambah ke Keranjang');
+
+    auth()->logout();
+    $this->get(route('products.show', $product))->assertSee('Tambah ke Keranjang');
 });
 
 // REG-04 / FR-AUTH-002: pending customer must never see prices, cart included.
@@ -192,4 +200,11 @@ it('ignores mass-assigned verification_status on register and profile update', f
     ]);
     expect($user->fresh()->customerStatus())->toBe(CustomerProfile::PENDING)
         ->and($user->fresh()->email)->toBe('budi@example.com');
+});
+
+// Temuan K: pesan konfirmasi kata sandi tampil di field konfirmasi, bukan di field kata sandi.
+it('reports password confirmation mismatch on the confirmation field', function () {
+    accessRegister($this, ['password_confirmation' => 'beda12345'])
+        ->assertSessionHasErrors(['password_confirmation' => 'Konfirmasi kata sandi tidak cocok.'])
+        ->assertSessionDoesntHaveErrors('password');
 });

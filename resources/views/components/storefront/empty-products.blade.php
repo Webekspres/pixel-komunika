@@ -1,16 +1,15 @@
 @props([
-    'title' => 'Tidak Ada Produk Ditemukan',
-    'description' => 'Maaf, kami tidak dapat menemukan produk yang sesuai dengan filter atau kata kunci pencarian Anda.',
+    'title' => 'Tidak ada produk yang cocok',
+    'description' => 'Tidak ada produk yang sesuai dengan filter atau kata kunci saat ini. Hapus filter untuk melihat semua produk.',
     'onReset' => 'resetFilters',
 ])
 
 <div {{ $attributes->class('flex flex-col items-center justify-center py-16 px-4 text-center') }}>
-    <div class="relative mb-6">
-        <div class="absolute inset-0 rounded-full bg-amber-100 blur-xl opacity-60"></div>
+    <div class="mb-6">
         <img
             src="{{ asset('assets/mascot/Maskot-base.webp') }}"
-            alt="Pixel Komunika Mascot"
-            class="relative z-10 w-36 h-36 object-contain drop-shadow-md"
+            alt=""
+            class="w-36 h-36 object-contain"
             width="144"
             height="144"
         >
@@ -22,9 +21,9 @@
     <button
         wire:click="{{ $onReset }}"
         type="button"
-        class="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-xs font-bold text-brand-black hover:bg-amber-300 transition-all shadow-sm"
+        class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-yellow px-6 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition-colors"
     >
         <x-icon name="rotate-ccw" class="size-4" />
-        <span>Reset Filter & Pencarian</span>
+        <span>Hapus filter dan pencarian</span>
     </button>
 </div>

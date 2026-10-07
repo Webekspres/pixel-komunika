@@ -10,7 +10,7 @@
                 <button
                     type="button"
                     @click="addModalOpen = true"
-                    class="inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                    class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-yellow px-4 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                 >
                     <x-icon name="plus" class="size-4" />
                     <span>Tambah Alamat Baru</span>
@@ -28,7 +28,7 @@
                     <button
                         type="button"
                         @click="addModalOpen = true"
-                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                        class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-4 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                     >
                         <x-icon name="plus" class="size-4" />
                         <span>Tambah Alamat Sekarang</span>
@@ -70,12 +70,12 @@
                                     <form method="POST" action="{{ route('account.addresses.default', $address) }}">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="font-bold text-amber-800 hover:text-amber-900 hover:underline">
+                                        <button type="submit" class="min-h-11 inline-flex items-center font-bold text-amber-800 hover:text-amber-900 hover:underline">
                                             Jadikan Utama
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-zinc-400 font-medium">Alamat Default</span>
+                                    <span class="text-zinc-500 font-medium">Alamat Default</span>
                                 @endif
                             </div>
 
@@ -103,7 +103,7 @@
                                     method="DELETE"
                                 >
                                     <x-slot:trigger>
-                                        <button type="button" class="inline-flex items-center gap-1 font-semibold text-red-600 hover:text-red-700 px-2.5 py-1 rounded-lg hover:bg-red-50 transition">
+                                        <button type="button" class="min-h-11 inline-flex items-center gap-1 font-semibold text-red-600 hover:text-red-700 px-2.5 rounded-lg hover:bg-red-50 transition">
                                             <x-icon name="trash-2" class="size-3.5" />
                                             <span>Hapus</span>
                                         </button>
@@ -146,7 +146,7 @@
                                 >
                                     <div class="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
                                         <h3 class="text-base font-bold text-zinc-900" id="modal-title-{{ $address->id }}">Ubah Alamat Pengiriman</h3>
-                                        <button @click="editAddressId = null" class="text-zinc-400 hover:text-zinc-700 p-1">
+                                        <button @click="editAddressId = null" class="text-zinc-500 hover:text-zinc-700 p-1">
                                             <x-icon name="x" class="size-5" />
                                         </button>
                                     </div>
@@ -162,7 +162,7 @@
                                                 name="label"
                                                 value="{{ $address->label }}"
                                                 placeholder="Contoh: Toko Utama / Rumah / Gudang"
-                                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                                             />
                                         </div>
                                         
@@ -177,7 +177,7 @@
                                                     value="{{ $address->recipient_name }}"
                                                     placeholder="Nama lengkap penerima"
                                                     required
-                                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                                                 />
                                             </div>
                                             <div>
@@ -190,7 +190,7 @@
                                                     value="{{ $address->recipient_phone }}"
                                                     placeholder="08xxxxxxxxxx"
                                                     required
-                                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                                                 />
                                             </div>
                                         </div>
@@ -213,7 +213,7 @@
                                                 rows="3"
                                                 placeholder="Nama jalan, gedung, RT/RW, nomor rumah, patokan"
                                                 required
-                                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                                             >{{ $address->address_line }}</textarea>
                                         </div>
 
@@ -226,13 +226,13 @@
                                             <button
                                                 type="button"
                                                 @click="editAddressId = null"
-                                                class="rounded-xl border border-zinc-200/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
+                                                class="min-h-11 inline-flex items-center rounded-xl border border-zinc-200/80 px-4.5 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
                                             >
                                                 Batal
                                             </button>
                                             <button
                                                 type="submit"
-                                                class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                                                class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                                             >
                                                 Simpan Perubahan
                                             </button>
@@ -280,7 +280,7 @@
                 >
                     <div class="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
                         <h3 class="text-base font-bold text-zinc-900" id="modal-title-add">Tambah Alamat Pengiriman Baru</h3>
-                        <button @click="addModalOpen = false" class="text-zinc-400 hover:text-zinc-700 p-1">
+                        <button @click="addModalOpen = false" class="text-zinc-500 hover:text-zinc-700 p-1">
                             <x-icon name="x" class="size-5" />
                         </button>
                     </div>
@@ -295,7 +295,7 @@
                                 name="label"
                                 value="{{ old('label') }}"
                                 placeholder="Contoh: Toko Utama / Rumah / Gudang"
-                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                             />
                         </div>
                         
@@ -310,7 +310,7 @@
                                     value="{{ old('recipient_name', $user->name) }}"
                                     placeholder="Nama lengkap penerima"
                                     required
-                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                                 />
                             </div>
                             <div>
@@ -323,7 +323,7 @@
                                     value="{{ old('recipient_phone', $user->phone) }}"
                                     placeholder="08xxxxxxxxxx"
                                     required
-                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                    class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                                 />
                             </div>
                         </div>
@@ -346,7 +346,7 @@
                                 rows="3"
                                 placeholder="Nama jalan, gedung, RT/RW, nomor rumah, patokan"
                                 required
-                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                             >{{ old('address_line') }}</textarea>
                         </div>
 
@@ -359,13 +359,13 @@
                             <button
                                 type="button"
                                 @click="addModalOpen = false"
-                                class="rounded-xl border border-zinc-200/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
+                                class="min-h-11 inline-flex items-center rounded-xl border border-zinc-200/80 px-4.5 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition"
                             >
                                 Batal
                             </button>
                             <button
                                 type="submit"
-                                class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                                class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                             >
                                 Simpan Alamat
                             </button>

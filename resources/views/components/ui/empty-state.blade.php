@@ -12,7 +12,7 @@
     @if ($mascot)
         <img
             src="{{ asset('assets/mascot/Maskot-base.webp') }}"
-            alt="Pixel Komunika Mascot"
+            alt=""
             class="mb-6 h-32 w-auto opacity-80"
             width="128"
             height="128"
@@ -27,7 +27,7 @@
     <h3 class="text-lg font-bold text-brand-black">{{ $title }}</h3>
 
     @if ($description)
-        <p class="mt-2 max-w-md text-sm leading-relaxed text-brand-black/60">{{ $description }}</p>
+        <p class="mt-2 max-w-md text-sm leading-relaxed text-brand-black/70">{{ $description }}</p>
     @endif
 
     @if (isset($action))

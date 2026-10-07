@@ -98,15 +98,14 @@
                                             <div class="flex size-7 items-center justify-center rounded-lg bg-brand-yellow text-brand-black">
                                                 <x-icon name="truck" class="size-4" />
                                             </div>
-                                            <h3 class="text-sm font-bold text-zinc-900">🛵 Pengiriman Toko (Internal Pixel Komunika)</h3>
-                                            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-700 uppercase">Rekomendasi Hemat / Internal Fleet</span>
+                                            <h3 class="text-sm font-bold text-zinc-900">Kurir Toko Pixel Komunika</h3>
                                         </div>
-                                        <p class="mt-1 text-xs text-zinc-500">Armada toko — H+1 kerja, hanya untuk area terjangkau.</p>
+                                        <p class="mt-1 text-xs text-zinc-600">Armada toko, H+1 hari kerja, untuk Kota dan Kabupaten Bandung. Ongkir Rp0 bila subtotal + PPh 22 mencapai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}.</p>
 
                                         <div class="mt-3">
                                             @if (empty($storeRates))
                                                 <div class="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 flex items-start gap-2.5">
-                                                    <x-icon name="info" class="size-4 shrink-0 text-zinc-400 mt-0.5" />
+                                                    <x-icon name="info" class="size-4 shrink-0 text-zinc-600 mt-0.5" />
                                                     <span>Kurir Toko tidak menjangkau area <strong>{{ $selectedAddress->district_name }}, {{ $selectedAddress->city_name }}</strong>, silakan pilih Ekspedisi Luar di bawah.</span>
                                                 </div>
                                             @else
@@ -114,15 +113,15 @@
                                                     @foreach ($storeRates as $rate)
                                                         @php $key = $rate['code'] . ':' . $rate['service']; @endphp
                                                         @php $isActive = $selectedCourierKey === $key; @endphp
-                                                        <label class="flex cursor-pointer items-center justify-between gap-3 w-full border-2 rounded-2xl p-4 transition-all {{ $isActive ? 'border-amber-400 bg-amber-50/40 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300' }}">
+                                                        <label class="flex cursor-pointer items-center justify-between gap-3 w-full border-2 rounded-2xl p-4 transition-all {{ $isActive ? 'border-brand-black bg-amber-50/40 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300' }}">
                                                             <div class="flex items-center gap-3 min-w-0">
-                                                                <input type="radio" name="selectedCourierKey" value="{{ $key }}" wire:model.live="selectedCourierKey" class="accent-amber-500" />
-                                                                <div class="flex size-9 shrink-0 items-center justify-center rounded-xl {{ $isActive ? 'bg-amber-400 text-zinc-900' : 'bg-zinc-100 text-zinc-600' }}">
+                                                                <input type="radio" name="selectedCourierKey" value="{{ $key }}" wire:model.live="selectedCourierKey" class="accent-brand-black" />
+                                                                <div class="flex size-9 shrink-0 items-center justify-center rounded-xl {{ $isActive ? 'bg-brand-yellow text-zinc-900' : 'bg-zinc-100 text-zinc-600' }}">
                                                                     <x-icon name="bike" class="size-4.5" />
                                                                 </div>
                                                                 <div class="min-w-0">
                                                                     <p class="text-sm font-bold text-zinc-900">Kurir Toko (Area {{ $selectedAddress->district_name }})</p>
-                                                                    <p class="text-xs text-zinc-500">Estimasi H+1 Kerja — Rute harian armada toko • {{ $rate['etd'] }}</p>
+                                                                    <p class="text-xs text-zinc-600">Rute harian armada toko, estimasi {{ $rate['etd'] }}</p>
                                                                 </div>
                                                             </div>
                                                             <span class="shrink-0 text-base font-bold text-zinc-900">Rp {{ number_format($rate['cost'], 0, ',', '.') }}</span>
@@ -135,8 +134,13 @@
 
                                     {{-- Seksi B: Ekspedisi Nasional & Instan --}}
                                     <div>
-                                        <h3 class="text-sm font-bold text-zinc-900">🚚 Ekspedisi Lainnya (Reguler &amp; Instan)</h3>
-                                        <p class="mt-1 text-xs text-zinc-500">Opsi nasional & instan via Biteship — tarif real-time.</p>
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex size-7 items-center justify-center rounded-lg bg-zinc-100 text-brand-black">
+                                                <x-icon name="package" class="size-4" />
+                                            </div>
+                                            <h3 class="text-sm font-bold text-zinc-900">Ekspedisi Lain (Reguler dan Instan)</h3>
+                                        </div>
+                                        <p class="mt-1 text-xs text-zinc-600">Opsi nasional dan instan lewat Biteship, tarif dihitung langsung.</p>
 
                                         <div wire:loading class="mt-3 grid gap-3 sm:grid-cols-2">
                                             @for ($i = 0; $i < 3; $i++)
@@ -210,7 +214,7 @@
                                 </div>
                                 <div class="flex justify-between border-t border-zinc-100 pt-3 text-base font-bold text-zinc-900">
                                     <span>Total Tagihan</span>
-                                    <span class="text-brand-yellow-dark text-lg transition-all">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
+                                    <span class="text-amber-800 text-lg transition-all">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                                 </div>
                             </div>
 
@@ -232,7 +236,7 @@
                                     <span wire:loading wire:target="selectedAddressId,selectedCourierKey" class="inline-flex items-center gap-2"><svg class="size-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Memuat...</span>
                                 </button>
                                 @if (! $canOrder)
-                                    <p class="text-center text-xs text-zinc-400">Pilih alamat dan kurir untuk melanjutkan.</p>
+                                    <p class="text-center text-xs text-zinc-600">Pilih alamat dan kurir untuk melanjutkan.</p>
                                 @endif
                             </div>
                         </div>

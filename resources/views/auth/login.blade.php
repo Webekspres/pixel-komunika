@@ -2,7 +2,6 @@
     <x-layout.auth-shell
         title="Masuk ke akun Anda"
         description="Gunakan email dan password terdaftar untuk membuka akses area pelanggan Pixel Komunika."
-        eyebrow="Masuk akun"
         panel-title="Akses harga grosir eksklusif"
         panel-description="Masuk untuk belanja partai sebagai pelanggan terverifikasi."
     >

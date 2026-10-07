@@ -49,7 +49,7 @@
             <img
                 src="{{ $image }}"
                 alt="{{ $title }}"
-                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                 loading="lazy"
                 width="800"
                 height="600"
@@ -62,67 +62,64 @@
             </div>
         @endif
 
-        {{-- Badge --}}
-        @if ($badge)
-            <span class="absolute top-3 left-3 inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold {{ $badgeClasses }}">
-                {{ $badge }}
-            </span>
-        @endif
-
-        {{-- Category badge --}}
-        @if ($category)
-            <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md bg-white/90 px-2.5 py-1 text-xs font-medium text-brand-black/70 backdrop-blur-sm">
-                @if ($icon)
-                    <x-icon :name="$icon" class="size-3" />
+        {{-- Badges stack in one row so the label and category never overlap --}}
+        @if ($badge || $category)
+            <div class="absolute inset-x-3 top-3 flex flex-wrap items-start gap-1.5">
+                @if ($badge)
+                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold {{ $badgeClasses }}">
+                        {{ $badge }}
+                    </span>
                 @endif
-                {{ $category }}
-            </span>
+                @if ($category)
+                    <span class="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-xs font-medium text-brand-black/80">
+                        @if ($icon)
+                            <x-icon :name="$icon" class="size-3" />
+                        @endif
+                        {{ $category }}
+                    </span>
+                @endif
+            </div>
         @endif
     </div>
 
     {{-- Content --}}
     <div class="p-4 sm:p-5">
-        <div class="flex items-start justify-between gap-3">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
             <div class="min-w-0 flex-1">
                 <h3 class="line-clamp-2 min-h-[2.75rem] text-sm leading-snug font-bold text-brand-black transition group-hover:text-brand-black sm:text-base">
                     {{ $title }}
                 </h3>
                 @if ($sku)
-                    <p class="mt-1 text-[11px] text-brand-black/38">SKU: {{ $sku }}</p>
+                    <p class="mt-1 text-[11px] break-all text-brand-black/65">SKU: {{ $sku }}</p>
                 @endif
             </div>
 
             @if ($stockLabel)
-                <span class="shrink-0 rounded-md px-2.5 py-1 text-[10px] font-bold {{ $stockClasses }}">
+                <span class="shrink-0 self-start rounded-md px-2.5 py-1 text-[11px] font-bold {{ $stockClasses }}">
                     {{ $stockLabel }}
                 </span>
             @endif
         </div>
 
         @if ($description)
-            <p class="mt-3 text-xs leading-relaxed text-brand-black/55">{{ $description }}</p>
+            <p class="mt-3 text-xs leading-relaxed text-brand-black/70">{{ $description }}</p>
         @endif
 
         <div class="mt-4 flex items-end justify-between gap-3 border-t border-brand-black/6 pt-4">
             <div>
                 @if ($showPrice && $price)
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-black/35">Harga Grosir</p>
+                    <p class="text-xs font-semibold text-brand-black/65">Harga Grosir</p>
                     <p class="mt-1 text-base font-extrabold text-brand-black sm:text-lg">
                         {{ $price }}
                     </p>
                 @elseif (!$showPrice)
-                    <p class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-black/45">
+                    <p class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-black/65">
                         <x-icon name="lock" class="size-3" />
                         Verifikasi Akun
                     </p>
                 @endif
             </div>
 
-            @if ($href)
-                <span class="inline-flex size-8 items-center justify-center rounded-md bg-brand-yellow transition duration-200 group-hover:translate-x-0.5">
-                    <x-icon name="arrow-right" class="size-4 text-brand-black" />
-                </span>
-            @endif
         </div>
 
         @if (isset($actions))

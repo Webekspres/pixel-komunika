@@ -1,14 +1,14 @@
 <div class="min-h-screen bg-surface-2 py-6 sm:py-8">
     <div class="container-2xl">
         <div class="mb-6 flex flex-wrap items-center gap-3">
-            <a href="{{ route('products.index') }}" wire:navigate class="inline-flex items-center gap-1 text-sm text-zinc-500 transition hover:text-zinc-700">
+            <a href="{{ route('products.index') }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 text-sm text-zinc-600 transition hover:text-zinc-900">
                 <x-icon name="arrow-left" class="size-4" />
                 Lanjut Belanja
             </a>
             <h1 class="text-xl font-black text-zinc-900 sm:text-2xl">
                 Keranjang Belanja
                 @if ($summary['items']->isNotEmpty())
-                    <span class="ml-2 text-sm font-semibold text-zinc-400">({{ $summary['items']->count() }} produk, {{ $summary['total_items'] }} unit)</span>
+                    <span class="ml-2 text-sm font-semibold text-zinc-600">({{ $summary['items']->count() }} produk, {{ $summary['total_items'] }} unit)</span>
                 @endif
             </h1>
             @if ($summary['items']->isNotEmpty())
@@ -16,7 +16,7 @@
                     <x-slot:trigger>
                         <button
                             type="button"
-                            class="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                            class="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 text-xs font-bold text-red-700 transition hover:bg-red-100"
                         >
                             <x-icon name="trash-2" class="size-3.5" />
                             Hapus Semua
@@ -47,11 +47,11 @@
             <div class="rounded-3xl border border-zinc-100 bg-white">
                 <x-ui.empty-state
                     title="Keranjang kosong"
-                    description="Belum ada produk di keranjangmu. Yuk belanja!"
+                    description="Belum ada produk di keranjang. Tambahkan produk dari katalog."
                     icon="shopping-cart"
                     mascot
                     :action-href="route('products.index')"
-                    action-label="Mulai Belanja"
+                    action-label="Lihat Katalog Produk"
                 />
             </div>
         @else
@@ -63,31 +63,25 @@
                                 <x-icon name="package" class="size-8 text-brand-black/40" />
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="text-xs text-zinc-400">SKU: {{ $item['product']->sku }}</p>
+                                <p class="text-xs text-zinc-600">SKU: {{ $item['product']->sku }}</p>
                                 <h3 class="text-sm font-semibold leading-snug text-zinc-900 sm:text-base">{{ $item['product']->displayName() }}</h3>
-                                <p class="mt-0.5 text-xs font-semibold text-zinc-500">
+                                <p class="mt-0.5 text-xs font-semibold text-zinc-600">
                                     Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / pcs · {{ $item['price_type'] }}
                                 </p>
 
                                 <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
                                     <div class="flex items-center overflow-hidden rounded-xl border-2 border-zinc-200">
-                                        <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})" class="flex size-8 items-center justify-center hover:bg-zinc-50" aria-label="Kurangi">
+                                        <button type="button" wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})" class="flex size-11 items-center justify-center hover:bg-zinc-100" aria-label="Kurangi jumlah {{ $item['product']->displayName() }}">
                                             <x-icon name="minus" class="size-3.5" />
                                         </button>
                                         <span class="w-10 text-center text-sm font-bold">{{ $item['quantity'] }}</span>
-                                        <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})" class="flex size-8 items-center justify-center hover:bg-zinc-50" aria-label="Tambah">
+                                        <button type="button" wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})" class="flex size-11 items-center justify-center hover:bg-zinc-100" aria-label="Tambah jumlah {{ $item['product']->displayName() }}">
                                             <x-icon name="plus" class="size-3.5" />
                                         </button>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <p class="font-bold text-zinc-900">Rp {{ number_format($item['line_subtotal'], 0, ',', '.') }}</p>
-                                        <button
-                                            wire:click="removeItem({{ $item['id'] }})"
-                                            class="inline-flex size-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-red-50 hover:text-red-500"
-                                            aria-label="Hapus"
-                                        >
-                                            <x-icon name="trash-2" class="size-4" />
-                                        </button>
+                                        @include('livewire.storefront.partials.cart-remove-item', ['item' => $item, 'context' => 'page'])
                                     </div>
                                 </div>
                             </div>
@@ -111,9 +105,10 @@
                                 <span>Total Berat</span>
                                 <span class="font-semibold text-zinc-900">{{ number_format($summary['total_weight_grams'] / 1000, 2) }} kg</span>
                             </div>
+                            <p class="text-xs leading-relaxed text-zinc-600">Ongkir kurir toko Rp0 untuk area Bandung bila subtotal + PPh 22 mencapai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}. Ongkir dihitung saat checkout.</p>
                             <div class="flex justify-between border-t border-zinc-100 pt-3 text-base font-bold text-zinc-900">
                                 <span>Estimasi Total</span>
-                                <span class="text-brand-yellow-dark">Rp {{ number_format($summary['subtotal'] + $summary['pph22'], 0, ',', '.') }}</span>
+                                <span class="text-amber-700">Rp {{ number_format($summary['subtotal'] + $summary['pph22'], 0, ',', '.') }}</span>
                             </div>
                         </div>
 
@@ -121,7 +116,6 @@
                             @if (auth()->user()->isActiveCustomer())
                                 <a href="{{ route('checkout.index') }}" wire:navigate class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-black py-3.5 text-sm font-bold text-white transition hover:bg-zinc-700">
                                     Lanjut Checkout
-                                    <x-icon name="arrow-right" class="size-4" />
                                 </a>
                             @else
                                 <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-center text-xs font-medium text-amber-800">
@@ -131,8 +125,8 @@
                                 </div>
                             @endif
                         @else
-                            <a href="{{ route('login') }}" class="block w-full rounded-xl bg-brand-yellow py-3.5 text-center text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark">
-                                Login untuk Checkout
+                            <a href="{{ route('login') }}" class="block w-full rounded-xl bg-brand-yellow py-3.5 text-center text-sm font-bold text-brand-black transition hover:bg-brand-yellow-soft">
+                                Masuk untuk Checkout
                             </a>
                         @endauth
                     </div>

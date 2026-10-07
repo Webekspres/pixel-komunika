@@ -2,9 +2,8 @@
     <x-layout.auth-shell
         title="Daftar pelanggan"
         description="Akun baru menunggu verifikasi admin sebelum bisa melihat harga dan berbelanja."
-        eyebrow="Pendaftaran pelanggan"
         panel-title="Gabung jadi reseller terverifikasi"
-        panel-description="Daftar usaha kamu. Admin review cepat, lalu akses harga partai."
+        panel-description="Daftarkan usaha Anda. Setelah admin menyetujui akun, harga partai dan checkout terbuka."
     >
         <form method="POST" action="{{ route('register.store') }}" class="space-y-5">
             @csrf

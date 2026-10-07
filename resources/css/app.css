@@ -28,7 +28,7 @@
     --color-brand-red: #f81818;
 
     --color-surface-1: #ffffff;
-    --color-surface-2: #F7F8FF;
+    --color-surface-2: #fafafa;
     --color-surface-3: #f5f5f5;
 
     --color-success: #15803d;
@@ -174,8 +174,7 @@ label:has(+ textarea[required])::after {
 }
 
 @utility product-card-hover {
-    @apply hover:-translate-y-1 hover:border-amber-400;
-    &:hover { box-shadow: var(--shadow-card-hover); }
+    @apply hover:border-brand-black/40;
 }
 
 /* Premium section rhythm */
@@ -214,12 +213,12 @@ label:has(+ textarea[required])::after {
 }
 
 @utility storefront-panel-soft {
-    @apply rounded-lg border border-brand-black/8 bg-white/88 backdrop-blur-sm;
+    @apply rounded-lg border border-brand-black/8 bg-white;
     box-shadow: var(--shadow-card);
 }
 
 @utility storefront-pill {
-    @apply inline-flex items-center gap-2 rounded-md border border-brand-black/10 bg-white/70 px-3 py-1.5 text-[11px] font-semibold text-brand-black/70 backdrop-blur-sm;
+    @apply inline-flex items-center gap-2 rounded-md border border-brand-black/10 bg-white px-3 py-1.5 text-[11px] font-semibold text-brand-black/80;
 }
 
 /* ============================================

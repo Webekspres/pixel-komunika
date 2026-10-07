@@ -86,7 +86,7 @@
                     x-model="selectedProvince"
                     @change="onProvinceChange()"
                     required
-                    class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8"
+                    class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8"
                 >
                     <option value="" disabled selected>Pilih Provinsi</option>
                     @foreach ($provinces as $prov)
@@ -95,7 +95,7 @@
                         </option>
                     @endforeach
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-500">
                     <x-icon name="chevron-down" class="size-4" />
                 </div>
             </div>
@@ -113,14 +113,14 @@
                     @change="onCityChange()"
                     :disabled="!selectedProvince"
                     required
-                    class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8 disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
+                    class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8 disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
                 >
                     <option value="" disabled selected x-text="selectedProvince ? 'Pilih Kota / Kabupaten' : 'Pilih Provinsi terlebih dahulu'"></option>
                     <template x-for="cityItem in availableCities" :key="cityItem">
                         <option :value="cityItem" x-text="cityItem" :selected="cityItem === selectedCity"></option>
                     </template>
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-500">
                     <x-icon name="chevron-down" class="size-4" />
                 </div>
             </div>
@@ -140,7 +140,7 @@
                     x-model="selectedDistrict"
                     :disabled="!selectedCity || isLoadingDistricts"
                     required
-                    class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8 disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
+                    class="w-full appearance-none rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs pr-8 disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
                 >
                     <option value="" disabled selected x-text="!selectedCity ? 'Pilih Kota terlebih dahulu' : (isLoadingDistricts ? 'Memuat Kecamatan...' : 'Pilih Kecamatan')"></option>
                     <template x-for="districtItem in availableDistricts" :key="districtItem">
@@ -150,7 +150,7 @@
                         <option :value="selectedDistrict" x-text="selectedDistrict" selected></option>
                     </template>
                 </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-500">
                     <template x-if="isLoadingDistricts">
                         <svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -174,7 +174,7 @@
                 name="postal_code"
                 value="{{ $postalCode }}"
                 placeholder="Contoh: 40132"
-                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
             />
         </div>
     </div>

@@ -7,14 +7,22 @@
     $mobileOverflowCategories = $categories->slice(2)->values();
 @endphp
 
-{{-- Brand assets: brand-logo.png (Laravel) — not Figma text-mark --}}
 {{-- Store contact matches footer WhatsApp (0815-4640-7702) --}}
+{{-- Announcement scrolls away; only the nav rows stay sticky. --}}
+@guest
+    <div class="w-full bg-brand-black px-4 text-center text-xs font-medium text-white">
+        Harga khusus untuk reseller terverifikasi.
+        <a href="{{ route('register') }}" class="ml-1 inline-flex min-h-11 items-center font-semibold text-brand-yellow underline underline-offset-2">Daftar Reseller</a>
+    </div>
+@endguest
+
 <header
     x-ref="storefrontHeader"
     class="sticky top-0 z-50 w-full border-b border-zinc-100 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.06)]"
     x-data="{
         mobileSearchOpen: false,
         categoryMoreOpen: false,
+        userMenuOpen: false,
         measureHeader() {
             this.$nextTick(() => {
                 const h = this.$refs.storefrontHeader?.offsetHeight ?? 0;
@@ -30,29 +38,17 @@
             this.measureHeader();
         },
     }"
+    @keydown.escape.window="categoryMoreOpen = false; userMenuOpen = false"
     x-init="
         measureHeader();
         $watch('mobileSearchOpen', () => measureHeader());
         new ResizeObserver(() => measureHeader()).observe($refs.storefrontHeader);
     "
 >
-    {{-- Guest-only register CTA — no scroll hide/show --}}
-    @guest
-        <div class="w-full overflow-hidden bg-brand-black">
-            <div class="flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium text-white">
-                <x-icon name="party-popper" class="size-3.5 shrink-0 text-brand-yellow" />
-                <span>
-                    Harga spesial untuk pelanggan terverifikasi!
-                    <a href="{{ route('register') }}" class="ml-1 font-semibold underline transition-colors hover:text-brand-yellow">Daftar sekarang</a>
-                </span>
-            </div>
-        </div>
-    @endguest
-
     <nav class="container-2xl" aria-label="Navigasi utama">
         {{-- Main row: logo | desktop search | actions --}}
         <div class="flex h-[4.5rem] items-center gap-3 border-b border-zinc-100 sm:h-20 sm:gap-4">
-            <a href="{{ route('home') }}" wire:navigate class="shrink-0" aria-label="Pixel Komunika beranda">
+            <a href="{{ route('home') }}" wire:navigate class="inline-flex min-h-11 shrink-0 items-center" aria-label="Pixel Komunika beranda">
                 <img
                     src="{{ asset('assets/brand-logo.png') }}"
                     alt="Pixel Komunika"
@@ -63,13 +59,14 @@
             </a>
 
             <form action="{{ route('products.index') }}" method="GET" class="relative hidden min-w-0 max-w-2xl flex-1 md:block">
-                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
+                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-500" />
                 <input
                     type="search"
                     name="cari"
                     value="{{ request('cari') }}"
+                    aria-label="Cari produk"
                     placeholder="Cari charger, kabel data, headset, power bank..."
-                    class="w-full rounded-xl border-0 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-brand-black transition focus:bg-white focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                    class="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-brand-black transition focus:border-brand-black focus:bg-white focus:ring-2 focus:ring-brand-black focus:outline-none"
                 >
             </form>
 
@@ -77,7 +74,7 @@
                 {{-- Mobile search toggle (left of cart) --}}
                 <button
                     type="button"
-                    class="inline-flex size-10 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-50 hover:text-brand-yellow md:hidden"
+                    class="inline-flex size-11 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-100 hover:text-brand-black md:hidden"
                     @click="toggleMobileSearch()"
                     :aria-expanded="mobileSearchOpen"
                     aria-label="Cari produk"
@@ -89,17 +86,20 @@
                 <livewire:storefront.cart-badge />
 
                 @auth
-                    <div class="relative" x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false">
+                    <div class="relative" @click.outside="userMenuOpen = false">
                         <button
                             type="button"
                             @click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center gap-2 rounded-xl px-2 py-2 transition hover:bg-zinc-50 sm:px-3"
+                            :aria-expanded="userMenuOpen"
+                            aria-haspopup="true"
+                            aria-label="Menu akun {{ auth()->user()->name }}"
+                            class="flex min-h-11 items-center gap-2 rounded-xl px-2 transition hover:bg-zinc-100 sm:px-3"
                         >
                             <div class="inline-flex size-7 items-center justify-center rounded-full bg-brand-yellow text-xs font-bold text-brand-black">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
-                            <span class="hidden max-w-[100px] truncate text-sm font-medium text-zinc-700 transition-colors hover:text-brand-yellow sm:inline">{{ auth()->user()->name }}</span>
-                            <x-icon name="chevron-down" class="hidden size-3.5 text-zinc-400 sm:inline" />
+                            <span class="hidden max-w-[100px] truncate text-sm font-medium text-zinc-700 sm:inline">{{ auth()->user()->name }}</span>
+                            <x-icon name="chevron-down" class="hidden size-3.5 text-zinc-500 sm:inline" />
                         </button>
 
                         <div
@@ -109,30 +109,30 @@
                             class="absolute right-0 z-50 mt-1 w-48 rounded-2xl border border-zinc-100 bg-white py-1.5 shadow-lg"
                         >
                             @if (auth()->user()->isAdmin())
-                                <a href="{{ route('admin.dashboard') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50 hover:text-brand-yellow">
-                                    <x-icon name="shield" class="size-4 text-zinc-400" />
+                                <a href="{{ route('admin.dashboard') }}" wire:navigate class="flex min-h-11 items-center gap-2.5 px-4 text-sm transition hover:bg-zinc-100">
+                                    <x-icon name="shield" class="size-4 text-zinc-500" />
                                     Admin
                                 </a>
                             @else
-                                <a href="{{ route('account.dashboard') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50 hover:text-brand-yellow">
-                                    <x-icon name="user" class="size-4 text-zinc-400" />
+                                <a href="{{ route('account.dashboard') }}" wire:navigate class="flex min-h-11 items-center gap-2.5 px-4 text-sm transition hover:bg-zinc-100">
+                                    <x-icon name="user" class="size-4 text-zinc-500" />
                                     Akun Saya
                                 </a>
                             @endif
                             @if (auth()->user()->isActiveCustomer())
-                                <a href="{{ route('orders.index') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50 hover:text-brand-yellow">
-                                    <x-icon name="package" class="size-4 text-zinc-400" />
+                                <a href="{{ route('orders.index') }}" wire:navigate class="flex min-h-11 items-center gap-2.5 px-4 text-sm transition hover:bg-zinc-100">
+                                    <x-icon name="package" class="size-4 text-zinc-500" />
                                     Pesanan Saya
                                 </a>
-                                <a href="{{ route('account.addresses.index') }}" wire:navigate class="flex items-center gap-2.5 px-4 py-2.5 text-sm transition hover:bg-zinc-50 hover:text-brand-yellow">
-                                    <x-icon name="map-pin" class="size-4 text-zinc-400" />
+                                <a href="{{ route('account.addresses.index') }}" wire:navigate class="flex min-h-11 items-center gap-2.5 px-4 text-sm transition hover:bg-zinc-100">
+                                    <x-icon name="map-pin" class="size-4 text-zinc-500" />
                                     Alamat
                                 </a>
                             @endif
                             <div class="my-1 border-t border-zinc-100"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 transition hover:bg-red-50">
+                                <button type="submit" class="flex min-h-11 w-full items-center gap-2.5 px-4 text-sm text-red-700 transition hover:bg-red-50">
                                     <x-icon name="log-out" class="size-4" />
                                     Keluar
                                 </button>
@@ -142,16 +142,16 @@
                 @else
                     <a
                         href="{{ route('login') }}"
-                        class="inline-flex size-10 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-50 hover:text-brand-yellow sm:hidden"
+                        class="inline-flex size-11 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-100 hover:text-brand-black sm:hidden"
                         aria-label="Masuk"
                     >
                         <x-icon name="user" class="size-5" />
                     </a>
                     <div class="hidden items-center gap-2 sm:flex">
-                        <a href="{{ route('login') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:text-brand-yellow">
+                        <a href="{{ route('login') }}" class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-brand-black">
                             Masuk
                         </a>
-                        <a href="{{ route('register') }}" class="rounded-xl bg-brand-yellow px-4 py-2 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-dark">
+                        <a href="{{ route('register') }}" class="inline-flex min-h-11 items-center rounded-xl bg-brand-yellow px-4 text-sm font-semibold text-brand-black transition hover:bg-brand-yellow-soft">
                             Daftar
                         </a>
                     </div>
@@ -169,47 +169,52 @@
         >
             <form action="{{ route('products.index') }}" method="GET" class="relative flex gap-2">
                 <div class="relative min-w-0 flex-1">
-                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
                     <input
                         x-ref="mobileSearchInput"
                         type="search"
                         name="cari"
                         value="{{ request('cari') }}"
+                        aria-label="Cari produk"
                         placeholder="Cari di semua kategori..."
-                        class="w-full rounded-xl border-0 bg-zinc-50 py-2.5 pr-4 pl-9 text-sm text-brand-black transition focus:bg-white focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                        class="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-9 text-sm text-brand-black transition focus:border-brand-black focus:bg-white focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
                 </div>
                 <button
                     type="submit"
-                    class="shrink-0 rounded-xl bg-brand-yellow px-4 py-2.5 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark"
+                    class="min-h-11 shrink-0 rounded-xl bg-brand-yellow px-4 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark"
                 >
                     Cari
                 </button>
             </form>
         </div>
 
-        {{-- Mobile category row (default, like Flowbite image 4) --}}
+        {{-- Mobile category row: links scroll inside their own track; the overflow menu stays on screen --}}
         <div
             x-show="!mobileSearchOpen"
-            class="relative flex h-10 items-center gap-1 overflow-visible lg:hidden"
+            class="flex h-11 items-center gap-1 lg:hidden"
             @click.outside="categoryMoreOpen = false"
         >
-            <a
-                href="{{ route('products.index') }}"
-                wire:navigate
-                class="shrink-0 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-yellow' }}"
-            >
-                Semua Produk
-            </a>
-            @foreach ($mobileVisibleCategories as $category)
+            <div class="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none]">
                 <a
-                    href="{{ route('products.index', ['kategori' => $category->id]) }}"
+                    href="{{ route('products.index') }}"
                     wire:navigate
-                    class="shrink-0 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors {{ request('kategori') == $category->id ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-yellow' }}"
+                    @if (request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all')) aria-current="page" @endif
+                    class="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-2.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/15 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-black' }}"
                 >
-                    {{ $category->name }}
+                    Semua Produk
                 </a>
-            @endforeach
+                @foreach ($mobileVisibleCategories as $category)
+                    <a
+                        href="{{ route('products.index', ['kategori' => $category->id]) }}"
+                        wire:navigate
+                        @if (request('kategori') == $category->id) aria-current="page" @endif
+                        class="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-2.5 text-[13px] font-medium transition-colors {{ request('kategori') == $category->id ? 'bg-brand-yellow/15 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-black' }}"
+                    >
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
 
             @if ($mobileOverflowCategories->isNotEmpty())
                 <div class="relative shrink-0">
@@ -217,7 +222,8 @@
                         type="button"
                         @click="categoryMoreOpen = !categoryMoreOpen"
                         :aria-expanded="categoryMoreOpen"
-                        class="inline-flex size-8 items-center justify-center rounded-lg text-zinc-600 transition hover:bg-zinc-50 hover:text-brand-yellow"
+                        aria-haspopup="true"
+                        class="inline-flex size-11 items-center justify-center rounded-lg text-zinc-700 transition hover:bg-zinc-100"
                         :class="categoryMoreOpen && 'bg-zinc-100 text-brand-black'"
                         aria-label="Kategori lainnya"
                     >
@@ -235,7 +241,7 @@
                                 href="{{ route('products.index', ['kategori' => $category->id]) }}"
                                 wire:navigate
                                 @click="categoryMoreOpen = false"
-                                class="block px-4 py-2.5 text-sm text-zinc-700 transition hover:bg-zinc-50 hover:text-brand-yellow"
+                                class="flex min-h-11 items-center px-4 text-sm text-zinc-700 transition hover:bg-zinc-100"
                             >
                                 {{ $category->name }}
                             </a>
@@ -245,7 +251,7 @@
                             href="{{ route('products.index') }}"
                             wire:navigate
                             @click="categoryMoreOpen = false"
-                            class="block px-4 py-2.5 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50 hover:text-brand-yellow"
+                            class="flex min-h-11 items-center px-4 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-100"
                         >
                             Lihat semua kategori
                         </a>
@@ -254,27 +260,27 @@
             @endif
         </div>
 
-        {{-- Desktop category row: kategori + telepon/sosmed --}}
+        {{-- Desktop category row: kategori + WhatsApp/sosmed --}}
         <div class="hidden h-10 items-center justify-between gap-4 lg:flex">
             <div class="-mx-1 flex min-w-0 flex-1 items-center gap-0 overflow-x-auto">
                 <a
                     href="{{ route('products.index') }}"
                     wire:navigate
-                    class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-yellow' }}"
+                    @if (request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all')) aria-current="page" @endif
+                    class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request()->routeIs('products.index') && (! request()->filled('kategori') || request('kategori') === 'all') ? 'bg-brand-yellow/15 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-black' }}"
                 >
                     Semua Produk
                 </a>
-                @if ($categories->isNotEmpty())
-                    @foreach ($categories as $category)
-                        <a
-                            href="{{ route('products.index', ['kategori' => $category->id]) }}"
-                            wire:navigate
-                            class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request('kategori') == $category->id ? 'bg-brand-yellow/10 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-yellow' }}"
-                        >
-                            {{ $category->name }}
-                        </a>
-                    @endforeach
-                @endif
+                @foreach ($categories as $category)
+                    <a
+                        href="{{ route('products.index', ['kategori' => $category->id]) }}"
+                        wire:navigate
+                        @if (request('kategori') == $category->id) aria-current="page" @endif
+                        class="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors {{ request('kategori') == $category->id ? 'bg-brand-yellow/15 font-semibold text-brand-black' : 'text-zinc-600 hover:text-brand-black' }}"
+                    >
+                        {{ $category->name }}
+                    </a>
+                @endforeach
             </div>
 
             <div class="flex shrink-0 items-center gap-3">
@@ -282,10 +288,10 @@
                     href="https://wa.me/6281546407702"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex items-center gap-2 text-[13px] font-medium text-zinc-600 transition-colors hover:text-brand-yellow"
+                    class="inline-flex items-center gap-2 text-[13px] font-medium text-zinc-600 transition-colors hover:text-brand-black"
                 >
-                    <x-icon name="phone" class="size-3.5 shrink-0 text-brand-yellow" />
-                    <span>0815-4640-7702</span>
+                    <x-icon name="message-circle" class="size-3.5 shrink-0 text-zinc-700" />
+                    <span>WhatsApp 0815-4640-7702</span>
                 </a>
 
                 <div class="flex items-center gap-1 border-l border-zinc-100 pl-3" aria-label="Sosial media">

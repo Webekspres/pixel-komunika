@@ -16,7 +16,8 @@
             <button
                 type="button"
                 wire:click="setFilter('{{ $key }}')"
-                class="inline-flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-bold whitespace-nowrap transition-all {{ $status === $key ? 'bg-zinc-900 text-white shadow-2xs' : 'bg-white border border-zinc-200/80 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900' }}"
+                aria-pressed="{{ $status === $key ? 'true' : 'false' }}"
+                class="min-h-11 inline-flex shrink-0 items-center gap-2 rounded-xl px-3.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-all {{ $status === $key ? 'bg-zinc-900 text-white shadow-2xs' : 'bg-white border border-zinc-200/80 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900' }}"
             >
                 <span>{{ $tab['label'] }}</span>
                 @if ($tab['count'] > 0)
@@ -51,17 +52,17 @@
                     <button
                         type="button"
                         wire:click="setFilter('all')"
-                        class="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 px-4 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-100 transition"
+                        class="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 px-4 text-xs font-bold text-zinc-700 hover:bg-zinc-100 transition"
                     >
                         <span>Tampilkan Semua Status</span>
                     </button>
                 @endif
                 <a
                     href="{{ route('products.index') }}"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                    class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-4 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                 >
                     <x-icon name="store" class="size-3.5" />
-                    <span>Mulai Belanja</span>
+                    <span>Lihat Katalog Produk</span>
                 </a>
             </div>
         </div>
@@ -69,17 +70,17 @@
         <div class="space-y-4">
             @foreach ($orders as $order)
                 @php
-                    $isWaiting = in_array($order->status, ['unpaid', 'payment_pending', 'payment_rejected'], true);
+                    $isWaiting = in_array($order->status, ['unpaid', 'payment_rejected'], true);
                 @endphp
                 <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 space-y-4 shadow-2xs transition-all hover:border-zinc-300">
                     <!-- Baris 1: Header Order -->
                     <div class="flex flex-col gap-2 border-b border-zinc-100 pb-3 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="font-mono font-bold text-zinc-900 text-sm sm:text-base">#{{ $order->order_number }}</span>
-                            <span class="text-xs text-zinc-400">•</span>
+                            <span class="text-xs text-zinc-500">•</span>
                             <span class="text-xs text-zinc-500 font-medium">{{ $order->created_at->format('d M Y, H:i') }}</span>
                             @if ($order->courier_code)
-                                <span class="text-xs text-zinc-400">•</span>
+                                <span class="text-xs text-zinc-500">•</span>
                                 <span class="text-xs font-medium text-zinc-600 uppercase">{{ $order->courier_code }} {{ $order->courier_service }}</span>
                             @endif
                         </div>
@@ -126,7 +127,7 @@
                             @if ($order->invoice && in_array($order->status, ['paid', 'processing', 'packed', 'shipped', 'completed']))
                                 <a
                                     href="{{ route('orders.invoice.download', $order) }}"
-                                    class="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition shadow-2xs"
+                                    class="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition shadow-2xs"
                                 >
                                     <x-icon name="download" class="size-3.5" />
                                     <span>Invoice PDF</span>
@@ -136,7 +137,7 @@
                             @if ($isWaiting)
                                 <a
                                     href="{{ route('orders.show', $order) }}"
-                                    class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                                    class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-4 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                                 >
                                     <x-icon name="upload" class="size-3.5" />
                                     <span>Unggah Bukti Bayar</span>
@@ -144,7 +145,7 @@
                             @else
                                 <a
                                     href="{{ route('orders.show', $order) }}"
-                                    class="inline-flex items-center gap-1.5 rounded-xl bg-zinc-100 border border-zinc-200/80 px-4 py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-200 transition"
+                                    class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-zinc-100 border border-zinc-200/80 px-4 text-xs font-semibold text-zinc-800 hover:bg-zinc-200 transition"
                                 >
                                     <span>Detail Pesanan</span>
                                     <x-icon name="chevron-right" class="size-3.5" />

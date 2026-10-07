@@ -9,8 +9,8 @@
         <button
             type="button"
             wire:click="{{ $onRemove }}"
-            class="text-zinc-400 hover:text-zinc-700 transition-colors"
-            title="Hapus filter"
+            class="-my-3 -mr-2 inline-flex size-11 items-center justify-center text-zinc-600 hover:text-zinc-900 transition-colors"
+            aria-label="Hapus filter {{ $label }}"
         >
             <x-icon name="x" class="size-3.5" />
         </button>

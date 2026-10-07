@@ -11,9 +11,10 @@
 ])
 
 @php
-    $name = $name ?? 'confirm-' . str()->uuid();
+    // Stabil antar render Livewire: dialog Flux memakai wire:ignore.self, nama acak membuat trigger tidak cocok lagi.
+    $name = $name ?? 'confirm-'.md5($title.'|'.$description);
     $danger = $confirmVariant === 'danger';
-    $iconClass = $danger ? 'bg-red-50 text-red-600' : 'bg-brand-yellow/20 text-brand-yellow-dark';
+    $iconClass = $danger ? 'bg-red-50 text-red-600' : 'bg-brand-yellow/20 text-amber-800';
 @endphp
 
 <flux:modal.trigger :name="$name">

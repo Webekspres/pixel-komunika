@@ -35,6 +35,10 @@ class AccountController extends Controller
             ->whereIn('status', ['unpaid', 'payment_pending', 'payment_rejected'])
             ->count();
 
+        $needsUploadCount = Order::where('user_id', $user->id)
+            ->whereIn('status', ['unpaid', 'payment_rejected'])
+            ->count();
+
         $processingCount = Order::where('user_id', $user->id)
             ->whereIn('status', ['paid', 'processing', 'packed'])
             ->count();
@@ -54,6 +58,7 @@ class AccountController extends Controller
         return view('account.dashboard', [
             'user' => $user,
             'waitingPaymentCount' => $waitingPaymentCount,
+            'needsUploadCount' => $needsUploadCount,
             'processingCount' => $processingCount,
             'shippedCount' => $shippedCount,
             'recentOrders' => $recentOrders,

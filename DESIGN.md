@@ -366,7 +366,9 @@ Avoid an oversized dashboard-like navigation.
 Current implementation (`components/storefront/navbar.blade.php`):
 
 - **Announcement bar**: guest-only register CTA on a black bar
-  ("Harga spesial untuk pelanggan terverifikasi! — Daftar sekarang").
+  ("Harga khusus untuk reseller terverifikasi. Daftar Reseller"). It sits
+  above the sticky header and scrolls away, so the sticky part stays short on
+  mobile.
 - **Main row**: logo, wide desktop search (hidden on mobile), cart badge,
   account menu (or Masuk / Daftar for guests), mobile search toggle.
 - **Mobile category row** (`< lg`): horizontally scrollable "Semua Produk" +
@@ -1018,6 +1020,10 @@ Recommended duration:
 # 32. Icons
 
 Use Lucide Icons.
+
+`resources/js/app.js` imports only the icons the views use (named imports).
+A new icon name must be added there; an unknown name renders as
+`circle-alert` and logs a console warning.
 
 Icons should be:
 

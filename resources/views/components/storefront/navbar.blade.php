@@ -16,8 +16,8 @@
         mobileSearchOpen: false,
         categoryMoreOpen: false,
         measureHeader() {
-            this.\$nextTick(() => {
-                const h = this.\$refs.storefrontHeader?.offsetHeight ?? 0;
+            this.$nextTick(() => {
+                const h = this.$refs.storefrontHeader?.offsetHeight ?? 0;
                 document.documentElement.style.setProperty('--storefront-header-height', h + 'px');
             });
         },
@@ -25,15 +25,15 @@
             this.mobileSearchOpen = !this.mobileSearchOpen;
             this.categoryMoreOpen = false;
             if (this.mobileSearchOpen) {
-                this.\$nextTick(() => this.\$refs.mobileSearchInput?.focus());
+                this.$nextTick(() => this.$refs.mobileSearchInput?.focus());
             }
             this.measureHeader();
         },
     }"
     x-init="
         measureHeader();
-        \$watch('mobileSearchOpen', () => measureHeader());
-        new ResizeObserver(() => measureHeader()).observe(\$refs.storefrontHeader);
+        $watch('mobileSearchOpen', () => measureHeader());
+        new ResizeObserver(() => measureHeader()).observe($refs.storefrontHeader);
     "
 >
     {{-- Guest-only register CTA — no scroll hide/show --}}

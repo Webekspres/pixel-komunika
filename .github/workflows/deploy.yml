@@ -41,6 +41,18 @@ jobs:
           CPANEL_API_BASE_URL: ${{ secrets.CPANEL_API_BASE_URL }}
           CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
+          # Tarik commit terbaru ke clone server; tanpa ini cPanel men-deploy HEAD lama.
+          head="$(curl --fail-with-body --silent --show-error --get \
+            -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
+            --data-urlencode "repository_root=$REPOSITORY_PATH" \
+            --data-urlencode "branch=$GITHUB_REF_NAME" \
+            "$CPANEL_API_BASE_URL/execute/VersionControl/update" \
+            | jq -r '(.result.data // .data).last_update.identifier')"
+          if [ "$head" != "$GITHUB_SHA" ]; then
+            echo "HEAD repo server $head, bukan $GITHUB_SHA; cek kredensial remote di cPanel Git Version Control." >&2
+            exit 1
+          fi
+
           response="$(curl --fail-with-body --silent --show-error --get \
             -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
             --data-urlencode "repository_root=$REPOSITORY_PATH" \

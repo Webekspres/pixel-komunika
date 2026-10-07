@@ -8,9 +8,6 @@ deployment:
       REPOSITORY="$(git rev-parse --show-toplevel)"
       PHP=/usr/local/bin/php
       COMPOSER=/home/pixelkom/bin/composer
-      NODE_BIN=/home/pixelkom/.nvm/versions/node/v24.19.0/bin
-      export PATH="$NODE_BIN:$PATH"
-      NPM="$NODE_BIN/npm"
 
       case "$BRANCH" in
         main)
@@ -43,7 +40,6 @@ deployment:
 
       [ -x "$PHP" ] || { echo "PHP CLI cPanel tidak ditemukan di '$PHP'." >&2; exit 1; }
       [ -f "$COMPOSER" ] || { echo "Composer tidak ditemukan di '$COMPOSER'." >&2; exit 1; }
-      [ -x "$NPM" ] || { echo "npm tidak ditemukan di '$NPM'." >&2; exit 1; }
 
       PHP_MODULES="$("$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" -m)"
       for EXTENSION in curl fileinfo iconv pdo_mysql zip; do
@@ -53,18 +49,19 @@ deployment:
         }
       done
 
+      # Aset Vite di-build oleh GitHub Actions (task cPanel dibatasi ulimit -v 4 GB
+      # sehingga build di server OOM) lalu di-upload sebagai build-<commit>.tgz.
+      ARTIFACT="/home/pixelkom/tmp/build-$(git rev-parse HEAD).tgz"
+      [ -f "$ARTIFACT" ] || { echo "Artefak build '$ARTIFACT' tidak ditemukan." >&2; exit 1; }
+
       echo "Deploying branch '$BRANCH' ke '$DEPLOYPATH'..."
       git archive --format=tar HEAD | tar -xf - -C "$DEPLOYPATH"
 
       cd "$DEPLOYPATH"
       "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-      "$NPM" ci --no-audit --no-fund
-      # Task deploy cPanel memakai ulimit lebih ketat dari SSH; build Vite
-      # (rolldown/oxide, Rust) abort saat memesan memori/thread. Catat batasnya
-      # ke log, longgarkan bila diizinkan, dan batasi thread Rust.
-      ulimit -a
-      ulimit -v unlimited 2>/dev/null || true
-      RAYON_NUM_THREADS=2 "$NPM" run build
+      rm -rf public/build
+      tar -xzf "$ARTIFACT" -C public
+      rm -f "$ARTIFACT"
       "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan optimize:clear
       "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan storage:link
 

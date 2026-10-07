@@ -36,6 +36,12 @@ jobs:
       - run: npm audit --audit-level=high
       - run: php artisan test
 
+      # Build aset di sini; task deploy cPanel (ulimit -v 4 GB) OOM saat build Vite.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci && npm run build && tar -czf build.tgz -C public build
+
       - name: Update and deploy through cPanel API
         env:
           CPANEL_API_BASE_URL: ${{ secrets.CPANEL_API_BASE_URL }}
@@ -52,6 +58,13 @@ jobs:
             echo "HEAD repo server $head, bukan $GITHUB_SHA; cek kredensial remote di cPanel Git Version Control." >&2
             exit 1
           fi
+
+          curl --fail-with-body --silent --show-error \
+            -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
+            -F "dir=/home/pixelkom/tmp" -F "overwrite=1" \
+            -F "file-1=@build.tgz;filename=build-$GITHUB_SHA.tgz" \
+            "$CPANEL_API_BASE_URL/execute/Fileman/upload_files" \
+            | jq -e '((.result.status // .status) == 1) and (((.result.data // .data).failed // 0) == 0)'
 
           response="$(curl --fail-with-body --silent --show-error --get \
             -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \

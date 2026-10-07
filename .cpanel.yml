@@ -59,7 +59,12 @@ deployment:
       cd "$DEPLOYPATH"
       "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" "$COMPOSER" install --no-dev --prefer-dist --no-interaction --optimize-autoloader
       "$NPM" ci --no-audit --no-fund
-      "$NPM" run build
+      # Task deploy cPanel memakai ulimit lebih ketat dari SSH; build Vite
+      # (rolldown/oxide, Rust) abort saat memesan memori/thread. Catat batasnya
+      # ke log, longgarkan bila diizinkan, dan batasi thread Rust.
+      ulimit -a
+      ulimit -v unlimited 2>/dev/null || true
+      RAYON_NUM_THREADS=2 "$NPM" run build
       "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan optimize:clear
       "$PHP" --ea-reference-dir="$PHP_REFERENCE_DIR" artisan storage:link
 

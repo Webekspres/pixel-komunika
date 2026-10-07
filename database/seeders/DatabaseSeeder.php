@@ -109,11 +109,15 @@ class DatabaseSeeder extends Seeder
                     'verification_status' => $row['status'],
                     'reviewed_by' => $row['status'] === CustomerProfile::PENDING ? null : $admin->id,
                     'reviewed_at' => $row['status'] === CustomerProfile::PENDING ? null : now(),
-                    'reseller_account_number' => $row['status'] === CustomerProfile::ACTIVE
-                        ? sprintf('%s-%06d', config('store.reseller_account_prefix', 'PKR'), $user->id)
-                        : null,
                 ],
             );
+
+            // Sama dengan CustomerVerificationService (id profil) agar persetujuan berikutnya tidak bentrok.
+            $profile->update([
+                'reseller_account_number' => $row['status'] === CustomerProfile::ACTIVE
+                    ? sprintf('%s-%06d', config('store.reseller_account_prefix', 'PKR'), $profile->id)
+                    : null,
+            ]);
 
             if ($row['status'] === CustomerProfile::ACTIVE) {
                 $activeCustomer = $user;

@@ -58,18 +58,32 @@
             @endif
 
             @if ($order->status === 'shipped' && ! ($order->shipment && $order->shipment->isHeld()))
-                <flux:button variant="primary" color="emerald" wire:click="transitionStatus('completed')" wire:confirm="Yakin menandai pesanan ini selesai?">
-                    Tandai Selesai
-                </flux:button>
+                <x-ui.confirm-dialog title="Tandai pesanan selesai" description="Pesanan {{ $order->order_number }} akan ditandai Selesai dan tercatat di audit log." confirm-variant="primary">
+                    <x-slot:trigger>
+                        <flux:button variant="primary" color="emerald">Tandai Selesai</flux:button>
+                    </x-slot:trigger>
+                    <x-slot:confirm>
+                        <flux:modal.close>
+                            <flux:button variant="primary" wire:click="transitionStatus('completed')">Ya, tandai selesai</flux:button>
+                        </flux:modal.close>
+                    </x-slot:confirm>
+                </x-ui.confirm-dialog>
                 <flux:button variant="danger" wire:click="openTerkendalaModal">
                     Tandai Terkendala
                 </flux:button>
             @endif
 
             @if ($order->shipment && $order->shipment->isHeld())
-                <flux:button variant="ghost" class="text-emerald-700!" wire:click="resolveTerkendala" wire:confirm="Kendala sudah teratasi dan pengiriman dilanjutkan?">
-                    Tandai Teratasi
-                </flux:button>
+                <x-ui.confirm-dialog title="Kendala pengiriman teratasi" description="Pengiriman pesanan {{ $order->order_number }} akan dilanjutkan." confirm-variant="primary">
+                    <x-slot:trigger>
+                        <flux:button variant="ghost" class="text-emerald-700!">Tandai Teratasi</flux:button>
+                    </x-slot:trigger>
+                    <x-slot:confirm>
+                        <flux:modal.close>
+                            <flux:button variant="primary" wire:click="resolveTerkendala">Ya, sudah teratasi</flux:button>
+                        </flux:modal.close>
+                    </x-slot:confirm>
+                </x-ui.confirm-dialog>
             @endif
 
             @if ($this->canCancelToday())

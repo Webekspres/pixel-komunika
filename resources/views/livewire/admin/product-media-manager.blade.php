@@ -73,15 +73,18 @@
                         >
                             <x-icon name="star" class="size-3.5" />
                         </button>
-                        <button
-                            type="button"
-                            wire:click="detach({{ $usage->id }})"
-                            wire:confirm="Lepas gambar ini dari produk? File di Media Library tidak ikut terhapus."
-                            class="rounded-lg p-1.5 text-zinc-400 transition hover:bg-white hover:text-red-600"
-                            title="Lepas dari produk"
-                        >
-                            <x-icon name="trash-2" class="size-3.5" />
-                        </button>
+                        <x-ui.confirm-dialog title="Lepas gambar dari produk" description="Gambar ini dilepas dari produk. File di Media Library tidak ikut terhapus." confirm-variant="danger">
+                            <x-slot:trigger>
+                                <button type="button" class="rounded-lg p-1.5 text-zinc-400 transition hover:bg-white hover:text-red-600" title="Lepas dari produk">
+                                    <x-icon name="trash-2" class="size-3.5" />
+                                </button>
+                            </x-slot:trigger>
+                            <x-slot:confirm>
+                                <flux:modal.close>
+                                    <flux:button variant="danger" wire:click="detach({{ $usage->id }})">Ya, lepas</flux:button>
+                                </flux:modal.close>
+                            </x-slot:confirm>
+                        </x-ui.confirm-dialog>
                     </div>
                 </div>
             @endforeach

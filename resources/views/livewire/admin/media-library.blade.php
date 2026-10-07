@@ -81,15 +81,18 @@
                                 {{ $item->original_name }}
                             </p>
                             @if ($item->product_usages_count === 0)
-                                <button
-                                    type="button"
-                                    wire:click="delete({{ $item->id }})"
-                                    wire:confirm="Hapus media ini? File akan dihapus permanen."
-                                    class="rounded-lg p-1 text-zinc-400 transition hover:bg-red-50 hover:text-red-600"
-                                    title="Hapus media"
-                                >
-                                    <x-icon name="trash-2" class="size-3.5" />
-                                </button>
+                                <x-ui.confirm-dialog title="Hapus media" description="Media {{ $item->original_name ?? $item->path }} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan." confirm-variant="danger">
+                                    <x-slot:trigger>
+                                        <button type="button" class="rounded-lg p-1 text-zinc-400 transition hover:bg-red-50 hover:text-red-600" title="Hapus media">
+                                            <x-icon name="trash-2" class="size-3.5" />
+                                        </button>
+                                    </x-slot:trigger>
+                                    <x-slot:confirm>
+                                        <flux:modal.close>
+                                            <flux:button variant="danger" wire:click="delete({{ $item->id }})">Ya, hapus</flux:button>
+                                        </flux:modal.close>
+                                    </x-slot:confirm>
+                                </x-ui.confirm-dialog>
                             @else
                                 <span class="rounded-lg p-1 text-zinc-300" title="Media dipakai produk — hapus setelah tidak digunakan">
                                     <x-icon name="lock" class="size-3.5" />

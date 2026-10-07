@@ -55,15 +55,22 @@
         @if ($summary['items']->isNotEmpty())
             <div class="flex items-center justify-between border-b border-brand-black/8 bg-white px-5 py-2.5">
                 <span class="text-[11px] font-medium text-brand-black/45">{{ $summary['items']->count() }} jenis produk</span>
-                <button
-                    type="button"
-                    wire:click="clearCart"
-                    wire:confirm="Kosongkan seluruh isi keranjang?"
-                    class="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 transition-colors hover:text-red-700"
-                >
-                    <x-icon name="trash-2" class="size-3.5" />
-                    Hapus Semua
-                </button>
+                <x-ui.confirm-dialog title="Kosongkan keranjang" description="Semua produk di keranjang akan dihapus. Tindakan ini tidak dapat dibatalkan.">
+                    <x-slot:trigger>
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 transition-colors hover:text-red-700"
+                    >
+                        <x-icon name="trash-2" class="size-3.5" />
+                        Hapus Semua
+                    </button>
+                    </x-slot:trigger>
+                    <x-slot:confirm>
+                        <flux:modal.close>
+                            <flux:button variant="danger" wire:click="clearCart">Ya, kosongkan</flux:button>
+                        </flux:modal.close>
+                    </x-slot:confirm>
+                </x-ui.confirm-dialog>
             </div>
         @endif
 
@@ -201,15 +208,22 @@
             @if ($summary['items']->isNotEmpty())
                 <div class="mt-2 flex w-full items-center justify-between px-5 pb-1">
                     <span class="text-[11px] font-medium text-zinc-400">{{ $summary['items']->count() }} jenis produk</span>
-                    <button
-                        type="button"
-                        wire:click="clearCart"
-                        wire:confirm="Kosongkan seluruh isi keranjang?"
-                        class="inline-flex items-center gap-1 text-xs font-bold text-red-600"
-                    >
-                        <x-icon name="trash-2" class="size-3.5" />
-                        Hapus Semua
-                    </button>
+                    <x-ui.confirm-dialog title="Kosongkan keranjang" description="Semua produk di keranjang akan dihapus. Tindakan ini tidak dapat dibatalkan.">
+                        <x-slot:trigger>
+                        <button
+                            type="button"
+                            class="inline-flex items-center gap-1 text-xs font-bold text-red-600"
+                        >
+                            <x-icon name="trash-2" class="size-3.5" />
+                            Hapus Semua
+                        </button>
+                        </x-slot:trigger>
+                        <x-slot:confirm>
+                            <flux:modal.close>
+                                <flux:button variant="danger" wire:click="clearCart">Ya, kosongkan</flux:button>
+                            </flux:modal.close>
+                        </x-slot:confirm>
+                    </x-ui.confirm-dialog>
                 </div>
             @endif
         </div>

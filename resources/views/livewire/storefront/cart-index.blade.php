@@ -12,15 +12,22 @@
                 @endif
             </h1>
             @if ($summary['items']->isNotEmpty())
-                <button
-                    type="button"
-                    wire:click="clearCart"
-                    wire:confirm="Kosongkan seluruh isi keranjang?"
-                    class="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100"
-                >
-                    <x-icon name="trash-2" class="size-3.5" />
-                    Hapus Semua
-                </button>
+                <x-ui.confirm-dialog title="Kosongkan keranjang" description="Semua produk di keranjang akan dihapus. Tindakan ini tidak dapat dibatalkan.">
+                    <x-slot:trigger>
+                        <button
+                            type="button"
+                            class="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                        >
+                            <x-icon name="trash-2" class="size-3.5" />
+                            Hapus Semua
+                        </button>
+                    </x-slot:trigger>
+                    <x-slot:confirm>
+                        <flux:modal.close>
+                            <flux:button variant="danger" wire:click="clearCart">Ya, kosongkan</flux:button>
+                        </flux:modal.close>
+                    </x-slot:confirm>
+                </x-ui.confirm-dialog>
             @endif
         </div>
 

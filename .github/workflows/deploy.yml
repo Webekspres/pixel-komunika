@@ -50,3 +50,32 @@ jobs:
             exit 1
           fi
           printf '%s\n' "$response" | jq -e '(.result.status // .status) == 1'
+          echo "DEPLOY_ID=$(printf '%s\n' "$response" | jq -r '(.result.data // .data).deploy_id')" >> "$GITHUB_ENV"
+
+      # cPanel menerima permintaan deploy lalu bisa gagal/menolak diam-diam
+      # (mis. file untracked di repo server); tunggu hasil sebenarnya.
+      - name: Wait for cPanel deployment result
+        env:
+          CPANEL_API_BASE_URL: ${{ secrets.CPANEL_API_BASE_URL }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: |
+          for _ in $(seq 60); do
+            deployment="$(curl --fail-with-body --silent --show-error --get \
+              -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
+              "$CPANEL_API_BASE_URL/execute/VersionControlDeployment/retrieve" \
+              | jq -c --arg id "$DEPLOY_ID" '(.result.data // .data)[] | select((.deploy_id | tostring) == $id)')"
+            if printf '%s' "$deployment" | jq -e '.timestamps.succeeded' >/dev/null; then
+              echo "Deploy $DEPLOY_ID berhasil."
+              exit 0
+            fi
+            if printf '%s' "$deployment" | jq -e '.timestamps.failed // .timestamps.canceled' >/dev/null; then
+              echo "Deploy $DEPLOY_ID gagal; cek log cPanel: $(printf '%s' "$deployment" | jq -r '.log_path')" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "Deploy $DEPLOY_ID tidak selesai dalam 10 menit; cek repo server (git status) dan log cPanel." >&2
+          exit 1
+
+      - name: Health check
+        run: curl --fail --silent --show-error --retry 3 --retry-delay 5 "https://${{ github.ref_name == 'main' && 'store.pixelkomunika.com' || 'dev.store.pixelkomunika.com' }}/health" | jq -e '.status == "ok"'

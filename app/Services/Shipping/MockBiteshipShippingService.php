@@ -28,7 +28,7 @@ class MockBiteshipShippingService implements ShippingCalculatorInterface
                 'provider' => Shipment::PROVIDER_STORE,
                 'code' => 'store',
                 'service' => 'Kurir Toko',
-                'name' => 'Kurir Toko — '.$rate->area_name,
+                'name' => 'Kurir Toko, '.$rate->area_name,
                 'cost' => (float) $rate->rate_amount,
                 'etd' => $rate->eta_text ?? 'H+1 hari kerja',
                 'store_courier_rate_id' => $rate->id,

@@ -37,7 +37,7 @@
 >
 
     @if (session()->has('success'))
-        <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+        <div class="fixed right-5 bottom-5 z-50 flex items-center gap-2 rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-xl" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
             <x-icon name="check-circle" class="size-5" />
             <span>{{ session('success') }}</span>
             <a href="{{ route('cart.index') }}" class="ml-2 text-emerald-100 underline hover:text-white">Lihat Keranjang</a>
@@ -59,14 +59,20 @@
                 <div class="p-6 sm:p-8 lg:sticky lg:top-24 lg:self-start">
                     <div class="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-brand-black/8 bg-zinc-50 group">
                         @if ($primaryMedia)
-                            <img
-                                src="{{ $primaryMedia->url() }}"
-                                :src="lightboxUrls[activeIndex]"
+                            <button
+                                type="button"
                                 @click="openLightbox(activeIndex)"
-                                alt="{{ $primaryMedia->alt_text ?: $product->displayName() }}"
-                                class="absolute inset-0 size-full cursor-zoom-in object-cover transition duration-500 group-hover:scale-105"
-                                loading="lazy"
+                                class="absolute inset-0 size-full cursor-zoom-in focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-brand-black"
+                                aria-label="Perbesar gambar {{ $product->displayName() }}"
                             >
+                                <img
+                                    src="{{ $primaryMedia->url() }}"
+                                    :src="lightboxUrls[activeIndex]"
+                                    alt="{{ $primaryMedia->alt_text ?: $product->displayName() }}"
+                                    class="size-full object-cover transition duration-300 group-hover:scale-105"
+                                    loading="lazy"
+                                >
+                            </button>
                         @else
                             <x-icon name="package" class="relative z-10 size-28 text-zinc-300 transition-transform duration-300 group-hover:scale-105 sm:size-32" />
                         @endif
@@ -81,8 +87,10 @@
                                 <button
                                     type="button"
                                     @click="activeIndex = {{ $index }}"
+                                    :aria-pressed="activeIndex === {{ $index }}"
+                                    aria-label="Tampilkan gambar {{ $index + 1 }}"
                                     class="relative size-16 shrink-0 overflow-hidden rounded-xl border-2 transition"
-                                    :class="activeIndex === {{ $index }} ? 'border-brand-yellow' : 'border-transparent opacity-70 hover:opacity-100'"
+                                    :class="activeIndex === {{ $index }} ? 'border-brand-black' : 'border-transparent opacity-70 hover:opacity-100'"
                                 >
                                     <img src="{{ $media->url() }}" alt="{{ $media->alt_text ?: $product->displayName() }}" class="size-full object-cover" loading="lazy">
                                 </button>
@@ -95,7 +103,7 @@
                 {{-- Info + Deskripsi + Spesifikasi --}}
                 <div class="flex flex-col space-y-6 border-t border-zinc-100 p-6 sm:p-8 lg:border-t-0 lg:border-l">
                     <div class="space-y-4">
-                        <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                        <p class="text-xs font-medium text-zinc-600">
                             {{ $product->brand?->name ?? 'Pixel Komunika' }} · {{ $product->category->name }}
                         </p>
                         @if ($product->enrichment?->label)
@@ -106,7 +114,7 @@
                         <h1 class="text-xl font-black leading-tight tracking-tight text-zinc-950 sm:text-2xl">
                             {{ $product->displayName() }}
                         </h1>
-                        <p class="font-mono text-xs text-zinc-400">SKU: {{ $product->sku }}</p>
+                        <p class="font-mono text-xs text-zinc-600">SKU: {{ $product->sku }}</p>
 
                         @if ($inStock)
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
@@ -151,12 +159,12 @@
                                 </div>
                             @else
                                 <div class="flex items-center gap-2.5">
-                                    <x-icon name="lock" class="size-4 shrink-0 text-zinc-400" />
+                                    <x-icon name="lock" class="size-4 shrink-0 text-zinc-600" />
                                     <div class="min-w-0 flex-1">
                                         <p class="text-sm font-semibold text-zinc-700">Harga tersembunyi</p>
-                                        <p class="text-xs text-zinc-400">Login untuk melihat harga grosir</p>
+                                        <p class="text-xs text-zinc-600">Login untuk melihat harga grosir</p>
                                     </div>
-                                    <a href="{{ route('login') }}" class="shrink-0 rounded-lg bg-brand-black px-3 py-1.5 text-xs font-bold text-white">
+                                    <a href="{{ route('login') }}" class="inline-flex min-h-11 shrink-0 items-center rounded-lg bg-brand-black px-4 text-xs font-bold text-white">
                                         Login
                                     </a>
                                 </div>
@@ -170,7 +178,7 @@
                                     <button
                                         wire:click="decrementQuantity"
                                         type="button"
-                                        class="flex size-10 items-center justify-center text-zinc-600 transition hover:bg-zinc-50"
+                                        class="flex size-11 items-center justify-center text-zinc-700 transition hover:bg-zinc-100"
                                         aria-label="Kurangi jumlah"
                                     >
                                         <x-icon name="minus" class="size-4" />
@@ -179,7 +187,7 @@
                                     <button
                                         wire:click="incrementQuantity"
                                         type="button"
-                                        class="flex size-10 items-center justify-center text-zinc-600 transition hover:bg-zinc-50"
+                                        class="flex size-11 items-center justify-center text-zinc-700 transition hover:bg-zinc-100"
                                         aria-label="Tambah jumlah"
                                     >
                                         <x-icon name="plus" class="size-4" />
@@ -189,7 +197,7 @@
                                 <button
                                     wire:click="addToCart"
                                     type="button"
-                                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-yellow px-5 py-2.5 font-bold text-brand-black transition hover:bg-brand-yellow-dark active:scale-[0.99]"
+                                    class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-yellow px-5 font-bold text-brand-black transition hover:bg-brand-yellow-soft"
                                 >
                                     <x-icon name="shopping-cart" class="size-5" />
                                     <span>Tambah ke Keranjang</span>
@@ -197,27 +205,17 @@
                             </div>
                         @endif
 
-                        {{-- Trust strip --}}
-                        <div class="grid grid-cols-3 gap-3 pt-1">
-                            <div class="flex flex-col items-center gap-1.5 text-center">
-                                <div class="flex size-9 items-center justify-center rounded-xl bg-zinc-50">
-                                    <x-icon name="shield" class="size-4 text-zinc-500" />
-                                </div>
-                                <span class="text-xs font-medium leading-tight text-zinc-500">Produk Original</span>
-                            </div>
-                            <div class="flex flex-col items-center gap-1.5 text-center">
-                                <div class="flex size-9 items-center justify-center rounded-xl bg-zinc-50">
-                                    <x-icon name="truck" class="size-4 text-zinc-500" />
-                                </div>
-                                <span class="text-xs font-medium leading-tight text-zinc-500">Kurir Toko H+1</span>
-                            </div>
-                            <div class="flex flex-col items-center gap-1.5 text-center">
-                                <div class="flex size-9 items-center justify-center rounded-xl bg-zinc-50">
-                                    <x-icon name="package" class="size-4 text-zinc-500" />
-                                </div>
-                                <span class="text-xs font-medium leading-tight text-zinc-500">Dikemas Aman</span>
-                            </div>
-                        </div>
+                        {{-- Shipping facts from BR-023 --}}
+                        <ul class="grid gap-2 pt-1 text-xs text-zinc-700 sm:grid-cols-2">
+                            <li class="flex items-center gap-2">
+                                <x-icon name="truck" class="size-4 shrink-0 text-zinc-700" />
+                                Kurir toko H+1 kerja, area Bandung
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <x-icon name="badge-percent" class="size-4 shrink-0 text-zinc-700" />
+                                Ongkir kurir toko Rp0 mulai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}
+                            </li>
+                        </ul>
                     </div>
 
                     {{-- Tabs: Deskripsi | Spesifikasi --}}
@@ -225,30 +223,38 @@
                         class="border-t border-zinc-100 pt-6"
                         x-data="{ tab: 'desc' }"
                     >
-                <div class="mb-5 flex gap-1">
+                <div class="mb-5 flex gap-1" role="tablist" aria-label="Informasi produk">
                     <button
                         type="button"
+                        role="tab"
+                        id="tab-desc"
+                        aria-controls="panel-desc"
+                        :aria-selected="tab === 'desc'"
                         @click="tab = 'desc'"
                         :class="tab === 'desc' ? 'bg-brand-yellow text-brand-black' : 'text-zinc-600 hover:bg-zinc-100'"
-                        class="rounded-xl px-4 py-2 text-sm font-semibold transition-colors"
+                        class="min-h-11 rounded-xl px-4 text-sm font-semibold transition-colors"
                     >
                         Deskripsi
                     </button>
                     <button
                         type="button"
+                        role="tab"
+                        id="tab-specs"
+                        aria-controls="panel-specs"
+                        :aria-selected="tab === 'specs'"
                         @click="tab = 'specs'"
                         :class="tab === 'specs' ? 'bg-brand-yellow text-brand-black' : 'text-zinc-600 hover:bg-zinc-100'"
-                        class="rounded-xl px-4 py-2 text-sm font-semibold transition-colors"
+                        class="min-h-11 rounded-xl px-4 text-sm font-semibold transition-colors"
                     >
                         Spesifikasi
                     </button>
                 </div>
 
-                <div x-show="tab === 'desc'" x-cloak>
+                <div x-show="tab === 'desc'" x-cloak role="tabpanel" id="panel-desc" aria-labelledby="tab-desc">
                     <p class="text-sm leading-relaxed text-zinc-700 whitespace-pre-line">{{ $description }}</p>
                 </div>
 
-                <div x-show="tab === 'specs'" x-cloak class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div x-show="tab === 'specs'" x-cloak role="tabpanel" id="panel-specs" aria-labelledby="tab-specs" class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div class="flex items-center gap-3 rounded-xl bg-zinc-50 px-4 py-2.5">
                         <span class="w-28 shrink-0 text-xs font-semibold text-zinc-500">Berat</span>
                         <span class="text-sm font-medium text-zinc-800">{{ $product->weight_grams }} gram</span>
@@ -282,7 +288,7 @@
                 <h2 class="text-xl font-black text-zinc-900">Produk Serupa</h2>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                     @foreach ($relatedProducts as $rel)
-                        @php($relPrimary = $rel->media->firstWhere('is_primary', true) ?? $rel->media->first())
+                        @php $relPrimary = $rel->media->firstWhere('is_primary', true) ?? $rel->media->first(); @endphp
                         <x-storefront.product-card
                             :title="$rel->displayName()"
                             :image="$relPrimary?->url()"
@@ -302,18 +308,18 @@
     </div>
 
     @if ($inStock && ($canViewPrices || auth()->guest()))
-        <div class="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 p-4 shadow-2xl backdrop-blur-md lg:hidden">
+        <div class="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white p-4 shadow-2xl lg:hidden">
             <div class="flex items-center gap-3">
                 <div class="flex shrink-0 items-center overflow-hidden rounded-xl border border-zinc-300 bg-white">
-                    <button wire:click="decrementQuantity" type="button" class="px-3 py-2 text-xs font-bold text-zinc-600" aria-label="Kurangi jumlah">-</button>
+                    <button wire:click="decrementQuantity" type="button" class="inline-flex size-11 items-center justify-center text-zinc-700" aria-label="Kurangi jumlah"><x-icon name="minus" class="size-4" /></button>
                     <span class="px-3 py-2 text-xs font-bold text-zinc-900">{{ $quantity }}</span>
-                    <button wire:click="incrementQuantity" type="button" class="px-3 py-2 text-xs font-bold text-zinc-600" aria-label="Tambah jumlah">+</button>
+                    <button wire:click="incrementQuantity" type="button" class="inline-flex size-11 items-center justify-center text-zinc-700" aria-label="Tambah jumlah"><x-icon name="plus" class="size-4" /></button>
                 </div>
 
                 <button
                     wire:click="addToCart"
                     type="button"
-                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-yellow py-3 text-xs font-bold text-brand-black shadow-xs"
+                    class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-yellow text-xs font-bold text-brand-black"
                 >
                     <x-icon name="shopping-cart" class="size-4" />
                     <span>Tambah ke Keranjang</span>
@@ -328,7 +334,10 @@
             x-show="lightboxOpen"
             x-cloak
             x-effect="document.body.style.overflow = lightboxOpen ? 'hidden' : ''"
-            class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Galeri {{ $product->displayName() }}"
             @click="lightboxOpen = false"
             @keydown.escape.window="lightboxOpen = false"
             @keydown.arrow-left.window="if (lightboxOpen) prevImage()"
@@ -336,6 +345,7 @@
         >
             <div
                 class="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-zinc-950 shadow-2xl ring-1 ring-white/10"
+                x-trap="lightboxOpen"
                 @click.stop
             >
                 {{-- Header --}}

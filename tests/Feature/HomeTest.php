@@ -14,7 +14,9 @@ it('shows the branded home page', function () {
         ->assertSee('Harga Grosir')
         ->assertSee('Kategori Produk')
         ->assertSee('Produk Pilihan')
-        ->assertSee('Mengapa Pixel Komunika');
+        ->assertSee('Yang perlu diketahui sebelum belanja')
+        ->assertDontSee('500+')
+        ->assertDontSee('200+');
 });
 
 // `\$nextTick` tercetak literal membuat x-data navbar gagal di-parse (pencarian mobile & menu kategori mati).

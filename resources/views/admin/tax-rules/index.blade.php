@@ -20,11 +20,11 @@
                 <table class="min-w-full text-sm">
                     <thead>
                         <tr class="border-b border-neutral-100 text-left">
-                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kategori</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Ambang belanja</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tarif PPh 22</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Status</th>
+                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold text-zinc-500">No</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Kategori</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Ambang belanja</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Tarif PPh 22</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Status</th>
                             <th class="px-5 py-3"></th>
                         </tr>
                     </thead>
@@ -32,20 +32,20 @@
                         @foreach ($categories as $category)
                             @php $rule = $category->taxRule; @endphp
                             <tr class="hover:bg-neutral-50">
-                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $loop->iteration }}</td>
+                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-500">{{ $loop->iteration }}</td>
                                 <td class="px-5 py-3.5 font-semibold text-zinc-900">{{ $category->name }}</td>
                                 <td class="px-5 py-3.5 text-zinc-700">
                                     @if ($rule)
                                         Rp {{ number_format($rule->threshold_amount, 0, ',', '.') }}
                                     @else
-                                        <span class="text-zinc-400">Belum dikonfigurasi</span>
+                                        <span class="text-zinc-500">Belum dikonfigurasi</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5 text-zinc-700">
                                     @if ($rule)
                                         {{ number_format($rule->rate_percent, 4) }}%
                                     @else
-                                        —
+                                        -
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5">

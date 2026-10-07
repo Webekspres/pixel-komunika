@@ -18,7 +18,7 @@
     @endif
 
     @if ($usages->isEmpty())
-        <p class="py-6 text-center text-xs text-zinc-400">
+        <p class="py-6 text-center text-xs text-zinc-500">
             Belum ada gambar. Tambahkan gambar baru atau pilih dari Media Library untuk thumbnail katalog.
         </p>
     @else
@@ -34,7 +34,7 @@
                         <div class="flex items-center gap-2">
                             <p class="min-w-0 truncate text-xs font-semibold text-zinc-800">{{ $media?->original_name }}</p>
                             @if ($usage->is_primary)
-                                <span class="shrink-0 rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-brand-yellow-dark">★ Utama</span>
+                                <span class="shrink-0 rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-amber-800">★ Utama</span>
                             @endif
                         </div>
                         <input
@@ -51,7 +51,7 @@
                             type="button"
                             wire:click="moveUp({{ $usage->id }})"
                             @disabled($loop->first)
-                            class="rounded-lg p-1.5 text-zinc-400 transition hover:bg-white hover:text-zinc-700 disabled:opacity-30"
+                            class="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white hover:text-zinc-700 disabled:opacity-30"
                             title="Naikkan urutan"
                         >
                             <x-icon name="chevron-up" class="size-3.5" />
@@ -60,7 +60,7 @@
                             type="button"
                             wire:click="moveDown({{ $usage->id }})"
                             @disabled($loop->last)
-                            class="rounded-lg p-1.5 text-zinc-400 transition hover:bg-white hover:text-zinc-700 disabled:opacity-30"
+                            class="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white hover:text-zinc-700 disabled:opacity-30"
                             title="Turunkan urutan"
                         >
                             <x-icon name="chevron-down" class="size-3.5" />
@@ -68,14 +68,14 @@
                         <button
                             type="button"
                             wire:click="setPrimary({{ $usage->id }})"
-                            class="rounded-lg p-1.5 text-zinc-400 transition hover:bg-white hover:text-brand-yellow-dark"
+                            class="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white hover:text-amber-800"
                             title="Jadikan gambar utama"
                         >
                             <x-icon name="star" class="size-3.5" />
                         </button>
                         <x-ui.confirm-dialog title="Lepas gambar dari produk" description="Gambar ini dilepas dari produk. File di Media Library tidak ikut terhapus." confirm-variant="danger">
                             <x-slot:trigger>
-                                <button type="button" class="rounded-lg p-1.5 text-zinc-400 transition hover:bg-white hover:text-red-600" title="Lepas dari produk">
+                                <button type="button" class="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white hover:text-red-600" title="Lepas dari produk">
                                     <x-icon name="trash-2" class="size-3.5" />
                                 </button>
                             </x-slot:trigger>
@@ -102,19 +102,19 @@
         <div class="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div class="flex items-center justify-between border-b border-neutral-100 px-5 py-3">
                 <h3 class="text-sm font-bold text-zinc-900">Pilih Media</h3>
-                <button type="button" wire:click="closePicker" class="rounded-lg p-1 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700">
+                <button type="button" wire:click="closePicker" class="rounded-lg p-1 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700">
                     <x-icon name="x" class="size-4.5" />
                 </button>
             </div>
 
             <div class="flex flex-col gap-3 border-b border-neutral-100 px-5 py-3 sm:flex-row sm:items-center">
                 <div class="relative flex-1">
-                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
                     <input
                         type="search"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Cari media..."
-                        class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                        class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
                 </div>
                 <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-xs font-bold text-zinc-700 transition hover:bg-zinc-50">
@@ -130,7 +130,7 @@
 
             <div class="flex-1 overflow-y-auto p-4">
                 @if ($library->isEmpty())
-                    <p class="py-10 text-center text-xs text-zinc-400">Tidak ada media yang cocok. Unggah media baru untuk memulai.</p>
+                    <p class="py-10 text-center text-xs text-zinc-500">Tidak ada media yang cocok. Unggah media baru untuk memulai.</p>
                 @else
                     <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
                         @foreach ($library as $item)

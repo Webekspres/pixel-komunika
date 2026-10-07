@@ -21,12 +21,12 @@
     <div class="rounded-2xl border border-neutral-100 bg-white">
         <div class="flex flex-col gap-3 border-b border-neutral-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="relative w-full sm:max-w-sm">
-                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
                 <input
                     type="search"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Cari No. Order / Penerima / HP..."
-                    class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                    class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                 >
             </div>
             <select
@@ -56,12 +56,11 @@
         @else
             <flux:table :paginate="$orders" container:class="[&_ui-table-scroll-area]:max-h-[70vh]">
                 <flux:table.columns>
-                    <flux:table.column align="center" class="w-12">No</flux:table.column>
                     <flux:table.column>No. Order</flux:table.column>
                     <flux:table.column>Pelanggan</flux:table.column>
                     <flux:table.column align="end" class="w-36">Total</flux:table.column>
                     <flux:table.column class="w-48">Status</flux:table.column>
-                    <flux:table.column align="end" class="w-28">Aksi</flux:table.column>
+                    <flux:table.column align="end" class="sticky right-0 bg-white shadow-[-8px_0_8px_-8px_rgb(0_0_0/0.15)] w-28">Aksi</flux:table.column>
                 </flux:table.columns>
 
                 <flux:table.rows>
@@ -71,7 +70,6 @@
                             class="cursor-pointer transition-colors hover:bg-neutral-50"
                             @click="window.location.href = '{{ route('admin.orders.show', $order) }}'"
                         >
-                            <flux:table.cell align="center" class="w-12 text-xs text-zinc-400">{{ $orders->firstItem() + $loop->index }}</flux:table.cell>
                             <flux:table.cell>
                                 <p class="font-bold text-zinc-900">{{ $order->order_number }}</p>
                                 <p class="text-xs text-zinc-500">{{ $order->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
@@ -101,7 +99,7 @@
                                     @endif
                                 </div>
                             </flux:table.cell>
-                            <flux:table.cell align="end" class="w-28" @click.stop>
+                            <flux:table.cell align="end" class="sticky right-0 bg-white shadow-[-8px_0_8px_-8px_rgb(0_0_0/0.15)] w-28" @click.stop>
                                 <div class="flex items-center justify-end gap-2">
                                     <flux:button href="{{ route('admin.orders.show', $order) }}" variant="ghost" size="sm">
                                         Detail

@@ -66,27 +66,27 @@
 
             <dl x-show="!editing" x-cloak class="mt-5 grid gap-4 sm:grid-cols-2">
                 <div>
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Nama toko</dt>
+                    <dt class="text-xs font-semibold text-zinc-500">Nama toko</dt>
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->store_name }}</dd>
                 </div>
                 <div>
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Nomor kontak</dt>
+                    <dt class="text-xs font-semibold text-zinc-500">Nomor kontak</dt>
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->contact_number }}</dd>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Alamat toko</dt>
+                    <dt class="text-xs font-semibold text-zinc-500">Alamat toko</dt>
                     <dd class="mt-0.5 text-sm leading-relaxed text-zinc-700">{{ $store->address }}</dd>
                 </div>
                 <div>
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Nama perusahaan</dt>
-                    <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->company_name ?: '—' }}</dd>
+                    <dt class="text-xs font-semibold text-zinc-500">Nama perusahaan</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->company_name ?: '-' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">NPWP</dt>
+                    <dt class="text-xs font-semibold text-zinc-500">NPWP</dt>
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->company_npwp }}</dd>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Lokasi Gudang</dt>
+                    <dt class="text-xs font-semibold text-zinc-500">Lokasi Gudang</dt>
                     <dd class="mt-0.5 text-sm font-semibold text-zinc-900">
                         @if($store->origin_biteship_label)
                             {{ $store->origin_biteship_label }}
@@ -97,16 +97,16 @@
                             <span class="block mt-1 text-xs font-normal text-zinc-500">{{ $store->origin_postal_code }}</span>
                         @elseif(config('biteship.origin_area_id'))
                             <span class="font-mono">{{ config('biteship.origin_area_id') }}</span> <span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">fallback .env</span>
-                            <span class="block mt-1 text-xs font-normal text-zinc-500">Regol, Bandung, Jawa Barat (40252) — Jl. Sawahkurung</span>
+                            <span class="block mt-1 text-xs font-normal text-zinc-500">Regol, Bandung, Jawa Barat (40252), Jl. Sawahkurung</span>
                         @else
-                            —
+                            -
                         @endif
                     </dd>
-                    <p class="mt-1 text-[11px] text-zinc-400">Dipakai untuk kalkulasi ongkir Biteship</p>
+                    <p class="mt-1 text-[11px] text-zinc-500">Dipakai untuk kalkulasi ongkir Biteship</p>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Kode pos asal</dt>
-                    <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->origin_postal_code ?: '—' }}</dd>
+                    <dt class="text-xs font-semibold text-zinc-500">Kode pos asal</dt>
+                    <dd class="mt-0.5 text-sm font-semibold text-zinc-900">{{ $store->origin_postal_code ?: '-' }}</dd>
                 </div>
             </dl>
 
@@ -118,27 +118,27 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="store_name" class="mb-1.5 block text-xs font-semibold text-zinc-700">Nama toko</label>
-                        <input id="store_name" name="store_name" type="text" required maxlength="191" value="{{ old('store_name', $store->store_name) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">
+                        <input id="store_name" name="store_name" type="text" required maxlength="191" value="{{ old('store_name', $store->store_name) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none">
                     </div>
                     <div>
                         <label for="contact_number" class="mb-1.5 block text-xs font-semibold text-zinc-700">Nomor kontak</label>
-                        <input id="contact_number" name="contact_number" type="text" required maxlength="32" value="{{ old('contact_number', $store->contact_number) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">
+                        <input id="contact_number" name="contact_number" type="text" required maxlength="32" value="{{ old('contact_number', $store->contact_number) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label for="address" class="mb-1.5 block text-xs font-semibold text-zinc-700">Alamat toko</label>
-                    <textarea id="address" name="address" rows="3" required class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">{{ old('address', $store->address) }}</textarea>
+                    <textarea id="address" name="address" rows="3" required class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none">{{ old('address', $store->address) }}</textarea>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="company_name" class="mb-1.5 block text-xs font-semibold text-zinc-700">Nama perusahaan</label>
-                        <input id="company_name" name="company_name" type="text" maxlength="191" value="{{ old('company_name', $store->company_name) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">
+                        <input id="company_name" name="company_name" type="text" maxlength="191" value="{{ old('company_name', $store->company_name) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none">
                     </div>
                     <div>
                         <label for="company_npwp" class="mb-1.5 block text-xs font-semibold text-zinc-700">NPWP</label>
-                        <input id="company_npwp" name="company_npwp" type="text" required maxlength="32" value="{{ old('company_npwp', $store->company_npwp) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none">
+                        <input id="company_npwp" name="company_npwp" type="text" required maxlength="32" value="{{ old('company_npwp', $store->company_npwp) }}" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none">
                     </div>
                 </div>
 
@@ -195,12 +195,12 @@
                     @click.away="isOpen = false"
                 >
                     <div>
-                        <label class="mb-1.5 block text-xs font-semibold text-zinc-700">Lokasi Gudang (Biteship Area) <span class="text-zinc-400 font-normal">— untuk kalkulasi ongkir Biteship</span></label>
+                        <label class="mb-1.5 block text-xs font-semibold text-zinc-700">Lokasi Gudang (Biteship Area) <span class="text-zinc-500 font-normal">untuk kalkulasi ongkir Biteship</span></label>
                         <input type="hidden" name="origin_biteship_area_id" id="origin_biteship_area_id" :value="selectedId" value="{{ old('origin_biteship_area_id', $store->origin_biteship_area_id ?? '') }}">
                         <input type="hidden" name="origin_biteship_label" id="origin_biteship_label" :value="selectedLabel" value="{{ old('origin_biteship_label', $store->origin_biteship_label ?? '') }}">
                         <div class="flex items-center gap-2">
                             <div class="relative flex-1">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">
                                     <x-icon name="search" class="size-4" />
                                 </div>
                                 <input
@@ -209,7 +209,7 @@
                                     @input.debounce.300ms="search()"
                                     @focus="if(query.length>=2) isOpen = true"
                                     placeholder="Ketik kecamatan/kota/kode pos gudang (mis. Regol 40252)..."
-                                    class="w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-9 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                    class="w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-9 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                                 >
                                 <div x-show="isLoading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                     <svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
@@ -221,7 +221,7 @@
                         <div x-show="selectedId" x-cloak class="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
                             <p class="font-semibold text-emerald-900" x-text="selectedLabel || 'Lokasi terpilih'"></p>
                             <p class="mt-0.5 font-mono text-[11px] text-emerald-700" x-text="selectedId"></p>
-                            <p class="mt-0.5 text-[11px] text-emerald-600">Kode pos: <span x-text="postalCode || '—'"></span></p>
+                            <p class="mt-0.5 text-[11px] text-emerald-600">Kode pos: <span x-text="postalCode || '-'"></span></p>
                         </div>
                         <!-- Fallback info -->
                         <p class="mt-1.5 text-[11px] leading-snug text-zinc-500">
@@ -233,7 +233,7 @@
                                 @elseif(config('biteship.origin_area_id'))
                                     Regol, Bandung, Jawa Barat ({{ config('biteship.origin_area_id') }}) <span class="text-amber-600">· fallback .env</span>
                                 @else
-                                    — (akan pakai .env)
+                                    Belum diatur
                                 @endif
                             </span>
 
@@ -245,12 +245,12 @@
                                     <button type="button" @click="select(item)" class="w-full text-left px-3.5 py-2.5 text-xs hover:bg-amber-50/80 transition border-b border-zinc-50 last:border-0">
                                         <p class="font-bold text-zinc-900" x-text="item.label"></p>
                                         <p class="text-[11px] text-zinc-500 mt-0.5"><span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span> <span x-show="item.postal_code" x-text="'('+item.postal_code+')'"></span></p>
-                                        <p class="font-mono text-[10px] text-zinc-400" x-text="item.biteship_area_id || item.id"></p>
+                                        <p class="font-mono text-[10px] text-zinc-500" x-text="item.biteship_area_id || item.id"></p>
                                     </button>
                                 </template>
                             </div>
                         </div>
-                        <p x-show="isOpen && !isLoading && results.length===0 && query.length>=2" x-cloak class="mt-1 text-xs text-zinc-500">Tidak ada hasil — coba kata kunci lain atau isi manual ID di bawah.</p>
+                        <p x-show="isOpen && !isLoading && results.length===0 && query.length>=2" x-cloak class="mt-1 text-xs text-zinc-500">Tidak ada hasil. Coba kata kunci lain atau isi manual ID di bawah.</p>
                     </div>
                     <details class="group">
                         <summary class="cursor-pointer text-[11px] font-semibold text-zinc-500 hover:text-zinc-700">Isi manual</summary>
@@ -258,7 +258,7 @@
                             <input type="text" placeholder="Label: Regol, Bandung, Jawa Barat (40252)" x-model="selectedLabel" @input="document.getElementById('origin_biteship_label').value = selectedLabel" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs text-zinc-700 focus:border-brand-yellow focus:outline-none">
                             <input type="text" placeholder="ID: IDNP9IDNC22IDND2043IDZ40132" x-model="selectedId" @input="document.getElementById('origin_biteship_area_id').value = selectedId" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 font-mono text-xs text-zinc-700 focus:border-brand-yellow focus:outline-none">
                         </div>
-                        <p class="mt-1 text-[11px] text-zinc-400">Label readable untuk admin awam, ID dari Biteship Maps API (contoh Regol 40252).</p>
+                        <p class="mt-1 text-[11px] text-zinc-500">Label readable untuk admin awam, ID dari Biteship Maps API (contoh Regol 40252).</p>
                     </details>
                 </div>
 
@@ -291,18 +291,18 @@
                     <table class="w-full text-left text-sm">
                         <thead>
                             <tr class="border-b border-neutral-100">
-                                <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Bank</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">No. Rekening</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Atas Nama</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Status</th>
-                                <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Aksi</th>
+                                <th class="w-12 px-5 py-3 text-center text-xs font-semibold text-zinc-500">No</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Bank</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">No. Rekening</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Atas Nama</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Status</th>
+                                <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-50">
                             @forelse ($bankAccounts as $account)
                                 <tr class="transition-colors hover:bg-neutral-50">
-                                    <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $loop->iteration }}</td>
+                                    <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-500">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3.5">
                                         <div class="flex items-center gap-2.5">
                                             <div class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
@@ -311,7 +311,7 @@
                                             <div>
                                                 <p class="font-semibold text-zinc-900">{{ $account->bank_name }}</p>
                                                 @if ($account->instructions)
-                                                    <p class="text-[11px] leading-snug text-zinc-400">{{ $account->instructions }}</p>
+                                                    <p class="text-[11px] leading-snug text-zinc-500">{{ $account->instructions }}</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -349,7 +349,7 @@
 
                                             <div x-show="editing" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="editing = false" @keydown.escape.window="editing = false">
                                                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
-                                                    <h3 class="text-sm font-bold text-zinc-900">Edit Rekening — {{ $account->bank_name }}</h3>
+                                                    <h3 class="text-sm font-bold text-zinc-900">Edit Rekening: {{ $account->bank_name }}</h3>
                                                     <form method="POST" action="{{ route('admin.settings.bank-accounts.update', $account) }}" class="mt-4 grid gap-3">
                                                         @csrf
                                                         @method('PATCH')
@@ -388,7 +388,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-5 py-10 text-center text-sm text-zinc-400">
+                                    <td colspan="6" class="px-5 py-10 text-center text-sm text-zinc-500">
                                         Belum ada rekening bank. Tambahkan rekening tujuan transfer.
                                     </td>
                                 </tr>
@@ -448,17 +448,17 @@
             </div>
 
             <div x-show="!editing" x-cloak class="mt-5">
-                <p class="text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Minimum kuantitas partai</p>
+                <p class="text-xs font-semibold text-zinc-500">Minimum kuantitas partai</p>
                 <p class="mt-1 text-2xl font-black text-zinc-900">
                     {{ $store->partai_minimum_quantity ?? 5 }}
                     <span class="text-sm font-semibold text-zinc-500">per SKU</span>
                 </p>
-                <p class="mt-4 text-[11px] font-semibold tracking-wide text-zinc-400 uppercase">Minimal pembelian</p>
+                <p class="mt-4 text-xs font-semibold text-zinc-500">Minimal pembelian</p>
                 <p class="mt-1 text-2xl font-black text-zinc-900">
                     {{ $store->minimum_order_quantity ?? 1 }}
                     <span class="text-sm font-semibold text-zinc-500">unit per SKU</span>
                 </p>
-                <p class="mt-1.5 text-xs text-zinc-400">Perubahan dicatat ke audit trail.</p>
+                <p class="mt-1.5 text-xs text-zinc-500">Perubahan dicatat ke audit trail.</p>
             </div>
 
             <form method="POST" action="{{ route('admin.settings.store-profile.update') }}" class="mt-5 grid gap-4" x-show="editing" x-cloak>
@@ -476,7 +476,7 @@
                         max="100000"
                         required
                         value="{{ old('partai_minimum_quantity', $store->partai_minimum_quantity ?? 5) }}"
-                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
                 </div>
 
@@ -490,9 +490,9 @@
                         max="100000"
                         required
                         value="{{ old('minimum_order_quantity', $store->minimum_order_quantity ?? 1) }}"
-                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
-                    <p class="mt-1.5 text-xs text-zinc-400">Pelanggan tidak bisa membeli kurang dari jumlah ini per produk. Samakan dengan minimum partai agar harga eceran tidak pernah dipakai. Perubahan dicatat ke audit trail.</p>
+                    <p class="mt-1.5 text-xs text-zinc-500">Pelanggan tidak bisa membeli kurang dari jumlah ini per produk. Samakan dengan minimum partai agar harga eceran tidak pernah dipakai. Perubahan dicatat ke audit trail.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 border-t border-neutral-100 pt-4">
@@ -504,9 +504,9 @@
             </form>
 
             <div class="mt-6 border-t border-neutral-100 pt-4">
-                <h3 class="mb-3 text-xs font-bold tracking-wide text-zinc-500 uppercase">Audit Trail</h3>
+                <h3 class="mb-3 text-xs font-bold text-zinc-500">Audit Trail</h3>
                 @if ($auditTrail->isEmpty())
-                    <p class="text-sm text-zinc-400">Belum ada perubahan tercatat.</p>
+                    <p class="text-sm text-zinc-500">Belum ada perubahan tercatat.</p>
                 @else
                     <ol class="space-y-3">
                         @foreach ($auditTrail as $log)
@@ -525,7 +525,7 @@
                                             ke <span class="font-bold">{{ data_get($log->new_values, $field) }}</span>
                                         </p>
                                     @endforeach
-                                    <p class="text-xs text-zinc-400">
+                                    <p class="text-xs text-zinc-500">
                                         {{ $log->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }}
                                         @if ($log->actor_user_id)
                                             · oleh {{ \App\Models\User::query()->whereKey($log->actor_user_id)->value('name') ?? 'Admin' }}
@@ -557,27 +557,27 @@
                     <table class="w-full text-left text-sm">
                         <thead>
                             <tr class="border-b border-neutral-100">
-                                <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kecamatan</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kode Pos</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tarif</th>
-                                <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Estimasi</th>
-                                <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Aksi</th>
+                                <th class="w-12 px-5 py-3 text-center text-xs font-semibold text-zinc-500">No</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Kecamatan</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Kode Pos</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Tarif</th>
+                                <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Estimasi</th>
+                                <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-50">
                             @forelse ($courierRates as $rate)
                                 <tr class="transition-colors hover:bg-neutral-50">
-                                    <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $loop->iteration }}</td>
+                                    <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-500">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3.5 font-semibold text-zinc-900">
                                         {{ $rate->area_name }}
                                         <span class="ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold {{ $rate->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-zinc-100 text-zinc-500' }}">
                                             {{ $rate->is_active ? 'Aktif' : 'Nonaktif' }}
                                         </span>
                                     </td>
-                                    <td class="px-5 py-3.5 font-mono text-xs text-zinc-500">{{ $rate->area_code ?: '—' }}</td>
+                                    <td class="px-5 py-3.5 font-mono text-xs text-zinc-500">{{ $rate->area_code ?: '-' }}</td>
                                     <td class="px-5 py-3.5 font-bold text-zinc-800">Rp {{ number_format($rate->rate_amount, 0, ',', '.') }}</td>
-                                    <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $rate->eta_text ?: '—' }}</td>
+                                    <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $rate->eta_text ?: '-' }}</td>
                                     <td class="px-5 py-3.5">
                                         <div class="flex items-center justify-end gap-2" x-data="{ editing: false }">
                                             <button type="button" @click="editing = !editing" class="rounded-xl bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-700 transition hover:bg-zinc-200">
@@ -602,7 +602,7 @@
 
                                             <div x-show="editing" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4 backdrop-blur-sm" @click.self="editing = false" @keydown.escape.window="editing = false">
                                                 <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
-                                                    <h3 class="text-sm font-bold text-zinc-900">Edit Tarif — {{ $rate->area_name }}</h3>
+                                                    <h3 class="text-sm font-bold text-zinc-900">Edit Tarif: {{ $rate->area_name }}</h3>
                                                     <form method="POST" action="{{ route('admin.settings.courier-rates.update', $rate) }}" class="mt-4 grid gap-3" x-data="{ query: '{{ addslashes($rate->area_name) }}', areaName: '{{ addslashes($rate->area_name) }}', areaCode: '{{ addslashes($rate->area_code ?? '') }}', results: [], loading: false, open: false, async search(){ if(this.query.length<2){this.results=[];this.open=false;return;} this.loading=true; this.open=true; try{ const r=await fetch(`/api/areas/search?q=${encodeURIComponent(this.query)}`); this.results=r.ok?await r.json():[] }catch(e){this.results=[]} this.loading=false; }, select(item){ this.areaName=item.district_name||''; this.areaCode=item.postal_code||''; this.query=this.areaName; this.open=false; this.results=[]; } }" @click.away="open=false">
                                                         @csrf
                                                         @method('PATCH')
@@ -610,24 +610,24 @@
                                                         <input type="hidden" name="area_name" :value="areaName">
                                                         <input type="hidden" name="area_code" :value="areaCode">
                                                         <div class="relative">
-                                                            <input type="text" x-model="query" @input.debounce.300ms="areaName=query; search()" @focus="if(query.length>=2) open=true" placeholder="* Kecamatan — ketik & pilih dari Biteship" required maxlength="191" class="w-full rounded-xl border border-neutral-200 pl-3 pr-9 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                                                            <input type="text" x-model="query" @input.debounce.300ms="areaName=query; search()" @focus="if(query.length>=2) open=true" placeholder="* Kecamatan: ketik & pilih dari Biteship" required maxlength="191" class="w-full rounded-xl border border-neutral-200 pl-3 pr-9 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                                                             <div x-show="loading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg></div>
                                                             <div x-show="open && results.length>0" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
                                                                 <template x-for="item in results" :key="item.id">
                                                                     <button type="button" @click="select(item)" class="w-full text-left px-3.5 py-2.5 text-xs hover:bg-amber-50/80 transition border-b border-zinc-50 last:border-0">
                                                                         <p class="font-bold text-zinc-900" x-text="item.label"></p>
                                                                         <p class="text-[11px] text-zinc-500"><span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span> <span x-show="item.postal_code" x-text="'('+item.postal_code+')'"></span></p>
-                                                                        <p class="font-mono text-[10px] text-zinc-400" x-text="item.biteship_area_id||item.id"></p>
+                                                                        <p class="font-mono text-[10px] text-zinc-500" x-text="item.biteship_area_id||item.id"></p>
                                                                     </button>
                                                                 </template>
                                                             </div>
                                                         </div>
                                                         <div class="grid gap-2 sm:grid-cols-2">
                                                             <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs">
-                                                                <span class="text-zinc-500">Kecamatan:</span> <span class="font-semibold text-zinc-900" x-text="areaName||'—'"></span>
+                                                                <span class="text-zinc-500">Kecamatan:</span> <span class="font-semibold text-zinc-900" x-text="areaName|| '-'"></span>
                                                             </div>
                                                             <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-mono">
-                                                                <span class="text-zinc-500">Kode Pos:</span> <span class="text-zinc-700" x-text="areaCode||'—'"></span>
+                                                                <span class="text-zinc-500">Kode Pos:</span> <span class="text-zinc-700" x-text="areaCode|| '-'"></span>
                                                             </div>
                                                         </div>
                                                         <input type="number" name="rate_amount" value="{{ $rate->rate_amount }}" required min="0" step="1" placeholder="Tarif (Rp)" class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
@@ -648,7 +648,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-5 py-10 text-center text-sm text-zinc-400">
+                                    <td colspan="6" class="px-5 py-10 text-center text-sm text-zinc-500">
                                         Belum ada tarif kurir toko.
                                     </td>
                                 </tr>
@@ -667,24 +667,24 @@
                         <input type="hidden" name="area_name" :value="areaName" :required="!areaName">
                         <input type="hidden" name="area_code" :value="areaCode">
                         <div class="relative">
-                            <input type="text" x-model="query" @input.debounce.300ms="areaName=query; search()" @focus="if(query.length>=2) open=true" placeholder="* Kecamatan — ketik & pilih dari Biteship (mis. Coblong)" required maxlength="191" class="w-full rounded-xl border border-neutral-200 pl-3 pr-9 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
+                            <input type="text" x-model="query" @input.debounce.300ms="areaName=query; search()" @focus="if(query.length>=2) open=true" placeholder="* Kecamatan: ketik & pilih dari Biteship (mis. Coblong)" required maxlength="191" class="w-full rounded-xl border border-neutral-200 pl-3 pr-9 py-2.5 text-sm focus:border-brand-yellow focus:outline-none">
                             <div x-show="loading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg></div>
                             <div x-show="open && results.length>0" x-cloak class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
                                 <template x-for="item in results" :key="item.id">
                                     <button type="button" @click="select(item)" class="w-full text-left px-3.5 py-2.5 text-xs hover:bg-amber-50/80 transition border-b border-zinc-50 last:border-0">
                                         <p class="font-bold text-zinc-900" x-text="item.label"></p>
                                         <p class="text-[11px] text-zinc-500"><span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span> <span x-show="item.postal_code" x-text="'('+item.postal_code+')'"></span></p>
-                                        <p class="font-mono text-[10px] text-zinc-400" x-text="item.biteship_area_id||item.id"></p>
+                                        <p class="font-mono text-[10px] text-zinc-500" x-text="item.biteship_area_id||item.id"></p>
                                     </button>
                                 </template>
                             </div>
                         </div>
                         <div class="grid gap-2 sm:grid-cols-2">
                             <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs">
-                                <span class="text-zinc-500">Kecamatan terpilih:</span> <span class="font-semibold text-zinc-900" x-text="areaName||'—'"></span>
+                                <span class="text-zinc-500">Kecamatan terpilih:</span> <span class="font-semibold text-zinc-900" x-text="areaName|| '-'"></span>
                             </div>
                             <div class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-mono">
-                                <span class="text-zinc-500">Kode Pos:</span> <span class="text-zinc-700" x-text="areaCode||'— (opsional)'"></span>
+                                <span class="text-zinc-500">Kode Pos:</span> <span class="text-zinc-700" x-text="areaCode||'- (opsional)'"></span>
                             </div>
                         </div>
                         <div class="grid gap-3 sm:grid-cols-2">

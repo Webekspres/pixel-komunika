@@ -95,7 +95,7 @@
                     </div>
                     <div>
                         <dt class="text-xs font-medium text-zinc-500">Nama Usaha</dt>
-                        <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $customer->business_name ?: '—' }}</dd>
+                        <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $customer->business_name ?: '-' }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-medium text-zinc-500">Email</dt>
@@ -103,11 +103,11 @@
                     </div>
                     <div>
                         <dt class="text-xs font-medium text-zinc-500">Telepon / WhatsApp</dt>
-                        <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $customer->user->phone ?: '—' }}</dd>
+                        <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $customer->user->phone ?: '-' }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-medium text-zinc-500">Nomor Reseller</dt>
-                        <dd class="mt-1 font-mono text-sm font-semibold text-zinc-900">{{ $customer->reseller_account_number ?: '—' }}</dd>
+                        <dd class="mt-1 font-mono text-sm font-semibold text-zinc-900">{{ $customer->reseller_account_number ?: '-' }}</dd>
                     </div>
                 </dl>
             </x-ui.section-card>
@@ -120,7 +120,7 @@
                     </div>
                     <div class="flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-4 py-3">
                         <span class="text-zinc-500">Diverifikasi oleh</span>
-                        <span class="font-semibold text-zinc-900">{{ $customer->reviewer?->name ?: '—' }}</span>
+                        <span class="font-semibold text-zinc-900">{{ $customer->reviewer?->name ?: '-' }}</span>
                     </div>
                     <div class="flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-4 py-3">
                         <span class="text-zinc-500">Waktu verifikasi</span>
@@ -141,7 +141,7 @@
                         <div class="flex items-center gap-2">
                             <p class="text-sm font-bold text-zinc-900">{{ $address->label ?: 'Alamat' }}</p>
                             @if ($address->is_default)
-                                <span class="rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-brand-yellow-dark">Default</span>
+                                <span class="rounded-full bg-brand-yellow/20 px-2 py-0.5 text-[10px] font-bold text-amber-800">Default</span>
                             @endif
                         </div>
                         <p class="mt-1 text-xs text-zinc-600">{{ $address->recipient_name }} · {{ $address->recipient_phone }}</p>
@@ -151,7 +151,7 @@
                         </p>
                     </div>
                 @empty
-                    <p class="text-sm text-zinc-400">Belum ada alamat tersimpan.</p>
+                    <p class="text-sm text-zinc-500">Belum ada alamat tersimpan.</p>
                 @endforelse
             </div>
         </x-ui.section-card>

@@ -466,7 +466,7 @@ Storefront boleh terasa modern, tetapi tetap ringan untuk shared hosting dan SSR
 - **CSS/Tailwind animation**: default pertama
 - **Alpine.js**: untuk toggle state kecil, drawer, modal glue
 - **Livewire**: untuk loading/transition state yang berhubungan dengan request
-- **GSAP**: hanya untuk interaction publik yang benar-benar butuh choreography lebih kaya
+- **GSAP**: tidak dipakai lagi (dihapus Oktober 2026 bersama scroll-reveal storefront; lihat `anti-slop/audit-001`). Tambahkan kembali hanya bila ada interaksi yang benar-benar butuh choreography.
 
 ### Rekomendasi pemakaian
 
@@ -525,7 +525,6 @@ Kondisi target:
 
 3. **Minimalkan JavaScript**
    - Alpine untuk interaction kecil
-   - GSAP hanya di screen publik penting
    - hindari dependency yang menambah runtime global tanpa impact jelas
 
 4. **Route-level thinking**

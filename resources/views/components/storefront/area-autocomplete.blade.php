@@ -126,7 +126,7 @@
         </label>
         
         <div class="relative">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-500">
                 <x-icon name="search" class="size-4" />
             </div>
 
@@ -137,10 +137,10 @@
                 @input.debounce.300ms="searchAreas()"
                 @focus="if(searchQuery.length >= 2) isOpen = true"
                 placeholder="Ketik nama Kecamatan, Kota, atau Kode Pos (misal: Coblong, Bandung)..."
-                class="w-full rounded-xl border border-zinc-200/80 bg-white pl-10 pr-10 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                class="w-full rounded-xl border border-zinc-200/80 bg-white pl-10 pr-10 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
             />
 
-            <div x-show="isLoading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400">
+            <div x-show="isLoading" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-500">
                 <svg class="size-4 animate-spin text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
@@ -186,7 +186,7 @@
                                     <span x-text="item.district_name"></span> • <span x-text="item.city_name"></span> • <span x-text="item.province_name"></span>
                                 </p>
                             </div>
-                            <span class="text-zinc-400 shrink-0">
+                            <span class="text-zinc-500 shrink-0">
                                 <x-icon name="arrow-right" class="size-3.5" />
                             </span>
                         </button>

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? config('app.name', 'Pixel Komunika') }}</title>
-        <meta name="description" content="{{ $metaDescription ?? 'Portal pelanggan terverifikasi Pixel Komunika — aksesoris elektronik, kartu data, dan pulsa.' }}">
+        <meta name="description" content="{{ $metaDescription ?? 'Portal pelanggan terverifikasi Pixel Komunika: aksesoris elektronik, kartu data, dan pulsa.' }}">
         <x-favicon />
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])

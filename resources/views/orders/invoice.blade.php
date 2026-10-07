@@ -30,7 +30,7 @@
             <div class="flex items-center gap-2">
                 <a
                     href="{{ route('orders.invoice.download', $order) }}"
-                    class="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-100 transition"
+                    class="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 text-xs font-bold text-zinc-700 hover:bg-zinc-100 transition"
                 >
                     <x-icon name="document-arrow-down" class="size-4" />
                     <span>Unduh PDF</span>
@@ -38,7 +38,7 @@
                 <button
                     type="button"
                     onclick="window.print()"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-4 py-2 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                    class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-4 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                 >
                     <x-icon name="printer" class="size-4" />
                     <span>Cetak</span>
@@ -76,7 +76,7 @@
             <!-- Customer & Shipping Info -->
             <div class="grid sm:grid-cols-2 gap-6 text-xs">
                 <div>
-                    <p class="font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Ditagihkan Kepada:</p>
+                    <p class="font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Ditagihkan Kepada:</p>
                     <p class="font-bold text-sm text-zinc-900 mt-1">{{ $order->user->name }}</p>
                     <p class="text-zinc-600">{{ $order->user->customerProfile?->business_name ?: 'Pelanggan Toko' }}</p>
                     <p class="text-zinc-600">{{ $order->user->email }} • {{ $order->user->phone ?? '-' }}</p>
@@ -86,7 +86,7 @@
                 </div>
 
                 <div>
-                    <p class="font-bold text-zinc-400 uppercase tracking-wider text-[10px]">Tujuan Pengiriman:</p>
+                    <p class="font-bold text-zinc-500 uppercase tracking-wider text-[10px]">Tujuan Pengiriman:</p>
                     <p class="font-bold text-sm text-zinc-900 mt-1">{{ $order->recipient_name }} ({{ $order->recipient_phone }})</p>
                     <p class="text-zinc-600 mt-0.5 leading-relaxed">
                         {{ $order->shipping_address_line }}<br>

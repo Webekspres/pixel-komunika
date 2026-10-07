@@ -131,3 +131,20 @@ it('renders printable order invoice page for the order owner', function () {
         ->assertSee('FAKTUR PENJUALAN')
         ->assertSee($order->order_number);
 });
+
+it('shows pending customers their review status instead of order links they cannot open', function () {
+    $customerRole = Role::firstOrCreate(['code' => Role::CUSTOMER], ['name' => Role::CUSTOMER]);
+    $customer = User::factory()->create(['role_id' => $customerRole->id]);
+    CustomerProfile::create([
+        'user_id' => $customer->id,
+        'business_name' => 'Toko Menunggu',
+        'verification_status' => CustomerProfile::PENDING,
+    ]);
+
+    $this->actingAs($customer)
+        ->get(route('account.dashboard'))
+        ->assertOk()
+        ->assertSee('Akun sedang ditinjau admin')
+        ->assertDontSee('B2B Verified Portal')
+        ->assertDontSee(route('orders.index', ['status' => 'unpaid']), false);
+});

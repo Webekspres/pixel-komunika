@@ -22,7 +22,7 @@
                             value="{{ old('name', $user->name) }}"
                             placeholder="Nama lengkap Anda"
                             required
-                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                         />
                     </div>
 
@@ -37,7 +37,7 @@
                             value="{{ old('phone', $user->phone) }}"
                             placeholder="08xxxxxxxxxx"
                             required
-                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                         />
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                             type="text"
                             value="{{ old('business_name', $user->customerProfile?->business_name) }}"
                             placeholder="Contoh: Toko Berkah Abadi"
-                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
+                            class="w-full rounded-xl border border-zinc-200/80 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 outline-hidden transition shadow-2xs"
                         />
                     </div>
 
@@ -75,7 +75,7 @@
                 <div class="flex items-center justify-end pt-4 border-t border-zinc-100">
                     <button
                         type="submit"
-                        class="inline-flex items-center gap-1.5 rounded-xl bg-brand-yellow px-5 py-2.5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
+                        class="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-brand-yellow px-5 text-xs sm:text-sm font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs"
                     >
                         Simpan Perubahan
                     </button>

@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? config('app.name', 'Pixel Komunika') }}</title>
-        <meta name="description" content="{{ $metaDescription ?? 'Portal pelanggan terverifikasi Pixel Komunika — aksesoris elektronik, kartu data, dan pulsa.' }}">
+        <meta name="description" content="{{ $metaDescription ?? 'Portal pelanggan terverifikasi Pixel Komunika: aksesoris elektronik, kartu data, dan pulsa.' }}">
         <x-favicon />
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-surface-2 font-sans text-brand-black antialiased">
         <div class="min-h-screen bg-linear-to-b from-brand-yellow-muted/65 via-brand-white to-zinc-50">
-            <header class="sticky top-0 z-30 border-b border-brand-black/8 bg-brand-white/88 backdrop-blur-xl">
+            <header class="sticky top-0 z-30 border-b border-brand-black/8 bg-white">
                 <div class="container-2xl">
                     <div class="flex min-h-[4.5rem] flex-wrap items-center gap-3 py-3">
                         <a href="{{ route('home') }}" class="shrink-0" aria-label="Pixel Komunika beranda">

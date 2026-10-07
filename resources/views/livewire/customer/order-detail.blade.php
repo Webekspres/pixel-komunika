@@ -64,9 +64,9 @@
     x-on:copy-to-clipboard.window="copy($event.detail.text || $event.detail)"
 >
     @if (session()->has('success') && request()->has('from_checkout'))
-        <div class="container-2xl px-4 sm:px-6 lg:px-8 py-4">
+        <div class="container-2xl py-4">
             <div class="flex items-center gap-3 rounded-2xl bg-brand-yellow/10 border border-brand-yellow/30 p-4 text-sm" role="alert">
-                <x-icon name="check-circle" class="size-5 text-brand-yellow shrink-0" />
+                <x-icon name="check-circle" class="size-5 text-amber-800 shrink-0" />
                 <div>
                     <p class="font-semibold text-brand-black">Pesanan berhasil dibuat!</p>
                     <p class="text-brand-black/70">Silakan selesaikan pembayaran sebelum batas waktu berakhir.</p>
@@ -75,22 +75,22 @@
         </div>
     @endif
 
-    <div class="container-2xl w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div class="container-2xl py-6">
         <div class="mb-6 sm:mb-8">
             <x-ui.page-header
                 :back-href="route('orders.index')"
                 :back-label="__('Kembali ke Pesanan Saya')"
-                eyebrow="Pesanan #{{ $order->order_number }}"
-                title="Detail Pesanan"
+                eyebrow="Detail pesanan"
+                :title="'#'.$order->order_number"
                 description="{{ $order->created_at->format('d M Y') }} • Batas bayar: {{ $order->expires_at ? $order->expires_at->format('d M Y H:i') : '-' }}"
             >
                 @if ($order->invoice)
                     <x-slot:actions>
-                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
+                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex min-h-11 items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50">
                             <x-icon name="file-text" class="size-4" />
                             Lihat Invoice
                         </a>
-                        <a href="{{ route('orders.invoice.download', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
+                        <a href="{{ route('orders.invoice.download', $order) }}" class="inline-flex min-h-11 items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50">
                             <x-icon name="download" class="size-4" />
                             Unduh Invoice (PDF)
                         </a>
@@ -118,7 +118,7 @@
                             <div class="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300
                                 {{ $isDoneOrCurrent
                                     ? 'bg-brand-yellow border-brand-yellow text-brand-black shadow-xs'
-                                    : ($isCancelledStep ? 'bg-rose-100 border-rose-300 text-rose-600' : 'bg-zinc-100 border-zinc-200 text-zinc-400') }}
+                                    : ($isCancelledStep ? 'bg-rose-100 border-rose-300 text-rose-600' : 'bg-zinc-100 border-zinc-200 text-zinc-500') }}
                             ">
                                 @if ($isCompleted)
                                     <x-icon name="check" class="size-4 stroke-[3]" />
@@ -144,13 +144,13 @@
 
                                 @if ($stepKey === 'shipped' && $order->shipment && $order->shipment->tracking_number)
                                     <div class="mt-2 flex flex-wrap items-center gap-2">
-                                        <x-icon name="truck" class="size-4 text-zinc-400" />
+                                        <x-icon name="truck" class="size-4 text-zinc-500" />
                                         <span class="font-mono text-xs font-semibold text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded-md">{{ $order->shipment->tracking_number }}</span>
                                         @if ($order->shipment->courier_code)
                                             <a href="{{ $order->shipment->courier_code === 'jne' ? 'https://www.jne.co.id/id/tracking/trace?awb=' . $order->shipment->tracking_number : ($order->shipment->courier_code === 'jnt' ? 'https://www.jtexpress.co.id/tracking/' . $order->shipment->tracking_number : '#') }}"
                                                target="_blank"
                                                rel="noopener noreferrer"
-                                               class="text-xs font-semibold text-brand-yellow-dark hover:underline inline-flex items-center gap-1">
+                                               class="text-xs font-semibold text-amber-800 hover:underline inline-flex items-center gap-1">
                                                 Lacak Kiriman
                                                 <x-icon name="external-link" class="size-3" />
                                             </a>
@@ -220,7 +220,7 @@
                                     @if ($item->price_type)
                                         <span class="inline-flex items-center rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 uppercase">{{ $item->price_type }}</span>
                                     @endif
-                                    <span class="text-zinc-400">•</span>
+                                    <span class="text-zinc-500">•</span>
                                     <span>{{ $item->quantity }} × Rp {{ number_format($item->unit_price, 0, ',', '.') }}</span>
                                 </div>
                             </div>
@@ -267,18 +267,18 @@
             <x-ui.section-card title="Informasi Pengiriman & Penerima">
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Penerima</p>
+                        <p class="text-xs font-semibold text-zinc-500">Penerima</p>
                         <p class="mt-1 font-semibold text-zinc-900">{{ $order->recipient_name }}</p>
                         <p class="mt-0.5 text-sm text-zinc-600">{{ $order->recipient_phone }}</p>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Alamat Lengkap</p>
+                        <p class="text-xs font-semibold text-zinc-500">Alamat Lengkap</p>
                         <p class="mt-1 text-sm text-zinc-700 whitespace-pre-line leading-relaxed">{{ $order->shipping_address_line }}, {{ $order->shipping_district }}, {{ $order->shipping_city }}, {{ $order->shipping_province }} {{ $order->shipping_postal_code }}</p>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Ekspedisi & Layanan</p>
+                        <p class="text-xs font-semibold text-zinc-500">Ekspedisi & Layanan</p>
                         <div class="mt-1 flex items-center gap-3">
                             <span class="inline-flex items-center rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm font-semibold text-zinc-800">
                                 {{ strtoupper($order->courier_code ?? '-') }} - {{ $order->courier_service ?? '-' }}
@@ -311,7 +311,7 @@
 
                     <!-- Nominal Tagihan -->
                     <div class="rounded-2xl bg-brand-yellow/5 border border-brand-yellow/30 p-4 shadow-2xs">
-                        <p class="text-xs font-semibold text-brand-black/60 uppercase tracking-wide">Nominal Tagihan</p>
+                        <p class="text-xs font-semibold text-brand-black/60">Nominal Tagihan</p>
                         <div class="mt-2 flex items-center justify-between gap-3">
                             <span class="text-2xl font-black text-brand-black" id="total-amount-display">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
                             <flux:button
@@ -327,15 +327,15 @@
                                 Salin
                             </flux:button>
                         </div>
-                        <p class="mt-2 text-xs text-brand-black/50">Nominal sudah termasuk PPh 22 & ongkir</p>
+                        <p class="mt-2 text-xs text-brand-black/70">Nominal sudah termasuk PPh 22 & ongkir</p>
                     </div>
 
                     <!-- 2. Rekening Tujuan Toko -->
                     @if ($bankAccounts->isNotEmpty())
                         <div>
                             <div class="flex items-center justify-between mb-3">
-                                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Rekening Tujuan Pembayaran</p>
-                                <span class="text-xs text-zinc-400">Transfer ke salah satu</span>
+                                <p class="text-xs font-semibold text-zinc-500">Rekening Tujuan Pembayaran</p>
+                                <span class="text-xs text-zinc-500">Transfer ke salah satu</span>
                             </div>
 
                             <div class="space-y-2.5">
@@ -385,7 +385,7 @@
 
                     <!-- 1. Form Upload Bukti Bayar (Custom Dropzone) -->
                     <div class="space-y-4">
-                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Upload Bukti Pembayaran</p>
+                        <p class="text-xs font-semibold text-zinc-500">Upload Bukti Pembayaran</p>
 
                         @if (session()->has('success'))
                             <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-800 flex items-center gap-2">
@@ -413,7 +413,7 @@
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label>File Bukti Pembayaran <span class="text-red-500">*</span></flux:label>
                                     @if ($proof_file)
-                                        <label for="proof_file_input" class="text-xs font-semibold text-brand-yellow-dark hover:underline cursor-pointer">
+                                        <label for="proof_file_input" class="text-xs font-semibold text-amber-800 hover:underline cursor-pointer">
                                             Ganti File
                                         </label>
                                     @endif
@@ -449,7 +449,7 @@
                                                     <img src="{{ $proofPreviewUrl }}" alt="Preview bukti pembayaran" class="size-full object-cover" />
                                                 </div>
                                             @else
-                                                <div class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-yellow/10 border border-brand-yellow/30 text-brand-yellow-dark">
+                                                <div class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-yellow/10 border border-brand-yellow/30 text-amber-800">
                                                     <x-icon name="image" class="size-7" />
                                                 </div>
                                             @endif
@@ -470,7 +470,7 @@
                                             <button
                                                 type="button"
                                                 wire:click="$set('proof_file', null)"
-                                                class="flex size-8 shrink-0 items-center justify-center rounded-xl text-zinc-400 hover:bg-red-50 hover:text-red-600 transition"
+                                                class="flex size-11 shrink-0 items-center justify-center rounded-xl text-zinc-500 hover:bg-red-50 hover:text-red-600 transition"
                                                 title="Hapus file terpilih"
                                                 aria-label="Hapus file"
                                             >
@@ -490,13 +490,13 @@
                                             class="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition cursor-pointer"
                                         >
                                             <div wire:loading.remove wire:target="proof_file" class="flex flex-col items-center">
-                                                <div class="flex size-12 items-center justify-center rounded-2xl bg-white border border-zinc-200/80 shadow-2xs text-zinc-500 group-hover:text-brand-yellow-dark group-hover:border-brand-yellow/40 transition">
+                                                <div class="flex size-12 items-center justify-center rounded-2xl bg-white border border-zinc-200/80 shadow-2xs text-zinc-500 group-hover:text-amber-800 group-hover:border-brand-yellow/40 transition">
                                                     <x-icon name="upload" class="size-6" />
                                                 </div>
                                                 <p class="mt-3 text-sm font-semibold text-zinc-800 group-hover:text-zinc-900">
                                                     Klik atau seret file bukti transfer ke sini
                                                 </p>
-                                                <p class="mt-1 text-xs text-zinc-400">
+                                                <p class="mt-1 text-xs text-zinc-500">
                                                     JPG, PNG, PDF maks 5MB
                                                 </p>
                                             </div>
@@ -540,7 +540,7 @@
                 @elseif ($isPaidOrLater)
                     <!-- Ringkasan Pembayaran Terverifikasi -->
                     <div>
-                        <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">Pembayaran Terverifikasi</p>
+                        <p class="text-xs font-semibold text-zinc-500 mb-3">Pembayaran Terverifikasi</p>
 
                         @if ($latestProof && $latestProof->status === 'approved')
                             <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 shadow-2xs">
@@ -569,7 +569,7 @@
                             </div>
                         @else
                             <div class="rounded-2xl bg-zinc-50 border border-zinc-200 p-4 text-center">
-                                <x-icon name="info" class="size-8 mx-auto text-zinc-400" />
+                                <x-icon name="info" class="size-8 mx-auto text-zinc-500" />
                                 <p class="mt-2 text-sm text-zinc-600">Informasi pembayaran akan muncul setelah diverifikasi admin.</p>
                             </div>
                         @endif

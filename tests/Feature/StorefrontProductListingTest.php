@@ -80,7 +80,8 @@ it('renders product detail page', function () {
         ->assertSee('Harga tersembunyi')
         ->assertSee('Deskripsi')
         ->assertSee('Spesifikasi')
-        ->assertSee('Produk Original');
+        ->assertSee('Kurir toko H+1')
+        ->assertDontSee('Produk Original');
 });
 
 it('shows wholesale prices on PDP to active verified customer', function () {

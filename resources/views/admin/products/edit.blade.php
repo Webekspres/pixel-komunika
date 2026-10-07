@@ -32,7 +32,7 @@
                 <div class="rounded-2xl border border-neutral-100 bg-white p-5 sm:p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <h2 class="text-sm font-bold text-zinc-900">Data POS (read-only)</h2>
-                        <span class="rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-bold tracking-wide text-zinc-500 uppercase">Sumber: POS</span>
+                        <span class="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-bold text-zinc-500">Sumber: POS</span>
                     </div>
 
                     <dl class="grid gap-4 sm:grid-cols-2">
@@ -42,11 +42,11 @@
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-zinc-500">Kategori</dt>
-                            <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $product->category?->name ?? '—' }}</dd>
+                            <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $product->category?->name ?? '-' }}</dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-zinc-500">Brand</dt>
-                            <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $product->brand?->name ?? '—' }}</dd>
+                            <dd class="mt-1 text-sm font-semibold text-zinc-900">{{ $product->brand?->name ?? '-' }}</dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-zinc-500">Stok tersedia</dt>
@@ -69,11 +69,11 @@
                         <div class="space-y-2">
                             @foreach ($product->prices as $price)
                                 <div class="flex items-center justify-between rounded-xl bg-neutral-50 px-4 py-2.5 text-sm">
-                                    <span class="text-xs font-bold tracking-wide text-zinc-500 uppercase">{{ $price->price_type }}</span>
+                                    <span class="text-xs font-bold text-zinc-500">{{ $price->price_type }}</span>
                                     <span class="font-semibold text-zinc-900">
                                         Rp {{ number_format($price->amount, 0, ',', '.') }}
                                         @if ($price->minimum_quantity)
-                                            <span class="text-xs text-zinc-400">· min {{ $price->minimum_quantity }}</span>
+                                            <span class="text-xs text-zinc-500">· min {{ $price->minimum_quantity }}</span>
                                         @endif
                                     </span>
                                 </div>
@@ -97,7 +97,7 @@
                                 type="text"
                                 value="{{ old('display_name', $product->enrichment?->display_name) }}"
                                 placeholder="{{ $product->name }}"
-                                class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                             >
                         </div>
 
@@ -113,7 +113,7 @@
                                     placeholder="otomatis dari nama tampilan"
                                     class="w-full cursor-not-allowed rounded-xl border border-neutral-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500 focus:outline-none"
                                 >
-                                <p class="mt-1 text-xs text-zinc-400">Diisi otomatis dari nama tampilan + ID produk saat pertama disimpan.</p>
+                                <p class="mt-1 text-xs text-zinc-500">Diisi otomatis dari nama tampilan + ID produk saat pertama disimpan.</p>
                             </div>
                             <div>
                                 <label for="label" class="mb-1.5 block text-xs font-semibold text-zinc-700">Label</label>
@@ -123,7 +123,7 @@
                                     type="text"
                                     value="{{ old('label', $product->enrichment?->label) }}"
                                     placeholder="mis. Best Seller"
-                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                                 >
                             </div>
                         </div>
@@ -135,7 +135,7 @@
                                 name="short_description"
                                 rows="2"
                                 maxlength="500"
-                                class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                             >{{ old('short_description', $product->enrichment?->short_description) }}</textarea>
                         </div>
 
@@ -145,7 +145,7 @@
                                 id="description"
                                 name="description"
                                 rows="5"
-                                class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                             >{{ old('description', $product->enrichment?->description) }}</textarea>
                         </div>
 
@@ -158,7 +158,7 @@
                                     type="text"
                                     maxlength="191"
                                     value="{{ old('seo_title', $product->enrichment?->seo_title) }}"
-                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                                 >
                             </div>
                             <div>
@@ -169,7 +169,7 @@
                                     type="number"
                                     min="0"
                                     value="{{ old('display_order', $product->enrichment?->display_order ?? 0) }}"
-                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                    class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                                 >
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                                         min="1"
                                         @required($field === 'weight_grams')
                                         value="{{ old($field, $product->{$field}) }}"
-                                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                                     >
                                 </div>
                             @endforeach
@@ -199,7 +199,7 @@
                                 name="seo_description"
                                 rows="2"
                                 maxlength="320"
-                                class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                class="w-full rounded-xl border border-neutral-200 p-3 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                             >{{ old('seo_description', $product->enrichment?->seo_description) }}</textarea>
                         </div>
 
@@ -212,7 +212,7 @@
                                     class="rounded border-zinc-300"
                                     @checked(old('is_visible', $product->enrichment?->is_visible ?? true))
                                 >
-                                <x-icon name="{{ ($product->enrichment?->is_visible ?? true) ? 'eye' : 'eye-off' }}" class="size-4 text-zinc-400" />
+                                <x-icon name="{{ ($product->enrichment?->is_visible ?? true) ? 'eye' : 'eye-off' }}" class="size-4 text-zinc-500" />
                                 Tampilkan di storefront
                             </label>
 

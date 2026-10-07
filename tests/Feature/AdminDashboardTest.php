@@ -63,7 +63,7 @@ it('shows figma-style admin dashboard with live aggregates for admins', function
         ->assertSee('Pesanan Hari Ini')
         ->assertSee('Pembayaran Pending')
         ->assertSee('Pelanggan Aktif')
-        ->assertSee('Total Omzet')
+        ->assertSee('Total omzet (semua waktu)')
         ->assertSee('Pesanan Terbaru')
         ->assertSee('PK-TEST-DASH-001')
         ->assertSee('Verifikasi Pelanggan')
@@ -93,7 +93,7 @@ it('renders customer list tabs without inline approval forms', function () {
         ->assertSee('Pelanggan')
         ->assertSee('Menunggu')
         ->assertSee('Rina Tabs')
-        ->assertSee('Detail')
+        ->assertSee('Tinjau')
         ->assertDontSee('name="action"');
 });
 

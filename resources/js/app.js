@@ -1,22 +1,203 @@
-import * as lucide from 'lucide';
-import { destroyStorefrontMotion, initStorefrontMotion } from './storefront-motion';
+import {
+    createIcons,
+    AlertCircle,
+    ArrowLeft,
+    ArrowRight,
+    Award,
+    Badge,
+    BadgeCheck,
+    BadgePercent,
+    BarChart3,
+    Bell,
+    BellOff,
+    Bike,
+    Boxes,
+    Calculator,
+    Calendar,
+    Check,
+    CheckCircle,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    CircleAlert,
+    CircleCheck,
+    ClipboardList,
+    Clock,
+    Code,
+    Copy,
+    CreditCard,
+    Currency,
+    Database,
+    Download,
+    Ellipsis,
+    ExternalLink,
+    Eye,
+    EyeOff,
+    File,
+    FileText,
+    Ghost,
+    Group,
+    History,
+    Home,
+    Image,
+    Inbox,
+    Info,
+    Key,
+    Landmark,
+    LayoutDashboard,
+    LayoutGrid,
+    Library,
+    Link,
+    Lock,
+    LogOut,
+    Logs,
+    Mail,
+    MapPin,
+    Menu,
+    MessageCircle,
+    Minus,
+    Package,
+    PackageSearch,
+    Pencil,
+    Percent,
+    Phone,
+    Plus,
+    Printer,
+    Radio,
+    Receipt,
+    RefreshCw,
+    RotateCcw,
+    ScrollText,
+    Search,
+    Settings,
+    Shield,
+    ShieldCheck,
+    ShoppingBag,
+    ShoppingCart,
+    SlidersHorizontal,
+    Star,
+    Store,
+    Summary,
+    Tag,
+    Target,
+    Trash2,
+    TrendingDown,
+    TrendingUp,
+    TriangleAlert,
+    Truck,
+    Type,
+    Undo2,
+    Upload,
+    User,
+    UserCheck,
+    Users,
+    Wallet,
+    Weight,
+    X,
+    XCircle,
+} from 'lucide';
 
-const { createIcons, icons: lucideIcons } = lucide;
-
-// lucide@1.x: named exports are iconNode arrays; prefer the icons namespace.
-const icons =
-    lucideIcons && Object.keys(lucideIcons).length > 0
-        ? lucideIcons
-        : Object.fromEntries(
-              Object.entries(lucide).filter(
-                  ([key, value]) =>
-                      typeof value !== 'function' &&
-                      key !== 'icons' &&
-                      Array.isArray(value) &&
-                      value.length > 0 &&
-                      Array.isArray(value[0]),
-              ),
-          );
+// ponytail: daftar statis agar bundle tidak memuat ~1.700 ikon. Ikon baru yang belum
+// didaftarkan di sini tampil sebagai circle-alert dan memunculkan warning di console.
+const icons = {
+    AlertCircle,
+    ArrowLeft,
+    ArrowRight,
+    Award,
+    Badge,
+    BadgeCheck,
+    BadgePercent,
+    BarChart3,
+    Bell,
+    BellOff,
+    Bike,
+    Boxes,
+    Calculator,
+    Calendar,
+    Check,
+    CheckCircle,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    CircleAlert,
+    CircleCheck,
+    ClipboardList,
+    Clock,
+    Code,
+    Copy,
+    CreditCard,
+    Currency,
+    Database,
+    Download,
+    Ellipsis,
+    ExternalLink,
+    Eye,
+    EyeOff,
+    File,
+    FileText,
+    Ghost,
+    Group,
+    History,
+    Home,
+    Image,
+    Inbox,
+    Info,
+    Key,
+    Landmark,
+    LayoutDashboard,
+    LayoutGrid,
+    Library,
+    Link,
+    Lock,
+    LogOut,
+    Logs,
+    Mail,
+    MapPin,
+    Menu,
+    MessageCircle,
+    Minus,
+    Package,
+    PackageSearch,
+    Pencil,
+    Percent,
+    Phone,
+    Plus,
+    Printer,
+    Radio,
+    Receipt,
+    RefreshCw,
+    RotateCcw,
+    ScrollText,
+    Search,
+    Settings,
+    Shield,
+    ShieldCheck,
+    ShoppingBag,
+    ShoppingCart,
+    SlidersHorizontal,
+    Star,
+    Store,
+    Summary,
+    Tag,
+    Target,
+    Trash2,
+    TrendingDown,
+    TrendingUp,
+    TriangleAlert,
+    Truck,
+    Type,
+    Undo2,
+    Upload,
+    User,
+    UserCheck,
+    Users,
+    Wallet,
+    Weight,
+    X,
+    XCircle,
+};
 
 const fallbackIconName = 'circle-alert';
 
@@ -30,9 +211,8 @@ function toExportName(name) {
 function refreshIcons() {
     document.querySelectorAll('[data-lucide]').forEach((element) => {
         const iconName = element.getAttribute('data-lucide');
-        const exportName = toExportName(iconName ?? '');
 
-        if (!icons[exportName]) {
+        if (!icons[toExportName(iconName ?? '')]) {
             console.warn(`[lucide] Missing icon "${iconName}", falling back to "${fallbackIconName}".`);
             element.setAttribute('data-lucide', fallbackIconName);
         }
@@ -41,29 +221,12 @@ function refreshIcons() {
     createIcons({ icons });
 }
 
-function bootUi(root = document) {
-    refreshIcons();
-    destroyStorefrontMotion();
-    // After full remount (navigate), clear done flags so motion can re-run.
-    if (root === document || root === document.documentElement || root === document.body) {
-        document.querySelectorAll('[data-reveal-done], [data-hero-done]').forEach((el) => {
-            el.removeAttribute('data-reveal-done');
-            el.removeAttribute('data-hero-done');
-        });
-    }
-    initStorefrontMotion(root);
-}
-
-document.addEventListener('DOMContentLoaded', () => bootUi());
-document.addEventListener('livewire:navigated', () => bootUi());
+document.addEventListener('DOMContentLoaded', refreshIcons);
+document.addEventListener('livewire:navigated', refreshIcons);
 document.addEventListener('livewire:init', () => {
     Livewire.hook('morph.updated', ({ el }) => {
-        if (el?.querySelector?.('[data-lucide], [data-lucide] *') || el?.hasAttribute?.('data-lucide')) {
+        if (el?.querySelector?.('[data-lucide]') || el?.hasAttribute?.('data-lucide')) {
             refreshIcons();
-        }
-        if (el?.querySelector?.('[data-reveal], [data-hero-animate]') || el?.hasAttribute?.('data-reveal') || el?.hasAttribute?.('data-hero-animate')) {
-            // Morph only: init new nodes without killing existing scroll triggers.
-            initStorefrontMotion(el);
         }
     });
 });

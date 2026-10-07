@@ -18,7 +18,7 @@
 
 <div {{ $attributes->class($wrapClass) }}>
     @if ($eyebrow)
-        <p class="mb-3 inline-flex items-center gap-2 text-sm font-semibold tracking-widest text-brand-black/50 uppercase">
+        <p class="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-black/70">
             <span class="inline-block h-px w-6 bg-brand-yellow"></span>
             {{ $eyebrow }}
         </p>

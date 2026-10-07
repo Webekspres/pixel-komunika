@@ -85,21 +85,21 @@
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b border-neutral-100">
-                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">No. Order</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tgl Kirim</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Pelanggan</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kecamatan</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Subtotal</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Ongkir</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">PPh 22</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Total</th>
+                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold text-zinc-500">No</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">No. Order</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Tgl Kirim</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Pelanggan</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Kecamatan</th>
+                            <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">Subtotal</th>
+                            <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">Ongkir</th>
+                            <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">PPh 22</th>
+                            <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">Total</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-50">
                         @forelse ($transactions as $order)
                             <tr class="transition-colors hover:bg-neutral-50">
-                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $transactions->firstItem() + $loop->index }}</td>
+                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-500">{{ $transactions->firstItem() + $loop->index }}</td>
                                 <td class="px-5 py-3.5">
                                     <a href="{{ route('admin.orders.show', $order) }}" wire:navigate class="font-bold text-zinc-900 hover:underline">
                                         {{ $order->order_number }}
@@ -109,7 +109,7 @@
                                     {{ ($order->shipment?->shipped_at ?? $order->created_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}
                                 </td>
                                 <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->recipient_name }}</td>
-                                <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->shipping_district ?: '—' }}</td>
+                                <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $order->shipping_district ?: '-' }}</td>
                                 <td class="px-5 py-3.5 text-right text-xs text-zinc-600">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</td>
                                 <td class="px-5 py-3.5 text-right text-xs text-zinc-600">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</td>
                                 <td class="px-5 py-3.5 text-right text-xs text-zinc-600">Rp {{ number_format($order->tax_pph22, 0, ',', '.') }}</td>
@@ -117,7 +117,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-5 py-10 text-center text-sm text-zinc-400">
+                                <td colspan="9" class="px-5 py-10 text-center text-sm text-zinc-500">
                                     Tidak ada transaksi pada periode ini.
                                 </td>
                             </tr>
@@ -126,7 +126,7 @@
                     @if ($transactions->isNotEmpty())
                         <tfoot>
                             <tr class="border-t border-neutral-100 bg-neutral-50/70">
-                                <td colspan="7" class="px-5 py-3.5 text-right text-xs font-bold tracking-wide text-zinc-500 uppercase">Total periode (semua halaman)</td>
+                                <td colspan="7" class="px-5 py-3.5 text-right text-xs font-bold text-zinc-500">Total periode (semua halaman)</td>
                                 <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-800">Rp {{ number_format($pph22, 0, ',', '.') }}</td>
                                 {{-- Kolom ini = grand total (omzet + PPh 22), sama seperti baris di atasnya. --}}
                                 <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-900">

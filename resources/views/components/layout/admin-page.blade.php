@@ -7,7 +7,6 @@
 
 <x-layout.app-page>
     <x-ui.page-header
-        eyebrow="Admin"
         :title="$title"
         :description="$description"
         variant="admin"

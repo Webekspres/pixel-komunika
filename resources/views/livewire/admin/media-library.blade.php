@@ -32,12 +32,12 @@
     <div class="rounded-2xl border border-neutral-100 bg-white">
         <div class="flex flex-col gap-3 border-b border-neutral-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="relative w-full sm:max-w-sm">
-                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
                 <input
                     type="search"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Cari nama file..."
-                    class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                    class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                 >
             </div>
             <span class="text-xs text-zinc-500">
@@ -51,7 +51,7 @@
                     <x-icon name="image" class="size-6 text-zinc-300" />
                 </div>
                 <p class="text-sm font-semibold text-zinc-700">Belum ada media</p>
-                <p class="mt-1 text-xs text-zinc-400">Unggah gambar pertama untuk mulai membangun perpustakaan media.</p>
+                <p class="mt-1 text-xs text-zinc-500">Unggah gambar pertama untuk mulai membangun perpustakaan media.</p>
             </div>
         @else
             <div class="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
@@ -83,7 +83,7 @@
                             @if ($item->product_usages_count === 0)
                                 <x-ui.confirm-dialog title="Hapus media" description="Media {{ $item->original_name ?? $item->path }} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan." confirm-variant="danger">
                                     <x-slot:trigger>
-                                        <button type="button" class="rounded-lg p-1 text-zinc-400 transition hover:bg-red-50 hover:text-red-600" title="Hapus media">
+                                        <button type="button" class="rounded-lg p-1 text-zinc-500 transition hover:bg-red-50 hover:text-red-600" title="Hapus media">
                                             <x-icon name="trash-2" class="size-3.5" />
                                         </button>
                                     </x-slot:trigger>
@@ -94,7 +94,7 @@
                                     </x-slot:confirm>
                                 </x-ui.confirm-dialog>
                             @else
-                                <span class="rounded-lg p-1 text-zinc-300" title="Media dipakai produk — hapus setelah tidak digunakan">
+                                <span class="rounded-lg p-1 text-zinc-300" title="Media dipakai produk. Hapus setelah tidak digunakan">
                                     <x-icon name="lock" class="size-3.5" />
                                 </span>
                             @endif
@@ -118,7 +118,7 @@
             <div class="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div class="flex items-center justify-between border-b border-neutral-100 px-5 py-3">
                     <h3 class="truncate text-sm font-bold text-zinc-900">{{ $preview->original_name }}</h3>
-                    <button type="button" wire:click="$set('previewId', null)" class="rounded-lg p-1 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700">
+                    <button type="button" wire:click="$set('previewId', null)" class="rounded-lg p-1 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-700">
                         <x-icon name="x" class="size-4.5" />
                     </button>
                 </div>
@@ -133,7 +133,7 @@
                     <div>
                         <dt class="font-semibold text-zinc-500">Dimensi</dt>
                         <dd class="mt-0.5 text-zinc-800">
-                            {{ $preview->width ? $preview->width.' × '.$preview->height.' px' : '—' }}
+                            {{ $preview->width ? $preview->width.' × '.$preview->height.' px' : '-' }}
                         </dd>
                     </div>
                     <div>

@@ -1,64 +1,95 @@
 <x-layouts.customer :title="'Ringkasan Akun - Pixel Komunika'">
-    <!-- 1. Stat Cards Berorientasi Transaksi (4 Kolom Grid) -->
+    @php
+        $status = $user->customerStatus();
+        $isActive = $user->isActiveCustomer();
+    @endphp
+
+    @unless ($isActive)
+        {{-- Non-active accounts cannot open orders or checkout; tell them where they stand instead. --}}
+        <section class="rounded-2xl border border-amber-300 bg-amber-50 p-5 sm:p-6" aria-labelledby="account-status-title">
+            <h2 id="account-status-title" class="text-base font-bold text-zinc-900">
+                @switch($status)
+                    @case(\App\Models\CustomerProfile::REJECTED) Pendaftaran akun belum disetujui @break
+                    @case(\App\Models\CustomerProfile::SUSPENDED) Akun sedang ditangguhkan @break
+                    @default Akun sedang ditinjau admin
+                @endswitch
+            </h2>
+            <p class="mt-1 max-w-2xl text-sm leading-relaxed text-zinc-700">
+                @if ($status === \App\Models\CustomerProfile::PENDING || ! $status)
+                    Harga, checkout, dan riwayat pesanan terbuka setelah admin menyetujui akun ini. Pastikan profil usaha sudah lengkap agar peninjauan tidak tertunda.
+                @else
+                    Harga, checkout, dan riwayat pesanan tidak tersedia untuk akun ini. Hubungi admin untuk informasi lebih lanjut.
+                @endif
+            </p>
+            @if (in_array($status, [\App\Models\CustomerProfile::REJECTED, \App\Models\CustomerProfile::SUSPENDED], true) && $user->customerProfile?->rejection_reason)
+                <p class="mt-2 text-sm text-zinc-700"><span class="font-semibold">Catatan admin:</span> {{ $user->customerProfile->rejection_reason }}</p>
+            @endif
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{{ route('account.profile') }}" class="inline-flex min-h-11 items-center rounded-xl bg-brand-black px-4 text-xs font-bold text-white hover:bg-brand-black/85">
+                    Periksa Profil Usaha
+                </a>
+                <a href="https://wa.me/6281546407702" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 text-xs font-bold text-zinc-800 hover:bg-zinc-50">
+                    <x-icon name="message-circle" class="size-4" />
+                    Hubungi admin via WhatsApp
+                </a>
+            </div>
+        </section>
+    @else
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <!-- 1. Menunggu Pembayaran -->
-        <a href="{{ route('orders.index', ['status' => 'unpaid']) }}" class="group block rounded-2xl border p-5 transition-all duration-200 shadow-2xs hover:shadow-xs {{ $waitingPaymentCount > 0 ? 'bg-amber-50/70 border-amber-200 hover:border-amber-300' : 'bg-white border-zinc-200/80 hover:border-zinc-300' }}">
+        <a href="{{ route('orders.index', ['status' => 'unpaid']) }}" class="group block rounded-2xl border p-5 transition-colors {{ $needsUploadCount > 0 ? 'border-amber-300 bg-amber-50 hover:border-amber-400' : 'border-zinc-200/80 bg-white hover:border-zinc-300' }}">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Menunggu Pembayaran</span>
-                <div class="flex size-9 items-center justify-center rounded-xl {{ $waitingPaymentCount > 0 ? 'bg-amber-100 text-amber-800' : 'bg-zinc-100 text-zinc-500' }}">
-                    <x-icon name="credit-card" class="size-4.5" />
-                </div>
+                <span class="text-sm font-semibold text-zinc-700">Menunggu Pembayaran</span>
+                <x-icon name="credit-card" class="size-5 {{ $needsUploadCount > 0 ? 'text-amber-800' : 'text-zinc-500' }}" />
             </div>
             <p class="mt-3 text-2xl font-black text-zinc-900">{{ $waitingPaymentCount }}</p>
-            <p class="mt-1 text-xs font-medium {{ $waitingPaymentCount > 0 ? 'text-amber-800 font-semibold' : 'text-zinc-500' }}">
-                {{ $waitingPaymentCount > 0 ? 'Perlu unggah bukti bayar' : 'Tidak ada tagihan aktif' }}
+            <p class="mt-1 text-xs font-medium {{ $needsUploadCount > 0 ? 'font-semibold text-amber-800' : 'text-zinc-600' }}">
+                @if ($needsUploadCount > 0)
+                    {{ $needsUploadCount }} perlu unggah bukti bayar
+                @elseif ($waitingPaymentCount > 0)
+                    Bukti terkirim, menunggu verifikasi admin
+                @else
+                    Tidak ada tagihan aktif
+                @endif
             </p>
         </a>
 
-        <!-- 2. Sedang Diproses -->
-        <a href="{{ route('orders.index', ['status' => 'processing']) }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-all duration-200 shadow-2xs hover:border-zinc-300 hover:shadow-xs">
+        <a href="{{ route('orders.index', ['status' => 'processing']) }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-colors hover:border-zinc-300">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Pesanan Diproses</span>
-                <div class="flex size-9 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
-                    <x-icon name="package" class="size-4.5" />
-                </div>
+                <span class="text-sm font-semibold text-zinc-700">Pesanan Diproses</span>
+                <x-icon name="package" class="size-5 text-zinc-500" />
             </div>
             <p class="mt-3 text-2xl font-black text-zinc-900">{{ $processingCount }}</p>
-            <p class="mt-1 text-xs font-medium text-zinc-500">Dalam penyiapan toko</p>
+            <p class="mt-1 text-xs font-medium text-zinc-600">Dalam penyiapan toko</p>
         </a>
 
-        <!-- 3. Sedang Dikirim -->
-        <a href="{{ route('orders.index', ['status' => 'shipped']) }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-all duration-200 shadow-2xs hover:border-zinc-300 hover:shadow-xs">
+        <a href="{{ route('orders.index', ['status' => 'shipped']) }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-colors hover:border-zinc-300">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Sedang Dikirim</span>
-                <div class="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-                    <x-icon name="truck" class="size-4.5" />
-                </div>
+                <span class="text-sm font-semibold text-zinc-700">Sedang Dikirim</span>
+                <x-icon name="truck" class="size-5 text-zinc-500" />
             </div>
             <p class="mt-3 text-2xl font-black text-zinc-900">{{ $shippedCount }}</p>
-            <p class="mt-1 text-xs font-medium text-zinc-500">
+            <p class="mt-1 text-xs font-medium text-zinc-600">
                 {{ $shippedCount > 0 ? 'Lacak resi pengiriman' : 'Belum ada pengiriman' }}
             </p>
         </a>
 
-        <!-- 4. Alamat Tersimpan -->
-        <a href="{{ route('account.addresses.index') }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-all duration-200 shadow-2xs hover:border-zinc-300 hover:shadow-xs">
+        <a href="{{ route('account.addresses.index') }}" class="group block rounded-2xl border border-zinc-200/80 bg-white p-5 transition-colors hover:border-zinc-300">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-700">Alamat Tersimpan</span>
-                <div class="flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700">
-                    <x-icon name="map-pin" class="size-4.5" />
-                </div>
+                <span class="text-sm font-semibold text-zinc-700">Alamat Tersimpan</span>
+                <x-icon name="map-pin" class="size-5 text-zinc-500" />
             </div>
-            <p class="mt-3 text-2xl font-black text-zinc-900">{{ $user->addresses->count() }} <span class="text-sm font-semibold text-zinc-500">Alamat</span></p>
-            <p class="mt-1 text-xs font-medium text-zinc-500 truncate">
+            <p class="mt-3 text-2xl font-black text-zinc-900">{{ $user->addresses->count() }} <span class="text-sm font-semibold text-zinc-600">Alamat</span></p>
+            <p class="mt-1 text-xs font-medium text-zinc-600 truncate">
                 {{ $primaryAddress ? 'Utama: ' . ($primaryAddress->label ?: $primaryAddress->recipient_name) : 'Belum ada alamat default' }}
             </p>
         </a>
     </div>
+    @endunless
 
     <!-- 2. Layout 2 Kolom (Pesanan Terbaru & Ringkasan Akun) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <!-- KOLOM KIRI (8 Kolom / ~65%): Card Pesanan Terkini -->
+        @if ($isActive)
         <div class="lg:col-span-8 space-y-6">
             <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-2xs">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-4 mb-4">
@@ -66,23 +97,22 @@
                         <h2 class="text-base font-bold text-zinc-900">Pesanan Terbaru</h2>
                         <p class="text-xs text-zinc-500">Transaksi belanja terkini Anda di Pixel Komunika</p>
                     </div>
-                    <a href="{{ route('orders.index') }}" class="text-xs font-bold text-brand-black hover:text-amber-600 transition-colors inline-flex items-center gap-1">
-                        <span>Lihat Semua Pesanan</span>
-                        <x-icon name="arrow-right" class="size-3.5" />
+                    <a href="{{ route('orders.index') }}" class="inline-flex min-h-11 items-center text-xs font-bold text-brand-black underline-offset-4 hover:underline">
+                        Lihat semua pesanan
                     </a>
                 </div>
 
                 @forelse ($recentOrders as $order)
                     @php
                         $firstItem = $order->items->first();
-                        $isWaiting = in_array($order->status, ['unpaid', 'payment_pending', 'payment_rejected'], true);
+                        $isWaiting = in_array($order->status, ['unpaid', 'payment_rejected'], true);
                     @endphp
                     <div class="py-4 first:pt-0 last:pb-0 border-b border-zinc-100 last:border-b-0">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                             <div>
                                 <div class="flex items-center gap-2">
                                     <span class="font-mono text-xs font-bold text-zinc-900">#{{ $order->order_number }}</span>
-                                    <span class="text-xs text-zinc-400">•</span>
+                                    <span class="text-xs text-zinc-500" aria-hidden="true">•</span>
                                     <span class="text-xs text-zinc-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
                                     <x-ui.status-badge :status="$order->status" />
                                 </div>
@@ -102,12 +132,12 @@
                             <div class="flex items-center justify-between sm:flex-col sm:items-end gap-2 shrink-0">
                                 <span class="text-sm font-extrabold text-zinc-900">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
                                 @if ($isWaiting)
-                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-1 rounded-xl bg-brand-yellow px-3.5 py-1.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs">
+                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-brand-yellow px-3.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition shadow-2xs">
                                         <x-icon name="upload" class="size-3.5" />
                                         <span>Unggah Bukti Bayar</span>
                                     </a>
                                 @else
-                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-1 rounded-xl bg-zinc-100 border border-zinc-200/80 px-3.5 py-1.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-200 transition">
+                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-zinc-100 border border-zinc-200/80 px-3.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-200 transition">
                                         <span>Detail Pesanan</span>
                                         <x-icon name="chevron-right" class="size-3.5" />
                                     </a>
@@ -117,20 +147,20 @@
                     </div>
                 @empty
                     <div class="py-8 text-center">
-                        <x-icon name="shopping-bag" class="size-12 mx-auto text-zinc-300" />
+                        <x-icon name="shopping-bag" class="size-12 mx-auto text-zinc-500" />
                         <h3 class="mt-3 text-sm font-bold text-zinc-800">Belum Ada Transaksi</h3>
                         <p class="mt-1 text-xs text-zinc-500 max-w-sm mx-auto">Jelajahi katalog produk Pixel Komunika dan mulai berbelanja kebutuhan toko Anda.</p>
-                        <a href="{{ route('products.index') }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-4 py-2.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition">
-                            <x-icon name="store" class="size-4" />
-                            <span>Mulai Belanja</span>
+                        <a href="{{ route('products.index') }}" class="min-h-11 mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-yellow px-4.5 text-xs font-bold text-brand-black hover:bg-brand-yellow-soft transition">
+                            <span>Lihat Katalog Produk</span>
                         </a>
                     </div>
                 @endforelse
             </div>
         </div>
+        @endif
 
         <!-- KOLOM KANAN (4 Kolom / ~35%): Profil & Alamat Utama -->
-        <div class="lg:col-span-4 space-y-6">
+        <div class="{{ $isActive ? 'lg:col-span-4 space-y-6' : 'grid gap-6 lg:col-span-12 lg:grid-cols-2' }}">
             <!-- Card Profil Toko & Usaha -->
             <div class="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-2xs">
                 <div class="flex items-center justify-between border-b border-zinc-100 pb-3 mb-3">

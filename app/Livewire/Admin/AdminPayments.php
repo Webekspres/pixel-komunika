@@ -144,6 +144,8 @@ class AdminPayments extends Component
     {
         $query = $this->scopeVisible(PaymentProof::query())
             ->with(['order.user', 'payment.bankAccount', 'reviewer'])
+            // Antrean verifikasi selalu di atas; itu keputusan utama di halaman ini.
+            ->orderByRaw("CASE WHEN status = 'pending' AND is_active = 1 THEN 0 ELSE 1 END")
             ->latest('id');
 
         if ($this->statusFilter === 'pending') {

@@ -31,28 +31,50 @@
 
         <div class="mt-5 flex flex-wrap gap-2">
             @if ($order->latestPaymentProof && $order->latestPaymentProof->status === 'pending')
-                <flux:button variant="primary" color="emerald" wire:click="approvePayment">
-                    Verifikasi Pembayaran
-                </flux:button>
-                <flux:button variant="ghost" class="text-red-600!" wire:click="openRejectModal">
+                @php($proof = $order->latestPaymentProof)
+                {{-- Bukti dibuka dulu sebelum keputusan; verifikasi mengubah status uang. --}}
+                <a
+                    href="{{ route('admin.payments.show', $proof) }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-50"
+                >
+                    <x-icon name="external-link" class="size-4" />
+                    Lihat bukti transfer
+                </a>
+                <x-ui.confirm-dialog
+                    title="Verifikasi pembayaran"
+                    :description="'Transfer '.$proof->bank_name.' a.n. '.$proof->account_name.' sebesar Rp '.number_format($proof->amount, 0, ',', '.').' untuk tagihan Rp '.number_format($order->grand_total, 0, ',', '.').' akan ditandai lunas dan pesanan lanjut diproses.'"
+                    confirm-variant="primary"
+                >
+                    <x-slot:trigger>
+                        <flux:button variant="primary">Verifikasi Pembayaran</flux:button>
+                    </x-slot:trigger>
+                    <x-slot:confirm>
+                        <flux:modal.close>
+                            <flux:button variant="primary" wire:click="approvePayment">Ya, verifikasi</flux:button>
+                        </flux:modal.close>
+                    </x-slot:confirm>
+                </x-ui.confirm-dialog>
+                <flux:button variant="ghost" class="text-red-700!" wire:click="openRejectModal">
                     Tolak Bukti
                 </flux:button>
             @endif
 
             @if ($order->status === 'paid')
-                <flux:button variant="primary" color="indigo" wire:click="transitionStatus('processing')">
+                <flux:button variant="primary" wire:click="transitionStatus('processing')">
                     Mulai Proses
                 </flux:button>
             @endif
 
             @if ($order->status === 'processing')
-                <flux:button variant="primary" color="sky" wire:click="transitionStatus('packed')">
+                <flux:button variant="primary" wire:click="transitionStatus('packed')">
                     Tandai Dikemas
                 </flux:button>
             @endif
 
             @if ($order->status === 'packed')
-                <flux:button variant="primary" color="blue" wire:click="openShipModal">
+                <flux:button variant="primary" wire:click="openShipModal">
                     Kirim Pesanan
                 </flux:button>
             @endif
@@ -60,7 +82,7 @@
             @if ($order->status === 'shipped' && ! ($order->shipment && $order->shipment->isHeld()))
                 <x-ui.confirm-dialog title="Tandai pesanan selesai" description="Pesanan {{ $order->order_number }} akan ditandai Selesai dan tercatat di audit log." confirm-variant="primary">
                     <x-slot:trigger>
-                        <flux:button variant="primary" color="emerald">Tandai Selesai</flux:button>
+                        <flux:button variant="primary">Tandai Selesai</flux:button>
                     </x-slot:trigger>
                     <x-slot:confirm>
                         <flux:modal.close>
@@ -143,7 +165,7 @@
                     <flux:modal.close>
                         <flux:button variant="ghost">Kembali</flux:button>
                     </flux:modal.close>
-                    <flux:button variant="primary" color="blue" wire:click="confirmShip">Kirim Pesanan</flux:button>
+                    <flux:button variant="primary" wire:click="confirmShip">Kirim Pesanan</flux:button>
                 </div>
             </div>
         </flux:modal>

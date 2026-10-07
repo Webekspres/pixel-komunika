@@ -24,13 +24,13 @@
         <div class="rounded-2xl border border-neutral-100 bg-white">
             <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-col gap-3 border-b border-neutral-100 px-4 py-4 sm:flex-row sm:items-center">
                 <div class="relative w-full sm:max-w-sm">
-                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
                     <input
                         type="search"
                         name="q"
                         value="{{ $search }}"
                         placeholder="Cari nama produk / SKU..."
-                        class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                        class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
                 </div>
                 <select
@@ -51,15 +51,14 @@
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b border-neutral-100">
-                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Produk</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">SKU</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kategori</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Brand</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Harga Partai</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Stok</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">Status</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Aksi</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Produk</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">SKU</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Kategori</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Brand</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Harga Partai</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Stok</th>
+                            <th class="px-5 py-3 text-center text-xs font-semibold text-zinc-500">Status</th>
+                            <th class="sticky right-0 bg-white shadow-[-8px_0_8px_-8px_rgb(0_0_0/0.15)] px-5 py-3 text-right text-xs font-semibold text-zinc-500">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-50">
@@ -71,7 +70,6 @@
                                 $primaryMedia = $product->media->firstWhere('is_primary', true) ?? $product->media->first();
                             @endphp
                             <tr class="transition-colors hover:bg-neutral-50">
-                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $products->firstItem() + $loop->index }}</td>
                                 <td class="px-5 py-3.5">
                                     <div class="flex items-center gap-3">
                                         <div class="size-10 shrink-0 overflow-hidden rounded-xl border border-neutral-100 bg-neutral-50">
@@ -90,18 +88,18 @@
                                         </div>
                                         <div class="min-w-0">
                                             <p class="truncate font-semibold text-zinc-900">{{ $product->displayName() }}</p>
-                                            <p class="truncate text-xs text-zinc-400">{{ $product->name }}</p>
+                                            <p class="truncate text-xs text-zinc-500">{{ $product->name }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-5 py-3.5 font-mono text-xs text-zinc-600">{{ $product->sku }}</td>
-                                <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $product->category?->name ?? '—' }}</td>
-                                <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $product->brand?->name ?? '—' }}</td>
+                                <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $product->category?->name ?? '-' }}</td>
+                                <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $product->brand?->name ?? '-' }}</td>
                                 <td class="px-5 py-3.5 font-semibold text-zinc-800">
                                     @if ($product->partaiPriceAmount() !== null)
                                         Rp {{ number_format($product->partaiPriceAmount(), 0, ',', '.') }}
                                     @else
-                                        <span class="text-zinc-400">—</span>
+                                        <span class="text-zinc-500">-</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5">
@@ -110,7 +108,7 @@
                                             {{ $stockStatus }} · {{ $stockQty }}
                                         </span>
                                     @else
-                                        <span class="text-xs text-zinc-400">—</span>
+                                        <span class="text-xs text-zinc-500">-</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5 text-center">
@@ -124,20 +122,19 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-5 py-3.5 text-right">
+                                <td class="sticky right-0 bg-white shadow-[-8px_0_8px_-8px_rgb(0_0_0/0.15)] px-5 py-3.5 text-right">
                                     <a
                                         href="{{ route('admin.products.edit', $product) }}"
                                         wire:navigate
-                                        class="inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-zinc-500 transition hover:text-brand-black"
+                                        class="inline-flex min-h-11 items-center whitespace-nowrap text-xs font-semibold text-zinc-800 underline-offset-4 transition hover:underline"
                                     >
                                         Kelola presentasi
-                                        <x-icon name="arrow-right" class="size-3.5" />
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-5 py-10 text-center text-sm text-zinc-400">
+                                <td colspan="8" class="px-5 py-10 text-center text-sm text-zinc-500">
                                     Tidak ada produk yang cocok.
                                 </td>
                             </tr>

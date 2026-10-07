@@ -127,6 +127,11 @@ it('lets a customer update profile and manage default addresses', function () {
 
     expect($firstAddress->is_default)->toBeFalse()
         ->and($secondAddress->is_default)->toBeTrue();
+
+    // Temuan M: konfirmasi hapus menyebut alamat yang dihapus walau label kosong.
+    $firstAddress->update(['label' => null]);
+    $this->actingAs($customer)->get(route('account.addresses.index'))
+        ->assertSee('Nama Baru – Jalan Mawar No. 1');
 });
 
 it('blocks a customer from editing another customers address', function () {

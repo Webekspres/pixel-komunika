@@ -23,3 +23,12 @@ it('shows the branded home page', function () {
 it('renders navbar Alpine magics without escaped dollar signs', function () {
     $this->get(route('home'))->assertOk()->assertDontSee('\\$', false);
 });
+
+it('serves the privacy policy and terms pages linked from the footer', function () {
+    $this->get(route('home'))
+        ->assertSee(route('legal.privacy'), false)
+        ->assertSee(route('legal.terms'), false);
+
+    $this->get(route('legal.privacy'))->assertOk()->assertSee('Kebijakan Privasi')->assertSee('UU 11/2008', false);
+    $this->get(route('legal.terms'))->assertOk()->assertSee('Syarat dan Ketentuan')->assertSee('Pengadilan Negeri Bandung');
+});

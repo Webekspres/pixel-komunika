@@ -71,7 +71,11 @@
     <div class="border-t border-white/10">
         <div class="container-2xl flex flex-col items-center justify-between gap-2 py-4 sm:flex-row">
             <p class="text-xs text-zinc-400">&copy; {{ date('Y') }} Pixel Komunika. Dikembangkan oleh PT Webekspres Teknologi Indonesia.</p>
-            <p class="text-xs text-zinc-400">NPWP: 0821.4146.0442.4000</p>
+            <div class="flex flex-wrap items-center gap-x-4 text-xs text-zinc-400">
+                <a href="{{ route('legal.terms') }}" class="inline-flex min-h-11 items-center hover:text-brand-yellow">Syarat dan Ketentuan</a>
+                <a href="{{ route('legal.privacy') }}" class="inline-flex min-h-11 items-center hover:text-brand-yellow">Kebijakan Privasi</a>
+                <span>NPWP: 0821.4146.0442.4000</span>
+            </div>
         </div>
     </div>
 </footer>

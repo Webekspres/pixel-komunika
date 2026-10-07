@@ -301,6 +301,14 @@
             <x-ui.section-card class="space-y-6" variant="storefront">
 
                 @if ($isWaitingPayment)
+                    @if ($order->status === 'payment_rejected' && $order->latestPaymentProof?->rejection_reason)
+                        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900" role="alert">
+                            <p class="font-semibold">Bukti pembayaran ditolak</p>
+                            <p class="mt-1">{{ $order->latestPaymentProof->rejection_reason }}</p>
+                            <p class="mt-2 text-xs text-rose-700">Silakan unggah ulang bukti pembayaran yang benar hari ini.</p>
+                        </div>
+                    @endif
+
                     <!-- Nominal Tagihan -->
                     <div class="rounded-2xl bg-brand-yellow/5 border border-brand-yellow/30 p-4 shadow-2xs">
                         <p class="text-xs font-semibold text-brand-black/60 uppercase tracking-wide">Nominal Tagihan</p>

@@ -122,6 +122,11 @@ it('PROBE-07 invoice HTML and PDF show reseller account number (CHK-09)', functi
     expect($order->invoice->reseller_account_number_snapshot)->toBe('PKR-000777');
 
     $this->actingAs($user)->get(route('orders.invoice', $order))->assertOk()->assertSee('PKR-000777');
+
+    // CHK-09: invoice bisa dibuka dari detail pesanan sejak terbit, sebelum dibayar.
+    $this->actingAs($user)->get(route('orders.show', $order))->assertOk()
+        ->assertSee(route('orders.invoice', $order))
+        ->assertSee(route('orders.invoice.download', $order));
 });
 
 it('PROBE-08 invoice keeps store NPWP snapshot after admin edits store profile (FR-CAT-009/FR-PRC-006)', function () use ($jne) {

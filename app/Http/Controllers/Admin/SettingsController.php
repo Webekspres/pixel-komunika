@@ -78,8 +78,14 @@ class SettingsController extends Controller
 
         $store->fill([...$validated, 'is_active' => true])->save();
 
-        // Identitas/NPWP tercetak di invoice, jadi setiap tab yang disimpan diaudit.
-        $audit->log('STORE_PROFILE_UPDATED', $store, $request->user(), $oldValues, $store->only(array_keys($validated)));
+        // Identitas/NPWP tercetak di invoice, jadi setiap perubahan diaudit; field yang tidak berubah tidak dicatat.
+        $changed = $store->wasRecentlyCreated
+            ? array_keys($validated)
+            : array_keys(array_intersect_key($store->getChanges(), $validated));
+
+        if ($changed !== []) {
+            $audit->log('STORE_PROFILE_UPDATED', $store, $request->user(), array_intersect_key($oldValues, array_flip($changed)), $store->only($changed));
+        }
 
         return $this->backToTab($request, 'Pengaturan toko berhasil disimpan.');
     }

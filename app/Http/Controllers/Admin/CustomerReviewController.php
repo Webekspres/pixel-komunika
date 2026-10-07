@@ -55,7 +55,7 @@ class CustomerReviewController extends Controller
                 ['key' => CustomerProfile::PENDING, 'label' => 'Menunggu', 'countKey' => CustomerProfile::PENDING],
                 ['key' => CustomerProfile::ACTIVE, 'label' => 'Aktif', 'countKey' => CustomerProfile::ACTIVE],
                 ['key' => CustomerProfile::REJECTED, 'label' => 'Ditolak', 'countKey' => CustomerProfile::REJECTED],
-                ['key' => CustomerProfile::SUSPENDED, 'label' => 'Dibekukan', 'countKey' => CustomerProfile::SUSPENDED],
+                ['key' => CustomerProfile::SUSPENDED, 'label' => 'Ditangguhkan', 'countKey' => CustomerProfile::SUSPENDED],
             ],
         ]);
     }

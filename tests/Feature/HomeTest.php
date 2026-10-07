@@ -16,3 +16,8 @@ it('shows the branded home page', function () {
         ->assertSee('Produk Pilihan')
         ->assertSee('Mengapa Pixel Komunika');
 });
+
+// `\$nextTick` tercetak literal membuat x-data navbar gagal di-parse (pencarian mobile & menu kategori mati).
+it('renders navbar Alpine magics without escaped dollar signs', function () {
+    $this->get(route('home'))->assertOk()->assertDontSee('\\$', false);
+});

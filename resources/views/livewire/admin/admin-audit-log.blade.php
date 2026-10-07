@@ -1,7 +1,7 @@
 <div class="space-y-5 p-6">
     <div>
         <h1 class="text-xl font-black text-zinc-900">Audit Log</h1>
-        <p class="mt-0.5 text-sm text-zinc-500">Jejak tindakan administratif kritis (FR-AUD-002).</p>
+        <p class="mt-0.5 text-sm text-zinc-500">Jejak tindakan administratif kritis.</p>
     </div>
 
     <div class="rounded-2xl border border-neutral-100 bg-white">

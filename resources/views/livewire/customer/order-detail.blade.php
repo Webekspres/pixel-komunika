@@ -84,8 +84,12 @@
                 title="Detail Pesanan"
                 description="{{ $order->created_at->format('d M Y') }} • Batas bayar: {{ $order->expires_at ? $order->expires_at->format('d M Y H:i') : '-' }}"
             >
-                @if ($isPaidOrLater && $order->invoice)
+                @if ($order->invoice)
                     <x-slot:actions>
+                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
+                            <x-icon name="file-text" class="size-4" />
+                            Lihat Invoice
+                        </a>
                         <a href="{{ route('orders.invoice.download', $order) }}" class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 shadow-xs">
                             <x-icon name="download" class="size-4" />
                             Unduh Invoice (PDF)
@@ -156,8 +160,8 @@
 
                                 @if ($stepKey === 'ordered')
                                     <p class="mt-0.5 text-xs text-zinc-500">{{ $order->created_at->format('d M Y, H:i') }} WIB</p>
-                                @elseif ($stepKey === 'payment_verified' && $latestProof)
-                                    <p class="mt-0.5 text-xs text-zinc-500">Diverifikasi: {{ $latestProof->verified_at?->format('d M Y, H:i') ?? '-' }} WIB</p>
+                                @elseif ($stepKey === 'payment_verified' && $latestProof?->verified_at)
+                                    <p class="mt-0.5 text-xs text-zinc-500">Diverifikasi: {{ $latestProof->verified_at->format('d M Y, H:i') }} WIB</p>
                                 @elseif ($stepKey === 'processing' && in_array($order->status, ['paid', 'processing', 'packed'], true))
                                     <p class="mt-0.5 text-xs text-zinc-500">Diproses sejak: {{ $order->updated_at->format('d M Y, H:i') }} WIB</p>
                                 @elseif ($stepKey === 'shipped' && $order->shipment && $order->shipment->shipped_at)
@@ -297,6 +301,14 @@
             <x-ui.section-card class="space-y-6" variant="storefront">
 
                 @if ($isWaitingPayment)
+                    @if ($order->status === 'payment_rejected' && $order->latestPaymentProof?->rejection_reason)
+                        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900" role="alert">
+                            <p class="font-semibold">Bukti pembayaran ditolak</p>
+                            <p class="mt-1">{{ $order->latestPaymentProof->rejection_reason }}</p>
+                            <p class="mt-2 text-xs text-rose-700">Silakan unggah ulang bukti pembayaran yang benar hari ini.</p>
+                        </div>
+                    @endif
+
                     <!-- Nominal Tagihan -->
                     <div class="rounded-2xl bg-brand-yellow/5 border border-brand-yellow/30 p-4 shadow-2xs">
                         <p class="text-xs font-semibold text-brand-black/60 uppercase tracking-wide">Nominal Tagihan</p>
@@ -447,7 +459,11 @@
                                                 <div class="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
                                                     <span class="font-mono">{{ number_format($proof_file->getSize() / 1024, 0) }} KB</span>
                                                     <span>•</span>
-                                                    <span class="font-medium text-emerald-600">Siap dikirim</span>
+                                                    @error('proof_file')
+                                                        <span class="font-medium text-rose-600">File tidak valid</span>
+                                                    @else
+                                                        <span class="font-medium text-emerald-600">Siap dikirim</span>
+                                                    @enderror
                                                 </div>
                                             </div>
 

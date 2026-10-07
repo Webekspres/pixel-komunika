@@ -174,6 +174,24 @@
                             </div>
                         </div>
 
+                        {{-- Berat & dimensi milik website (POS tidak mengirimnya); dipakai menghitung ongkir. --}}
+                        <div class="grid gap-4 sm:grid-cols-4">
+                            @foreach (['weight_grams' => 'Berat (gram)', 'length_cm' => 'Panjang (cm)', 'width_cm' => 'Lebar (cm)', 'height_cm' => 'Tinggi (cm)'] as $field => $label)
+                                <div>
+                                    <label for="{{ $field }}" class="mb-1.5 block text-xs font-semibold text-zinc-700">{{ $label }}@if ($field === 'weight_grams') <span class="text-rose-600">*</span>@endif</label>
+                                    <input
+                                        id="{{ $field }}"
+                                        name="{{ $field }}"
+                                        type="number"
+                                        min="1"
+                                        @required($field === 'weight_grams')
+                                        value="{{ old($field, $product->{$field}) }}"
+                                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+
                         <div>
                             <label for="seo_description" class="mb-1.5 block text-xs font-semibold text-zinc-700">SEO description</label>
                             <textarea
@@ -214,7 +232,7 @@
                         <x-icon name="info" class="mt-0.5 size-4 shrink-0 text-amber-600" />
                         <div class="text-xs leading-relaxed text-amber-900">
                             <p class="font-bold">Data katalog sumber POS</p>
-                            <p class="mt-1">SKU, kategori, merek, harga, dan stok dikelola di POS (FR-CAT-003). Halaman ini hanya mengelola presentasi tampilan website (FR-CAT-004/006).</p>
+                            <p class="mt-1">SKU, kategori, merek, harga, dan stok dikelola di POS. Halaman ini hanya mengelola presentasi tampilan website.</p>
                         </div>
                     </div>
                 </div>

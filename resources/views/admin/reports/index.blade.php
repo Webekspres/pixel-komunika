@@ -11,7 +11,7 @@
     <div class="space-y-6 p-6">
         <div>
             <h1 class="text-xl font-black text-zinc-900">Laporan Penjualan</h1>
-            <p class="mt-0.5 text-sm text-zinc-500">Omzet dihitung dari pesanan terkirim (shipped) dan selesai (completed), timezone Jakarta (FR-RPT-001).</p>
+            <p class="mt-0.5 text-sm text-zinc-500">Omzet dihitung dari pesanan yang sudah dikirim dan selesai, berdasarkan tanggal kirim (WIB).</p>
         </div>
 
         <div class="flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -50,21 +50,21 @@
                 :value="'Rp '.number_format($omzet, 0, ',', '.')"
                 icon="trending-up"
                 variant="admin"
-                description="Subtotal + ongkir (shipped)"
+                description="Subtotal + ongkir"
             />
             <x-ui.stat-card
                 label="PPh 22 Terutang"
                 :value="'Rp '.number_format($pph22, 0, ',', '.')"
                 icon="percent"
                 variant="admin"
-                description="Dilaporkan terpisah (FR-RPT-004)"
+                description="Dilaporkan terpisah dari omzet"
             />
             <x-ui.stat-card
                 label="Jumlah Pesanan"
                 :value="number_format($orderCount)"
                 icon="shopping-bag"
                 variant="admin"
-                description="Order shipped + completed"
+                description="Pesanan dikirim + selesai"
             />
             <x-ui.stat-card
                 label="Rata-rata per Pesanan"

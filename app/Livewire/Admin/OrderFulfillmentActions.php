@@ -67,8 +67,10 @@ class OrderFulfillmentActions extends Component
             return;
         }
 
-        $this->order->refresh();
         session()->flash('success', "Pembayaran untuk Order #{$this->order->order_number} telah disetujui.");
+
+        // Muat ulang agar kartu status di halaman (di luar komponen ini) ikut terbarui.
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function openRejectModal(): void
@@ -107,8 +109,9 @@ class OrderFulfillmentActions extends Component
         }
 
         $this->resetRejectModal();
-        $this->order->refresh();
         session()->flash('success', "Pembayaran untuk Order #{$this->order->order_number} telah ditolak.");
+
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function transitionStatus(string $status, FulfillmentService $fulfillment)
@@ -121,8 +124,9 @@ class OrderFulfillmentActions extends Component
             return;
         }
 
-        $this->order->refresh();
-        session()->flash('success', "Status pesanan {$this->order->order_number} diperbarui menjadi {$status}.");
+        session()->flash('success', "Status pesanan {$this->order->order_number} berhasil diperbarui.");
+
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function openShipModal(): void
@@ -151,8 +155,9 @@ class OrderFulfillmentActions extends Component
         }
 
         $this->resetShipModal();
-        $this->order->refresh();
         session()->flash('success', "Order #{$this->order->order_number} ditandai Dikirim.");
+
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function openCancelModal(): void
@@ -188,8 +193,9 @@ class OrderFulfillmentActions extends Component
         }
 
         $this->resetCancelModal();
-        $this->order->refresh();
         session()->flash('success', "Order #{$this->order->order_number} berhasil dibatalkan dan stok telah direstore.");
+
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function openTerkendalaModal(): void
@@ -221,16 +227,18 @@ class OrderFulfillmentActions extends Component
         }
 
         $this->resetTerkendalaModal();
-        $this->order->refresh();
         session()->flash('success', "Order #{$this->order->order_number} ditandai terkendala pengiriman.");
+
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function resolveTerkendala(FulfillmentService $fulfillment)
     {
         $fulfillment->resolveTerkendala($this->order, auth()->user());
 
-        $this->order->refresh();
         session()->flash('success', "Kendala pengiriman Order #{$this->order->order_number} telah diselesaikan.");
+
+        return $this->redirect(route('admin.orders.show', $this->order));
     }
 
     public function render()

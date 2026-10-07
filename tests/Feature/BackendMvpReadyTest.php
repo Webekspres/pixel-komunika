@@ -127,6 +127,9 @@ it('rejects payment with audit and retain_until on upload', function () {
     expect($proof->fresh()->status)->toBe('rejected')
         ->and($order->fresh()->status)->toBe('payment_rejected')
         ->and(AuditLog::where('action', 'PAYMENT_REJECTED')->exists())->toBeTrue();
+
+    // PAY-05: pelanggan melihat alasan penolakan sebelum mengunggah ulang.
+    $this->actingAs($customer)->get(route('orders.show', $order))->assertOk()->assertSee('Nominal tidak cocok');
 });
 
 use App\Models\InventoryLedger;

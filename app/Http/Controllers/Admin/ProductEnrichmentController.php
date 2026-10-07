@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -59,10 +60,17 @@ class ProductEnrichmentController extends Controller
             'label' => ['nullable', 'string', 'max:100'],
             'display_order' => ['nullable', 'integer', 'min:0'],
             'is_visible' => ['sometimes', 'boolean'],
+            'weight_grams' => ['required', 'integer', 'min:1', 'max:1000000'],
+            'length_cm' => ['nullable', 'integer', 'min:1', 'max:10000'],
+            'width_cm' => ['nullable', 'integer', 'min:1', 'max:10000'],
+            'height_cm' => ['nullable', 'integer', 'min:1', 'max:10000'],
         ]);
 
+        $dimensions = ['weight_grams', 'length_cm', 'width_cm', 'height_cm'];
+        $product->update(Arr::only($validated, $dimensions));
+
         $enrichment->upsertEnrichment($product, [
-            ...$validated,
+            ...Arr::except($validated, $dimensions),
             'is_visible' => $request->boolean('is_visible'),
         ]);
 

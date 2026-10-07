@@ -158,6 +158,8 @@ class AdminDashboardService
             'pendingVerificationCount' => $pendingVerificationCount,
             'productSkuCount' => $productSkuCount,
             'lastSyncTimeFormatted' => $lastSyncTimeFormatted,
+            'lastSyncStatus' => $lastSync?->status,
+            'posDriver' => config('pos.driver'),
             'chartDays' => $chartDays,
             'chartDates' => $chartDates,
             'chartRevenue' => $chartRevenue,

@@ -48,16 +48,29 @@ it('updates product enrichment presentation', function () {
             'description' => 'Deskripsi lengkap baru',
             'display_order' => '3',
             'is_visible' => '0',
+            'weight_grams' => '320',
+            'length_cm' => '15',
+            'width_cm' => '8',
+            'height_cm' => '',
         ])
         ->assertRedirect(route('admin.products.edit', $product));
 
     $enrichment = $product->enrichment->fresh();
+    $product->refresh();
 
     expect($enrichment->display_name)->toBe('Power Bank Premium')
         ->and($enrichment->slug)->toBe('power-bank-premium')
         ->and($enrichment->short_description)->toBe('Deskripsi singkat baru')
         ->and($enrichment->display_order)->toBe(3)
-        ->and($enrichment->is_visible)->toBeFalse();
+        ->and($enrichment->is_visible)->toBeFalse()
+        // KAT-06: berat & dimensi dikelola admin website (POS tidak mengirimnya).
+        ->and($product->weight_grams)->toBe(320)
+        ->and($product->length_cm)->toBe(15)
+        ->and($product->height_cm)->toBeNull();
+
+    $this->actingAs($admin)
+        ->patch(route('admin.products.update', $product), ['weight_grams' => '0'])
+        ->assertSessionHasErrors('weight_grams');
 });
 
 it('manages product media via the media manager', function () {

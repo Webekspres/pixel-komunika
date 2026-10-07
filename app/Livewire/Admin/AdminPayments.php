@@ -96,7 +96,7 @@ class AdminPayments extends Component
 
         $this->validate([
             'adminNote' => ['required', 'string', 'min:5'],
-        ]);
+        ], [], ['adminNote' => 'alasan penolakan']);
 
         try {
             $paymentService->rejectPayment($proof, $this->adminNote, auth()->user());

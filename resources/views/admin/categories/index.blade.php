@@ -16,17 +16,17 @@
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b border-neutral-100">
-                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold tracking-wide text-zinc-400 uppercase">No</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Kategori</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Jumlah Produk</th>
-                            <th class="px-5 py-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Sinkron POS</th>
-                            <th class="px-5 py-3 text-right text-xs font-semibold tracking-wide text-zinc-400 uppercase">Status</th>
+                            <th class="w-12 px-5 py-3 text-center text-xs font-semibold text-zinc-500">No</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Kategori</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Jumlah Produk</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-zinc-500">Sinkron POS</th>
+                            <th class="px-5 py-3 text-right text-xs font-semibold text-zinc-500">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-50">
                         @forelse ($categories as $category)
                             <tr class="transition-colors hover:bg-neutral-50">
-                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-400">{{ $loop->iteration }}</td>
+                                <td class="w-12 px-5 py-3.5 text-center text-xs text-zinc-500">{{ $loop->iteration }}</td>
                                 <td class="px-5 py-3.5 font-semibold text-zinc-900">{{ $category->name }}</td>
                                 <td class="px-5 py-3.5 text-xs text-zinc-600">{{ $category->products_count }} produk</td>
                                 <td class="px-5 py-3.5">
@@ -35,9 +35,9 @@
                                             <x-icon name="refresh-cw" class="size-3" />
                                             Sinkron POS
                                         </span>
-                                        <span class="mt-0.5 block text-[10px] text-zinc-400">{{ $category->synced_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}</span>
+                                        <span class="mt-0.5 block text-[10px] text-zinc-500">{{ $category->synced_at->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}</span>
                                     @else
-                                        <span class="text-xs text-zinc-400">Belum sinkron</span>
+                                        <span class="text-xs text-zinc-500">Belum sinkron</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5 text-right">
@@ -60,7 +60,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-10 text-center text-sm text-zinc-400">
+                                <td colspan="5" class="px-5 py-10 text-center text-sm text-zinc-500">
                                     Belum ada kategori.
                                 </td>
                             </tr>

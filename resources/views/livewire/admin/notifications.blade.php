@@ -25,7 +25,7 @@
         <div class="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
             <p class="text-sm font-bold text-zinc-900">Notifikasi</p>
             @if ($unreadCount > 0)
-                <button type="button" wire:click="markAllRead" class="text-xs font-semibold text-brand-yellow-dark hover:underline">
+                <button type="button" wire:click="markAllRead" class="text-xs font-semibold text-amber-800 hover:underline">
                     Tandai semua dibaca
                 </button>
             @endif
@@ -49,7 +49,7 @@
                         role="menuitem"
                     >
                         <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full {{ $notification->read_at ? 'bg-zinc-100' : 'bg-brand-yellow/20' }}">
-                            <x-icon :name="$isOrder ? 'shopping-bag' : 'bell'" class="size-4 {{ $notification->read_at ? 'text-zinc-400' : 'text-brand-yellow-dark' }}" />
+                            <x-icon :name="$isOrder ? 'shopping-bag' : 'bell'" class="size-4 {{ $notification->read_at ? 'text-zinc-500' : 'text-amber-800' }}" />
                         </span>
                         <span class="min-w-0 flex-1">
                             <span class="block text-sm font-semibold text-zinc-800">
@@ -64,7 +64,7 @@
                                     · Rp {{ number_format((float) $total, 0, ',', '.') }}
                                 @endif
                             </span>
-                            <span class="mt-1 block text-[11px] text-zinc-400">
+                            <span class="mt-1 block text-[11px] text-zinc-500">
                                 {{ $notification->created_at->timezone('Asia/Jakarta')->diffForHumans() }}
                             </span>
                         </span>
@@ -76,7 +76,7 @@
             @empty
                 <div class="px-4 py-10 text-center">
                     <x-icon name="bell-off" class="mx-auto mb-2 size-6 text-zinc-300" />
-                    <p class="text-xs text-zinc-400">Belum ada notifikasi.</p>
+                    <p class="text-xs text-zinc-500">Belum ada notifikasi.</p>
                 </div>
             @endforelse
         </div>

@@ -73,7 +73,7 @@
 
                     @if ($order->latestPaymentProof)
                         <div class="rounded-[1.25rem] border border-zinc-200 bg-zinc-50 p-4">
-                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">Bukti pembayaran terakhir</p>
+                            <p class="text-xs font-bold text-zinc-500">Bukti pembayaran terakhir</p>
                             <p class="mt-2 text-sm font-semibold text-zinc-900">
                                 {{ $order->latestPaymentProof->bank_name }} • {{ $order->latestPaymentProof->account_name }}
                             </p>

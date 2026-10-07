@@ -7,7 +7,7 @@
     <div class="rounded-2xl border border-neutral-100 bg-white">
         <div class="flex flex-col gap-3 border-b border-neutral-100 px-4 py-4 lg:flex-row lg:flex-wrap lg:items-end">
             <div class="min-w-[10rem]">
-                <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">Aksi</label>
+                <label class="mb-1 block text-xs font-bold text-zinc-500">Aksi</label>
                 <select wire:model.live="action" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm">
                     <option value="">Semua aksi</option>
                     @foreach ($actions as $actionOption)
@@ -16,7 +16,7 @@
                 </select>
             </div>
             <div class="min-w-[10rem]">
-                <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">Aktor</label>
+                <label class="mb-1 block text-xs font-bold text-zinc-500">Aktor</label>
                 <select wire:model.live="actorId" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm">
                     <option value="">Semua aktor</option>
                     @foreach ($actors as $actor)
@@ -25,7 +25,7 @@
                 </select>
             </div>
             <div class="min-w-[12rem]">
-                <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">Entity</label>
+                <label class="mb-1 block text-xs font-bold text-zinc-500">Entity</label>
                 <select wire:model.live="auditableType" class="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-sm">
                     <option value="">Semua entity</option>
                     @foreach ($types as $type)
@@ -34,11 +34,11 @@
                 </select>
             </div>
             <div>
-                <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">Dari</label>
+                <label class="mb-1 block text-xs font-bold text-zinc-500">Dari</label>
                 <input type="date" wire:model.live="dateFrom" class="rounded-xl border border-neutral-200 px-3 py-2.5 text-sm">
             </div>
             <div>
-                <label class="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">Sampai</label>
+                <label class="mb-1 block text-xs font-bold text-zinc-500">Sampai</label>
                 <input type="date" wire:model.live="dateTo" class="rounded-xl border border-neutral-200 px-3 py-2.5 text-sm">
             </div>
             <button type="button" wire:click="clearFilters" class="rounded-xl border border-neutral-200 px-3.5 py-2.5 text-xs font-bold text-zinc-600 hover:bg-neutral-50">
@@ -57,7 +57,7 @@
         @else
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
-                    <thead class="border-b border-neutral-100 bg-zinc-50/80 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                    <thead class="border-b border-neutral-100 bg-zinc-50/80 text-xs font-bold text-zinc-500">
                         <tr>
                             <th class="px-4 py-3">Waktu</th>
                             <th class="px-4 py-3">Aktor</th>
@@ -81,8 +81,8 @@
                                 <td class="px-4 py-3 text-xs text-zinc-600">
                                     {{ class_basename($log->auditable_type) }} #{{ $log->auditable_id }}
                                 </td>
-                                <td class="px-4 py-3 font-mono text-[10px] text-zinc-400">
-                                    {{ $log->request_id ?: '—' }}
+                                <td class="px-4 py-3 font-mono text-[10px] text-zinc-500">
+                                    {{ $log->request_id ?: '-' }}
                                 </td>
                             </tr>
                         @endforeach

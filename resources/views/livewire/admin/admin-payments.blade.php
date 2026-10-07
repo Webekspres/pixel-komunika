@@ -45,12 +45,12 @@
 
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div class="relative w-full sm:w-64">
-                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                    <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
                     <input
                         type="search"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Cari No. Order / Pelanggan / Bank..."
-                        class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-yellow/20 focus:outline-none"
+                        class="w-full rounded-xl border border-neutral-200 py-2.5 pr-3 pl-10 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
                 </div>
                 <select
@@ -59,7 +59,7 @@
                 >
                     <option value="">Semua Bank Tujuan</option>
                     @foreach ($banks as $bank)
-                        <option value="{{ $bank->id }}">{{ $bank->bank_name }} — {{ $bank->account_number }}</option>
+                        <option value="{{ $bank->id }}">{{ $bank->bank_name }} · {{ $bank->account_number }}</option>
                     @endforeach
                 </select>
             </div>
@@ -76,20 +76,18 @@
         @else
             <flux:table :paginate="$proofs" container:class="[&_ui-table-scroll-area]:max-h-[70vh]">
                 <flux:table.columns>
-                    <flux:table.column align="center" class="w-12">No</flux:table.column>
                     <flux:table.column class="w-44">No. Order</flux:table.column>
                     <flux:table.column>Pelanggan</flux:table.column>
                     <flux:table.column>Bank Tujuan</flux:table.column>
                     <flux:table.column align="end" class="w-36">Nominal</flux:table.column>
                     <flux:table.column class="w-44">Waktu Pengajuan</flux:table.column>
                     <flux:table.column class="w-40">Status</flux:table.column>
-                    <flux:table.column align="end" class="w-40">Aksi</flux:table.column>
+                    <flux:table.column align="end" class="sticky right-0 bg-white shadow-[-8px_0_8px_-8px_rgb(0_0_0/0.15)] w-40">Aksi</flux:table.column>
                 </flux:table.columns>
 
                 <flux:table.rows>
                     @foreach ($proofs as $proof)
                         <flux:table.row :key="$proof->id" class="transition-colors hover:bg-neutral-50">
-                            <flux:table.cell align="center" class="w-12 text-xs text-zinc-400">{{ $proofs->firstItem() + $loop->index }}</flux:table.cell>
                             <flux:table.cell>
                                 <a href="{{ route('admin.orders.show', $proof->order) }}" wire:navigate class="font-bold text-zinc-900 hover:underline">
                                     #{{ $proof->order->order_number }}
@@ -104,7 +102,7 @@
                                     <p class="font-medium text-zinc-900">{{ $proof->payment->bankAccount->bank_name }}</p>
                                     <p class="text-xs text-zinc-500">a.n. {{ $proof->payment->bankAccount->account_holder }}</p>
                                 @else
-                                    <p class="text-xs text-zinc-500">—</p>
+                                    <p class="text-xs text-zinc-500">-</p>
                                 @endif
                             </flux:table.cell>
                             <flux:table.cell align="end" class="font-bold text-zinc-900">
@@ -116,7 +114,7 @@
                             <flux:table.cell>
                                 <x-ui.status-badge :status="$proof->status" />
                             </flux:table.cell>
-                            <flux:table.cell align="end" class="w-40">
+                            <flux:table.cell align="end" class="sticky right-0 bg-white shadow-[-8px_0_8px_-8px_rgb(0_0_0/0.15)] w-40">
                                 @if ($proof->status === 'pending')
                                     <flux:button variant="primary" color="amber" size="sm" wire:click="openReview({{ $proof->id }})">
                                         Periksa &amp; Verifikasi
@@ -139,7 +137,7 @@
             <div class="space-y-5">
                 <div>
                     <flux:heading size="lg">
-                        Review Pembayaran — Order #{{ $reviewingProof->order->order_number }}
+                        Review Pembayaran Order #{{ $reviewingProof->order->order_number }}
                     </flux:heading>
                     <flux:subheading class="mt-2">
                         {{ $reviewingProof->order->user?->name ?? $reviewingProof->order->recipient_name }}
@@ -152,7 +150,7 @@
 
                 <div class="grid gap-5 md:grid-cols-2">
                     <div>
-                        <p class="mb-2 text-xs font-bold tracking-wide text-zinc-500 uppercase">Preview Bukti Transfer</p>
+                        <p class="mb-2 text-xs font-bold text-zinc-500">Preview Bukti Transfer</p>
                         <div class="rounded-xl border border-neutral-200 bg-neutral-50 p-3">
                             @if ($this->isPdf($reviewingProof))
                                 <iframe
@@ -177,7 +175,7 @@
 
                     <div class="space-y-4">
                         <div class="rounded-xl bg-zinc-50 p-4 text-sm">
-                            <p class="text-xs font-bold tracking-wide text-zinc-500 uppercase">Rekening Tujuan Toko</p>
+                            <p class="text-xs font-bold text-zinc-500">Rekening Tujuan Toko</p>
                             @if ($reviewingProof->payment?->bankAccount)
                                 <p class="mt-2 font-bold text-zinc-900">{{ $reviewingProof->payment->bankAccount->bank_name }}</p>
                                 <p class="font-mono text-xs text-zinc-600">{{ $reviewingProof->payment->bankAccount->account_number }}</p>

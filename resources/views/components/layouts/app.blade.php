@@ -41,66 +41,66 @@
                             height="32"
                         >
                     </a>
-                    <span class="rounded-lg bg-brand-yellow px-2 py-0.5 text-[10px] font-black tracking-wide text-brand-black uppercase">Admin</span>
+                    <span class="rounded-lg bg-brand-yellow px-2 py-0.5 text-xs font-black text-brand-black">Admin</span>
                 </div>
 
                 <nav class="flex flex-1 flex-col overflow-y-auto py-3" aria-label="Navigasi sidebar">
-                    <p class="px-4 pt-2 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Utama</p>
-                    <a href="{{ route('admin.dashboard') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <p class="px-4 pt-2 pb-1 text-xs font-bold text-zinc-500">Utama</p>
+                    <a href="{{ route('admin.dashboard') }}" wire:navigate @if (request()->routeIs('admin.dashboard')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                         <x-icon name="layout-dashboard" class="size-4 shrink-0" />
                         <span>Dashboard</span>
                     </a>
 
-                    <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Penjualan</p>
-                    <a href="{{ route('admin.orders.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <p class="px-4 pt-4 pb-1 text-xs font-bold text-zinc-500">Penjualan</p>
+                    <a href="{{ route('admin.orders.index') }}" wire:navigate @if (request()->routeIs('admin.orders.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                         <x-icon name="shopping-bag" class="size-4 shrink-0" />
                         <span>Pesanan</span>
                     </a>
-                    <a href="{{ route('admin.payments.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.payments.index') }}" wire:navigate @if (request()->routeIs('admin.payments.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                         <x-icon name="credit-card" class="size-4 shrink-0" />
                         <span>Pembayaran</span>
                     </a>
 
-                    <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Katalog</p>
-                    <a href="{{ route('admin.products.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                    <p class="px-4 pt-4 pb-1 text-xs font-bold text-zinc-500">Katalog</p>
+                    <a href="{{ route('admin.products.index') }}" wire:navigate @if (request()->routeIs('admin.products.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                         <x-icon name="package" class="size-4 shrink-0" />
                         <span>Produk</span>
                     </a>
-                    <a href="{{ route('admin.categories.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.categories.index') }}" wire:navigate @if (request()->routeIs('admin.categories.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                         <x-icon name="tag" class="size-4 shrink-0" />
                         <span>Kategori</span>
                     </a>
-                    <a href="{{ route('admin.brands.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.brands.index') }}" wire:navigate @if (request()->routeIs('admin.brands.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
                         <x-icon name="award" class="size-4 shrink-0" />
                         <span>Merek</span>
                     </a>
-                    <a href="{{ route('admin.media.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.media.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.media.index') }}" wire:navigate @if (request()->routeIs('admin.media.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.media.*') ? 'active' : '' }}">
                         <x-icon name="image" class="size-4 shrink-0" />
                         <span>Media</span>
                     </a>
 
-                    <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Pelanggan</p>
-                    <a href="{{ route('admin.customers.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
+                    <p class="px-4 pt-4 pb-1 text-xs font-bold text-zinc-500">Pelanggan</p>
+                    <a href="{{ route('admin.customers.index') }}" wire:navigate @if (request()->routeIs('admin.customers.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
                         <x-icon name="users" class="size-4 shrink-0" />
                         <span>Pelanggan</span>
                     </a>
 
-                    <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Analitik</p>
-                    <a href="{{ route('admin.reports.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                    <p class="px-4 pt-4 pb-1 text-xs font-bold text-zinc-500">Analitik</p>
+                    <a href="{{ route('admin.reports.index') }}" wire:navigate @if (request()->routeIs('admin.reports.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                         <x-icon name="bar-chart-3" class="size-4 shrink-0" />
                         <span>Laporan</span>
                     </a>
-                    <a href="{{ route('admin.audit-logs.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.audit-logs.index') }}" wire:navigate @if (request()->routeIs('admin.audit-logs.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
                         <x-icon name="scroll-text" class="size-4 shrink-0" />
                         <span>Audit Log</span>
                     </a>
 
-                    <p class="px-4 pt-4 pb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Sistem</p>
-                    <a href="{{ route('admin.tax-rules.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.tax-rules.*') ? 'active' : '' }}">
+                    <p class="px-4 pt-4 pb-1 text-xs font-bold text-zinc-500">Sistem</p>
+                    <a href="{{ route('admin.tax-rules.index') }}" wire:navigate @if (request()->routeIs('admin.tax-rules.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.tax-rules.*') ? 'active' : '' }}">
                         <x-icon name="percent" class="size-4 shrink-0" />
                         <span>PPh 22</span>
                     </a>
-                    <a href="{{ route('admin.settings.index') }}" wire:navigate class="admin-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.settings.index') }}" wire:navigate @if (request()->routeIs('admin.settings.*')) aria-current="page" @endif class="admin-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                         <x-icon name="settings" class="size-4 shrink-0" />
                         <span>Pengaturan</span>
                     </a>
@@ -150,7 +150,7 @@
                                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                                     </div>
                                     <span class="hidden text-xs font-semibold text-zinc-700 sm:block">{{ Str::limit(auth()->user()->name, 18) }}</span>
-                                    <x-icon name="chevron-down" class="size-3.5 text-zinc-400" />
+                                    <x-icon name="chevron-down" class="size-3.5 text-zinc-500" />
                                 </button>
 
                                 <div

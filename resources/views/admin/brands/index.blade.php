@@ -12,7 +12,7 @@
         @endif
 
         @if ($brands->isEmpty())
-            <div class="rounded-2xl border border-neutral-100 bg-white px-5 py-12 text-center text-sm text-zinc-400">
+            <div class="rounded-2xl border border-neutral-100 bg-white px-5 py-12 text-center text-sm text-zinc-500">
                 Belum ada merek.
             </div>
         @else
@@ -20,10 +20,10 @@
                 @foreach ($brands as $brand)
                     <div class="flex flex-col rounded-2xl border border-neutral-100 bg-white p-5">
                         <div class="flex items-start justify-between gap-3">
-                            <div class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-yellow/20 text-base font-black text-brand-yellow-dark">
+                            <div class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-yellow/20 text-base font-black text-amber-800">
                                 {{ strtoupper(substr($brand->name, 0, 1)) }}
                             </div>
-                            <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-zinc-500 uppercase">Sinkron POS</span>
+                            <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-bold text-zinc-500">Sinkron POS</span>
                         </div>
 
                         <h2 class="mt-3 text-sm font-bold text-zinc-900">{{ $brand->name }}</h2>

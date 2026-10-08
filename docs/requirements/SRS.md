@@ -81,9 +81,10 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - master data dan inventory disinkronkan penuh sekali sehari; stok per produk
   dapat dicek berkala untuk rekonsiliasi;
 - website menjadi source of truth transaksi, invoice, dan lifecycle order;
-- commit penjualan website membuat invoice serta mengurangi stok efektif,
-  kemudian worker mengirim laporan penjualan ke POS untuk mencatat transaksi
-  dan mengurangi stok POS;
+- commit penjualan website membuat invoice serta mengurangi stok efektif;
+  setelah pesanan diproses (pembayaran diverifikasi), worker mengirim laporan
+  penjualan ke POS pada H+1 untuk mencatat transaksi dan mengurangi stok POS
+  (CR-023);
 - retur website menambah stok efektif, kemudian worker mengirim laporan retur
   ke POS untuk mencatat retur dan menambah stok POS;
 - acknowledgement/lookup laporan digunakan untuk rekonsiliasi tanpa membatalkan
@@ -325,7 +326,7 @@ Working scheme dari klien:
 | Master Data | `GetPriceList` | POS -> Web | Sekali sehari | Sinkronisasi harga eceran, partai, dan grosir. |
 | Inventory | `GetAllStock` | POS -> Web | Sekali sehari | Membentuk snapshot stok awal hari. |
 | Inventory | `GetStockByProduct` | POS -> Web | Berkala/ketika diperlukan | Mencocokkan stok produk tertentu. |
-| Sales Reporting | Laporan penjualan - nama final TBD | Web -> POS | Setiap transaksi website | Mencatat penjualan web dan mengurangi stok POS; invoice tetap diterbitkan website. |
+| Sales Reporting | Laporan penjualan - nama final TBD | Web -> POS | H+1 setelah pesanan diproses (CR-023) | Mencatat penjualan web dan mengurangi stok POS; invoice tetap diterbitkan website. |
 | Return Reporting | Laporan retur - nama final TBD | Web -> POS | Setiap retur website | Mencatat retur web dan menambah stok POS setelah laporan penjualan asal diterima atau direkonsiliasi. |
 | Reporting Status | Acknowledgement/lookup - nama final TBD | POS <-> Web | Rekonsiliasi/ketika diperlukan | Mencocokkan penerimaan laporan penjualan/retur berdasarkan external reference. |
 
@@ -954,7 +955,7 @@ selesai berada pada requirement dan riwayat perubahan terkait.
 | TD-011 | Tetapkan provider/template konfirmasi WhatsApp, kalender hari kerja, aturan poin, dan kewenangan penyelesaian manual. | OPN-020 | Open |
 | TD-012 | Tetapkan fallback berat/dimensi, kode layanan, akun production, dan biaya Biteship. | OPN-021 | Open |
 | TD-013 | Tetapkan format NPWP/nomor akun reseller serta kontrak provider invoice dan notifikasi. | OPN-022, OPN-023 | Open |
-| TD-014 | Tetapkan format atau awalan nomor invoice. | OPN-008, OPN-022 | Open |
+| TD-014 | Tetapkan format atau awalan nomor invoice. | OPN-008, OPN-022 | Resolved: `WEB-[yymm]-[0001]`, urut ulang tiap bulan (CR-023) |
 
 ## 21. Referensi Teknis
 

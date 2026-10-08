@@ -62,6 +62,7 @@ Status requirement:
 | CR-019 | Rabu, 12 Agustus 2026 | Arahan dokumentasi klien | Daftar pertanyaan hanya menampilkan hal yang belum terjawab; pertanyaan selesai dihapus dan keputusannya tetap berada pada requirement atau riwayat perubahan. | Bagian pertanyaan BRD, dokumen review klien, dan open technical items diringkas. | Documentation baseline updated |
 | CR-020 | Jumat, 21 Agustus 2026 | Klarifikasi klien Sylvi melalui WhatsApp | Khusus kurir toko, gratis ongkir berlaku ketika subtotal barang ditambah PPh 22 mencapai sedikitnya Rp1.000.000. Nilai di bawah ambang memakai tarif kurir toko, dan pengiriman dilakukan H+1. | BR-023, RULE-030, OPN-010, serta requirement dan desain turunannya diperbarui. Nilai tarif per area tetap menunggu data klien. | Threshold and H+1 resolved; area rates open |
 | CR-021 | Rabu, 7 Oktober 2026, 18.45-18.50 WIB | Klarifikasi klien Sylvi dan PIC POS Kak Rio melalui WhatsApp | (1) Pelanggan boleh membeli produk di bawah minimum partai selama sedikitnya satu produk dalam pesanan mencapai minimum partai; harga eceran tidak ditampilkan maupun dipakai. Jenis harga yang dipakai: Partai, Grosir 1, Grosir 2. (2) Ketentuan retur di invoice dan di syarat & ketentuan website sama-sama berlaku. (3) Penomoran invoice website dipisah dari POS. (4) Hanya pesanan yang sudah *delivered* yang dilaporkan ke POS. | Checkout kini mensyaratkan satu SKU mencapai minimum partai (BR-006, RULE-018, FR-PRC-002); fitur "minimal pembelian per SKU" (5 Okt) dihapus. Urutan Partai vs Grosir 1/Grosir 2, format nomor invoice, dan definisi *delivered* menunggu konfirmasi; FR-POS-017 belum diubah. | Checkout rule resolved; pricing tiers, invoice format, POS reporting open |
+| CR-022 | Kamis, 8 Oktober 2026, 08.58-09.00 WIB | Klarifikasi klien Sylvi melalui WhatsApp | (1) Bila belum ada produk yang mencapai 5 unit, keranjang wajib menampilkan peringatan bahwa target minimal 5 unit di salah satu produk belum terpenuhi. (2) Harga grosir berlaku per produk: contoh 11PDNINT03GB (Partai Rp25.500, Grosir 1 Rp25.000 min. 10, Grosir 2 Rp21.500 min. 20) dibeli 20 unit memakai Rp21.500 per unit. | Partai menjadi harga dasar; produk yang mencapai minimum Grosir 1/Grosir 2 memakai harga grosir termurah yang tercapai. Aturan "partai menang terhadap grosir" pada OPN-013, BR-006, RULE-018, FR-PRC-002, dan MVP-005 diganti. Sinkronisasi POS menerima `Grosir 2`. Harga utama di katalog memakai Partai. | Resolved |
 
 ### 2.2 Model Delivery Hybrid Agile-Waterfall
 
@@ -269,7 +270,7 @@ flowchart LR
 | BR-003 | Admin harus menyetujui pelanggan sebelum akses pembelian diberikan. | Baseline |
 | BR-004 | Admin harus dapat mengaktifkan dan menonaktifkan akun pelanggan. | Baseline |
 | BR-005 | Sistem harus menyinkronkan seluruh field produk yang tersedia di POS. SKU tetap mengikuti POS; website dapat mengubah nama tampilan produk secara mandiri dan melengkapi field presentasi yang tidak disediakan POS ([lihat OPN-003](#opn-003)). | Baseline |
-| BR-006 | Setiap produk harus memiliki harga eceran, partai, dan grosir dari POS. Harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. Transaksi memakai harga partai untuk seluruh item jika sedikitnya satu produk/SKU mencapai minimum global yang dapat diubah admin, dengan nilai awal lima unit; kuantitas antar-SKU tidak dijumlahkan. Jika item juga memenuhi syarat grosir, harga partai tetap dipakai. Checkout hanya dapat dilakukan bila sedikitnya satu SKU mencapai minimum partai; SKU lain dalam pesanan yang sama boleh di bawah minimum ([CR-021](#21-riwayat-perubahan)). | Baseline; resolved |
+| BR-006 | Setiap produk harus memiliki harga eceran, partai, dan grosir dari POS. Harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. Transaksi memakai harga partai untuk seluruh item jika sedikitnya satu produk/SKU mencapai minimum global yang dapat diubah admin, dengan nilai awal lima unit; kuantitas antar-SKU tidak dijumlahkan. Harga partai menjadi harga dasar; produk yang jumlahnya mencapai minimum Grosir 1 atau Grosir 2 memakai harga grosir termurah yang minimumnya tercapai ([CR-022](#21-riwayat-perubahan)). Checkout hanya dapat dilakukan bila sedikitnya satu SKU mencapai minimum partai; SKU lain dalam pesanan yang sama boleh di bawah minimum ([CR-021](#21-riwayat-perubahan)). | Baseline; resolved |
 | BR-007 | Admin harus dapat memilih klasifikasi produk dan mengatur ambang nilai belanja untuk masing-masing klasifikasi terpilih melalui website ([lihat OPN-018](#opn-018)). | Baseline |
 | BR-008 | Admin harus dapat mengatur tarif PPh 22 melalui website, termasuk `0%`; sistem menambahkan PPh 22 ketika nilai belanja pada klasifikasi terpilih melampaui ambangnya. Dasar pengenaan adalah seluruh subtotal klasifikasi yang terpicu. Subtotal klasifikasi terpicu digabung, dibagi `1,11`, lalu dikalikan persentase PPh 22. Keseragaman tarif multi-klasifikasi dan aturan pembulatan mengikuti [OPN-006](#opn-006). | Baseline; formula resolved, rate/rounding partial |
 | BR-009 | Website harus menarik kategori, produk, detail produk, daftar harga, dan seluruh stok dari POS sekali sehari; stok per produk dapat dipanggil berkala untuk rekonsiliasi. Data contoh hanya digunakan sebelum koneksi tersedia ([OPN-005](#opn-005), [OPN-019](#opn-019)). | Baseline; kontrak API partially open |
@@ -320,7 +321,7 @@ flowchart LR
 | RULE-015 | Perubahan data produk atau identitas toko setelah order tidak mengubah invoice lama; invoice menggunakan snapshot identitas toko, item, harga, total, dan PPh 22 transaksi. |
 | RULE-016 | Data contoh harus deterministik, idempotent, menggunakan identifier stabil, tidak menimpa enrichment lokal, dan hanya aktif pada environment non-production. |
 | RULE-017 | Data contoh bukan bukti bahwa koneksi POS production telah lulus; go-live mensyaratkan koneksi POS production berhasil diuji. |
-| RULE-018 | Minimum harga partai adalah konfigurasi global website dengan nilai awal lima unit. Transaksi memenuhi syarat jika sedikitnya satu baris produk/SKU mencapai minimum; kuantitas SKU berbeda tidak digabung. Setelah syarat terpenuhi, harga partai berlaku untuk seluruh item dalam order. Jika item juga memenuhi minimum grosir, harga partai tetap dipakai. Pesanan yang belum memiliki SKU mencapai minimum ditolak saat checkout (CR-021). |
+| RULE-018 | Minimum harga partai adalah konfigurasi global website dengan nilai awal lima unit. Transaksi memenuhi syarat jika sedikitnya satu baris produk/SKU mencapai minimum; kuantitas SKU berbeda tidak digabung. Setelah syarat terpenuhi, harga partai berlaku untuk seluruh item dalam order. Produk yang mencapai minimum Grosir 1/Grosir 2 memakai harga grosir termurah yang tercapai (CR-022). Pesanan yang belum memiliki SKU mencapai minimum ditolak saat checkout (CR-021). |
 | RULE-019 | Ambang PPh 22 berbasis nilai belanja pada klasifikasi terpilih, bukan batas kuantitas maksimum dan bukan alasan untuk menolak checkout. Persentase `0%` menonaktifkan pungutan untuk aturan tersebut. |
 | RULE-020 | Pesanan tanpa pembayaran yang masih aktif pada hari pembuatannya otomatis menjadi `CANCELLED` pada hari kalender berikutnya. |
 | RULE-021 | Commit transaksi website menjadi event pembuatan invoice, pengurangan stok efektif, dan pembuatan laporan penjualan POS dengan external reference unik. |
@@ -628,10 +629,14 @@ Setiap produk wajib memiliki tiga jenis harga dari POS:
    global yang dapat diubah admin, dengan nilai awal lima unit. Kuantitas SKU
    berbeda tidak dijumlahkan. Setelah terpenuhi, harga partai berlaku untuk
    seluruh item dalam order.
-3. **Grosir** dengan minimum kuantitas dan harga yang dapat berbeda per produk;
-   contoh klien adalah minimum 200 unit dengan harga Rp10.800.
+3. **Grosir 1** dan **Grosir 2** dengan minimum kuantitas dan harga yang dapat
+   berbeda per produk; contoh klien adalah minimum 200 unit dengan harga Rp10.800.
 
-Jika suatu item memenuhi harga partai dan grosir, harga partai dipakai.
+Partai adalah harga dasar setiap item. Item yang jumlahnya mencapai minimum
+Grosir 1 atau Grosir 2 memakai harga grosir termurah yang minimumnya tercapai
+(CR-022, menggantikan aturan sebelumnya bahwa partai menang terhadap grosir).
+Checkout hanya dapat dilakukan bila sedikitnya satu item mencapai minimum partai
+(CR-021).
 
 **Pemilik:** Klien / System Analyst · **Target:** 7 Agustus 2026 · **Status:** Resolved
 

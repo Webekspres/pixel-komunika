@@ -44,44 +44,66 @@ class SandboxPosMasterSyncService implements PosMasterSyncInterface
 
             $validationErrors = $this->validatePayloads($categories, $products, $pricelists);
 
-            if (! empty($validationErrors)) {
-                foreach ($validationErrors as $err) {
-                    SyncError::query()->create([
-                        'sync_run_id' => $run->id,
-                        'entity_type' => $err['entity_type'],
-                        'external_id' => $err['external_id'] ?? null,
-                        'error_code' => $err['error_code'],
-                        'error_message' => $err['error_message'],
-                        'payload_excerpt_redacted' => isset($err['payload']) ? $this->redactPayload($err['payload']) : null,
-                        'retryable' => false,
-                        'created_at' => now(),
-                    ]);
-                }
+            foreach ($validationErrors as $err) {
+                SyncError::query()->create([
+                    'sync_run_id' => $run->id,
+                    'entity_type' => $err['entity_type'],
+                    'external_id' => $err['external_id'] ?? null,
+                    'error_code' => $err['error_code'],
+                    'error_message' => $err['error_message'],
+                    'payload_excerpt_redacted' => isset($err['payload']) ? $this->redactPayload($err['payload']) : null,
+                    'retryable' => false,
+                    'created_at' => now(),
+                ]);
+            }
 
+            // Kak Rio (7 Okt): data master bermasalah diabaikan; produk tidak valid dilewati
+            // dan dicatat tanpa menggagalkan produk lain.
+            $invalidItemIds = collect($validationErrors)
+                ->whereIn('entity_type', ['product', 'pricelist'])
+                ->pluck('external_id')->filter()->flip();
+            $validProducts = array_values(array_filter($products, function ($prod) use ($invalidItemIds) {
+                $itemId = trim((string) ($prod['item_id'] ?? ''));
+
+                return $itemId !== '' && ! $invalidItemIds->has($itemId);
+            }));
+            $errorSummary = collect($validationErrors)->pluck('error_code')->countBy()->toArray();
+
+            if (! empty($validationErrors) && $validProducts === []) {
                 $run->update([
                     'status' => 'FAILED',
                     'finished_at' => now(),
                     'failed_count' => count($validationErrors),
                     'summary' => [
-                        'message' => 'Pre-write validation failed with '.count($validationErrors).' errors.',
-                        'errors' => collect($validationErrors)->pluck('error_code')->countBy()->toArray(),
+                        'message' => 'Pre-write validation failed with '.count($validationErrors).' errors; no valid product.',
+                        'errors' => $errorSummary,
                     ],
                 ]);
 
                 return $run->fresh();
             }
 
-            $this->persistMasters($categories, $products, $pricelists);
+            $validCategories = array_values(array_filter(
+                $categories,
+                fn ($cat) => trim((string) ($cat['category_id'] ?? '')) !== '',
+            ));
 
+            $this->persistMasters($validCategories, $validProducts, $pricelists);
+
+            $skipped = count($products) - count($validProducts);
             $run->update([
-                'status' => 'SUCCEEDED',
+                'status' => empty($validationErrors) ? 'SUCCEEDED' : 'PARTIAL',
                 'finished_at' => now(),
-                'success_count' => count($products),
+                'success_count' => count($validProducts),
+                'failed_count' => $skipped,
                 'summary' => [
-                    'message' => 'Master sync succeeded via SandboxPosMasterSyncService.',
-                    'categories_count' => count($categories),
-                    'products_count' => count($products),
+                    'message' => empty($validationErrors)
+                        ? 'Master sync succeeded via SandboxPosMasterSyncService.'
+                        : "Master sync partial: {$skipped} invalid product(s) skipped.",
+                    'categories_count' => count($validCategories),
+                    'products_count' => count($validProducts),
                     'pricelists_count' => count($pricelists),
+                    'errors' => $errorSummary,
                 ],
             ]);
         } catch (Throwable $e) {

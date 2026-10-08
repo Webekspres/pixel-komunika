@@ -84,7 +84,7 @@ it('creates charge components shipment payment and notifications on checkout', f
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
 
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'provider' => 'STORE_COURIER',
@@ -107,7 +107,7 @@ it('rejects payment with audit and retain_until on upload', function () {
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'code' => 'jne', 'service' => 'REG', 'cost' => 15000,
@@ -141,7 +141,7 @@ it('processes return approve into sales_return outbox', function () {
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'code' => 'jne', 'service' => 'REG', 'cost' => 10000,
@@ -156,7 +156,7 @@ it('processes return approve into sales_return outbox', function () {
     app(OrderService::class)->processReturn($return, 'approve', null, $admin, 'OK');
 
     $snapshotAfterReturn = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
-    expect($snapshotAfterReturn)->toBe($snapshotBeforeReturn + 1);
+    expect($snapshotAfterReturn)->toBe($snapshotBeforeReturn + 5);
 
     $ledgerEntry = InventoryLedger::where('product_id', $product->id)
         ->where('source', 'ORDER_RETURNED')
@@ -168,8 +168,8 @@ it('processes return approve into sales_return outbox', function () {
         ->and(SalesReturn::where('order_id', $order->id)->exists())->toBeTrue()
         ->and(PosIntegrationOperation::where('operation', 'WEB_RETURN_REPORT')->where('order_id', $order->id)->exists())->toBeTrue()
         ->and($ledgerEntry)->not->toBeNull()
-        ->and($ledgerEntry->quantity_delta)->toBe(1)
-        ->and($ledgerEntry->quantity_after)->toBe($snapshotBeforeReturn + 1);
+        ->and($ledgerEntry->quantity_delta)->toBe(5)
+        ->and($ledgerEntry->quantity_after)->toBe($snapshotBeforeReturn + 5);
 });
 
 it('holds auto-complete when shipment is TERKENDALA and completes otherwise', function () {
@@ -178,7 +178,7 @@ it('holds auto-complete when shipment is TERKENDALA and completes otherwise', fu
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'code' => 'jne', 'service' => 'REG', 'cost' => 10000,
     ]);
@@ -207,7 +207,7 @@ it('dispatches sample pos sync and sale acks', function () {
     ['customer' => $customer, 'address' => $address] = mvpCustomer();
     $product = Product::first();
     $cart = app(CartService::class)->getOrCreateCart($customer);
-    app(CartService::class)->addItem($cart, $product->id, 1);
+    app(CartService::class)->addItem($cart, $product->id, 5);
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'code' => 'jne', 'service' => 'REG', 'cost' => 10000,
     ]);
@@ -224,7 +224,7 @@ it('sends pending whatsapp via stub and reports shipped omzet', function () {
     ['customer' => $customer, 'address' => $address] = mvpCustomer();
     $product = Product::first();
     $cart = app(CartService::class)->getOrCreateCart($customer);
-    app(CartService::class)->addItem($cart, $product->id, 1);
+    app(CartService::class)->addItem($cart, $product->id, 5);
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'code' => 'jne', 'service' => 'REG', 'cost' => 10000,
     ]);
@@ -243,7 +243,7 @@ it('denies cross-user order policy', function () {
 
     $product = Product::first();
     $cart = app(CartService::class)->getOrCreateCart($owner);
-    app(CartService::class)->addItem($cart, $product->id, 1);
+    app(CartService::class)->addItem($cart, $product->id, 5);
     $order = app(OrderService::class)->createOrderFromCart($owner, $cart, $address, [
         'code' => 'jne', 'service' => 'REG', 'cost' => 10000,
     ]);

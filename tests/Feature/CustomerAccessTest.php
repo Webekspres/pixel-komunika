@@ -3,7 +3,9 @@
 use App\Domains\SeedDataSupport\SampleCatalogImporter;
 use App\Models\Address;
 use App\Models\CustomerProfile;
+use App\Models\Product;
 use App\Models\User;
+use App\Services\CartService;
 
 beforeEach(function () {
     app(SampleCatalogImporter::class)->import();
@@ -59,6 +61,8 @@ it('allows active customers to access checkout and order history', function () {
     $customer->customerProfile()->create([
         'verification_status' => CustomerProfile::ACTIVE,
     ]);
+    $cartService = app(CartService::class);
+    $cartService->addItem($cartService->getOrCreateCart($customer->fresh()), Product::where('sku', 'PB-10000')->value('id'), 5);
 
     $this->actingAs($customer)
         ->get(route('checkout.index'))

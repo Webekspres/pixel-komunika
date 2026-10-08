@@ -137,6 +137,10 @@
                 </div>
                 <p class="text-[11px] leading-relaxed text-zinc-600">Ongkir kurir toko Rp0 untuk area Bandung bila subtotal + PPh 22 mencapai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}.</p>
 
+@if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
+                    <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-800">{{ $checkoutBlocker }}</p>
+                @endif
+
                 <div class="grid grid-cols-2 gap-2 pt-2">
                     <a
                         href="{{ route('cart.index') }}"
@@ -148,7 +152,7 @@
                     </a>
 
                     @auth
-                        @if (auth()->user()->isActiveCustomer())
+                        @if (auth()->user()->isActiveCustomer() && ! $checkoutBlocker)
                             <a
                                 href="{{ route('checkout.index') }}"
                                 wire:navigate
@@ -159,7 +163,11 @@
                             </a>
                         @else
                             <button type="button" disabled class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">
-                                {{ auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING ? 'Menunggu Verifikasi' : 'Checkout Terkunci' }}
+                                {{ match (true) {
+                                    auth()->user()->isActiveCustomer() => 'Belum Bisa Checkout',
+                                    auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING => 'Menunggu Verifikasi',
+                                    default => 'Checkout Terkunci',
+                                } }}
                             </button>
                         @endif
                     @else
@@ -270,6 +278,10 @@
                 </div>
                 <p class="text-[11px] leading-relaxed text-zinc-600">Ongkir kurir toko Rp0 untuk area Bandung bila subtotal + PPh 22 mencapai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}.</p>
 
+@if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
+                    <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-800">{{ $checkoutBlocker }}</p>
+                @endif
+
                 <div class="grid grid-cols-2 gap-2">
                     <a
                         href="{{ route('cart.index') }}"
@@ -281,7 +293,7 @@
                     </a>
 
                     @auth
-                        @if (auth()->user()->isActiveCustomer())
+                        @if (auth()->user()->isActiveCustomer() && ! $checkoutBlocker)
                             <a
                                 href="{{ route('checkout.index') }}"
                                 wire:navigate
@@ -292,7 +304,11 @@
                             </a>
                         @else
                             <button type="button" disabled class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl bg-zinc-200 text-center text-xs font-bold text-zinc-700">
-                                {{ auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING ? 'Menunggu Verifikasi' : 'Checkout Terkunci' }}
+                                {{ match (true) {
+                                    auth()->user()->isActiveCustomer() => 'Belum Bisa Checkout',
+                                    auth()->user()->customerStatus() === \App\Models\CustomerProfile::PENDING => 'Menunggu Verifikasi',
+                                    default => 'Checkout Terkunci',
+                                } }}
                             </button>
                         @endif
                     @else

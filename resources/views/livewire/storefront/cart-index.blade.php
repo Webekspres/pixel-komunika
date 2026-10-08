@@ -113,7 +113,11 @@
                         </div>
 
                         @auth
-                            @if (auth()->user()->isActiveCustomer())
+                            @if (auth()->user()->isActiveCustomer() && $checkoutBlocker)
+                                <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-center text-xs font-medium text-amber-800">
+                                    {{ $checkoutBlocker }}
+                                </div>
+                            @elseif (auth()->user()->isActiveCustomer())
                                 <a href="{{ route('checkout.index') }}" wire:navigate class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-black py-3.5 text-sm font-bold text-white transition hover:bg-zinc-700">
                                     Lanjut Checkout
                                 </a>

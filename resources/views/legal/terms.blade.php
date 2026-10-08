@@ -28,9 +28,9 @@
             <ol>
                 <li>harga partai berlaku untuk seluruh pesanan bila sedikitnya satu produk dibeli {{ $partaiMinimum }} unit atau lebih (jumlah produk berbeda tidak dijumlahkan), dan harga partai didahulukan daripada harga grosir;</li>
                 <li>harga grosir berlaku untuk produk yang jumlahnya mencapai minimum grosir produk tersebut;</li>
-                <li>di luar dua kondisi itu berlaku harga reguler.</li>
             </ol>
         </li>
+        <li>Pesanan baru dapat dibuat bila sedikitnya satu produk dibeli {{ $partaiMinimum }} unit atau lebih. Produk lain dalam pesanan yang sama boleh dibeli kurang dari jumlah itu.</li>
         <li>Harga yang berlaku untuk setiap produk ditampilkan di keranjang dan halaman checkout sebelum pesanan dibuat. Harga pada pesanan yang sudah dibuat tidak berubah walaupun harga produk kemudian berubah.</li>
         <li>PPh 22 dihitung sesuai ketentuan dan tarif yang berlaku untuk klasifikasi produk, lalu dicantumkan terpisah di keranjang, checkout, dan invoice.</li>
     </ul>

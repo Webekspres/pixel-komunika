@@ -37,9 +37,8 @@ it('does not aggregate quantities across skus for partai eligibility', function 
 
     $summary = $cartService->getCartSummary($cart);
 
-    foreach ($summary['items'] as $line) {
-        expect($line['price_type'])->toBe(ProductPrice::RETAIL);
-    }
+    expect($summary['partai_eligible'])->toBeFalse()
+        ->and($summary['items']->pluck('price_type')->contains(ProductPrice::RETAIL))->toBeFalse();
 });
 
 it('applies partai cart-wide when any single sku qualifies', function () {

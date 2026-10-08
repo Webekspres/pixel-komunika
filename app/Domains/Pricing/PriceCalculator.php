@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class PriceCalculator
 {
-    public function resolvePrice(Product $product, int $quantity, bool $cartHasPartaiEligibleSku = false): ProductPrice
+    public function resolvePrice(Product $product, int $quantity, bool $cartHasPartaiEligibleSku = false): ?ProductPrice
     {
         $prices = $product->prices->keyBy('price_type');
         $partaiMin = $this->partaiMinimumQuantity();
@@ -31,13 +31,9 @@ class PriceCalculator
             return $wholesale;
         }
 
-        return $prices->get(ProductPrice::RETAIL, $bulk ?? $wholesale);
-    }
-
-    /** Minimal pembelian per SKU (Pengaturan > Partai); mencegah reseller jatuh ke harga ECERAN. */
-    public function minimumOrderQuantity(): int
-    {
-        return max(1, (int) (StoreProfile::active()?->minimum_order_quantity ?? 1));
+        // FR-PRC-007: ECERAN tidak pernah dipakai; keranjang yang belum memenuhi partai
+        // menampilkan harga partai sebagai estimasi karena checkout baru dibuka setelah memenuhi.
+        return $bulk ?? $wholesale;
     }
 
     public function partaiMinimumQuantity(): int

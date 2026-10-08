@@ -51,7 +51,7 @@ function reportFixtureOrder(): Order
 
     $product = Product::query()->firstOrFail();
     $cart = app(CartService::class)->getOrCreateCart($customer);
-    app(CartService::class)->addItem($cart, $product->id, 2);
+    app(CartService::class)->addItem($cart, $product->id, 6);
 
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'code' => 'jne',

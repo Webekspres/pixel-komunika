@@ -49,7 +49,7 @@ it('renders customer order detail page with unified cards, stepper, and bank acc
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -100,7 +100,7 @@ it('handles payment proof upload and preview safely for images and pdfs', functi
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -146,7 +146,7 @@ it('hides customer cancel and offers whatsapp return only after shipping', funct
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [

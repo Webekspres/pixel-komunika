@@ -17,7 +17,6 @@ class SettingsController extends Controller
 {
     protected const QUANTITY_FIELDS = [
         'partai_minimum_quantity' => 'Minimum partai',
-        'minimum_order_quantity' => 'Minimal pembelian',
     ];
 
     protected function backToTab(Request $request, string $message): RedirectResponse
@@ -65,7 +64,6 @@ class SettingsController extends Controller
             'company_name' => ['nullable', 'string', 'max:191'],
             'company_npwp' => ['sometimes', 'required', 'string', 'max:32'],
             'partai_minimum_quantity' => ['sometimes', 'required', 'integer', 'min:1', 'max:100000'],
-            'minimum_order_quantity' => ['sometimes', 'required', 'integer', 'min:1', 'max:100000'],
             'origin_biteship_area_id' => ['nullable', 'string', 'max:191'],
             'origin_biteship_label' => ['nullable', 'string', 'max:255'],
             'origin_postal_code' => ['nullable', 'string', 'max:16'],
@@ -73,7 +71,7 @@ class SettingsController extends Controller
 
         $store = StoreProfile::active() ?? new StoreProfile;
         $oldValues = $store->exists
-            ? $store->only(['store_name', 'address', 'contact_number', 'company_name', 'company_npwp', 'partai_minimum_quantity', 'minimum_order_quantity', 'origin_biteship_area_id', 'origin_biteship_label', 'origin_postal_code'])
+            ? $store->only(['store_name', 'address', 'contact_number', 'company_name', 'company_npwp', 'partai_minimum_quantity', 'origin_biteship_area_id', 'origin_biteship_label', 'origin_postal_code'])
             : [];
 
         $store->fill([...$validated, 'is_active' => true])->save();

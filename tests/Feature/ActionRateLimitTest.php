@@ -1,14 +1,16 @@
 <?php
 
+use App\Domains\SeedDataSupport\SampleCatalogImporter;
 use App\Livewire\Customer\OrderDetail;
 use App\Livewire\Storefront\Checkout;
-use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\CustomerProfile;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Role;
 use App\Models\StoreProfile;
 use App\Models\User;
+use App\Services\CartService;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
 
@@ -41,17 +43,10 @@ it('rate limits repeated checkout placeOrder attempts', function () {
         'user_id' => $user->id,
         'verification_status' => CustomerProfile::ACTIVE,
     ]);
-    Address::create([
-        'user_id' => $user->id,
-        'recipient_name' => 'Toko',
-        'recipient_phone' => '08123456789',
-        'address_line' => 'Jl. Merdeka 1',
-        'province_name' => 'Jawa Barat',
-        'city_name' => 'Bandung',
-        'district_name' => 'Coblong',
-        'postal_code' => '40135',
-        'is_default' => true,
-    ]);
+    // Tanpa alamat: placeOrder gagal validasi sebelum membuat order, keranjang tetap terisi.
+    app(SampleCatalogImporter::class)->import();
+    $cartService = app(CartService::class);
+    $cartService->addItem($cartService->getOrCreateCart($user), Product::where('sku', 'PB-10000')->value('id'), 5);
 
     RateLimiter::clear('checkout-order:'.$user->id);
 

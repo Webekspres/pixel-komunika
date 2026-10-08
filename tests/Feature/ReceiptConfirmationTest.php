@@ -75,7 +75,7 @@ function shippedOrderWithToken(): array
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
         'provider' => 'STORE_COURIER',

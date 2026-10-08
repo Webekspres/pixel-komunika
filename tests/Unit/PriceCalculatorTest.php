@@ -29,7 +29,8 @@ it('picks partai over grosir when partai eligible and grosir only when not', fun
 
     $calculator = app(PriceCalculator::class);
 
-    expect($calculator->resolvePrice($product->fresh('prices'), 2, false)->price_type)->toBe(ProductPrice::RETAIL)
+    // FR-PRC-007: ECERAN tidak pernah dipakai.
+    expect($calculator->resolvePrice($product->fresh('prices'), 2, false)->price_type)->toBe(ProductPrice::BULK)
         ->and($calculator->resolvePrice($product->fresh('prices'), 5, false)->price_type)->toBe(ProductPrice::BULK)
         ->and($calculator->resolvePrice($product->fresh('prices'), 2, true)->price_type)->toBe(ProductPrice::BULK)
         ->and($calculator->resolvePrice($product->fresh('prices'), 12, true)->price_type)->toBe(ProductPrice::BULK)

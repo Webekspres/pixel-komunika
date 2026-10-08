@@ -80,28 +80,15 @@ it('saves identitas and partai tabs independently', function () {
         ->and(StoreProfile::active()->store_name)->toBe('Toko Baru')
         ->and(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->where('auditable_type', StoreProfile::class)->count())->toBe(2); // identitas + partai masing-masing diaudit
 
-    // Form partai mengirim kedua field; yang tidak berubah tidak boleh tercatat.
-    $this->actingAs($admin)
-        ->patch(route('admin.settings.store-profile.update'), [
-            'partai_minimum_quantity' => 25,
-            'minimum_order_quantity' => 5,
-            'tab' => 'partai',
-        ])
-        ->assertSessionHasNoErrors();
-
-    $latest = AuditLog::where('action', 'STORE_PROFILE_UPDATED')->latest('id')->first();
-    expect($latest->new_values)->toBe(['minimum_order_quantity' => 5]);
-
     // Simpan tanpa perubahan: tidak ada entri audit baru.
     $this->actingAs($admin)
         ->patch(route('admin.settings.store-profile.update'), [
             'partai_minimum_quantity' => 25,
-            'minimum_order_quantity' => 5,
             'tab' => 'partai',
         ])
         ->assertSessionHasNoErrors();
 
-    expect(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->count())->toBe(3);
+    expect(AuditLog::where('action', 'STORE_PROFILE_UPDATED')->count())->toBe(2);
 });
 
 it('manages bank account CRUD', function () {

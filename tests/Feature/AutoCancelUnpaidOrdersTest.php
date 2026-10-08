@@ -40,7 +40,7 @@ it('auto cancels unpaid orders from previous calendar days', function () {
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
     $stockBefore = InventorySnapshot::where('product_id', $product->id)->value('quantity_available');
 
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
     $order = $orderService->createOrderFromCart($user, $cart, $address, ['code' => 'jne', 'service' => 'REG', 'cost' => 0]);
 
     $order->forceFill(['created_at' => now()->subDays(2)])->save();
@@ -76,7 +76,7 @@ it('does not auto cancel todays unpaid orders', function () {
 
     $cart = $cartService->getOrCreateCart($user);
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
     $order = $orderService->createOrderFromCart($user, $cart, $address, ['code' => 'jne', 'service' => 'REG', 'cost' => 0]);
 
     Artisan::call('orders:auto-cancel-unpaid');

@@ -50,7 +50,7 @@ it('allows customer to upload payment proof and admin to approve it', function (
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -119,7 +119,7 @@ it('shows active bank account as transfer destination on order detail page', fun
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -162,7 +162,7 @@ it('restores inventory stock when an order is cancelled', function () {
 
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 3);
+    $cartService->addItem($cart, $product->id, 7);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -172,7 +172,7 @@ it('restores inventory stock when an order is cancelled', function () {
     ]);
 
     $snapshotAfterOrder = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
-    expect($snapshotAfterOrder)->toBe($snapshotBefore - 3);
+    expect($snapshotAfterOrder)->toBe($snapshotBefore - 7);
 
     // Cancel order
     $orderService->cancelOrder($order, 'Testing cancellation', 'SYSTEM');
@@ -210,7 +210,7 @@ it('restores inventory stock via ORDER_RETURNED ledger when return is approved',
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -228,7 +228,7 @@ it('restores inventory stock via ORDER_RETURNED ledger when return is approved',
     $orderService->processReturn($return, 'approve', null, $admin, 'OK');
 
     $snapshotAfterReturn = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
-    expect($snapshotAfterReturn)->toBe($snapshotBeforeReturn + 2);
+    expect($snapshotAfterReturn)->toBe($snapshotBeforeReturn + 6);
 
     $ledgerEntry = InventoryLedger::where('product_id', $product->id)
         ->where('source', 'ORDER_RETURNED')
@@ -237,8 +237,8 @@ it('restores inventory stock via ORDER_RETURNED ledger when return is approved',
         ->first();
 
     expect($ledgerEntry)->not->toBeNull()
-        ->and($ledgerEntry->quantity_delta)->toBe(2)
-        ->and($ledgerEntry->quantity_after)->toBe($snapshotBeforeReturn + 2);
+        ->and($ledgerEntry->quantity_delta)->toBe(6)
+        ->and($ledgerEntry->quantity_after)->toBe($snapshotBeforeReturn + 6);
 });
 
 it('does not modify stock when return is rejected', function () {
@@ -268,7 +268,7 @@ it('does not modify stock when return is rejected', function () {
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [

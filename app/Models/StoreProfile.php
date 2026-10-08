@@ -14,7 +14,6 @@ class StoreProfile extends Model
         'company_name',
         'company_npwp',
         'partai_minimum_quantity',
-        'minimum_order_quantity',
         'origin_biteship_area_id',
         'origin_biteship_label',
         'origin_postal_code',
@@ -26,7 +25,6 @@ class StoreProfile extends Model
         return [
             'is_active' => 'boolean',
             'partai_minimum_quantity' => 'integer',
-            'minimum_order_quantity' => 'integer',
         ];
     }
 

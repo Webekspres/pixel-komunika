@@ -71,6 +71,7 @@ class CartDrawer extends Component
 
         return view('livewire.storefront.cart-drawer', [
             'summary' => $summary,
+            'checkoutBlocker' => $cartService->checkoutBlocker($summary),
         ]);
     }
 }

@@ -26,6 +26,13 @@ class Checkout extends Component
     public function mount(CartService $cartService, ShippingCalculatorInterface $shippingService)
     {
         $user = Auth::user();
+
+        $cart = $cartService->getOrCreateCart($user, session()->getId());
+        // Halaman keranjang sudah menampilkan alasannya (kosong / belum memenuhi minimum partai).
+        if ($cartService->checkoutBlocker($cartService->getCartSummary($cart))) {
+            return $this->redirectRoute('cart.index', navigate: true);
+        }
+
         $defaultAddress = $user->addresses()->where('is_default', true)->first() ?? $user->addresses()->first();
         if ($defaultAddress) {
             $this->selectedAddressId = $defaultAddress->id;

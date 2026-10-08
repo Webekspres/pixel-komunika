@@ -43,7 +43,7 @@ it('renders customer account dashboard overview with user greeting and transacti
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [
@@ -116,7 +116,7 @@ it('renders printable order invoice page for the order owner', function () {
     $product = Product::first();
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($customer);
-    $cartService->addItem($cart, $product->id, 1);
+    $cartService->addItem($cart, $product->id, 5);
 
     $orderService = app(OrderService::class);
     $order = $orderService->createOrderFromCart($customer, $cart, $address, [

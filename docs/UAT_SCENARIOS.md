@@ -5,10 +5,10 @@ subtitle: Website B2B Pixel Komunika — MVP
 
 | | |
 |---|---|
-| **Versi dokumen** | 1.0 — 5 Oktober 2026 |
+| **Versi dokumen** | 1.1 — 8 Oktober 2026 |
 | **Disusun oleh** | Webekspres Teknologi Indonesia |
 | **Pelaksana uji** | Pixel Komunika (klien) dan tim IT Pixel Komunika |
-| **Jadwal UAT** | Kamis, 15 Oktober 2026 |
+| **Jadwal UAT** | Dua hari berturut-turut, disepakati bersama klien setelah WhatsApp Fonnte dan akun Biteship klien aktif |
 | **Lingkungan uji** | Staging — `https://dev.store.pixelkomunika.com` |
 
 # 1. Tujuan
@@ -28,6 +28,18 @@ kebutuhan bisnis Pixel Komunika sebelum digunakan secara resmi (go-live).
 - UAT dinyatakan **diterima** bila seluruh skenario berprioritas **Tinggi**
   lulus dan tidak ada temuan berkategori *Bug kritis* yang terbuka.
 - Hasil UAT ditandatangani pada bagian **12. Persetujuan (Sign-off)**.
+- Tanggal go-live ditetapkan bersama klien **setelah** UAT dinyatakan diterima.
+
+**Alur UAT.** UAT dilakukan dalam satu putaran selama dua hari berturut-turut
+agar seluruh skenario, termasuk yang bergantung pada waktu dan layanan
+eksternal, teruji sekaligus:
+
+1. **Hari 1:** jalankan seluruh skenario. Biarkan satu pesanan berstatus
+   **Menunggu Pembayaran** untuk CAN-03.
+2. **Hari 2:** periksa hasil CAN-03, uji ulang temuan yang sudah diperbaiki,
+   lalu sign-off.
+
+Temuan *Bug kritis* diperbaiki dan diuji ulang di staging sebelum sign-off.
 
 # 2. Persiapan
 
@@ -68,7 +80,7 @@ sebelum transaksi pertama di production.
 | K-5 | Hari kerja untuk penyelesaian otomatis | Senin–Jumat, tidak termasuk libur nasional & cuti bersama SKB 3 Menteri | FUL-05 |
 | K-6 | Notifikasi WhatsApp order baru | Melalui layanan Fonnte ke nomor admin `081546407702` dengan pesan "Cek Order masuk" | CHK-08 |
 | K-7 | Pembatalan pesanan | Hanya oleh **admin** (hari yang sama) atau **sistem** (tidak dibayar). Pelanggan tidak dapat membatalkan sendiri; pelanggan menghubungi admin | CAN-01, CAN-04 |
-| K-8 | Pengajuan retur | Pelanggan mengajukan retur lewat tombol **Ajukan Retur via WhatsApp** pada pesanan *Dikirim/Selesai*; retur diproses admin di luar website | FUL-07 |
+| K-8 | Pengajuan retur | Pelanggan mengajukan retur lewat tombol **Ajukan Retur via WhatsApp** pada pesanan *Dikirim/Selesai*; retur diproses admin di luar website. Ketentuan retur pada invoice **dan** pada halaman Syarat & Ketentuan website sama-sama berlaku (disepakati 7 Okt) | FUL-07 |
 
 # 4. Registrasi, Persetujuan, dan Hak Akses
 
@@ -108,9 +120,9 @@ sebelum transaksi pertama di production.
 | CHK-05 | Tinggi | PPh 22 dikenakan | Belanja produk dari kategori ber-PPh 22 sampai subtotal kategori **melebihi** ambang. | PPh 22 = (subtotal kategori terkena ÷ 1,11) × tarif. Contoh: subtotal Rp11.100.000, tarif 1,5% → PPh 22 Rp150.000. Lihat juga K-3. | | |
 | CHK-06 | Tinggi | Kurir toko — tarif area | Pilih alamat di Bandung dengan total belanja (subtotal + PPh 22) < Rp1.000.000, pilih **Kurir Toko**. | Ongkir sesuai tarif kecamatan; estimasi H+1 hari kerja. | | |
 | CHK-07 | Tinggi | Kurir toko — gratis ongkir | Ulangi CHK-06 dengan total belanja (subtotal + PPh 22) ≥ Rp1.000.000. | Ongkir Kurir Toko **Rp0 (gratis)**. | | |
-| CHK-08 | Tinggi | Membuat pesanan | Selesaikan checkout. | Nomor pesanan & invoice terbit (format K-1), status **Menunggu Pembayaran**, stok produk berkurang. Admin melihat **tanda merah** pesanan baru; WhatsApp terkirim ke nomor admin (K-6, bila nomor Fonnte sudah aktif). | | |
+| CHK-08 | Tinggi | Membuat pesanan | Selesaikan checkout. | Nomor pesanan & invoice terbit (format K-1), status **Menunggu Pembayaran**, stok produk berkurang. Admin melihat **tanda merah** pesanan baru; WhatsApp terkirim ke nomor admin (K-6). | | |
 | CHK-09 | Tinggi | Invoice | Buka detail pesanan → **Invoice**, lalu **Unduh PDF**. | Invoice memuat identitas & NPWP toko, nomor akun reseller, daftar barang + SKU, harga, PPh 22, ongkir, dan total. PDF dapat diunduh. | | |
-| CHK-10 | Sedang | Pengiriman ekspedisi | Pilih alamat di luar Bandung. | Pilihan kurir ekspedisi beserta ongkirnya tampil. *Di staging tarif masih simulasi; tarif asli aktif setelah akun Biteship klien terdaftar.* | | |
+| CHK-10 | Sedang | Pengiriman ekspedisi | Pilih alamat di luar Bandung. | Pilihan kurir ekspedisi beserta ongkirnya tampil sesuai tarif Biteship. | | |
 
 # 7. Pembayaran
 
@@ -128,7 +140,7 @@ sebelum transaksi pertama di production.
 |---|---|---|---|---|---|---|
 | CAN-01 | Tinggi | Admin membatalkan (hari yang sama) | Buat pesanan baru. Admin: **Pesanan** → **Batalkan** dengan alasan. | Status **Dibatalkan**, alasan tercatat, stok produk kembali. | | |
 | CAN-02 | Tinggi | Batas pembatalan admin | Lihat pesanan belum dibayar yang dibuat **kemarin** atau pesanan yang sudah **Diproses**. | Tombol batal tidak tersedia. | | |
-| CAN-03 | Tinggi | Batal otomatis tidak dibayar | Biarkan pesanan **Menunggu Pembayaran** sampai lewat tengah malam (cek keesokan harinya). | Pesanan otomatis **Dibatalkan** oleh sistem, stok kembali. *Dapat diperagakan Webekspres Teknologi Indonesia bila tidak sempat menunggu.* | | |
+| CAN-03 | Tinggi | Batal otomatis tidak dibayar | Hari 1: biarkan pesanan **Menunggu Pembayaran** sampai lewat tengah malam. Hari 2: periksa pesanan tersebut. | Pesanan otomatis **Dibatalkan** oleh sistem, stok kembali. | | |
 | CAN-04 | Tinggi | Pelanggan tidak dapat membatalkan | Login sebagai pelanggan, buka pesanan **Menunggu Pembayaran**. | Tidak ada tombol batal; pembatalan hanya melalui admin (K-7). | | |
 | FUL-01 | Tinggi | Alur pemrosesan | Admin membuka pesanan **Diproses** → **Dikemas** → **Dikirim** (isi nomor resi). | Status berubah berurutan; pelanggan melihat status dan nomor resi; pelanggan menerima tautan konfirmasi penerimaan. | | |
 | FUL-02 | Tinggi | Konfirmasi penerimaan pelanggan | Buka tautan konfirmasi penerimaan untuk pesanan **Dikirim** → konfirmasi. | Pesanan menjadi **Selesai**. Membuka tautan yang sama lagi hanya menampilkan info bahwa pesanan sudah dikonfirmasi. | | |
@@ -150,15 +162,13 @@ sebelum transaksi pertama di production.
 
 # 10. Di luar cakupan UAT ini
 
-Hal berikut **belum** diuji pada 15 Oktober karena masih menunggu pihak
+Hal berikut **belum** diuji pada UAT ini karena masih menunggu pihak
 eksternal. Masing-masing akan diverifikasi terpisah sebelum/sesudah go-live.
 
 | Hal | Status | Keterangan |
 |---|---|---|
 | Sinkronisasi stok & harga langsung dari POS | Menunggu vendor POS | UAT memakai data contoh |
 | Pelaporan penjualan & retur ke POS | Menunggu vendor POS | Diuji pada contract test POS |
-| Tarif & pemesanan kurir Biteship asli | Menunggu akun Biteship klien | Staging memakai tarif simulasi |
-| WhatsApp order baru | Menunggu pendaftaran nomor di Fonnte | Tanda merah admin sudah berfungsi |
 | Kirim invoice via WhatsApp/email, poin loyalitas, ongkir pesanan gabungan, lupa kata sandi | Fase berikutnya | Bukan bagian MVP |
 
 # 11. Pencatatan Temuan

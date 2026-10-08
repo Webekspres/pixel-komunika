@@ -198,7 +198,9 @@ class CartService
         }
 
         if (! $summary['partai_eligible']) {
-            return "Tambahkan minimal {$this->priceCalculator->partaiMinimumQuantity()} unit untuk salah satu produk agar bisa checkout.";
+            $minimum = $this->priceCalculator->partaiMinimumQuantity();
+
+            return "Target pembelian minimal {$minimum} unit di salah satu produk belum terpenuhi. Tambah jumlah salah satu produk menjadi {$minimum} unit untuk checkout.";
         }
 
         return null;

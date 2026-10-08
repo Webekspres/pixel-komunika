@@ -157,9 +157,9 @@ it('KAT-02/05 blocks checkout until one SKU reaches the partai minimum and never
 
     expect($cartService->getCartSummary($cart)['items']->pluck('price_type')->unique()->all())->toBe([ProductPrice::BULK])
         ->and(fn () => app(OrderService::class)->createOrderFromCart($user, $cart, $address, $jne))
-        ->toThrow(InvalidArgumentException::class, 'Tambahkan minimal 5 unit');
+        ->toThrow(InvalidArgumentException::class, 'Target pembelian minimal 5 unit di salah satu produk belum terpenuhi');
 
-    $this->actingAs($user)->get(route('cart.index'))->assertSee('Tambahkan minimal 5 unit')->assertDontSee('Lanjut Checkout');
+    $this->actingAs($user)->get(route('cart.index'))->assertSee('Target pembelian minimal 5 unit di salah satu produk belum terpenuhi')->assertDontSee('Lanjut Checkout');
     $this->actingAs($user)->get(route('checkout.index'))->assertRedirect(route('cart.index'));
 
     $cartService->addItem($cart, $powerBank, 1);

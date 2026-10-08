@@ -137,7 +137,7 @@
                 </div>
                 <p class="text-[11px] leading-relaxed text-zinc-600">Ongkir kurir toko Rp0 untuk area Bandung bila subtotal + PPh 22 mencapai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}.</p>
 
-@if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
+                @if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
                     <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-800">{{ $checkoutBlocker }}</p>
                 @endif
 
@@ -278,7 +278,7 @@
                 </div>
                 <p class="text-[11px] leading-relaxed text-zinc-600">Ongkir kurir toko Rp0 untuk area Bandung bila subtotal + PPh 22 mencapai Rp {{ number_format(config('store.shipping.free_store_courier_threshold'), 0, ',', '.') }}.</p>
 
-@if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
+                @if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
                     <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-800">{{ $checkoutBlocker }}</p>
                 @endif
 

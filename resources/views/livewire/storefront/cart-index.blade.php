@@ -55,6 +55,12 @@
                 />
             </div>
         @else
+            @if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
+                <div role="status" class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-800">
+                    {{ $checkoutBlocker }}
+                </div>
+            @endif
+
             <div class="flex flex-col gap-5 lg:flex-row">
                 <div class="flex-1 space-y-3">
                     @foreach ($summary['items'] as $item)
@@ -114,9 +120,9 @@
 
                         @auth
                             @if (auth()->user()->isActiveCustomer() && $checkoutBlocker)
-                                <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-center text-xs font-medium text-amber-800">
-                                    {{ $checkoutBlocker }}
-                                </div>
+                                <button type="button" disabled class="flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-zinc-200 py-3.5 text-sm font-bold text-zinc-700">
+                                    Belum Bisa Checkout
+                                </button>
                             @elseif (auth()->user()->isActiveCustomer())
                                 <a href="{{ route('checkout.index') }}" wire:navigate class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-black py-3.5 text-sm font-bold text-white transition hover:bg-zinc-700">
                                     Lanjut Checkout

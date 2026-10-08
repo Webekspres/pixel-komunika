@@ -66,9 +66,19 @@ class SamplePosSyncService implements PosMasterSyncInterface
         return $run->fresh();
     }
 
+    /** CR-023: penjualan dilaporkan H+1 setelah pesanan diproses (diantrikan saat pembayaran diverifikasi). */
     public function dispatchPendingSaleReports(int $limit = 50): int
     {
-        return $this->dispatchPending(PosIntegrationOperation::WEB_SALE_REPORT, $limit);
+        $ops = PosIntegrationOperation::query()
+            ->where('operation', PosIntegrationOperation::WEB_SALE_REPORT)
+            ->where('status', PosIntegrationOperation::PENDING)
+            ->where('created_at', '<', now()->startOfDay())
+            ->limit($limit)
+            ->get();
+
+        $ops->each(fn (PosIntegrationOperation $op) => $this->applyAck($op));
+
+        return $ops->count();
     }
 
     public function dispatchPendingReturnReports(int $limit = 50): int
@@ -96,21 +106,6 @@ class SamplePosSyncService implements PosMasterSyncInterface
         }
 
         return $done;
-    }
-
-    protected function dispatchPending(string $operation, int $limit): int
-    {
-        $ops = PosIntegrationOperation::query()
-            ->where('operation', $operation)
-            ->where('status', PosIntegrationOperation::PENDING)
-            ->limit($limit)
-            ->get();
-
-        foreach ($ops as $op) {
-            $this->applyAck($op);
-        }
-
-        return $ops->count();
     }
 
     protected function applyAck(PosIntegrationOperation $op): void

@@ -269,7 +269,6 @@ class OrderService
             $cart->items()->delete();
 
             $this->notifications->notifyNewOrder($order);
-            $this->posOutbox->queueSaleReport($order);
 
             return $order->fresh(['items', 'invoice', 'shipment', 'payment', 'chargeComponents']);
         });
@@ -322,17 +321,8 @@ class OrderService
                 ]);
             }
 
-            $salesReturn = SalesReturn::query()->updateOrCreate(
-                ['order_id' => $order->id],
-                [
-                    'return_number' => 'SR-'.$order->order_number,
-                    'reason' => $reason,
-                    'reporting_status' => SalesReturn::PENDING,
-                    'returned_at' => now(),
-                ],
-            );
-
-            $this->posOutbox->queueReturnReport($order, $salesReturn);
+            // CR-023: pesanan dilaporkan ke POS baru setelah diproses, sedangkan pembatalan hanya
+            // berlaku sebelum diproses; tidak ada penjualan POS yang perlu diretur.
             $this->audit->log('ORDER_CANCELLED', $order, $actor, null, [
                 'cancellation_source' => $source,
                 'reason' => $reason,

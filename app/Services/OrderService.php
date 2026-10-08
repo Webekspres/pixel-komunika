@@ -98,7 +98,17 @@ class OrderService
             $datePrefix = now()->format('Ymd');
             $randomSuffix = strtoupper(Str::random(5));
             $orderNumber = "PK-{$datePrefix}-{$randomSuffix}";
-            $invoiceNumber = "INV-{$datePrefix}-{$randomSuffix}";
+            // CR-023: nomor invoice web terpisah dari POS, WEB-[yymm]-[0001], urut ulang tiap bulan.
+            // ponytail: lockForUpdate menahan checkout bersamaan; bentrokan sisa (awal bulan, belum ada baris)
+            // ditolak unique index invoice_number dan checkout bisa diulang. Tambah tabel counter bila sering terjadi.
+            $invoicePrefix = 'WEB-'.now()->format('ym').'-';
+            $lastInvoiceNumber = Invoice::query()
+                ->where('invoice_number', 'like', $invoicePrefix.'%')
+                ->orderByRaw('LENGTH(invoice_number) DESC')
+                ->orderByDesc('invoice_number')
+                ->lockForUpdate()
+                ->value('invoice_number');
+            $invoiceNumber = $invoicePrefix.str_pad((string) ((int) substr((string) $lastInvoiceNumber, strlen($invoicePrefix)) + 1), 4, '0', STR_PAD_LEFT);
 
             $order = Order::create([
                 'order_number' => $orderNumber,

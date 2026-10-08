@@ -62,6 +62,9 @@ Klarifikasi klien pada 28 Juli 2026 menetapkan:
 - harga partai eligible jika sedikitnya satu produk/SKU mencapai minimum global
   website (awal lima unit); kuantitas antar-SKU tidak dijumlahkan; setelah
   terpicu harga partai berlaku untuk seluruh order dan menang terhadap grosir;
+- checkout hanya dapat dilakukan bila sedikitnya satu SKU mencapai minimum
+  partai; SKU lain boleh di bawahnya dan harga eceran tidak pernah dipakai
+  (klarifikasi klien 7 Oktober 2026, CR-021);
 - istilah batas maksimal dikoreksi menjadi ambang nilai belanja per klasifikasi;
   melewati ambang tidak menolak checkout;
 - PPh 22 menggunakan tarif configurable, termasuk `0%`, dan dipicu ketika

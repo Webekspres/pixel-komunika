@@ -93,9 +93,9 @@ sebelum transaksi pertama di production.
 | KAT-02 | Tinggi | Harga eceran tidak tampil | Sebagai reseller aktif, perhatikan harga di katalog dan detail produk. | Harga yang tampil adalah harga reseller (grosir/partai), **bukan harga eceran**. | | |
 | KAT-03 | Tinggi | Harga grosir | Masukkan produk ke keranjang dengan jumlah ≥ minimum grosir produk tersebut. | Harga satuan berubah menjadi harga grosir. | | |
 | KAT-04 | Tinggi | Harga partai — satu produk ≥ 5 unit | Masukkan produk A sebanyak 5 unit dan produk B sebanyak 1 unit. | Harga **partai** berlaku untuk **seluruh** produk di keranjang yang memiliki harga partai. | | |
-| KAT-05 | Tinggi | Harga partai — tidak digabung antar produk | Kosongkan keranjang. Masukkan produk A 3 unit dan produk B 3 unit. | Harga partai **tidak** berlaku (jumlah antar produk tidak dijumlahkan). | | |
+| KAT-05 | Tinggi | Harga partai — tidak digabung antar produk | Kosongkan keranjang. Masukkan produk A 3 unit dan produk B 3 unit. | Jumlah antar produk tidak dijumlahkan: tombol checkout diganti pesan "Tambahkan minimal 5 unit untuk salah satu produk agar bisa checkout." Harga eceran tidak tampil. Tambah produk A menjadi 5 unit: tombol **Lanjut Checkout** muncul. | | |
 | KAT-06 | Sedang | Kelengkapan produk oleh admin | Admin: **Produk** → ubah nama tampilan, foto/video, berat, dan dimensi suatu produk. | Perubahan tampil di website dan tidak hilang setelah sinkronisasi data produk. | | |
-| KAT-07 | Sedang | Minimum partai | Admin: **Pengaturan** → ubah minimum partai (misal 6), ulangi KAT-04 dengan 5 unit. | Harga partai tidak berlaku sampai jumlah mencapai minimum baru. Kembalikan ke 5 setelah uji. | | |
+| KAT-07 | Sedang | Minimum partai | Admin: **Pengaturan** → ubah minimum partai (misal 6), ulangi KAT-04 dengan 5 unit. | Checkout belum bisa dilakukan sampai salah satu produk mencapai minimum baru. Kembalikan ke 5 setelah uji. | | |
 
 # 6. Keranjang dan Checkout
 

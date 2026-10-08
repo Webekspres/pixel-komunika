@@ -424,6 +424,7 @@
                     [$syncLabel, $syncBadge] = match (true) {
                         $posDriver === 'sample' => ['Data contoh', 'bg-zinc-100 text-zinc-700 ring-zinc-500/20'],
                         $lastSyncStatus === 'SUCCEEDED' => ['Sinkron', 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'],
+                        $lastSyncStatus === 'PARTIAL' => ['Sinkron sebagian', 'bg-amber-50 text-amber-700 ring-amber-600/20'],
                         $lastSyncStatus === 'FAILED' => ['Sinkron gagal', 'bg-rose-50 text-rose-700 ring-rose-600/20'],
                         $lastSyncStatus === 'RUNNING' => ['Sedang sinkron', 'bg-amber-50 text-amber-700 ring-amber-600/20'],
                         default => ['Belum pernah sinkron', 'bg-zinc-100 text-zinc-700 ring-zinc-500/20'],

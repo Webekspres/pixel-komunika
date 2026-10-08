@@ -293,3 +293,41 @@ it('successfully syncs valid master data and preserves local enrichment and tax 
     $taxRule = CategoryTaxRule::query()->where('category_id', $cat->id)->first();
     expect((float) $taxRule->rate_percent)->toBe(0.5);
 });
+
+it('skips and records invalid products without failing valid ones', function () {
+    Http::fake([
+        'https://pos-sandbox.test/master/category' => Http::response([
+            'status' => 'success',
+            'message' => 'ok',
+            'data' => [['category_id' => 'CAT1', 'category_name' => 'Kategori 1']],
+        ], 200),
+        'https://pos-sandbox.test/master/product' => Http::response([
+            'status' => 'success',
+            'message' => 'ok',
+            'data' => [
+                ['item_id' => 'ITEM-OK', 'item_name' => 'Produk Valid', 'category_id' => 'CAT1'],
+                ['item_id' => 'ITEM-DUP', 'item_name' => 'Produk A', 'category_id' => 'CAT1'],
+                ['item_id' => 'ITEM-DUP', 'item_name' => 'Produk B', 'category_id' => 'CAT1'],
+                ['item_id' => 'ITEM-MINQTY', 'item_name' => 'Produk Min 0', 'category_id' => 'CAT1'],
+            ],
+        ], 200),
+        'https://pos-sandbox.test/master/pricelist' => Http::response([
+            'status' => 'success',
+            'message' => 'ok',
+            'data' => [
+                ['item_id' => 'ITEM-OK', 'price' => [['type' => 'Partai', 'amount' => 9000, 'min_qty' => 5]]],
+                ['item_id' => 'ITEM-DUP', 'price' => [['type' => 'Partai', 'amount' => 9000, 'min_qty' => 5]]],
+                ['item_id' => 'ITEM-MINQTY', 'price' => [['type' => 'Partai', 'amount' => 9000, 'min_qty' => 0]]],
+            ],
+        ], 200),
+    ]);
+
+    $run = (new SandboxPosMasterSyncService(new PosApiClient('https://pos-sandbox.test', 'secret123')))->syncMasters();
+
+    expect($run->status)->toBe('PARTIAL')
+        ->and($run->success_count)->toBe(1)
+        ->and($run->failed_count)->toBe(3)
+        ->and(Product::query()->pluck('pos_product_id')->all())->toBe(['ITEM-OK'])
+        ->and(SyncError::query()->where('sync_run_id', $run->id)->pluck('error_code')->unique()->sort()->values()->all())
+        ->toBe(['DUPLICATE_ITEM_ID', 'INVALID_MIN_QTY']);
+});

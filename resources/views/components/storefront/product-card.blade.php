@@ -108,7 +108,7 @@
         <div class="mt-4 flex items-end justify-between gap-3 border-t border-brand-black/6 pt-4">
             <div>
                 @if ($showPrice && $price)
-                    <p class="text-xs font-semibold text-brand-black/65">Harga Grosir</p>
+                    <p class="text-xs font-semibold text-brand-black/65">Harga Partai</p>
                     <p class="mt-1 text-base font-extrabold text-brand-black sm:text-lg">
                         {{ $price }}
                     </p>

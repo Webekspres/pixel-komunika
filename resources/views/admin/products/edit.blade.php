@@ -69,7 +69,7 @@
                         <div class="space-y-2">
                             @foreach ($product->prices as $price)
                                 <div class="flex items-center justify-between rounded-xl bg-neutral-50 px-4 py-2.5 text-sm">
-                                    <span class="text-xs font-bold text-zinc-500">{{ $price->price_type }}</span>
+                                    <span class="text-xs font-bold text-zinc-500">{{ \App\Models\ProductPrice::LABELS[$price->price_type] ?? $price->price_type }}</span>
                                     <span class="font-semibold text-zinc-900">
                                         Rp {{ number_format($price->amount, 0, ',', '.') }}
                                         @if ($price->minimum_quantity)

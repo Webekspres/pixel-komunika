@@ -83,7 +83,7 @@ it('PROBE-04 product added to cart then hidden by admin cannot be checked out (F
     $user = checkoutCustomer();
     $cart = app(CartService::class)->getOrCreateCart($user);
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
-    app(CartService::class)->addItem($cart, $product->id, 1);
+    app(CartService::class)->addItem($cart, $product->id, 5);
     $product->update(['is_active' => false]);
     $product->enrichment()->update(['is_visible' => false]);
 
@@ -116,7 +116,7 @@ it('PROBE-06 PPh 22 is rounded to the nearest rupiah (K-3)', function () {
 it('PROBE-07 invoice HTML and PDF show reseller account number (CHK-09)', function () use ($jne) {
     $user = checkoutCustomer();
     $cart = app(CartService::class)->getOrCreateCart($user);
-    app(CartService::class)->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 1);
+    app(CartService::class)->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 5);
     $order = app(OrderService::class)->createOrderFromCart($user, $cart, checkoutAddress($user), $jne);
 
     expect($order->invoice->reseller_account_number_snapshot)->toBe('PKR-000777');
@@ -134,7 +134,7 @@ it('PROBE-08 invoice keeps store NPWP snapshot after admin edits store profile (
     $store = StoreProfile::create(['store_name' => 'Pixel Komunika', 'address' => 'Bandung', 'contact_number' => '0815', 'company_name' => 'Pixel Komunika', 'company_npwp' => '11.111.111.1-111.000', 'is_active' => true]);
     $user = checkoutCustomer();
     $cart = app(CartService::class)->getOrCreateCart($user);
-    app(CartService::class)->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 1);
+    app(CartService::class)->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 5);
     $order = app(OrderService::class)->createOrderFromCart($user, $cart, checkoutAddress($user), $jne);
 
     $store->update(['company_npwp' => '99.999.999.9-999.000']);
@@ -143,26 +143,30 @@ it('PROBE-08 invoice keeps store NPWP snapshot after admin edits store profile (
         ->assertSee('11.111.111.1-111.000')->assertDontSee('99.999.999.9-999.000');
 });
 
-it('KAT-02/05 enforces the admin minimum purchase so resellers never fall back to ECERAN', function () {
-    StoreProfile::query()->update(['is_active' => false]);
-    StoreProfile::create(['store_name' => 'Pixel Komunika', 'address' => 'Bandung', 'contact_number' => '0815', 'company_npwp' => '11.111.111.1-111.000', 'partai_minimum_quantity' => 5, 'minimum_order_quantity' => 5, 'is_active' => true]);
-
+// BR-006 (keputusan klien 7 Okt): checkout butuh minimal satu SKU mencapai minimum partai.
+it('KAT-02/05 blocks checkout until one SKU reaches the partai minimum and never charges ECERAN', function () use ($jne) {
     $user = checkoutCustomer();
+    $address = checkoutAddress($user);
     $cartService = app(CartService::class);
     $cart = $cartService->getOrCreateCart($user);
-    $productId = Product::where('sku', 'PB-10000')->value('id');
+    $powerBank = Product::where('sku', 'PB-10000')->value('id');
+    $headphone = Product::where('sku', 'HP-WL')->value('id');
 
-    expect(fn () => $cartService->addItem($cart, $productId, 1))
-        ->toThrow(InvalidArgumentException::class, 'Minimal pembelian 5 unit');
+    $cartService->addItem($cart, $powerBank, 4);
+    $cartService->addItem($cart, $headphone, 2);
 
-    // Tombol tambah cepat langsung memasukkan jumlah minimal.
-    $cartService->addItem($cart, $productId);
-    $line = $cartService->getCartSummary($cart)['items']->first();
+    expect($cartService->getCartSummary($cart)['items']->pluck('price_type')->unique()->all())->toBe([ProductPrice::BULK])
+        ->and(fn () => app(OrderService::class)->createOrderFromCart($user, $cart, $address, $jne))
+        ->toThrow(InvalidArgumentException::class, 'Target pembelian minimal 5 unit di salah satu produk belum terpenuhi');
 
-    expect($line['quantity'])->toBe(5)
-        ->and($line['price_type'])->not->toBe(ProductPrice::RETAIL)
-        ->and(fn () => $cartService->updateQuantity($cart, $cart->items()->first()->id, 4))
-        ->toThrow(InvalidArgumentException::class, 'Minimal pembelian 5 unit');
+    $this->actingAs($user)->get(route('cart.index'))->assertSee('Target pembelian minimal 5 unit di salah satu produk belum terpenuhi')->assertDontSee('Lanjut Checkout');
+    $this->actingAs($user)->get(route('checkout.index'))->assertRedirect(route('cart.index'));
+
+    $cartService->addItem($cart, $powerBank, 1);
+    $order = app(OrderService::class)->createOrderFromCart($user, $cart, $address, $jne);
+
+    expect($order->items()->pluck('quantity')->sort()->values()->all())->toBe([2, 5])
+        ->and($order->items()->where('price_type', '!=', ProductPrice::BULK)->exists())->toBeFalse();
 });
 
 it('PROBE-10 Biteship rates are parsed from the real /v1/rates/couriers schema (CHK-10)', function () {
@@ -209,5 +213,31 @@ it('PROBE-13 product page shows admin-configured partai minimum (KAT-07)', funct
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
 
     $this->actingAs($user)->get(route('products.show', $product))->assertOk()
-        ->assertSee('min. 6 unit')->assertDontSee('min. 5 unit');
+        ->assertSee('minimal 6 unit')->assertDontSee('minimal 5 unit');
+});
+
+// CR-022: tier Grosir 2 dari data contoh dipakai di keranjang dengan label yang terbaca.
+it('KAT-03 charges Grosir 2 once a SKU reaches its minimum and labels it in the cart', function () {
+    $user = checkoutCustomer();
+    $cartService = app(CartService::class);
+    $cart = $cartService->getOrCreateCart($user);
+    $cartService->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 24);
+
+    $line = $cartService->getCartSummary($cart)['items']->first();
+
+    expect($line['price_type'])->toBe(ProductPrice::WHOLESALE_2)
+        ->and($line['unit_price'])->toBe(145000.0);
+    $this->actingAs($user)->get(route('cart.index'))->assertSee('Rp 145.000 / pcs · Grosir 2');
+});
+
+// Filter harga memakai Partai, jadi produk tanpa harga grosir tetap ikut tersaring.
+it('KAT-01 price filter includes products that have no grosir price', function () {
+    $this->actingAs(checkoutCustomer());
+    $product = Product::where('sku', 'PB-10000')->firstOrFail();
+    $product->prices()->whereIn('price_type', [ProductPrice::WHOLESALE, ProductPrice::WHOLESALE_2])->delete();
+
+    Livewire::test(ProductIndex::class)
+        ->set('minPrice', '160000')
+        ->set('maxPrice', '170000')
+        ->assertViewHas('products', fn ($products) => $products->pluck('sku')->all() === ['PB-10000']);
 });

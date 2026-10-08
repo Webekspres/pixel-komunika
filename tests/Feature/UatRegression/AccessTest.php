@@ -88,7 +88,7 @@ it('blocks suspended customer from placing order via open checkout component', f
     $user = accessCustomer(CustomerProfile::ACTIVE);
     accessAddress($user);
     $cartService = app(CartService::class);
-    $cartService->addItem($cartService->getOrCreateCart($user), Product::where('sku', 'PB-10000')->firstOrFail()->id, 1);
+    $cartService->addItem($cartService->getOrCreateCart($user), Product::where('sku', 'PB-10000')->firstOrFail()->id, 5);
 
     $this->actingAs($user);
     $component = Livewire::test(Checkout::class);

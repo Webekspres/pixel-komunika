@@ -132,23 +132,22 @@
                         <div class="rounded-2xl bg-zinc-50 p-4">
                             @if ($canViewPrices)
                                 <p class="text-2xl font-black text-zinc-950">
-                                    Rp {{ number_format($product->listPriceAmount() ?? 0, 0, ',', '.') }}
+                                    Rp {{ number_format($product->partaiPriceAmount() ?? 0, 0, ',', '.') }}
                                 </p>
-                                <p class="mt-0.5 text-xs text-zinc-500">Harga Grosir B2B / unit</p>
-                                @if ($product->partaiPriceAmount())
-                                    <div class="mt-2 border-t border-zinc-200 pt-2">
-                                        <p class="text-xs text-zinc-500">
-                                            Harga Partai:
-                                            <span class="font-semibold text-zinc-700">
-                                                Rp {{ number_format($product->partaiPriceAmount(), 0, ',', '.') }}
-                                            </span>
-                                            (min. {{ app(\App\Domains\Pricing\PriceCalculator::class)->partaiMinimumQuantity() }} unit/SKU)
-                                            @if ($product->grosirMinimumQuantity())
-                                                · Grosir min. {{ $product->grosirMinimumQuantity() }} unit
-                                            @endif
-                                        </p>
-                                    </div>
+                                <p class="mt-0.5 text-xs text-zinc-500">Harga partai / unit</p>
+                                @if ($product->grosirPrices()->isNotEmpty())
+                                    <dl class="mt-3 space-y-1 border-t border-zinc-200 pt-3 text-xs">
+                                        @foreach ($product->grosirPrices() as $grosir)
+                                            <div class="flex justify-between gap-3">
+                                                <dt class="text-zinc-600">{{ \App\Models\ProductPrice::LABELS[$grosir->price_type] }} · min. {{ $grosir->minimum_quantity }} unit</dt>
+                                                <dd class="font-semibold text-zinc-900">Rp {{ number_format($grosir->amount, 0, ',', '.') }}</dd>
+                                            </div>
+                                        @endforeach
+                                    </dl>
                                 @endif
+                                <p class="mt-3 border-t border-zinc-200 pt-3 text-xs text-zinc-600">
+                                    Checkout butuh minimal {{ app(\App\Domains\Pricing\PriceCalculator::class)->partaiMinimumQuantity() }} unit untuk salah satu produk di keranjang.
+                                </p>
                             @elseif ($isPendingCustomer)
                                 <div class="flex items-start gap-2.5">
                                     <x-icon name="clock" class="mt-0.5 size-4 shrink-0 text-amber-500" />
@@ -299,7 +298,7 @@
                             :stock-label="$rel->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$rel->inventorySnapshot->quantity_available : 'Habis'"
                             :stock-variant="$rel->inventorySnapshot?->quantity_available > 0 ? 'available' : 'unavailable'"
                             :show-price="auth()->user()?->canViewPrices()"
-                            :price="'Rp '.number_format($rel->listPriceAmount() ?? 0, 0, ',', '.')"
+                            :price="'Rp '.number_format($rel->partaiPriceAmount() ?? 0, 0, ',', '.')"
                         />
                     @endforeach
                 </div>

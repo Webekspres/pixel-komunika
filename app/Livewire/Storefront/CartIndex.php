@@ -54,6 +54,7 @@ class CartIndex extends Component
 
         return view('livewire.storefront.cart-index', [
             'summary' => $summary,
+            'checkoutBlocker' => $cartService->checkoutBlocker($summary),
         ])->layout('layouts.storefront');
     }
 }

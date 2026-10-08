@@ -218,7 +218,7 @@
                                 <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
                                     <span class="inline-flex items-center rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] font-medium text-zinc-700">SKU: {{ $item->sku }}</span>
                                     @if ($item->price_type)
-                                        <span class="inline-flex items-center rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 uppercase">{{ $item->price_type }}</span>
+                                        <span class="inline-flex items-center rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800">{{ \App\Models\ProductPrice::LABELS[$item->price_type] ?? $item->price_type }}</span>
                                     @endif
                                     <span class="text-zinc-500">•</span>
                                     <span>{{ $item->quantity }} × Rp {{ number_format($item->unit_price, 0, ',', '.') }}</span>

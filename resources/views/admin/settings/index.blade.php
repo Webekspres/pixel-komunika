@@ -453,11 +453,6 @@
                     {{ $store->partai_minimum_quantity ?? 5 }}
                     <span class="text-sm font-semibold text-zinc-500">per SKU</span>
                 </p>
-                <p class="mt-4 text-xs font-semibold text-zinc-500">Minimal pembelian</p>
-                <p class="mt-1 text-2xl font-black text-zinc-900">
-                    {{ $store->minimum_order_quantity ?? 1 }}
-                    <span class="text-sm font-semibold text-zinc-500">unit per SKU</span>
-                </p>
                 <p class="mt-1.5 text-xs text-zinc-500">Perubahan dicatat ke audit trail.</p>
             </div>
 
@@ -478,21 +473,7 @@
                         value="{{ old('partai_minimum_quantity', $store->partai_minimum_quantity ?? 5) }}"
                         class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
                     >
-                </div>
-
-                <div>
-                    <label for="minimum_order_quantity" class="mb-1.5 block text-xs font-semibold text-zinc-700">Minimal pembelian per SKU</label>
-                    <input
-                        id="minimum_order_quantity"
-                        name="minimum_order_quantity"
-                        type="number"
-                        min="1"
-                        max="100000"
-                        required
-                        value="{{ old('minimum_order_quantity', $store->minimum_order_quantity ?? 1) }}"
-                        class="w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-sm focus:border-brand-yellow focus:ring-2 focus:ring-brand-black focus:outline-none"
-                    >
-                    <p class="mt-1.5 text-xs text-zinc-500">Pelanggan tidak bisa membeli kurang dari jumlah ini per produk. Samakan dengan minimum partai agar harga eceran tidak pernah dipakai. Perubahan dicatat ke audit trail.</p>
+                    <p class="mt-1.5 text-xs text-zinc-500">Checkout baru bisa dilakukan bila minimal satu produk mencapai jumlah ini. Setelah itu harga partai berlaku untuk semua produk di pesanan. Perubahan dicatat ke audit trail.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 border-t border-neutral-100 pt-4">
@@ -515,7 +496,7 @@
                                     <x-icon name="history" class="size-3 text-zinc-500" />
                                 </div>
                                 <div class="min-w-0">
-                                    @foreach (['partai_minimum_quantity' => 'Minimum partai', 'minimum_order_quantity' => 'Minimal pembelian'] as $field => $label)
+                                    @foreach (['partai_minimum_quantity' => 'Minimum partai'] as $field => $label)
                                         @continue(! array_key_exists($field, (array) $log->new_values))
                                         <p class="text-zinc-800">
                                             {{ $label }} diubah

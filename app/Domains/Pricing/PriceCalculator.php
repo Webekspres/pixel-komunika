@@ -10,34 +10,20 @@ use Illuminate\Support\Collection;
 
 class PriceCalculator
 {
-    public function resolvePrice(Product $product, int $quantity, bool $cartHasPartaiEligibleSku = false): ProductPrice
+    /**
+     * Partai adalah harga dasar; Grosir 1/Grosir 2 dipakai bila jumlah SKU mencapai minimumnya
+     * dan harganya lebih murah (CR-022). ECERAN tidak pernah dipakai (FR-PRC-007).
+     */
+    public function resolvePrice(Product $product, int $quantity): ?ProductPrice
     {
-        $prices = $product->prices->keyBy('price_type');
-        $partaiMin = $this->partaiMinimumQuantity();
-
-        $wholesale = $prices->get(ProductPrice::WHOLESALE);
-        $bulk = $prices->get(ProductPrice::BULK);
-
-        // Partai beats grosir once any SKU in cart meets global partai minimum.
-        if ($cartHasPartaiEligibleSku && $bulk) {
-            return $bulk;
-        }
-
-        if ($bulk && $quantity >= $partaiMin) {
-            return $bulk;
-        }
-
-        if ($wholesale && $quantity >= (int) $wholesale->minimum_quantity) {
-            return $wholesale;
-        }
-
-        return $prices->get(ProductPrice::RETAIL, $bulk ?? $wholesale);
-    }
-
-    /** Minimal pembelian per SKU (Pengaturan > Partai); mencegah reseller jatuh ke harga ECERAN. */
-    public function minimumOrderQuantity(): int
-    {
-        return max(1, (int) (StoreProfile::active()?->minimum_order_quantity ?? 1));
+        return $product->prices
+            ->filter(fn (ProductPrice $price) => match ($price->price_type) {
+                ProductPrice::BULK => true,
+                ProductPrice::WHOLESALE, ProductPrice::WHOLESALE_2 => $price->minimum_quantity >= 1 && $quantity >= $price->minimum_quantity,
+                default => false,
+            })
+            ->sortBy(fn (ProductPrice $price) => (float) $price->amount)
+            ->first();
     }
 
     public function partaiMinimumQuantity(): int

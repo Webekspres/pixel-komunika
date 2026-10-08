@@ -14,7 +14,7 @@ it('imports sample catalog data through an idempotent path', function () {
 
     expect(Category::query()->count())->toBe(3)
         ->and(Product::query()->count())->toBe(4)
-        ->and(ProductPrice::query()->count())->toBe(12)
+        ->and(ProductPrice::query()->count())->toBe(13)
         ->and(InventoryLedger::query()->count())->toBe(8);
 
     $product = Product::query()->where('sku', 'PB-10000')->firstOrFail();

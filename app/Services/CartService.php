@@ -42,8 +42,7 @@ class CartService
         throw new InvalidArgumentException('User or Session ID required to resolve cart.');
     }
 
-    /** $quantity null = tombol tambah cepat: minimal pembelian bila produk baru, +1 bila sudah ada. */
-    public function addItem(Cart $cart, int $productId, ?int $quantity = null): CartItem
+    public function addItem(Cart $cart, int $productId, int $quantity = 1): CartItem
     {
         // FR-CART-001: hanya pelanggan aktif (terautentikasi) yang dapat menambahkan ke keranjang.
         if ($cart->user_id === null) {
@@ -54,10 +53,6 @@ class CartService
         if (! $cart->user?->isActiveCustomer()) {
             throw new InvalidArgumentException('Akun Anda belum aktif untuk berbelanja. Tunggu verifikasi admin.');
         }
-
-        $existingItem = $cart->items()->where('product_id', $productId)->first();
-        $minimum = $this->priceCalculator->minimumOrderQuantity();
-        $quantity ??= $existingItem ? 1 : $minimum;
 
         if ($quantity < 1) {
             throw new InvalidArgumentException('Jumlah minimal 1.');
@@ -71,11 +66,8 @@ class CartService
 
         $stockAvailable = $product->inventorySnapshot ? $product->inventorySnapshot->quantity_available : 0;
 
+        $existingItem = $cart->items()->where('product_id', $productId)->first();
         $newQuantity = $existingItem ? ($existingItem->quantity + $quantity) : $quantity;
-
-        if ($newQuantity < $minimum) {
-            throw new InvalidArgumentException("Minimal pembelian {$minimum} unit per produk.");
-        }
 
         if ($newQuantity > $stockAvailable) {
             throw new InvalidArgumentException("Stok tidak mencukupi. Stok tersedia: {$stockAvailable}");
@@ -101,11 +93,6 @@ class CartService
             $cartItem->delete();
 
             return null;
-        }
-
-        $minimum = $this->priceCalculator->minimumOrderQuantity();
-        if ($quantity < $minimum) {
-            throw new InvalidArgumentException("Minimal pembelian {$minimum} unit per produk. Hapus produk bila tidak jadi membeli.");
         }
 
         $stockAvailable = $cartItem->product->inventorySnapshot ? $cartItem->product->inventorySnapshot->quantity_available : 0;
@@ -143,6 +130,7 @@ class CartService
                 'pph22_components' => [],
                 'total_weight_grams' => 0,
                 'total_items' => 0,
+                'partai_eligible' => false,
             ];
         }
 
@@ -164,7 +152,7 @@ class CartService
         $itemSummaries = collect();
 
         foreach ($items as $item) {
-            $priceModel = $this->priceCalculator->resolvePrice($item->product, $item->quantity, $hasPartaiEligible);
+            $priceModel = $this->priceCalculator->resolvePrice($item->product, $item->quantity);
             $unitPrice = $priceModel ? (float) $priceModel->amount : 0;
             $lineSubtotal = round($unitPrice * $item->quantity, 2);
 
@@ -183,7 +171,7 @@ class CartService
                 'product' => $item->product,
                 'quantity' => $item->quantity,
                 'unit_price' => $unitPrice,
-                'price_type' => $priceModel ? $priceModel->price_type : 'RETAIL',
+                'price_type' => $priceModel?->price_type,
                 'line_subtotal' => $lineSubtotal,
             ]);
         }
@@ -198,6 +186,23 @@ class CartService
             'pph22_aggregate' => $pph22Result['aggregate'],
             'total_weight_grams' => $totalWeightGrams,
             'total_items' => $items->sum('quantity'),
+            'partai_eligible' => $hasPartaiEligible,
         ];
+    }
+
+    /** BR-006 (keputusan klien 7 Okt): checkout butuh minimal satu SKU yang mencapai minimum partai. */
+    public function checkoutBlocker(array $summary): ?string
+    {
+        if ($summary['items']->isEmpty()) {
+            return 'Keranjang belanja kosong.';
+        }
+
+        if (! $summary['partai_eligible']) {
+            $minimum = $this->priceCalculator->partaiMinimumQuantity();
+
+            return "Target pembelian minimal {$minimum} unit di salah satu produk belum terpenuhi. Tambah jumlah salah satu produk menjadi {$minimum} unit untuk checkout.";
+        }
+
+        return null;
     }
 }

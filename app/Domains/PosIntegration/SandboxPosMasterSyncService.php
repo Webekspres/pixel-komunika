@@ -19,6 +19,7 @@ class SandboxPosMasterSyncService implements PosMasterSyncInterface
         'Eceran' => ProductPrice::RETAIL,
         'Partai' => ProductPrice::BULK,
         'Grosir 1' => ProductPrice::WHOLESALE,
+        'Grosir 2' => ProductPrice::WHOLESALE_2,
     ];
 
     public function __construct(

@@ -41,7 +41,6 @@ class DatabaseSeeder extends Seeder
                 'company_name' => config('store.company_name'),
                 'company_npwp' => config('store.npwp'),
                 'partai_minimum_quantity' => 5,
-                'minimum_order_quantity' => 5,
                 'origin_biteship_area_id' => config('biteship.origin_area_id') ?: 'IDNP9IDNC22IDND2066IDZ40252', // Regol 40252 (Jl Sawahkurung) fallback
                 'origin_biteship_label' => 'Regol, Bandung, Jawa Barat (40252)',
                 'origin_postal_code' => '40252',

@@ -55,6 +55,12 @@
                 />
             </div>
         @else
+            @if ($checkoutBlocker && auth()->user()?->isActiveCustomer())
+                <div role="status" class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-800">
+                    {{ $checkoutBlocker }}
+                </div>
+            @endif
+
             <div class="flex flex-col gap-5 lg:flex-row">
                 <div class="flex-1 space-y-3">
                     @foreach ($summary['items'] as $item)
@@ -66,7 +72,7 @@
                                 <p class="text-xs text-zinc-600">SKU: {{ $item['product']->sku }}</p>
                                 <h3 class="text-sm font-semibold leading-snug text-zinc-900 sm:text-base">{{ $item['product']->displayName() }}</h3>
                                 <p class="mt-0.5 text-xs font-semibold text-zinc-600">
-                                    Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / pcs · {{ $item['price_type'] }}
+                                    Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / pcs · {{ \App\Models\ProductPrice::LABELS[$item['price_type']] ?? $item['price_type'] }}
                                 </p>
 
                                 <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
@@ -113,7 +119,11 @@
                         </div>
 
                         @auth
-                            @if (auth()->user()->isActiveCustomer())
+                            @if (auth()->user()->isActiveCustomer() && $checkoutBlocker)
+                                <button type="button" disabled class="flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-zinc-200 py-3.5 text-sm font-bold text-zinc-700">
+                                    Belum Bisa Checkout
+                                </button>
+                            @elseif (auth()->user()->isActiveCustomer())
                                 <a href="{{ route('checkout.index') }}" wire:navigate class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-black py-3.5 text-sm font-bold text-white transition hover:bg-zinc-700">
                                     Lanjut Checkout
                                 </a>

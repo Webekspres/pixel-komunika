@@ -40,7 +40,7 @@ it('creates an order and invoice from cart and updates inventory ledger', functi
 
     $cart = $cartService->getOrCreateCart($user);
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
-    $cartService->addItem($cart, $product->id, 2);
+    $cartService->addItem($cart, $product->id, 6);
 
     $stockBefore = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
 
@@ -60,7 +60,7 @@ it('creates an order and invoice from cart and updates inventory ledger', functi
         ->and($order->tax_pph22_snapshot)->toBeArray();
 
     $stockAfter = InventorySnapshot::where('product_id', $product->id)->first()->quantity_available;
-    expect($stockAfter)->toBe($stockBefore - 2);
+    expect($stockAfter)->toBe($stockBefore - 6);
 
     // Cart should be empty now
     $summary = $cartService->getCartSummary($cart);

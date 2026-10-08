@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Domains\Audit\AuditLogger;
 use App\Domains\Notifications\NotificationService;
 use App\Domains\PosIntegration\PosOutboxService;
-use App\Domains\Pricing\PriceCalculator;
 use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\Cart;
@@ -48,8 +47,8 @@ class OrderService
 
         $summary = $this->cartService->getCartSummary($cart);
 
-        if ($summary['items']->isEmpty()) {
-            throw new InvalidArgumentException('Keranjang belanja kosong.');
+        if ($blocker = $this->cartService->checkoutBlocker($summary)) {
+            throw new InvalidArgumentException($blocker);
         }
 
         if ($idempotencyKey) {
@@ -125,18 +124,12 @@ class OrderService
                 'expires_at' => now('Asia/Jakarta')->endOfDay()->addDay(),
             ]);
 
-            $minimumQty = app(PriceCalculator::class)->minimumOrderQuantity();
-
             foreach ($summary['items'] as $itemData) {
                 $product = $itemData['product'];
                 $qty = $itemData['quantity'];
 
                 if ($qty < 1 || ! $product->isStorefrontVisible()) {
                     throw new InvalidArgumentException("Produk {$product->displayName()} sudah tidak tersedia. Hapus dari keranjang untuk melanjutkan.");
-                }
-
-                if ($qty < $minimumQty) {
-                    throw new InvalidArgumentException("Minimal pembelian {$minimumQty} unit untuk {$product->displayName()}.");
                 }
                 $unitPrice = $itemData['unit_price'];
                 $lineSubtotal = $itemData['line_subtotal'];

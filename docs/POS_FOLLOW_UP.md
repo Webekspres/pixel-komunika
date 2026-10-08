@@ -14,7 +14,7 @@ Daftar follow-up integrasi POS setelah flow website berbasis data contoh stabil.
   1. Ketiadaan endpoint stock read/sync live.
   2. Ketiadaan kontrak live untuk report sale, report return, dan acknowledgement/reconciliation.
   3. Kualitas identifier POS (duplikasi `item_id` dan pricelist pada data sandbox).
-  4. Belum adanya skema dan kesepakatan pemetaan tier harga `Grosir 2` serta tipe asing.
+  4. ~~Pemetaan tier harga `Grosir 2`~~: selesai 8 Okt (CR-022), dipetakan ke `GROSIR_2`. Tipe lain di luar dokumentasi (mis. `tes`) tetap ditolak.
   5. Keputusan final pemetaan dan perlakuan pajak (`ppn` dan `pph`) dari POS.
 
 ## Tujuan

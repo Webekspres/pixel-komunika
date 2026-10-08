@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Storefront;
 
-use App\Domains\Pricing\PriceCalculator;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +18,6 @@ class ProductShow extends Component
         // Produk nonaktif/tersembunyi tidak bisa dibuka pelanggan; admin tetap bisa pratinjau.
         abort_unless($product->isStorefrontVisible() || Auth::user()?->isAdmin(), 404);
 
-        $this->quantity = app(PriceCalculator::class)->minimumOrderQuantity();
-
         $this->product = $product->load(['category', 'brand', 'enrichment', 'prices', 'inventorySnapshot', 'media.library']);
     }
 
@@ -34,7 +31,7 @@ class ProductShow extends Component
 
     public function decrementQuantity()
     {
-        if ($this->quantity > app(PriceCalculator::class)->minimumOrderQuantity()) {
+        if ($this->quantity > 1) {
             $this->quantity--;
         }
     }

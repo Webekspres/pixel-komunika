@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 
 class Product extends Model
 {
@@ -104,24 +105,6 @@ class Product extends Model
         return $enrichment?->display_name ?: $this->name;
     }
 
-    public function listPriceAmount(): ?float
-    {
-        $prices = $this->relationLoaded('prices')
-            ? $this->prices
-            : $this->prices()->get();
-
-        $byType = $prices->keyBy('price_type');
-
-        $grosir = $byType->get(ProductPrice::WHOLESALE);
-        if ($grosir) {
-            return (float) $grosir->amount;
-        }
-
-        $partai = $byType->get(ProductPrice::BULK);
-
-        return $partai ? (float) $partai->amount : null;
-    }
-
     public function partaiPriceAmount(): ?float
     {
         $prices = $this->relationLoaded('prices')
@@ -133,14 +116,16 @@ class Product extends Model
         return $partai ? (float) $partai->amount : null;
     }
 
-    public function grosirMinimumQuantity(): ?int
+    /** Grosir 1/Grosir 2 berurutan dari minimum terkecil, untuk daftar tingkatan harga di halaman produk. */
+    public function grosirPrices(): Collection
     {
         $prices = $this->relationLoaded('prices')
             ? $this->prices
             : $this->prices()->get();
 
-        $grosir = $prices->firstWhere('price_type', ProductPrice::WHOLESALE);
-
-        return $grosir?->minimum_quantity;
+        return $prices
+            ->whereIn('price_type', [ProductPrice::WHOLESALE, ProductPrice::WHOLESALE_2])
+            ->sortBy('minimum_quantity')
+            ->values();
     }
 }

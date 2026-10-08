@@ -115,7 +115,7 @@ it('fails sync when duplicate price tier or negative price is present', function
         ->and(SyncError::query()->where('error_code', 'DUPLICATE_PRICE_TIER')->exists())->toBeTrue();
 });
 
-it('rejects foreign price types like Grosir 2 and tes as unsupported', function () {
+it('rejects unknown price types like tes but accepts Grosir 2 (CR-022)', function () {
     Http::fake([
         'https://pos-sandbox.test/master/category' => Http::response([
             'status' => 'success',
@@ -150,7 +150,8 @@ it('rejects foreign price types like Grosir 2 and tes as unsupported', function 
     $run = $service->syncMasters();
 
     expect($run->status)->toBe('FAILED')
-        ->and(SyncError::query()->where('error_code', 'UNSUPPORTED_PRICE_TYPE')->count())->toBe(2);
+        ->and(SyncError::query()->where('error_code', 'UNSUPPORTED_PRICE_TYPE')->pluck('error_message')->all())
+        ->toBe(['Unsupported price type [tes] for product [ITEM-FOREIGN].']);
 });
 
 it('fails sync when a product does not have any price tier', function () {
@@ -255,6 +256,7 @@ it('successfully syncs valid master data and preserves local enrichment and tax 
                         ['type' => 'Eceran', 'amount' => 10000, 'min_qty' => 1],
                         ['type' => 'Partai', 'amount' => 9000, 'min_qty' => 5],
                         ['type' => 'Grosir 1', 'amount' => 8000, 'min_qty' => 20],
+                        ['type' => 'Grosir 2', 'amount' => 7500, 'min_qty' => 40],
                     ],
                 ],
             ],
@@ -284,7 +286,8 @@ it('successfully syncs valid master data and preserves local enrichment and tax 
     $prices = $prod->prices()->pluck('amount', 'price_type')->toArray();
     expect((float) $prices[ProductPrice::RETAIL])->toBe(10000.0)
         ->and((float) $prices[ProductPrice::BULK])->toBe(9000.0)
-        ->and((float) $prices[ProductPrice::WHOLESALE])->toBe(8000.0);
+        ->and((float) $prices[ProductPrice::WHOLESALE])->toBe(8000.0)
+        ->and((float) $prices[ProductPrice::WHOLESALE_2])->toBe(7500.0);
 
     // Assert tax rule preserved
     $taxRule = CategoryTaxRule::query()->where('category_id', $cat->id)->first();

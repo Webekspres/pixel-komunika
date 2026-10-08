@@ -125,7 +125,7 @@ Dokumen ini dipakai untuk mencatat:
 - CI: `composer audit` + `npm audit` (NFR-SEC-010); patch `laravel/framework`, `league/commonmark`, `league/flysystem` untuk advisory terbuka.
 - `store.holidays` diisi libur nasional + cuti bersama sisa 2026 dan 2027 (SKB 3 Menteri).
 - Keputusan: format nomor invoice/akun reseller dan PPh 22 memakai aturan saat ini, diubah bila ada komentar UAT; tombol "Selesai" admin dipertahankan.
-- Skenario UAT ([`UAT_SCENARIOS.md`](UAT_SCENARIOS.md) + PDF) untuk 15 Okt; penguji klien + tim IT klien.
+- Skenario UAT ([`UAT_SCENARIOS.md`](UAT_SCENARIOS.md) + PDF) satu putaran dua hari setelah Fonnte + Biteship klien aktif, go-live setelah sign-off; penguji klien + tim IT klien.
 - Pembatalan oleh pelanggan dihapus (FR-ORD-006/007: hanya admin/sistem); retur pelanggan via tombol WhatsApp pada pesanan dikirim/selesai.
 - Test suite 171/171 lulus.
 

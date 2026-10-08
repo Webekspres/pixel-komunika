@@ -112,6 +112,7 @@ class SampleCatalogImporter
                         brand: ['pos_brand_id' => 'BRAND-PIXEL', 'name' => 'Pixel Gear', 'is_active' => true, 'source_updated_at' => now(), 'synced_at' => now()],
                         prices: [175000, 165000, 155000],
                         wholesaleMinimum: 12,
+                        wholesale2: [145000, 24],
                         stock: 48,
                         lowStockThreshold: 8,
                         weightGrams: 260,
@@ -263,6 +264,7 @@ class SampleCatalogImporter
         ?int $lengthCm = 10,
         ?int $widthCm = 8,
         ?int $heightCm = 4,
+        ?array $wholesale2 = null,
     ): array {
         $slug = Str::slug($name);
 
@@ -307,6 +309,13 @@ class SampleCatalogImporter
                     'pos_price_id' => $posProductId.'-GROSIR',
                     'synced_at' => now(),
                 ],
+                ...($wholesale2 ? [[
+                    'price_type' => ProductPrice::WHOLESALE_2,
+                    'amount' => $wholesale2[0],
+                    'minimum_quantity' => $wholesale2[1],
+                    'pos_price_id' => $posProductId.'-GROSIR2',
+                    'synced_at' => now(),
+                ]] : []),
             ],
             'inventory' => [
                 'quantity_available' => $stock,

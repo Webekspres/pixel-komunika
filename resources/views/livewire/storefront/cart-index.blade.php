@@ -72,7 +72,7 @@
                                 <p class="text-xs text-zinc-600">SKU: {{ $item['product']->sku }}</p>
                                 <h3 class="text-sm font-semibold leading-snug text-zinc-900 sm:text-base">{{ $item['product']->displayName() }}</h3>
                                 <p class="mt-0.5 text-xs font-semibold text-zinc-600">
-                                    Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / pcs · {{ $item['price_type'] }}
+                                    Rp {{ number_format($item['unit_price'], 0, ',', '.') }} / pcs · {{ \App\Models\ProductPrice::LABELS[$item['price_type']] ?? $item['price_type'] }}
                                 </p>
 
                                 <div class="mt-3 flex flex-wrap items-center justify-between gap-2">

@@ -152,7 +152,7 @@ class CartService
         $itemSummaries = collect();
 
         foreach ($items as $item) {
-            $priceModel = $this->priceCalculator->resolvePrice($item->product, $item->quantity, $hasPartaiEligible);
+            $priceModel = $this->priceCalculator->resolvePrice($item->product, $item->quantity);
             $unitPrice = $priceModel ? (float) $priceModel->amount : 0;
             $lineSubtotal = round($unitPrice * $item->quantity, 2);
 
@@ -171,7 +171,7 @@ class CartService
                 'product' => $item->product,
                 'quantity' => $item->quantity,
                 'unit_price' => $unitPrice,
-                'price_type' => $priceModel ? $priceModel->price_type : 'RETAIL',
+                'price_type' => $priceModel?->price_type,
                 'line_subtotal' => $lineSubtotal,
             ]);
         }

@@ -213,5 +213,31 @@ it('PROBE-13 product page shows admin-configured partai minimum (KAT-07)', funct
     $product = Product::where('sku', 'PB-10000')->firstOrFail();
 
     $this->actingAs($user)->get(route('products.show', $product))->assertOk()
-        ->assertSee('min. 6 unit')->assertDontSee('min. 5 unit');
+        ->assertSee('minimal 6 unit')->assertDontSee('minimal 5 unit');
+});
+
+// CR-022: tier Grosir 2 dari data contoh dipakai di keranjang dengan label yang terbaca.
+it('KAT-03 charges Grosir 2 once a SKU reaches its minimum and labels it in the cart', function () {
+    $user = checkoutCustomer();
+    $cartService = app(CartService::class);
+    $cart = $cartService->getOrCreateCart($user);
+    $cartService->addItem($cart, Product::where('sku', 'PB-10000')->value('id'), 24);
+
+    $line = $cartService->getCartSummary($cart)['items']->first();
+
+    expect($line['price_type'])->toBe(ProductPrice::WHOLESALE_2)
+        ->and($line['unit_price'])->toBe(145000.0);
+    $this->actingAs($user)->get(route('cart.index'))->assertSee('Rp 145.000 / pcs · Grosir 2');
+});
+
+// Filter harga memakai Partai, jadi produk tanpa harga grosir tetap ikut tersaring.
+it('KAT-01 price filter includes products that have no grosir price', function () {
+    $this->actingAs(checkoutCustomer());
+    $product = Product::where('sku', 'PB-10000')->firstOrFail();
+    $product->prices()->whereIn('price_type', [ProductPrice::WHOLESALE, ProductPrice::WHOLESALE_2])->delete();
+
+    Livewire::test(ProductIndex::class)
+        ->set('minPrice', '160000')
+        ->set('maxPrice', '170000')
+        ->assertViewHas('products', fn ($products) => $products->pluck('sku')->all() === ['PB-10000']);
 });

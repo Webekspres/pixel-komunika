@@ -13,6 +13,15 @@ class ProductPrice extends Model
 
     public const WHOLESALE = 'GROSIR';
 
+    public const WHOLESALE_2 = 'GROSIR_2';
+
+    public const LABELS = [
+        self::RETAIL => 'Eceran',
+        self::BULK => 'Partai',
+        self::WHOLESALE => 'Grosir 1',
+        self::WHOLESALE_2 => 'Grosir 2',
+    ];
+
     protected $fillable = [
         'product_id',
         'price_type',

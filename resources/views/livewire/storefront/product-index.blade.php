@@ -167,7 +167,7 @@
                                 :stock-label="$product->inventorySnapshot?->quantity_available > 0 ? 'Stok: '.$product->inventorySnapshot->quantity_available : 'Habis'"
                                 :stock-variant="$product->inventorySnapshot?->quantity_available > 0 ? 'available' : 'unavailable'"
                                 :show-price="auth()->user()?->canViewPrices()"
-                                :price="'Rp '.number_format($product->listPriceAmount() ?? 0, 0, ',', '.')"
+                                :price="'Rp '.number_format($product->partaiPriceAmount() ?? 0, 0, ',', '.')"
                             >
                                 <x-slot:actions>
                                     <div class="flex items-center gap-2">

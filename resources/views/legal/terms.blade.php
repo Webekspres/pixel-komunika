@@ -26,8 +26,8 @@
     <ul>
         <li>Harga per unit ditentukan oleh jumlah pembelian:
             <ol>
-                <li>harga partai berlaku untuk seluruh pesanan bila sedikitnya satu produk dibeli {{ $partaiMinimum }} unit atau lebih (jumlah produk berbeda tidak dijumlahkan), dan harga partai didahulukan daripada harga grosir;</li>
-                <li>harga grosir berlaku untuk produk yang jumlahnya mencapai minimum grosir produk tersebut;</li>
+                <li>harga partai adalah harga dasar setiap produk dalam pesanan;</li>
+                <li>bila jumlah suatu produk mencapai minimum Grosir 1 atau Grosir 2 produk tersebut, produk itu memakai harga grosir yang lebih murah. Minimum grosir tercantum di halaman produk.</li>
             </ol>
         </li>
         <li>Pesanan baru dapat dibuat bila sedikitnya satu produk dibeli {{ $partaiMinimum }} unit atau lebih. Produk lain dalam pesanan yang sama boleh dibeli kurang dari jumlah itu.</li>

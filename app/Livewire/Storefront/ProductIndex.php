@@ -126,14 +126,14 @@ class ProductIndex extends Component
 
         if ($canViewPrices && $this->minPrice !== null && is_numeric($this->minPrice)) {
             $query->whereHas('prices', function ($q) {
-                $q->where('price_type', ProductPrice::WHOLESALE)
+                $q->where('price_type', ProductPrice::BULK)
                     ->where('amount', '>=', (float) $this->minPrice);
             });
         }
 
         if ($canViewPrices && $this->maxPrice !== null && is_numeric($this->maxPrice)) {
             $query->whereHas('prices', function ($q) {
-                $q->where('price_type', ProductPrice::WHOLESALE)
+                $q->where('price_type', ProductPrice::BULK)
                     ->where('amount', '<=', (float) $this->maxPrice);
             });
         }
@@ -144,13 +144,13 @@ class ProductIndex extends Component
             'name_desc' => $query->orderBy('products.name', 'desc'),
             'price_low' => $query->join('product_prices', function ($join) {
                 $join->on('products.id', '=', 'product_prices.product_id')
-                    ->where('product_prices.price_type', '=', ProductPrice::WHOLESALE);
+                    ->where('product_prices.price_type', '=', ProductPrice::BULK);
             })
                 ->orderBy('product_prices.amount', 'asc')
                 ->select('products.*'),
             'price_high' => $query->join('product_prices', function ($join) {
                 $join->on('products.id', '=', 'product_prices.product_id')
-                    ->where('product_prices.price_type', '=', ProductPrice::WHOLESALE);
+                    ->where('product_prices.price_type', '=', ProductPrice::BULK);
             })
                 ->orderBy('product_prices.amount', 'desc')
                 ->select('products.*'),

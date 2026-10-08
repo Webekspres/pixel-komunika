@@ -96,7 +96,7 @@ it('shows wholesale prices on PDP to active verified customer', function () {
         ->get(route('products.show', $product))
         ->assertOk()
         ->assertSee($product->name)
-        ->assertSee(number_format($product->listPriceAmount() ?? 0, 0, ',', '.'));
+        ->assertSee(number_format($product->partaiPriceAmount() ?? 0, 0, ',', '.'));
 });
 
 it('renders clean related products links on PDP without escaped quotes', function () {

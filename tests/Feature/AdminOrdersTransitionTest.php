@@ -114,6 +114,20 @@ it('cancels a same-day unpaid order via the detail component', function () {
         ->and($order->cancellation_source)->toBe('ADMIN')
         ->and($order->cancelled_by_user_id)->toBe($admin->id)
         ->and($order->cancellation_reason)->toBe('Pelanggan meminta pembatalan');
+
+    $this->actingAs($admin)->get(route('admin.orders.show', $order))
+        ->assertSee('Dibatalkan oleh '.$admin->name)
+        ->assertSee('Alasan: Pelanggan meminta pembatalan');
+});
+
+it('shows system auto-cancellation on the admin order detail (CAN-03)', function () {
+    $admin = User::factory()->admin()->create();
+    $order = ordersFixtureOrder();
+    $this->travel(1)->days();
+    $this->artisan('orders:auto-cancel-unpaid')->assertSuccessful();
+
+    $this->actingAs($admin)->get(route('admin.orders.show', $order))
+        ->assertSee('Dibatalkan otomatis oleh Sistem');
 });
 
 it('rejects admin cancellation outside the same transaction day (FR-ORD-006)', function () {

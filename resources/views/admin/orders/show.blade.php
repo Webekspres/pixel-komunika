@@ -38,6 +38,19 @@
                     </div>
                 </div>
 
+                @if ($order->cancellation_source)
+                    <div class="mt-6 border-t border-zinc-200 pt-4 text-sm">
+                        <p class="font-semibold text-zinc-900">Pembatalan</p>
+                        <p class="mt-2 text-zinc-700">
+                            {{ $order->cancellation_source === 'SYSTEM' ? 'Dibatalkan otomatis oleh Sistem' : 'Dibatalkan oleh '.($order->cancelledBy?->name ?? 'Admin') }}
+                            · {{ $order->cancelled_at?->format('d M Y H:i') }}
+                        </p>
+                        @if ($order->cancellation_reason)
+                            <p class="mt-1 text-zinc-600">Alasan: {{ $order->cancellation_reason }}</p>
+                        @endif
+                    </div>
+                @endif
+
                 <div class="mt-6 border-t border-zinc-200 pt-4">
                     <p class="text-sm font-semibold text-zinc-900">Alamat pengiriman</p>
                     <p class="mt-2 text-sm text-zinc-700">{{ $order->recipient_name }} • {{ $order->recipient_phone }}</p>

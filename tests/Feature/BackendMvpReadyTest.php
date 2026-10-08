@@ -96,7 +96,8 @@ it('creates charge components shipment payment and notifications on checkout', f
     expect($order->shipment)->not->toBeNull()
         ->and($order->payment)->not->toBeNull()
         ->and($order->payment->status)->toBe('NOT_SUBMITTED')
-        ->and(PosIntegrationOperation::where('order_id', $order->id)->where('operation', 'WEB_SALE_REPORT')->exists())->toBeTrue()
+        // CR-023: laporan penjualan POS baru diantrikan saat pesanan diproses.
+        ->and(PosIntegrationOperation::where('order_id', $order->id)->exists())->toBeFalse()
         ->and(AppNotification::where('order_id', $order->id)->where('type', 'NEW_ORDER')->count())->toBeGreaterThan(0);
 });
 
@@ -200,21 +201,38 @@ it('holds auto-complete when shipment is TERKENDALA and completes otherwise', fu
     expect($order->fresh()->status)->toBe('completed');
 });
 
-it('dispatches sample pos sync and sale acks', function () {
+// CR-023: penjualan dilaporkan ke POS H+1 setelah pesanan diproses; pesanan yang batal sebelum diproses tidak dilaporkan.
+it('reports a sale to POS the day after the order is processed, never for orders cancelled before', function () {
+    Storage::fake('local');
     $run = app(SamplePosSyncService::class)->syncMasters();
     expect($run->status)->toBe('SUCCEEDED');
 
-    ['customer' => $customer, 'address' => $address] = mvpCustomer();
+    ['customer' => $customer, 'admin' => $admin, 'address' => $address] = mvpCustomer();
     $product = Product::first();
-    $cart = app(CartService::class)->getOrCreateCart($customer);
-    app(CartService::class)->addItem($cart, $product->id, 5);
-    $order = app(OrderService::class)->createOrderFromCart($customer, $cart, $address, [
-        'code' => 'jne', 'service' => 'REG', 'cost' => 10000,
-    ]);
+    $cartService = app(CartService::class);
+    $orderService = app(OrderService::class);
+    $paymentService = app(PaymentService::class);
+    $placeOrder = function () use ($cartService, $orderService, $customer, $address, $product) {
+        $cartService->addItem($cartService->getOrCreateCart($customer), $product->id, 5);
 
-    $count = app(SamplePosSyncService::class)->dispatchPendingSaleReports();
-    expect($count)->toBeGreaterThan(0)
-        ->and(PosIntegrationOperation::where('order_id', $order->id)->value('status'))->toBe('SUCCEEDED');
+        return $orderService->createOrderFromCart($customer, $cartService->getOrCreateCart($customer), $address, ['code' => 'jne', 'service' => 'REG', 'cost' => 10000]);
+    };
+
+    $cancelled = $placeOrder();
+    $orderService->cancelOrder($cancelled, 'Batal sebelum bayar', 'ADMIN', $admin);
+
+    $order = $placeOrder();
+    $proof = $paymentService->uploadPaymentProof($order, $customer, ['bank_name' => 'BCA', 'account_name' => 'Toko', 'amount' => $order->grand_total], UploadedFile::fake()->image('bukti.jpg'));
+    $paymentService->approvePayment($proof, $admin);
+
+    expect(PosIntegrationOperation::where('order_id', $cancelled->id)->exists())->toBeFalse()
+        ->and(PosIntegrationOperation::where('order_id', $order->id)->value('operation'))->toBe(PosIntegrationOperation::WEB_SALE_REPORT)
+        ->and(app(SamplePosSyncService::class)->dispatchPendingSaleReports())->toBe(0);
+
+    $this->travel(1)->days();
+
+    expect(app(SamplePosSyncService::class)->dispatchPendingSaleReports())->toBe(1)
+        ->and(PosIntegrationOperation::where('order_id', $order->id)->value('status'))->toBe(PosIntegrationOperation::SUCCEEDED);
 });
 
 it('sends pending whatsapp via stub and reports shipped omzet', function () {

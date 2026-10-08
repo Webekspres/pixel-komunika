@@ -260,9 +260,9 @@
                         </div>
                         <p class="mt-1 text-[11px] text-zinc-500">Label readable untuk admin awam, ID dari Biteship Maps API (contoh Regol 40252).</p>
                     </details>
-                </div>
 
-                <input type="hidden" name="origin_postal_code" id="origin_postal_code" :value="postalCode" value="{{ old('origin_postal_code', $store->origin_postal_code) }}">
+                    <input type="hidden" name="origin_postal_code" id="origin_postal_code" :value="postalCode" value="{{ old('origin_postal_code', $store->origin_postal_code) }}">
+                </div>
 
                 <div class="flex justify-end gap-2 border-t border-neutral-100 pt-4">
                     <button type="button" @click="editing = false" class="rounded-xl border border-neutral-200 px-4 py-2.5 text-xs font-bold text-zinc-600 transition hover:bg-neutral-50">Batal</button>

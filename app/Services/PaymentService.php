@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Domains\Audit\AuditLogger;
+use App\Domains\PosIntegration\PosOutboxService;
 use App\Models\BankAccount;
 use App\Models\Order;
 use App\Models\Payment;
@@ -17,6 +18,7 @@ class PaymentService
 {
     public function __construct(
         protected AuditLogger $audit,
+        protected PosOutboxService $posOutbox,
     ) {}
 
     public function uploadPaymentProof(Order $order, User $user, array $data, UploadedFile $file): PaymentProof
@@ -112,6 +114,8 @@ class PaymentService
             ]);
 
             $order->update(['status' => 'processing']);
+            // CR-023: laporan penjualan POS dikirim H+1 setelah pesanan diproses (lihat SamplePosSyncService).
+            $this->posOutbox->queueSaleReport($order);
 
             if ($order->invoice) {
                 $order->invoice->update(['status' => 'paid']);

@@ -2,7 +2,7 @@
     type="button"
     @click="$dispatch('open-cart-drawer')"
     class="relative inline-flex size-11 items-center justify-center rounded-xl text-zinc-700 transition hover:bg-zinc-100 hover:text-brand-black"
-    aria-label="Keranjang belanja, {{ $cartCount }} produk"
+    aria-label="Keranjang belanja, {{ $cartCount }} unit"
     wire:key="cart-badge-{{ $cartCount }}"
 >
     <x-icon name="shopping-cart" class="size-5" />

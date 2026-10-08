@@ -98,7 +98,17 @@ class OrderService
             $datePrefix = now()->format('Ymd');
             $randomSuffix = strtoupper(Str::random(5));
             $orderNumber = "PK-{$datePrefix}-{$randomSuffix}";
-            $invoiceNumber = "INV-{$datePrefix}-{$randomSuffix}";
+            // CR-023: nomor invoice web terpisah dari POS, WEB-[yymm]-[0001], urut ulang tiap bulan.
+            // ponytail: lockForUpdate menahan checkout bersamaan; deadlock sisa (awal bulan, belum ada baris) diulang
+            // lewat attempts transaksi, unique index sebagai pengaman akhir. Tambah tabel counter bila volume besar.
+            $invoicePrefix = 'WEB-'.now()->format('ym').'-';
+            $lastInvoiceNumber = Invoice::query()
+                ->where('invoice_number', 'like', $invoicePrefix.'%')
+                ->orderByRaw('LENGTH(invoice_number) DESC')
+                ->orderByDesc('invoice_number')
+                ->lockForUpdate()
+                ->value('invoice_number');
+            $invoiceNumber = $invoicePrefix.str_pad((string) ((int) substr((string) $lastInvoiceNumber, strlen($invoicePrefix)) + 1), 4, '0', STR_PAD_LEFT);
 
             $order = Order::create([
                 'order_number' => $orderNumber,
@@ -259,10 +269,9 @@ class OrderService
             $cart->items()->delete();
 
             $this->notifications->notifyNewOrder($order);
-            $this->posOutbox->queueSaleReport($order);
 
             return $order->fresh(['items', 'invoice', 'shipment', 'payment', 'chargeComponents']);
-        });
+        }, attempts: 3); // Deadlock nomor invoice (dua checkout bersamaan di awal bulan) diulang otomatis.
     }
 
     /**
@@ -312,17 +321,8 @@ class OrderService
                 ]);
             }
 
-            $salesReturn = SalesReturn::query()->updateOrCreate(
-                ['order_id' => $order->id],
-                [
-                    'return_number' => 'SR-'.$order->order_number,
-                    'reason' => $reason,
-                    'reporting_status' => SalesReturn::PENDING,
-                    'returned_at' => now(),
-                ],
-            );
-
-            $this->posOutbox->queueReturnReport($order, $salesReturn);
+            // CR-023: pesanan dilaporkan ke POS baru setelah diproses, sedangkan pembatalan hanya
+            // berlaku sebelum diproses; tidak ada penjualan POS yang perlu diretur.
             $this->audit->log('ORDER_CANCELLED', $order, $actor, null, [
                 'cancellation_source' => $source,
                 'reason' => $reason,

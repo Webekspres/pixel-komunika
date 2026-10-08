@@ -91,3 +91,28 @@ it('allows admin users to access admin orders management', function () {
         ->get('/admin/orders')
         ->assertOk();
 });
+
+// CR-023: nomor invoice web WEB-[yymm]-[0001], berurutan dan kembali ke 0001 tiap bulan.
+it('numbers web invoices sequentially per month', function () {
+    $this->travelTo(now()->setDate(2026, 10, 31)->setTime(10, 0));
+    $customer = User::factory()->activeCustomer()->create();
+    $address = $customer->addresses()->create([
+        'recipient_name' => 'Toko', 'recipient_phone' => '08123456789', 'address_line' => 'Jl. Merdeka 1',
+        'province_name' => 'Jawa Barat', 'city_name' => 'Bandung', 'district_name' => 'Coblong', 'postal_code' => '40135', 'is_default' => true,
+    ]);
+    $cartService = app(CartService::class);
+    $productId = Product::where('sku', 'PB-10000')->value('id');
+    $invoiceNumber = function () use ($cartService, $customer, $address, $productId) {
+        $cart = $cartService->getOrCreateCart($customer);
+        $cartService->addItem($cart, $productId, 5);
+
+        return app(OrderService::class)->createOrderFromCart($customer, $cart, $address, ['code' => 'jne', 'service' => 'REG', 'cost' => 10000])->invoice->invoice_number;
+    };
+
+    expect($invoiceNumber())->toBe('WEB-2610-0001')
+        ->and($invoiceNumber())->toBe('WEB-2610-0002');
+
+    $this->travelTo(now()->setDate(2026, 11, 1)->setTime(9, 0));
+
+    expect($invoiceNumber())->toBe('WEB-2611-0001');
+});

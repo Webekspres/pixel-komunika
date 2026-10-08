@@ -61,7 +61,7 @@ sebelum transaksi pertama di production.
 
 | No | Hal | Aturan sementara | Skenario terkait |
 |---|---|---|---|
-| K-1 | Format nomor pesanan & invoice | `PK-20261015-A7K2Q` dan `INV-20261015-A7K2Q` (tanggal + 5 karakter acak, tidak berurutan) | CHK-08 |
+| K-1 | Format nomor pesanan & invoice | Pesanan `PK-20261015-A7K2Q` (tanggal + 5 karakter acak). Invoice `WEB-2610-0001`: tahun-bulan + nomor urut 4 digit, kembali ke 0001 setiap bulan (disetujui klien 8 Okt) | CHK-08 |
 | K-2 | Format nomor akun reseller | `PKR-000123`, terbit otomatis saat pendaftaran disetujui | REG-05 |
 | K-3 | PPh 22 bila beberapa klasifikasi terkena sekaligus | Dasar = jumlah subtotal klasifikasi yang terkena; tarif yang dipakai = **tarif tertinggi**; dibulatkan ke rupiah terdekat | CHK-05 |
 | K-4 | Admin menyelesaikan pesanan secara manual | Diizinkan untuk pesanan berstatus *Dikirim* (dengan konfirmasi, tercatat di audit log) | FUL-03 |

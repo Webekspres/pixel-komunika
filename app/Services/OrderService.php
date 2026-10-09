@@ -131,7 +131,7 @@ class OrderService
                 'tax_pph22' => $taxPph22,
                 'tax_pph22_snapshot' => $taxPph22Snapshot,
                 'grand_total' => $grandTotal,
-                'expires_at' => now('Asia/Jakarta')->endOfDay()->addDay(),
+                'expires_at' => now('Asia/Jakarta')->endOfDay(),
             ]);
 
             foreach ($summary['items'] as $itemData) {

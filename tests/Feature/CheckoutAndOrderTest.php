@@ -52,6 +52,8 @@ it('creates an order and invoice from cart and updates inventory ledger', functi
 
     expect($order)->toBeInstanceOf(Order::class)
         ->and($order->status)->toBe('unpaid')
+        // BR-030: batas bayar = akhir hari pembuatan, sejalan dengan auto-cancel 00:05.
+        ->and($order->expires_at->toDateString())->toBe(now()->toDateString())
         ->and($order->items)->toHaveCount(1)
         ->and($order->invoice)->not->toBeNull()
         ->and($order->invoice->status)->toBe('unpaid')

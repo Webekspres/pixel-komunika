@@ -49,6 +49,7 @@ class ReportController extends Controller
             'district' => $district,
             'districts' => $districts,
             'omzet' => $summary['omzet'],
+            'shipping' => $summary['shipping'],
             'pph22' => $summary['pph22'],
             'orderCount' => $orderCount,
             'avgPerOrder' => $orderCount > 0 ? $summary['omzet'] / $orderCount : 0,

@@ -116,7 +116,9 @@ it('probe: dashboard total omzet equals report omzet', function () {
     $dashboard = app(AdminDashboardService::class)->build();
     $report = app(ReportingService::class)->salesSummary();
 
-    expect($dashboard['totalRevenue'])->toBe($report['omzet']);
+    expect($dashboard['totalRevenue'])->toBe($report['omzet'])
+        ->and($report['omzet'])->toBe(100000.0) // CR-024: omzet tanpa ongkir
+        ->and($report['shipping'])->toBe(15000.0);
 });
 
 // ADM-05: orders on the last day of last month are dropped from "vs bulan lalu".

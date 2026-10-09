@@ -70,7 +70,7 @@ it('renders customer order detail page with unified cards, stepper, and bank acc
         ->assertSee('1234567890')
         ->assertSee('Pixel Komunika')
         ->assertSee('Klik atau seret file bukti transfer ke sini')
-        ->assertSee('JPG, PNG, PDF maks 5MB')
+        ->assertSee('JPG, PNG, WEBP, PDF maks 5MB')
         ->call('copyToClipboard', '1234567890')
         ->assertDispatched('copy-to-clipboard', text: '1234567890');
 });

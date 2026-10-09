@@ -113,6 +113,23 @@ it('PROBE-06 PPh 22 is rounded to the nearest rupiah (K-3)', function () {
     expect($result['total'])->toBe(13514.0);
 });
 
+it('CR-024 PPh 22 only applies to products flagged pph by POS (CHK-04/05)', function () {
+    $product = Product::where('sku', 'PB-10000')->firstOrFail();
+    CategoryTaxRule::query()->updateOrCreate(
+        ['category_id' => $product->category_id],
+        ['threshold_amount' => 0, 'rate_percent' => 1.5, 'is_active' => true],
+    );
+    $user = checkoutCustomer();
+    $cart = app(CartService::class)->getOrCreateCart($user);
+    app(CartService::class)->addItem($cart, $product->id, 5);
+
+    expect(app(CartService::class)->getCartSummary($cart)['pph22'])->toBeGreaterThan(0);
+
+    $product->update(['pph22_applicable' => false]);
+
+    expect(app(CartService::class)->getCartSummary($cart->fresh())['pph22'])->toEqual(0);
+});
+
 it('PROBE-07 invoice HTML and PDF show reseller account number (CHK-09)', function () use ($jne) {
     $user = checkoutCustomer();
     $cart = app(CartService::class)->getOrCreateCart($user);

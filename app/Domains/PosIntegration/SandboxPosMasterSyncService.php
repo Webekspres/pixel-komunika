@@ -357,6 +357,7 @@ class SandboxPosMasterSyncService implements PosMasterSyncInterface
                     ?? Category::query()->where('pos_category_id', $posCatId)->value('id');
 
                 $existingProduct = Product::query()->where('pos_product_id', $posProductId)->first();
+                $pph22Applicable = (int) ($prod['pph'] ?? 0) === 1;
 
                 if ($existingProduct) {
                     $product = $existingProduct;
@@ -364,6 +365,7 @@ class SandboxPosMasterSyncService implements PosMasterSyncInterface
                         'name' => (string) $prod['item_name'],
                         'category_id' => $categoryId,
                         'brand_id' => $brandId,
+                        'pph22_applicable' => $pph22Applicable,
                         'synced_at' => now(),
                     ]);
                 } else {
@@ -374,6 +376,7 @@ class SandboxPosMasterSyncService implements PosMasterSyncInterface
                         'category_id' => $categoryId,
                         'brand_id' => $brandId,
                         'is_active' => true,
+                        'pph22_applicable' => $pph22Applicable,
                         'synced_at' => now(),
                     ]);
 

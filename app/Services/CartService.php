@@ -160,10 +160,13 @@ class CartService
             $itemWeight = ($item->product->weight_grams ?? 500) * $item->quantity;
             $totalWeightGrams += $itemWeight;
 
-            $processedLines->push([
-                'category_id' => $item->product->category_id,
-                'line_total' => $lineSubtotal,
-            ]);
+            // CR-024: hanya produk ber-flag PPh 22 dari POS yang masuk dasar klasifikasi.
+            if ($item->product->pph22_applicable) {
+                $processedLines->push([
+                    'category_id' => $item->product->category_id,
+                    'line_total' => $lineSubtotal,
+                ]);
+            }
 
             $itemSummaries->push([
                 'id' => $item->id,

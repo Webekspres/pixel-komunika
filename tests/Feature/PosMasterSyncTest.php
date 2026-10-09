@@ -272,6 +272,7 @@ it('successfully syncs valid master data and preserves local enrichment and tax 
 
     $prod->refresh();
     expect($prod->name)->toBe('Nama Baru POS')
+        ->and($prod->pph22_applicable)->toBeFalse() // CR-024: pph 0 dari POS
         ->and($prod->sku)->toBe('CUSTOM-SKU-001') // Preserved!
         ->and($prod->weight_grams)->toBe(750) // Preserved!
         ->and((float) $prod->length_cm)->toBe(20.0) // Preserved!

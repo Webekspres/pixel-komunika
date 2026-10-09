@@ -326,8 +326,8 @@ Working scheme dari klien:
 | Master Data | `GetPriceList` | POS -> Web | Sekali sehari | Sinkronisasi harga eceran, partai, dan grosir. |
 | Inventory | `GetAllStock` | POS -> Web | Sekali sehari | Membentuk snapshot stok awal hari. |
 | Inventory | `GetStockByProduct` | POS -> Web | Berkala/ketika diperlukan | Mencocokkan stok produk tertentu. |
-| Sales Reporting | Laporan penjualan - nama final TBD | Web -> POS | H+1 setelah pesanan diproses (CR-023) | Mencatat penjualan web dan mengurangi stok POS; invoice tetap diterbitkan website. |
-| Return Reporting | Laporan retur - nama final TBD | Web -> POS | Setiap retur website | Mencatat retur web dan menambah stok POS setelah laporan penjualan asal diterima atau direkonsiliasi. |
+| Sales Reporting | `POST /order/create_order` (CR-024) | Web -> POS | H+1 setelah pesanan diproses (CR-023) | Mencatat penjualan web dan mengurangi stok POS; invoice tetap diterbitkan website. |
+| Return Reporting | Tidak dipakai website (CR-024) | POS | Retur diproses admin di POS lewat `cancel_order` | Website tidak mengirim laporan retur; stok retur kembali lewat sinkronisasi stok. |
 | Reporting Status | Acknowledgement/lookup - nama final TBD | POS <-> Web | Rekonsiliasi/ketika diperlukan | Mencocokkan penerimaan laporan penjualan/retur berdasarkan external reference. |
 
 Label pelaporan di atas bersifat konseptual, bukan nama endpoint atau kontrak
@@ -414,6 +414,7 @@ menggantikan pengujian koneksi terhadap POS asli sebelum go-live.
 | Minimum global harga partai | Website; default 5 | Baseline |
 | Kategori/klasifikasi dan merek | POS | Baseline |
 | Konfigurasi klasifikasi, ambang, dan tarif PPh 22 | Website | Baseline |
+| Status produk kena PPh 22 (penanda `pph`) | POS | CR-024 |
 | Order, retur, lifecycle, dan invoice | Website | Baseline |
 | Identitas toko/perusahaan dan nomor akun reseller pada invoice | Website snapshot | Baseline |
 | Pencatatan penjualan/retur web dan stok POS | POS dari laporan website | Baseline downstream |

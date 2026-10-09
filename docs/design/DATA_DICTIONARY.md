@@ -138,6 +138,7 @@ baru dibuat hanya jika role operasional bertambah.
 | width_cm       | DECIMAL(10,2)   |   Ya  | —           | Lebar kemasan opsional.                          |
 | height_cm      | DECIMAL(10,2)   |   Ya  | —           | Tinggi kemasan opsional.                         |
 | is_active      | BOOLEAN         | Tidak | `true`, IDX | Aktif pada master.                               |
+| pph22_applicable | BOOLEAN       | Tidak | `true`      | Penanda POS `pph = 1`: produk kena PPh 22 (CR-024). |
 | synced_at      | DATETIME(6)     |   Ya  | —           | Sinkronisasi berhasil terakhir.                  |
 | created_at     | DATETIME(6)     | Tidak | —           | Waktu pembuatan.                                 |
 | updated_at     | DATETIME(6)     | Tidak | —           | Waktu perubahan.                                 |

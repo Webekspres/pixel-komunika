@@ -497,7 +497,7 @@
                                                     Klik atau seret file bukti transfer ke sini
                                                 </p>
                                                 <p class="mt-1 text-xs text-zinc-500">
-                                                    JPG, PNG, PDF maks 5MB
+                                                    JPG, PNG, WEBP, PDF maks 5MB
                                                 </p>
                                             </div>
 

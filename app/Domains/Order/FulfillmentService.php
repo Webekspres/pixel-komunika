@@ -21,7 +21,7 @@ class FulfillmentService
     public function transition(Order $order, string $status, ?User $actor = null, ?string $trackingNumber = null): Order
     {
         $allowed = [
-            // Pembatalan lewat OrderService::cancelOrder (restore stok + retur POS), bukan di sini.
+            // Pembatalan lewat OrderService::cancelOrder (restore stok), bukan di sini.
             'paid' => ['processing'],
             'processing' => ['packed'],
             'packed' => ['shipped'],

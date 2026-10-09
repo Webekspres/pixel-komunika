@@ -176,7 +176,7 @@
             <div class="space-y-5">
                 <div>
                     <flux:heading size="lg">Batalkan Pesanan {{ $order->order_number }}</flux:heading>
-                    <flux:subheading class="mt-2">Pembatalan mengembalikan stok produk, menonaktifkan invoice, dan mencatat laporan retur POS. Tindakan ini tidak dapat dibatalkan.</flux:subheading>
+                    <flux:subheading class="mt-2">Pembatalan mengembalikan stok produk dan menonaktifkan invoice. Tindakan ini tidak dapat dibatalkan.</flux:subheading>
                 </div>
 
                 <flux:textarea

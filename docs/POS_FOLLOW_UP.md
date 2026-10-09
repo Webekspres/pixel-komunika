@@ -10,12 +10,13 @@ Daftar follow-up integrasi POS setelah flow website berbasis data contoh stabil.
   3. `GET /master/pricelist`
   4. `POST /master/product_detail` (targeted on-demand lookup).
 - Adapter sandbox telah menerapkan validasi pra-tulis ketat (fail-fast) agar snapshot katalog terlindungi dari anomali data sandbox.
-- **Integrasi POS production BELUM selesai dan masih DIBLOKIR** oleh:
-  1. Ketiadaan endpoint stock read/sync live.
-  2. Ketiadaan kontrak live untuk report sale, report return, dan acknowledgement/reconciliation.
-  3. Kualitas identifier POS (duplikasi `item_id` dan pricelist pada data sandbox).
-  4. ~~Pemetaan tier harga `Grosir 2`~~: selesai 8 Okt (CR-022), dipetakan ke `GROSIR_2`. Tipe lain di luar dokumentasi (mis. `tes`) tetap ditolak.
-  5. Keputusan final pemetaan dan perlakuan pajak (`ppn` dan `pph`) dari POS.
+- **Integrasi POS production BELUM selesai.** Status per 9 Okt 2026 (POS API Documentation v1 revisi 9 Okt + jawaban Kak Rio, CR-024):
+  1. ~~Endpoint stok~~: tersedia `GET /inventory/stock` dan `POST /inventory/stock_by_id` (`item_id`, `item_name`, `onhand`). Masih kosong karena stok web belum dialokasikan; nantinya hanya berisi item teralokasi untuk web. Adapter stok belum dibuat (masih sample). Respons kosong tidak boleh mengosongkan katalog.
+  2. ~~Kontrak laporan penjualan~~: `POST /order/create_order` dengan `sales_id` = nomor invoice web, `customer` `Retail`, `pembayaran` `Transfer`, `biaya_lain` = ongkir; baris `dpp = line_amount × qty / 1,11`, `ppn = dpp × 11%`. Error bisnis datang dengan HTTP 200 (`Order already exist` = sudah tercatat). Lookup saat timeout lewat `view_orders_detail`. Adapter belum dibuat (masih simulator). **Terbuka:** nilai `pph` per baris dan konfirmasi akhir rumus DPP.
+  3. ~~Retur~~: tidak dipakai website. Retur diproses admin di POS (`cancel_order`); stok retur kembali lewat sinkronisasi stok.
+  4. ~~Kualitas identifier POS~~: produk tidak valid dilewati dan dicatat tanpa menggagalkan sync (32bda03).
+  5. ~~Pemetaan tier harga `Grosir 2`~~: selesai 8 Okt (CR-022), dipetakan ke `GROSIR_2`. Tipe lain di luar dokumentasi (mis. `tes`) tetap ditolak.
+  6. ~~Perlakuan pajak `pph`~~: `pph = 1` disimpan sebagai `products.pph22_applicable`; hanya produk ini yang masuk dasar PPh 22 (CR-024). Penanda `ppn` belum dipakai (website tidak menghitung PPN).
 
 ## Tujuan
 

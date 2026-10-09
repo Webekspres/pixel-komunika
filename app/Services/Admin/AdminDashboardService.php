@@ -49,7 +49,7 @@ class AdminDashboardService
             ->whereDate('reviewed_at', '>=', $weekStart)
             ->count();
 
-        // Omzet = definisi laporan (subtotal + ongkir, status shipped/completed) agar angka sama.
+        // Omzet = definisi laporan (subtotal barang tanpa ongkir, status shipped/completed) agar angka sama.
         $totalRevenue = $this->reporting->salesSummary()['omzet'];
         $revenueThisMonth = $this->reporting->salesSummary($now->copy()->startOfMonth(), $now)['omzet'];
         $lastMonth = $now->copy()->subMonthNoOverflow();

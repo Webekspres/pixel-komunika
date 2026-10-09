@@ -50,7 +50,7 @@
                 :value="'Rp '.number_format($omzet, 0, ',', '.')"
                 icon="trending-up"
                 variant="admin"
-                description="Subtotal + ongkir"
+                description="Subtotal barang, tanpa ongkir"
             />
             <x-ui.stat-card
                 label="PPh 22 Terutang"
@@ -126,13 +126,11 @@
                     @if ($transactions->isNotEmpty())
                         <tfoot>
                             <tr class="border-t border-neutral-100 bg-neutral-50/70">
-                                <td colspan="7" class="px-5 py-3.5 text-right text-xs font-bold text-zinc-500">Total periode (semua halaman)</td>
+                                <td colspan="5" class="px-5 py-3.5 text-right text-xs font-bold text-zinc-500">Total periode (semua halaman)</td>
+                                <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-800">Rp {{ number_format($omzet, 0, ',', '.') }}</td>
+                                <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-800">Rp {{ number_format($shipping, 0, ',', '.') }}</td>
                                 <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-800">Rp {{ number_format($pph22, 0, ',', '.') }}</td>
-                                {{-- Kolom ini = grand total (omzet + PPh 22), sama seperti baris di atasnya. --}}
-                                <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-900">
-                                    Rp {{ number_format($omzet + $pph22, 0, ',', '.') }}
-                                    <span class="block text-[11px] font-medium text-zinc-500">Omzet (subtotal + ongkir): Rp {{ number_format($omzet, 0, ',', '.') }}</span>
-                                </td>
+                                <td class="px-5 py-3.5 text-right text-xs font-bold text-zinc-900">Rp {{ number_format($omzet + $shipping + $pph22, 0, ',', '.') }}</td>
                             </tr>
                         </tfoot>
                     @endif

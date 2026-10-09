@@ -182,7 +182,7 @@ Tarif multi-klasifikasi serta pembulatan mengikuti [OPN-006](BRD.md#opn-006).
 |---|---|---|---|---|
 | FR-PRC-001 | Worker | Sistem menyinkronkan harga `ECERAN`, `PARTAI`, dan `GROSIR` untuk setiap produk dari POS. | Produk hanya siap dijual setelah ketiga jenis harga lolos validasi kontrak; harga eceran disimpan tetapi tidak ditampilkan pada storefront fase saat ini. | Baseline |
 | FR-PRC-002 | Sistem | Sistem memilih harga yang berlaku berdasarkan aturan jenis harga. | Admin dapat mengubah minimum global partai (awal lima). Jika satu SKU mencapai minimum, harga partai berlaku untuk semua item. Kuantitas antar-SKU tidak dijumlahkan. Partai adalah harga dasar; SKU yang mencapai minimum Grosir 1/Grosir 2 memakai harga grosir termurah yang tercapai (CR-022). Checkout ditolak di server, dan tombol checkout diganti pesan di keranjang, bila belum ada SKU yang mencapai minimum (CR-021). Harga eceran tidak pernah dipakai. | Baseline |
-| FR-PRC-003 | Admin | Admin dapat memilih klasifikasi produk serta mengatur ambang nilai belanja per klasifikasi melalui website. | Perubahan tervalidasi dan diaudit; nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22, sedangkan melewati ambang tidak menolak checkout. | Baseline |
+| FR-PRC-003 | Admin | Admin dapat memilih klasifikasi produk serta mengatur ambang nilai belanja per klasifikasi melalui website. | Nilai belanja klasifikasi hanya menghitung produk ber-penanda POS `pph = 1` (CR-024). Perubahan tervalidasi dan diaudit; nilai belanja di bawah atau sama dengan ambang tidak memicu PPh 22, sedangkan melewati ambang tidak menolak checkout. | Baseline |
 | FR-PRC-004 | Sistem | Sistem menghitung PPh 22 menggunakan tarif yang dikelola melalui website, termasuk `0%`, ketika aturan klasifikasi terpicu. | Seluruh subtotal klasifikasi yang melewati ambang digabung dan menghasilkan `pph22 = (dasar gabungan / 1,11) × tarif`. Konfigurasi dan hasil disimpan sebagai snapshot; tarif multi-klasifikasi dan pembulatan mengikuti [OPN-006](BRD.md#opn-006). | Baseline; formula resolved, rate/rounding partial |
 | FR-PRC-005 | Sistem | Sistem memvalidasi ulang harga saat checkout. | Perubahan harga setelah item masuk cart ditampilkan sebelum konfirmasi order. | Proposed |
 | FR-PRC-006 | Sistem | Harga disimpan sebagai snapshot per item transaksi. | Invoice historis tidak bergantung pada harga produk terkini. | Proposed |
@@ -218,8 +218,8 @@ kontrak dan koneksi aktual wajib diuji sebelum production.
 | FR-POS-014 | Sistem | Seeder mengikuti kontrak data internal yang juga digunakan adapter POS. | SKU/external ID stabil, field wajib tervalidasi, dan perubahan ke API tidak memerlukan perubahan domain transaksi. | Baseline |
 | FR-POS-015 | Sistem | Seeder aman dijalankan berulang kali. | Eksekusi ulang tidak membuat duplikasi; nilai source utama diperbarui dan pelengkap lokal untuk field yang tidak tersedia tetap dipertahankan. | Baseline |
 | FR-POS-016 | Sistem | Penggunaan data contoh dibatasi berdasarkan environment. | Data contoh tersedia untuk local/staging/UAT; setelah alur website berjalan, akses POS dikoordinasikan dengan Kak Rio; production selalu menolak eksekusi data contoh. | Baseline |
-| FR-POS-017 | Worker | Setiap order website yang sudah diproses (`PROCESSING`, pembayaran diverifikasi) menghasilkan laporan penjualan POS yang dikirim H+1 (CR-023). | Order yang belum diproses atau dibatalkan sebelum diproses tidak dilaporkan. Operasi memakai external reference unik, membawa snapshot transaksi yang diperlukan POS, dan menyimpan status acknowledgement tanpa menunda atau menggandakan order/invoice website. | Baseline; contract partially open |
-| FR-POS-018 | Worker | Setiap retur website menghasilkan laporan retur POS. | Laporan ditahan sampai laporan penjualan asal berhasil atau direkonsiliasi; retry tidak membuat retur ganda dan acknowledgement tersimpan. | Baseline; idempotency contract open |
+| FR-POS-017 | Worker | Setiap order website yang sudah diproses (`PROCESSING`, pembayaran diverifikasi) menghasilkan laporan penjualan POS yang dikirim H+1 (CR-023). | Order yang belum diproses atau dibatalkan sebelum diproses tidak dilaporkan. Operasi memakai `POST /order/create_order` dengan `sales_id` = nomor invoice website, `customer` `Retail`, `pembayaran` `Transfer`, dan `biaya_lain` = ongkir (CR-024), membawa snapshot transaksi yang diperlukan POS, dan menyimpan status acknowledgement tanpa menunda atau menggandakan order/invoice website. | Baseline; contract partially open |
+| FR-POS-018 | Worker | ~~Setiap retur website menghasilkan laporan retur POS.~~ Retur diproses admin langsung di POS (`cancel_order`); website tidak mengirim laporan retur (CR-024). | Status pesanan web tidak berubah saat retur; stok retur kembali lewat sinkronisasi stok POS. | Superseded by CR-024 |
 | FR-POS-019 | Worker | Sistem merekonsiliasi status laporan penjualan dan retur terhadap POS. | Selisih status/reference dicatat dan tidak menimpa transaksi atau invoice website tanpa audit; kontrak lookup/acknowledgement mengikuti [OPN-005](BRD.md#opn-005). | Baseline; contract partially open |
 | FR-POS-020 | Sistem | Timeout atau respons ambigu pada operasi pelaporan tidak di-retry secara buta. | Sistem mencari external reference/status terlebih dahulu atau menandai `RECONCILIATION_REQUIRED`; kebijakan final mengikuti kontrak idempotency POS. | Baseline; contract open |
 
@@ -314,7 +314,7 @@ mengikuti [OPN-020](BRD.md#opn-020).
 
 | ID | Aktor | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| FR-RPT-001 | Admin | Admin dapat melihat jumlah transaksi, omzet, dan PPh 22. | Nilai PPh 22 ditampilkan terpisah; omzet memasukkan order mulai saat `SHIPPED`. | Baseline |
+| FR-RPT-001 | Admin | Admin dapat melihat jumlah transaksi, omzet, dan PPh 22. | Nilai PPh 22 dan ongkir ditampilkan terpisah; omzet = subtotal barang dan memasukkan order mulai saat `SHIPPED` (CR-024). | Baseline |
 | FR-RPT-002 | Admin | Laporan dapat difilter berdasarkan periode. | Tanggal menggunakan zona waktu Asia/Jakarta. | Baseline |
 | FR-RPT-003 | Admin | Laporan dapat difilter berdasarkan area/kecamatan. | Hasil sesuai snapshot alamat transaksi. | Baseline |
 | FR-RPT-004 | Admin | Laporan dapat difilter berdasarkan status dan metode pengiriman. | Filter dapat dikombinasikan. | Proposed |
@@ -357,7 +357,7 @@ WhatsApp tetap dibatasi oleh [OPN-023](BRD.md#opn-023).
 | Laporan penjualan POS timeout/ambigu | Order dan invoice website tetap sah; sistem mencari external reference atau menandai rekonsiliasi sebelum retry. |
 | Laporan retur POS timeout/ambigu | Retur dan stok efektif website tetap sah; status laporan direkonsiliasi sebelum retry agar POS tidak menerima retur dua kali. |
 | Payload POS tidak valid | Record terkait ditolak, error dicatat, proses lain dapat dilanjutkan sesuai kebijakan. |
-| Payload POS memuat konfigurasi PPh 22 | Field tersebut tidak menimpa konfigurasi website; perbedaan dicatat sebagai contract mismatch untuk ditinjau. |
+| Payload POS memuat konfigurasi PPh 22 | Penanda produk `pph` disimpan sebagai status kena PPh 22 (CR-024); ambang dan tarif tetap dari konfigurasi website dan tidak ditimpa. |
 | Seeder dijalankan ulang | Data inti di-upsert secara idempotent dan enrichment lokal dipertahankan. |
 | Biteship gagal | Checkout tidak memakai ongkir nol; pelanggan mendapat pesan yang dapat ditindaklanjuti. |
 | Stok berubah saat checkout | Checkout dihentikan dan keranjang diperbarui. |

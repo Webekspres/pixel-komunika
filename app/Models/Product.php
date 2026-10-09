@@ -27,6 +27,7 @@ class Product extends Model
         'width_cm',
         'height_cm',
         'is_active',
+        'pph22_applicable',
         'synced_at',
     ];
 
@@ -34,6 +35,7 @@ class Product extends Model
     {
         return [
             'is_active' => 'boolean',
+            'pph22_applicable' => 'boolean',
             'synced_at' => 'datetime',
         ];
     }

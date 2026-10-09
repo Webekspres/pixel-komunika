@@ -13,24 +13,26 @@ class ReportingService
     /**
      * Omzet counted at SHIPPED (status=shipped), not double-counted at completed.
      *
-     * @return array{omzet: float, pph22: float, order_count: int, by_district: Collection}
+     * @return array{omzet: float, shipping: float, pph22: float, order_count: int, by_district: Collection}
      */
     public function salesSummary(?CarbonInterface $from = null, ?CarbonInterface $to = null, ?string $district = null): array
     {
         $query = $this->shippedOrders($from, $to, $district);
 
-        // Use subtotal+shipping as omzet base from shipped moment; completed shares same snapshot.
-        $omzet = (float) (clone $query)->sum(DB::raw('subtotal + shipping_cost'));
+        // Omzet = subtotal barang; ongkir & PPh 22 terpisah (POS: biaya_lain di luar penjualan, CR-024).
+        $omzet = (float) (clone $query)->sum('subtotal');
+        $shipping = (float) (clone $query)->sum('shipping_cost');
         $pph22 = (float) (clone $query)->sum('tax_pph22');
         $count = (clone $query)->count();
 
         $byDistrict = (clone $query)
-            ->select('shipping_district', DB::raw('COUNT(*) as order_count'), DB::raw('SUM(subtotal + shipping_cost) as omzet'))
+            ->select('shipping_district', DB::raw('COUNT(*) as order_count'), DB::raw('SUM(subtotal) as omzet'))
             ->groupBy('shipping_district')
             ->get();
 
         return [
             'omzet' => $omzet,
+            'shipping' => $shipping,
             'pph22' => $pph22,
             'order_count' => $count,
             'by_district' => $byDistrict,
